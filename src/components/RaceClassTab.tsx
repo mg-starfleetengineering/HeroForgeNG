@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CharacterState, RaceData, ClassData, LevelProgression } from '../types/character';
-import { getSourceBadgeInfo, isSourceAllowed } from '../utils/sourceFilter';
+import { getSourceBadgeInfo, isSourceAllowed, sortDropdownItems } from '../utils/sourceFilter';
+import { SearchableSelect, SearchableOption } from './SearchableSelect';
 
 interface RaceClassTabProps {
   character: CharacterState;
@@ -10,6 +11,45 @@ interface RaceClassTabProps {
 }
 
 export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData, classesData, onChange }) => {
+  const sortedRaces = useMemo(
+    () => sortDropdownItems(racesData, character.allowedSources),
+    [racesData, character.allowedSources]
+  );
+
+  const sortedClasses = useMemo(
+    () => sortDropdownItems(classesData, character.allowedSources),
+    [classesData, character.allowedSources]
+  );
+
+  const raceOptions: SearchableOption[] = useMemo(() => {
+    return sortedRaces.map(r => {
+      const badge = getSourceBadgeInfo(r.source, character.allowedSources);
+      return {
+        value: r.name,
+        label: r.name,
+        sublabel: `(${r.type || 'Humanoid'})`,
+        badge: badge.sourceCode,
+        isAllowed: badge.isAllowed
+      };
+    });
+  }, [sortedRaces, character.allowedSources]);
+
+  const classOptions: SearchableOption[] = useMemo(() => {
+    return [
+      { value: '', label: '-- None --', isAllowed: true },
+      ...sortedClasses.map(c => {
+        const badge = getSourceBadgeInfo(c.source, character.allowedSources);
+        return {
+          value: c.name,
+          label: c.name,
+          sublabel: `(d${c.hitDie})`,
+          badge: badge.sourceCode,
+          isAllowed: badge.isAllowed
+        };
+      })
+    ];
+  }, [sortedClasses, character.allowedSources]);
+
   const raceObj = racesData.find(r => r.name === character.selectedRace) || racesData[0];
   const selectedRaceBadge = getSourceBadgeInfo(raceObj?.source, character.allowedSources);
 
@@ -34,20 +74,12 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
 
         <div>
           <label className="label-text">Base Race</label>
-          <select
+          <SearchableSelect
             value={character.selectedRace}
-            onChange={e => onChange({ selectedRace: e.target.value })}
-            className="input-field"
-          >
-            {racesData.map((r, idx) => {
-              const badge = getSourceBadgeInfo(r.source, character.allowedSources);
-              return (
-                <option key={r.id || `${r.name}_${idx}`} value={r.name}>
-                  {!badge.isAllowed ? `⚠️ ${r.name} (${r.type || 'Humanoid'}) [${badge.sourceCode} - Restricted]` : `${r.name} (${r.type || 'Humanoid'}) [${badge.sourceCode}]`}
-                </option>
-              );
-            })}
-          </select>
+            options={raceOptions}
+            onChange={val => onChange({ selectedRace: val })}
+            placeholder="Search base race..."
+          />
         </div>
 
         {raceObj && (
@@ -124,39 +156,21 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
                   <tr key={l} className="hover:bg-slate-800/40 transition-colors">
                     <td className="py-2 px-2 text-center text-amber-400 font-bold">{l}</td>
                     <td className="py-2 px-2">
-                      <select
+                      <SearchableSelect
                         value={lvlData.primaryClass || ''}
-                        onChange={e => handleLevelChange(l, 'primaryClass', e.target.value)}
-                        className="input-field text-xs py-1"
-                      >
-                        <option value="">-- None --</option>
-                        {classesData.map((c, idx) => {
-                          const badge = getSourceBadgeInfo(c.source, character.allowedSources);
-                          return (
-                            <option key={c.id || `${c.name}_${idx}`} value={c.name}>
-                              {!badge.isAllowed ? `⚠️ ${c.name} (d${c.hitDie}) [${badge.sourceCode}]` : `${c.name} (d${c.hitDie}) [${badge.sourceCode}]`}
-                            </option>
-                          );
-                        })}
-                      </select>
+                        options={classOptions}
+                        onChange={val => handleLevelChange(l, 'primaryClass', val)}
+                        placeholder="-- None --"
+                      />
                     </td>
                     {character.isGestalt && (
                       <td className="py-2 px-2">
-                        <select
+                        <SearchableSelect
                           value={lvlData.secondaryClass || ''}
-                          onChange={e => handleLevelChange(l, 'secondaryClass', e.target.value)}
-                          className="input-field text-xs py-1"
-                        >
-                          <option value="">-- None --</option>
-                          {classesData.map(c => {
-                            const badge = getSourceBadgeInfo(c.source, character.allowedSources);
-                            return (
-                              <option key={c.name} value={c.name}>
-                                {!badge.isAllowed ? `⚠️ ${c.name} (d${c.hitDie}) [${badge.sourceCode}]` : `${c.name} (d${c.hitDie}) [${badge.sourceCode}]`}
-                              </option>
-                            );
-                          })}
-                        </select>
+                          options={classOptions}
+                          onChange={val => handleLevelChange(l, 'secondaryClass', val)}
+                          placeholder="-- None --"
+                        />
                       </td>
                     )}
                     <td className="py-2 px-2 text-center text-slate-300">d{hd}</td>
@@ -178,3 +192,4 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
     </div>
   );
 };
+

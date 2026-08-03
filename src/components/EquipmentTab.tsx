@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { CharacterState, WeaponData, RaceData, ClassData, Equipment, CustomArmorData, WondrousItem, InventoryItem, Funds } from '../types/character';
-import { getSourceBadgeInfo } from '../utils/sourceFilter';
+import { getSourceBadgeInfo, sortDropdownItems } from '../utils/sourceFilter';
+import { SearchableSelect, SearchableOption } from './SearchableSelect';
 import { calculateTotalScore, getAbilityMod, parseRaceMods } from '../engine/stats';
 import { calculateBAB } from '../engine/classes';
 import {
   resolveWeapon, resolveArmor, resolveShield, calculateFeatCombatBonuses,
   calculateCarryingCapacity, calculateCoinWeight, calculateTotalNetWorthGP,
-  calculateTotalCarriedWeight, getEncumbranceStatus
+  calculateTotalCarriedWeight, getEncumbranceStatus, ARMOR_WEIGHT_MAP, SHIELD_WEIGHT_MAP
 } from '../engine/equipment';
 
 interface EquipmentTabProps {
@@ -42,7 +43,7 @@ const COMMON_ITEM_PRESETS = [
   { name: "Sunrod", weight: 1, location: 'Backpack', value: '2 gp', notes: 'Provides light 30 ft radius' },
   { name: "Tanglefoot Bag", weight: 4, location: 'Backpack', value: '50 gp' },
   { name: "Spyglass", weight: 1, location: 'Belt Pouch', value: '1,000 gp' }
-];
+].sort((a, b) => a.name.localeCompare(b.name));
 
 export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   character,
@@ -84,6 +85,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const [invValue, setInvValue] = useState('');
   const [invNotes, setInvNotes] = useState('');
   const [activeLocationFilter, setActiveLocationFilter] = useState<string>('All');
+  const [includeEquippedInTable, setIncludeEquippedInTable] = useState<boolean>(true);
 
   const eq: Equipment = character.equipment || {
     armor: 'chainshirt',
@@ -135,8 +137,48 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const customWeapons = character.customWeapons || [];
   const customArmors = character.customArmors || [];
 
-  // Combined weapons list for dropdowns
-  const availableWeapons = [...customWeapons, ...weaponsData];
+  const armorObj = resolveArmor(eq.armor, customArmors);
+  const shieldObj = resolveShield(eq.shield, customArmors);
+  const armorAc = armorObj.acBonus + (eq.armorEnhancement || 0);
+  const shieldAc = shieldObj.acBonus + (eq.shieldEnhancement || 0);
+
+  // Combined weapons list for dropdowns (allowed sources grouped at top, sorted A-Z)
+  const availableWeapons = useMemo(
+    () => sortDropdownItems([...customWeapons, ...weaponsData], character.allowedSources),
+    [customWeapons, weaponsData, character.allowedSources]
+  );
+
+  const weaponOptions: SearchableOption[] = useMemo(() => {
+    const options: SearchableOption[] = [
+      { value: 'none', label: '-- None --', isAllowed: true }
+    ];
+
+    availableWeapons.forEach(w => {
+      const badge = getSourceBadgeInfo(w.source, character.allowedSources);
+      options.push({
+        value: w.name,
+        label: w.name,
+        sublabel: `(${w.damageM}, ${w.type})`,
+        badge: badge.sourceCode,
+        isAllowed: badge.isAllowed
+      });
+    });
+
+    options.push({ value: '__CUSTOM__', label: '+ Custom / Typed Weapon Name...', isAllowed: true });
+    return options;
+  }, [availableWeapons, character.allowedSources]);
+
+  const presetOptions: SearchableOption[] = useMemo(() => {
+    return [
+      { value: '', label: '+ Quick Add Gear Preset...', isAllowed: true },
+      ...COMMON_ITEM_PRESETS.map(p => ({
+        value: p.name,
+        label: p.name,
+        sublabel: `(${p.weight} lb, ${p.value})`,
+        isAllowed: true
+      }))
+    ];
+  }, []);
 
   // Resolve Weapons
   const primaryWpnObj = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
@@ -305,10 +347,228 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     handleEqChange('wondrousItems', currentItems.filter(i => i.id !== id));
   };
 
-  // Filtered inventory items
-  const filteredInventory = activeLocationFilter === 'All'
-    ? inventory
-    : inventory.filter(item => (item.location || 'Carried').toLowerCase() === activeLocationFilter.toLowerCase());
+  const parseWeight = (val: any): number => {
+    if (val === null || val === undefined) return 0;
+    const num = typeof val === 'number' ? val : parseFloat(String(val));
+    return isNaN(num) ? 0 : num;
+  };
+
+  // Build complete itemized list of all gear/items contributing to character weight
+  const activeCarriedItemsBreakdown: Array<{
+    id: string;
+    name: string;
+    icon: string;
+    location: string;
+    quantity: number;
+    unitWeight: number;
+    totalWeight: number;
+    notes?: string;
+    value?: string;
+    isEquippedGear?: boolean;
+    isCurrency?: boolean;
+    isStashed?: boolean;
+    isHaversack?: boolean;
+  }> = [];
+
+  // 1. Equipped Armor
+  if (eq.armor && eq.armor !== 'none') {
+    const armorKey = eq.armor.toLowerCase().trim();
+    let armorW = 0;
+    if (ARMOR_WEIGHT_MAP[armorKey] !== undefined) {
+      armorW = ARMOR_WEIGHT_MAP[armorKey];
+    } else {
+      const customArmor = (character.customArmors || []).find(a => a.name.toLowerCase() === armorKey || a.id.toLowerCase() === armorKey);
+      armorW = parseWeight(customArmor?.weight || 20);
+    }
+    activeCarriedItemsBreakdown.push({
+      id: `eq_armor_${eq.armor}`,
+      name: armorObj.name + (eq.armorEnhancement ? ` +${eq.armorEnhancement}` : ''),
+      icon: '🛡️',
+      location: 'Equipped (Armor)',
+      quantity: 1,
+      unitWeight: armorW,
+      totalWeight: armorW,
+      notes: `AC +${armorAc}, Check ${armorObj.checkPenalty}`,
+      isEquippedGear: true
+    });
+  }
+
+  // 2. Equipped Shield
+  if (eq.shield && eq.shield !== 'none') {
+    const shieldKey = eq.shield.toLowerCase().trim();
+    let shieldW = 0;
+    if (SHIELD_WEIGHT_MAP[shieldKey] !== undefined) {
+      shieldW = SHIELD_WEIGHT_MAP[shieldKey];
+    } else {
+      const customShield = (character.customArmors || []).find(a => a.name.toLowerCase() === shieldKey || a.id.toLowerCase() === shieldKey);
+      shieldW = parseWeight(customShield?.weight || 10);
+    }
+    activeCarriedItemsBreakdown.push({
+      id: `eq_shield_${eq.shield}`,
+      name: shieldObj.name + (eq.shieldEnhancement ? ` +${eq.shieldEnhancement}` : ''),
+      icon: '🛡️',
+      location: 'Equipped (Shield)',
+      quantity: 1,
+      unitWeight: shieldW,
+      totalWeight: shieldW,
+      notes: `AC +${shieldAc}`,
+      isEquippedGear: true
+    });
+  }
+
+  // 3. Primary Weapon
+  if (eq.primaryWeapon && eq.primaryWeapon !== 'none') {
+    const wpnW = parseWeight(primaryWpnObj.weight);
+    activeCarriedItemsBreakdown.push({
+      id: `eq_primary_wpn`,
+      name: primaryWpnObj.name + (eq.primaryWeaponEnhancement ? ` +${eq.primaryWeaponEnhancement}` : ''),
+      icon: '⚔️',
+      location: 'Equipped (Primary Weapon)',
+      quantity: 1,
+      unitWeight: wpnW,
+      totalWeight: wpnW,
+      notes: `${primaryWpnObj.damageM}, Crit ${primaryWpnObj.threat < 20 ? `${primaryWpnObj.threat}-20` : '20'}/x${primaryWpnObj.critMultiplier || 2}`,
+      isEquippedGear: true
+    });
+  }
+
+  // 4. Secondary Weapon
+  if (hasSecondary && secondaryWpnObj) {
+    const wpnW = parseWeight(secondaryWpnObj.weight);
+    activeCarriedItemsBreakdown.push({
+      id: `eq_sec_wpn`,
+      name: secondaryWpnObj.name + (eq.secondaryWeaponEnhancement ? ` +${eq.secondaryWeaponEnhancement}` : ''),
+      icon: '⚔️',
+      location: 'Equipped (Off-Hand)',
+      quantity: 1,
+      unitWeight: wpnW,
+      totalWeight: wpnW,
+      notes: `${secondaryWpnObj.damageM}`,
+      isEquippedGear: true
+    });
+  }
+
+  // 5. Ranged Weapon
+  if (hasRanged && rangedWpnObj) {
+    const wpnW = parseWeight(rangedWpnObj.weight);
+    activeCarriedItemsBreakdown.push({
+      id: `eq_rng_wpn`,
+      name: rangedWpnObj.name + (eq.rangedWeaponEnhancement ? ` +${eq.rangedWeaponEnhancement}` : ''),
+      icon: '🏹',
+      location: 'Equipped (Ranged)',
+      quantity: 1,
+      unitWeight: wpnW,
+      totalWeight: wpnW,
+      notes: `${rangedWpnObj.damageM}`,
+      isEquippedGear: true
+    });
+  }
+
+  // 6. Wondrous Items
+  (eq.wondrousItems || []).forEach(item => {
+    const w = parseWeight(item.weight);
+    activeCarriedItemsBreakdown.push({
+      id: `eq_wondrous_${item.id}`,
+      name: item.name,
+      icon: '💎',
+      location: `Equipped (${item.slot})`,
+      quantity: 1,
+      unitWeight: w,
+      totalWeight: w,
+      notes: item.effect,
+      isEquippedGear: true
+    });
+  });
+
+  // 7. Coin Purse / Currency Weight
+  const totalCoinsNum = (funds.cp || 0) + (funds.sp || 0) + (funds.gp || 0) + (funds.pp || 0);
+  if (totalCoinsNum > 0 && coinWeight > 0) {
+    activeCarriedItemsBreakdown.push({
+      id: `eq_coin_purse`,
+      name: `Coin Purse (${totalCoinsNum} coins)`,
+      icon: '🪙',
+      location: 'Belt Pouch (Coins)',
+      quantity: 1,
+      unitWeight: coinWeight,
+      totalWeight: coinWeight,
+      notes: `50 coins/lb (${funds.gp || 0} GP, ${funds.sp || 0} SP, ${funds.cp || 0} CP, ${funds.pp || 0} PP)`,
+      value: `${netWorthGP.toLocaleString()} GP`,
+      isCurrency: true
+    });
+  }
+
+  // 8. General Inventory Items
+  inventory.forEach(item => {
+    const loc = (item.location || 'Carried').toLowerCase();
+    const isStashed = loc === 'stash' || loc === 'mount';
+    const isHaversack = loc === 'haversack';
+    const unitW = parseWeight(item.weight);
+    const totW = isStashed ? 0 : (isHaversack ? 0 : (item.quantity * unitW));
+
+    activeCarriedItemsBreakdown.push({
+      id: item.id,
+      name: item.name,
+      icon: '🎒',
+      location: item.location || 'Carried',
+      quantity: item.quantity,
+      unitWeight: unitW,
+      totalWeight: totW,
+      notes: item.notes,
+      value: item.value,
+      isStashed,
+      isHaversack
+    });
+  });
+
+  interface TableCarriedItem {
+    id: string;
+    name: string;
+    icon: string;
+    location: string;
+    quantity: number;
+    unitWeight: number;
+    totalWeight: number;
+    notes?: string;
+    value?: string;
+    isEquippedGear?: boolean;
+    isCurrency?: boolean;
+    isStashed?: boolean;
+    isHaversack?: boolean;
+  }
+
+  // Select items to display in the main inventory table
+  const tableSourceItems: TableCarriedItem[] = includeEquippedInTable ? activeCarriedItemsBreakdown : inventory.map(item => {
+    const loc = (item.location || 'Carried').toLowerCase();
+    const isStashed = loc === 'stash' || loc === 'mount';
+    const isHaversack = loc === 'haversack';
+    const unitW = parseWeight(item.weight);
+    return {
+      id: item.id,
+      name: item.name,
+      icon: '🎒',
+      location: item.location || 'Carried',
+      quantity: item.quantity,
+      unitWeight: unitW,
+      totalWeight: isStashed ? 0 : (isHaversack ? 0 : (item.quantity * unitW)),
+      notes: item.notes,
+      value: item.value,
+      isStashed,
+      isHaversack,
+      isEquippedGear: false,
+      isCurrency: false
+    };
+  });
+
+  const filteredInventoryTable = activeLocationFilter === 'All'
+    ? tableSourceItems
+    : tableSourceItems.filter(item => {
+        const locLower = item.location.toLowerCase();
+        const filterLower = activeLocationFilter.toLowerCase();
+        if (locLower.includes(filterLower)) return true;
+        if (filterLower === 'carried' && (locLower.includes('equipped') || locLower.includes('carried'))) return true;
+        if (filterLower === 'belt pouch' && locLower.includes('belt pouch')) return true;
+        return false;
+      });
 
   // Encumbrance level color class
   const getEncumbranceBadgeClass = () => {
@@ -517,29 +777,18 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             </div>
             <div className="grid grid-cols-3 gap-2">
               <div className="col-span-2 space-y-1.5">
-                <select
-                  value={availableWeapons.some(w => w.name === eq.primaryWeapon) ? eq.primaryWeapon : '__CUSTOM__'}
-                  onChange={e => {
-                    if (e.target.value !== '__CUSTOM__') {
-                      handleEqChange('primaryWeapon', e.target.value);
+                <SearchableSelect
+                  value={availableWeapons.some(w => w.name === eq.primaryWeapon) ? eq.primaryWeapon : (eq.primaryWeapon && eq.primaryWeapon !== 'none' ? '__CUSTOM__' : 'none')}
+                  options={weaponOptions}
+                  onChange={val => {
+                    if (val !== '__CUSTOM__') {
+                      handleEqChange('primaryWeapon', val);
+                    } else {
+                      handleEqChange('primaryWeapon', '__CUSTOM__');
                     }
                   }}
-                  className="input-field text-xs font-semibold text-amber-300"
-                >
-                  <option value="none">-- None --</option>
-                  {!availableWeapons.some(w => w.name === eq.primaryWeapon) && eq.primaryWeapon && eq.primaryWeapon !== 'none' && (
-                    <option value="__CUSTOM__">Custom: {eq.primaryWeapon}</option>
-                  )}
-                  {availableWeapons.map((w, idx) => {
-                    const badge = getSourceBadgeInfo(w.source, character.allowedSources);
-                    return (
-                      <option key={w.id || `${w.name}_${idx}`} value={w.name}>
-                        {!badge.isAllowed ? `⚠️ ${w.name} (${w.damageM}, ${w.type}) [${badge.sourceCode} - Restricted]` : `${w.name} (${w.damageM}, ${w.type}) [${badge.sourceCode}]`}
-                      </option>
-                    );
-                  })}
-                  <option value="__CUSTOM__">+ Custom / Typed Weapon Name...</option>
-                </select>
+                  placeholder="Select primary weapon..."
+                />
 
                 {/* Freeform input if custom or user wants to edit name */}
                 {(!availableWeapons.some(w => w.name === eq.primaryWeapon) || eq.primaryWeapon === '__CUSTOM__') && (
@@ -603,29 +852,18 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             <label className="label-text">Secondary / Off-Hand Weapon</label>
             <div className="grid grid-cols-3 gap-2">
               <div className="col-span-2 space-y-1.5">
-                <select
+                <SearchableSelect
                   value={availableWeapons.some(w => w.name === eq.secondaryWeapon) ? eq.secondaryWeapon : (eq.secondaryWeapon && eq.secondaryWeapon !== 'none' ? '__CUSTOM__' : 'none')}
-                  onChange={e => {
-                    if (e.target.value !== '__CUSTOM__') {
-                      handleEqChange('secondaryWeapon', e.target.value);
+                  options={weaponOptions}
+                  onChange={val => {
+                    if (val !== '__CUSTOM__') {
+                      handleEqChange('secondaryWeapon', val);
+                    } else {
+                      handleEqChange('secondaryWeapon', '__CUSTOM__');
                     }
                   }}
-                  className="input-field text-xs"
-                >
-                  <option value="none">-- None --</option>
-                  {!availableWeapons.some(w => w.name === eq.secondaryWeapon) && eq.secondaryWeapon && eq.secondaryWeapon !== 'none' && (
-                    <option value="__CUSTOM__">Custom: {eq.secondaryWeapon}</option>
-                  )}
-                  {availableWeapons.map((w, idx) => {
-                    const badge = getSourceBadgeInfo(w.source, character.allowedSources);
-                    return (
-                      <option key={w.id || `${w.name}_sec_${idx}`} value={w.name}>
-                        {!badge.isAllowed ? `⚠️ ${w.name} (${w.damageM}, ${w.type}) [${badge.sourceCode} - Restricted]` : `${w.name} (${w.damageM}, ${w.type}) [${badge.sourceCode}]`}
-                      </option>
-                    );
-                  })}
-                  <option value="__CUSTOM__">+ Custom / Typed Weapon Name...</option>
-                </select>
+                  placeholder="Select secondary weapon..."
+                />
 
                 {(!availableWeapons.some(w => w.name === eq.secondaryWeapon) && eq.secondaryWeapon && eq.secondaryWeapon !== 'none') && (
                   <input
@@ -664,29 +902,18 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             <label className="label-text">Ranged Weapon</label>
             <div className="grid grid-cols-3 gap-2">
               <div className="col-span-2 space-y-1.5">
-                <select
+                <SearchableSelect
                   value={availableWeapons.some(w => w.name === eq.rangedWeapon) ? eq.rangedWeapon : (eq.rangedWeapon && eq.rangedWeapon !== 'none' ? '__CUSTOM__' : 'none')}
-                  onChange={e => {
-                    if (e.target.value !== '__CUSTOM__') {
-                      handleEqChange('rangedWeapon', e.target.value);
+                  options={weaponOptions}
+                  onChange={val => {
+                    if (val !== '__CUSTOM__') {
+                      handleEqChange('rangedWeapon', val);
+                    } else {
+                      handleEqChange('rangedWeapon', '__CUSTOM__');
                     }
                   }}
-                  className="input-field text-xs"
-                >
-                  <option value="none">-- None --</option>
-                  {!availableWeapons.some(w => w.name === eq.rangedWeapon) && eq.rangedWeapon && eq.rangedWeapon !== 'none' && (
-                    <option value="__CUSTOM__">Custom: {eq.rangedWeapon}</option>
-                  )}
-                  {availableWeapons.map((w, idx) => {
-                    const badge = getSourceBadgeInfo(w.source, character.allowedSources);
-                    return (
-                      <option key={w.id || `${w.name}_rng_${idx}`} value={w.name}>
-                        {!badge.isAllowed ? `⚠️ ${w.name} (${w.damageM}, ${w.type}) [${badge.sourceCode} - Restricted]` : `${w.name} (${w.damageM}, ${w.type}) [${badge.sourceCode}]`}
-                      </option>
-                    );
-                  })}
-                  <option value="__CUSTOM__">+ Custom / Typed Weapon Name...</option>
-                </select>
+                  placeholder="Select ranged weapon..."
+                />
 
                 {(!availableWeapons.some(w => w.name === eq.rangedWeapon) && eq.rangedWeapon && eq.rangedWeapon !== 'none') && (
                   <input
@@ -795,6 +1022,30 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             </div>
             <p className="text-[10px] text-slate-400">Coin Weight: <span className="text-amber-300 font-mono font-bold">{coinWeight} lbs</span> (50 coins/lb in D&D 3.5e).</p>
           </div>
+
+          {/* Active Carried Weight Itemized Breakdown */}
+          <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-800 text-xs space-y-2">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+              <span className="font-bold text-amber-400 flex items-center gap-1.5">
+                <i className="fa-solid fa-list-check text-amber-500"></i> Active Carried Weight Itemized Breakdown
+              </span>
+              <span className="font-mono text-amber-300 font-bold text-xs">{totalCarriedWeight} lbs total</span>
+            </div>
+            <div className="max-h-52 overflow-y-auto space-y-1.5 pr-1 font-mono text-[11px] scrollbar-thin">
+              {activeCarriedItemsBreakdown.filter(i => !i.isStashed).map(item => (
+                <div key={item.id} className="flex justify-between items-center bg-slate-900/80 px-2.5 py-1 rounded border border-slate-800/80">
+                  <span className="text-slate-200 truncate mr-2 flex items-center gap-1.5">
+                    <span>{item.icon}</span>
+                    <span className="font-semibold">{item.name}</span>
+                    <span className="text-[10px] text-slate-400 font-sans">({item.location})</span>
+                  </span>
+                  <span className={`font-bold shrink-0 ${item.totalWeight > 0 ? 'text-amber-300' : 'text-slate-500'}`}>
+                    {item.isHaversack ? '0 lb (Haversack)' : `${item.totalWeight.toFixed(1)} lb`}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Currency & Funds Tracker */}
@@ -883,26 +1134,32 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             <h2 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2">
               <i className="fa-solid fa-bag-shopping text-amber-500"></i> General Inventory & Containers
             </h2>
-            <p className="text-xs text-slate-400">Organize potions, adventuring gear, containers, and stash.</p>
+            <p className="text-xs text-slate-400">Organize potions, adventuring gear, containers, equipped items, and stash.</p>
           </div>
 
-          {/* Quick Add Presets Bar */}
-          <div className="flex items-center gap-2">
-            <select
-              onChange={e => {
-                if (e.target.value) {
-                  handleQuickAddPreset(e.target.value);
-                  e.target.value = '';
-                }
-              }}
-              className="input-field text-xs text-amber-300 font-semibold max-w-[200px]"
-              defaultValue=""
-            >
-              <option value="" disabled>+ Quick Add Gear Preset...</option>
-              {COMMON_ITEM_PRESETS.map((p, idx) => (
-                <option key={idx} value={p.name}>{p.name} ({p.weight} lb, {p.value})</option>
-              ))}
-            </select>
+          {/* Quick Add Presets Bar & Toggle */}
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer bg-slate-950/80 px-3 py-1.5 rounded-xl border border-slate-800 hover:border-amber-500/50 transition shadow-sm">
+              <input
+                type="checkbox"
+                checked={includeEquippedInTable}
+                onChange={e => setIncludeEquippedInTable(e.target.checked)}
+                className="rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500"
+              />
+              <span className="font-medium text-[11px]">Include Equipped Gear & Coins in List</span>
+            </label>
+            <div className="w-52">
+              <SearchableSelect
+                value=""
+                options={presetOptions}
+                onChange={val => {
+                  if (val) {
+                    handleQuickAddPreset(val);
+                  }
+                }}
+                placeholder="+ Quick Add Gear..."
+              />
+            </div>
             <button
               onClick={() => setShowAddInventoryModal(true)}
               className="btn btn-primary text-xs flex items-center gap-1.5"
@@ -928,7 +1185,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
               {loc}
               {loc !== 'All' && (
                 <span className="ml-1.5 text-[10px] opacity-75">
-                  ({inventory.filter(i => (i.location || 'Carried').toLowerCase() === loc.toLowerCase()).length})
+                  ({filteredInventoryTable.filter(i => (i.location || 'Carried').toLowerCase().includes(loc.toLowerCase())).length})
                 </span>
               )}
             </button>
@@ -936,7 +1193,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         </div>
 
         {/* Inventory Items List */}
-        {filteredInventory.length === 0 ? (
+        {filteredInventoryTable.length === 0 ? (
           <div className="p-8 text-center bg-slate-950/40 rounded-xl border border-slate-800 space-y-2">
             <i className="fa-solid fa-box-open text-3xl text-slate-600"></i>
             <p className="text-xs text-slate-400">No items found for container filter "{activeLocationFilter}".</p>
@@ -957,67 +1214,89 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
-                {filteredInventory.map(item => {
-                  const totalLineWeight = (item.quantity * item.weight);
-                  const isStashed = ['stash', 'mount'].includes((item.location || '').toLowerCase());
-                  const isHaversack = (item.location || '').toLowerCase() === 'haversack';
+                {filteredInventoryTable.map(item => {
+                  const isStashed = item.isStashed;
+                  const isHaversack = item.isHaversack;
+                  const isEquippedGear = item.isEquippedGear;
+                  const isCurrency = item.isCurrency;
 
                   return (
-                    <tr key={item.id} className="hover:bg-slate-950/40 transition">
+                    <tr key={item.id} className={`hover:bg-slate-950/40 transition ${isEquippedGear ? 'bg-amber-500/5' : isCurrency ? 'bg-cyan-500/5' : ''}`}>
                       <td className="py-2.5 px-3">
-                        <span className="font-bold text-amber-200 block text-xs">{item.name}</span>
-                        {item.notes && <span className="text-[10px] text-slate-400 font-sans block">{item.notes}</span>}
-                      </td>
-                      <td className="py-2.5 px-3 text-center">
-                        <select
-                          value={item.location || 'Backpack'}
-                          onChange={e => handleUpdateItemLocation(item.id, e.target.value)}
-                          className="bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-[11px] text-slate-300 font-sans"
-                        >
-                          <option value="Carried">Carried</option>
-                          <option value="Backpack">Backpack</option>
-                          <option value="Belt Pouch">Belt Pouch</option>
-                          <option value="Haversack">Haversack</option>
-                          <option value="Mount">Mount</option>
-                          <option value="Stash">Stash</option>
-                        </select>
-                      </td>
-                      <td className="py-2.5 px-3 text-center">
-                        <div className="flex items-center justify-center gap-1.5">
-                          <button
-                            onClick={() => handleUpdateItemQty(item.id, -1)}
-                            className="w-5 h-5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-bold"
-                          >
-                            -
-                          </button>
-                          <span className="font-bold text-white w-6 text-center">{item.quantity}</span>
-                          <button
-                            onClick={() => handleUpdateItemQty(item.id, 1)}
-                            className="w-5 h-5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-bold"
-                          >
-                            +
-                          </button>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">{item.icon}</span>
+                          <div>
+                            <span className="font-bold text-amber-200 text-xs flex items-center gap-1.5">
+                              {item.name}
+                              {isEquippedGear && <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 text-[9px] font-sans uppercase font-bold border border-amber-500/30">Equipped</span>}
+                              {isCurrency && <span className="px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 text-[9px] font-sans uppercase font-bold border border-cyan-500/30">Coins</span>}
+                            </span>
+                            {item.notes && <span className="text-[10px] text-slate-400 font-sans block">{item.notes}</span>}
+                          </div>
                         </div>
                       </td>
-                      <td className="py-2.5 px-3 text-center text-slate-300">{item.weight} lb</td>
+                      <td className="py-2.5 px-3 text-center">
+                        {!isEquippedGear && !isCurrency ? (
+                          <select
+                            value={item.location || 'Backpack'}
+                            onChange={e => handleUpdateItemLocation(item.id, e.target.value)}
+                            className="bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-[11px] text-slate-300 font-sans"
+                          >
+                            <option value="Carried">Carried</option>
+                            <option value="Backpack">Backpack</option>
+                            <option value="Belt Pouch">Belt Pouch</option>
+                            <option value="Haversack">Haversack</option>
+                            <option value="Mount">Mount</option>
+                            <option value="Stash">Stash</option>
+                          </select>
+                        ) : (
+                          <span className="text-[11px] text-amber-300 font-sans font-medium">{item.location}</span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        {!isEquippedGear && !isCurrency ? (
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              onClick={() => handleUpdateItemQty(item.id, -1)}
+                              className="w-5 h-5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-bold"
+                            >
+                              -
+                            </button>
+                            <span className="font-bold text-white w-6 text-center">{item.quantity}</span>
+                            <button
+                              onClick={() => handleUpdateItemQty(item.id, 1)}
+                              className="w-5 h-5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-bold"
+                            >
+                              +
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="font-bold text-slate-300 text-xs">1</span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-center text-slate-300">{item.unitWeight.toFixed(1)} lb</td>
                       <td className="py-2.5 px-3 text-center">
                         {isStashed ? (
-                          <span className="text-slate-500 italic text-[10px]">({totalLineWeight.toFixed(1)} lb stashed)</span>
+                          <span className="text-slate-500 italic text-[10px]">({item.totalWeight.toFixed(1)} lb stashed)</span>
                         ) : isHaversack ? (
                           <span className="text-purple-400 font-bold text-[10px]">0 lb (Haversack)</span>
                         ) : (
-                          <span className="text-amber-300 font-bold">{totalLineWeight.toFixed(1)} lb</span>
+                          <span className="text-amber-300 font-bold">{item.totalWeight.toFixed(1)} lb</span>
                         )}
                       </td>
                       <td className="py-2.5 px-3 text-center text-slate-400">{item.value || '-'}</td>
                       <td className="py-2.5 px-3 text-right">
-                        <button
-                          onClick={() => handleRemoveInventoryItem(item.id)}
-                          className="text-slate-500 hover:text-rose-400 p-1 text-xs"
-                          title="Delete Item"
-                        >
-                          <i className="fa-solid fa-trash-can"></i>
-                        </button>
+                        {!isEquippedGear && !isCurrency ? (
+                          <button
+                            onClick={() => handleRemoveInventoryItem(item.id)}
+                            className="text-slate-500 hover:text-rose-400 p-1 text-xs"
+                            title="Delete Item"
+                          >
+                            <i className="fa-solid fa-trash-can"></i>
+                          </button>
+                        ) : (
+                          <span className="text-[10px] text-slate-500 font-sans italic">{isCurrency ? 'Coins' : 'Equipped'}</span>
+                        )}
                       </td>
                     </tr>
                   );

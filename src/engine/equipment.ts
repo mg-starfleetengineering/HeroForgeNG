@@ -284,11 +284,11 @@ export function calculateCarryingCapacity(strScore: number, sizeStr: string = 'M
   };
 }
 
-const ARMOR_WEIGHT_MAP: Record<string, number> = {
+export const ARMOR_WEIGHT_MAP: Record<string, number> = {
   none: 0, padded: 10, leather: 15, studded: 20, chainshirt: 25, breastplate: 30, fullplate: 50
 };
 
-const SHIELD_WEIGHT_MAP: Record<string, number> = {
+export const SHIELD_WEIGHT_MAP: Record<string, number> = {
   none: 0, buckler: 5, light_wooden: 5, heavy_shield: 15, tower_shield: 45
 };
 
