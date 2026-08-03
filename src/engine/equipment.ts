@@ -30,6 +30,29 @@ const STANDARD_SHIELD_MAP: Record<string, { name: string; acBonus: number; check
   tower_shield: { name: 'Tower Shield', acBonus: 4, checkPenalty: -10 }
 };
 
+const DAMAGE_INDEX_MAP: Record<string, string> = {
+  '1': '1d2',
+  '2': '1d3',
+  '3': '1d4',
+  '4': '1d6',
+  '5': '1d8',
+  '6': '1d10',
+  '7': '1d12',
+  '8': '2d4',
+  '9': '2d4',
+  '10': '2d6',
+  '11': '2d8',
+  '12': '2d10',
+  '13': '3d6'
+};
+
+const normalizeWeapon = (wpn: WeaponData): WeaponData => {
+  if (wpn.damageM && DAMAGE_INDEX_MAP[String(wpn.damageM).trim()]) {
+    return { ...wpn, damageM: DAMAGE_INDEX_MAP[String(wpn.damageM).trim()] };
+  }
+  return wpn;
+};
+
 /**
  * Resolves a weapon name to full WeaponData.
  * Supports format: "Custom Name (Base Model Name)" (e.g. "Nodachi (Greatsword)").
@@ -40,7 +63,7 @@ export function resolveWeapon(
   weaponsData: WeaponData[] = []
 ): WeaponData {
   if (!rawName || !rawName.trim()) {
-    return DEFAULT_WEAPON;
+    return normalizeWeapon(DEFAULT_WEAPON);
   }
 
   const cleanName = rawName.trim();
@@ -49,13 +72,13 @@ export function resolveWeapon(
   const customMatch = customWeapons.find(
     w => w.name.toLowerCase() === cleanName.toLowerCase()
   );
-  if (customMatch) return customMatch;
+  if (customMatch) return normalizeWeapon(customMatch);
 
   // 2. Check direct match in standard weaponsData
   const stdMatch = weaponsData.find(
     w => w.name.toLowerCase() === cleanName.toLowerCase()
   );
-  if (stdMatch) return stdMatch;
+  if (stdMatch) return normalizeWeapon(stdMatch);
 
   // 3. Check aliased pattern: "Custom Name (Base Weapon)" e.g. "Nodachi (Greatsword)"
   const aliasMatch = cleanName.match(/^(.+?)\s*\((.+?)\)$/);
@@ -69,7 +92,7 @@ export function resolveWeapon(
     w => w.name.toLowerCase() === baseName.toLowerCase()
   );
   if (baseCustomMatch) {
-    return { ...baseCustomMatch, name: cleanName };
+    return normalizeWeapon({ ...baseCustomMatch, name: cleanName });
   }
 
   const baseStdMatch = weaponsData.find(
@@ -78,11 +101,11 @@ export function resolveWeapon(
          baseName.toLowerCase().includes(w.name.toLowerCase())
   );
   if (baseStdMatch) {
-    return { ...baseStdMatch, name: cleanName };
+    return normalizeWeapon({ ...baseStdMatch, name: cleanName });
   }
 
   // 4. Default fallback with custom name
-  return {
+  return normalizeWeapon({
     id: cleanName.toLowerCase().replace(/\s+/g, '_'),
     name: cleanName,
     category: 'Martial',
@@ -92,7 +115,7 @@ export function resolveWeapon(
     critMultiplier: 2,
     weight: 4,
     type: 'Slashing'
-  };
+  });
 }
 
 /**

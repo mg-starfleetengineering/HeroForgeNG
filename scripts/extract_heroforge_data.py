@@ -31,13 +31,61 @@ def extract_classes():
     df = pd.read_excel("data/ClassInfo.xlsx", header=None)
     headers = [str(h).strip() if pd.notna(h) else f"col_{i}" for i, h in enumerate(df.iloc[1].values)]
     
+    source_map = {
+        "Players Handbook II": "PH2",
+        "Complete Warrior": "CW",
+        "Complete Divine": "CD",
+        "Complete Arcane": "CAr",
+        "Complete Adventurer": "CAd",
+        "Complete Champion": "CC",
+        "Complete Scoundrel": "CS",
+        "Complete Mage": "CM",
+        "Races of Stone": "RoS",
+        "Races of the Wild": "RotW",
+        "Races of Destiny": "RoD",
+        "Races of the Dragon": "RotD",
+        "Frostburn": "Frost",
+        "Sandstorm": "Sand",
+        "Stormwrack": "Sto",
+        "Tome of Battle": "ToB",
+        "Tome of Magic": "TM",
+        "Magic of Incarnum": "MoI",
+        "Expanded Psionics": "XPH",
+        "Eberron": "ECS",
+        "DragonLance": "DLCS",
+        "Oriental Adventures": "OA",
+        "Draconomicon": "Dr",
+        "Dragon Magic": "DrM",
+        "Libris Mortis": "LM",
+        "Lords of Madness": "LoM",
+        "Book of Vile": "BV",
+        "Book of Exalted": "BoED",
+        "Planar Handbook": "PlH",
+        "Ravenloft": "RCS",
+        "Heroes of Battle": "HB",
+        "Heroes of Horror": "HH"
+    }
+    
     classes = []
+    current_source = "PHB"
+    
     for row_idx in range(3, len(df)):
         row = df.iloc[row_idx]
         class_name = clean_val(row[1])
         if not class_name or class_name == "Select Class" or class_name == "Select A Class":
             continue
         
+        # Check if header row for section
+        class_str = str(class_name).strip()
+        if "Base Classes" in class_str or "Prestige Classes" in class_str:
+            matched_src = "PHB"
+            for key, val in source_map.items():
+                if key.lower() in class_str.lower():
+                    matched_src = val
+                    break
+            current_source = matched_src
+            continue
+            
         abbreviation = clean_val(row[2])
         max_lvl = clean_val(row[4]) or 20
         bonus_caster = clean_val(row[6])
@@ -78,6 +126,7 @@ def extract_classes():
             "refFactor": fref,
             "willFactor": fwill,
             "bonusCaster": bonus_caster,
+            "source": "PHB" if class_name in ["Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Wizard"] else current_source,
             "proficiencies": {
                 "lightArmor": prof_light,
                 "mediumArmor": prof_med,

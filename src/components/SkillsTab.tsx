@@ -1,7 +1,7 @@
 import React from 'react';
 import { CharacterState, RaceData, ClassData } from '../types/character';
 import { ALL_SKILLS, calculateTotalSkillPoints, isClassSkillForCharacter } from '../engine/skills';
-import { calculateTotalScore, getAbilityMod } from '../engine/stats';
+import { calculateTotalScore, getAbilityMod, parseRaceMods } from '../engine/stats';
 
 interface SkillsTabProps {
   character: CharacterState;
@@ -12,12 +12,10 @@ interface SkillsTabProps {
 
 export const SkillsTab: React.FC<SkillsTabProps> = ({ character, racesData, classesData, onChange }) => {
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
-  const raceMods = {
-    str: raceObj.strAdj || 0, dex: raceObj.dexAdj || 0, con: raceObj.conAdj || 0,
-    int: raceObj.intAdj || 0, wis: raceObj.wisAdj || 0, cha: raceObj.chaAdj || 0
-  };
+  const raceMods = parseRaceMods(raceObj);
 
-  const intScore = calculateTotalScore('int', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
+  const totalLevel = character.levelProgression?.filter(l => l.primaryClass).length || 1;
+  const intScore = calculateTotalScore('int', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
   const intMod = getAbilityMod(intScore);
   const isHuman = character.selectedRace === 'Human';
 
@@ -66,7 +64,7 @@ export const SkillsTab: React.FC<SkillsTabProps> = ({ character, racesData, clas
               const isClass = isClassSkillForCharacter(skill.name, character.levelProgression, classesData);
               const ranks = (character.skillRanks || {})[skill.name] || 0;
 
-              const abilityScore = calculateTotalScore(skill.keyAbility, character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
+              const abilityScore = calculateTotalScore(skill.keyAbility, character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
               const abMod = getAbilityMod(abilityScore);
               const totalMod = Math.floor(ranks) + abMod;
               const modStr = totalMod >= 0 ? `+${totalMod}` : `${totalMod}`;

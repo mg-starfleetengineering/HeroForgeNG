@@ -1,6 +1,6 @@
 import React from 'react';
 import { CharacterState, RaceData, ClassData, Equipment } from '../types/character';
-import { calculateTotalScore, getAbilityMod } from '../engine/stats';
+import { calculateTotalScore, getAbilityMod, parseRaceMods } from '../engine/stats';
 import { calculateBAB, calculateBaseSave, calculateTotalHP } from '../engine/classes';
 
 interface HeaderProps {
@@ -25,20 +25,16 @@ export const Header: React.FC<HeaderProps> = ({
   onImport
 }) => {
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
-  const raceMods = {
-    str: raceObj.strAdj || 0, dex: raceObj.dexAdj || 0, con: raceObj.conAdj || 0,
-    int: raceObj.intAdj || 0, wis: raceObj.wisAdj || 0, cha: raceObj.chaAdj || 0
-  };
+  const raceMods = parseRaceMods(raceObj);
 
-  const conScore = calculateTotalScore('con', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
-  const dexScore = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
-  const wisScore = calculateTotalScore('wis', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
+  const totalLevel = character.levelProgression.filter(l => l.primaryClass).length || 1;
+  const conScore = calculateTotalScore('con', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
+  const dexScore = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
+  const wisScore = calculateTotalScore('wis', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
 
   const conMod = getAbilityMod(conScore);
   const dexMod = getAbilityMod(dexScore);
   const wisMod = getAbilityMod(wisScore);
-
-  const totalLevel = character.levelProgression.filter(l => l.primaryClass).length || 1;
   const hp = calculateTotalHP(character.levelProgression, classesData, conMod);
   const bab = calculateBAB(character.levelProgression, classesData);
 
@@ -65,6 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'feats', label: 'Feats', icon: 'fa-award' },
     { id: 'equipment', label: 'Equipment', icon: 'fa-boxes-packing' },
     { id: 'spells', label: 'Spells & Powers', icon: 'fa-hat-wizard' },
+    { id: 'sources', label: 'Source Books', icon: 'fa-book-atlas' },
     { id: 'notes', label: 'Notes & Journal', icon: 'fa-book-bookmark' },
     { id: 'sheet', label: 'Character Sheet', icon: 'fa-scroll' }
   ];

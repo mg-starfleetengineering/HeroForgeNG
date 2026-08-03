@@ -10,6 +10,8 @@ import { SpellsTab } from './components/SpellsTab';
 import { NotesTab } from './components/NotesTab';
 import { SheetViewTab } from './components/SheetViewTab';
 import { PortraitModal } from './components/PortraitModal';
+import { SourceBooksTab } from './components/SourceBooksTab';
+import { CORE_SOURCES } from './utils/sourceFilter';
 
 const DEFAULT_CHARACTER: CharacterState = {
   name: 'Valerius the Brave',
@@ -58,6 +60,7 @@ const DEFAULT_CHARACTER: CharacterState = {
     { id: 'inv_7', name: 'Hempen Rope (50 ft)', quantity: 1, weight: 10, location: 'Backpack', value: '1 gp' },
     { id: 'inv_8', name: 'Potion of Cure Light Wounds', quantity: 2, weight: 0.1, location: 'Belt Pouch', value: '50 gp', notes: 'Heals 1d8+1 HP' }
   ],
+  allowedSources: [...CORE_SOURCES],
   notes: {
     backstory: 'Valerius was raised in the borderlands of Oakhaven. After a band of goblins raided his village, he pledged himself to Pelor to protect the innocent and uphold justice across the continent.',
     appearance: 'Tall, broad-shouldered warrior with short dark hair and a faint scar along his left jaw line. Wears polished steel plate over chainmail with a crimson cloak.',
@@ -261,6 +264,7 @@ export const App: React.FC = () => {
         {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} onChange={updateCharacter} />}
         {activeTab === 'equipment' && <EquipmentTab character={character} weaponsData={weaponsData} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
         {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} />}
+        {activeTab === 'sources' && <SourceBooksTab character={character} onChange={updateCharacter} />}
         {activeTab === 'notes' && <NotesTab character={character} onChange={updateCharacter} />}
         {activeTab === 'sheet' && <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} />}
       </main>

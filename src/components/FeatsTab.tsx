@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CharacterState, FeatData } from '../types/character';
+import { getSourceBadgeInfo } from '../utils/sourceFilter';
 
 interface FeatsTabProps {
   character: CharacterState;
@@ -195,15 +196,36 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, onChan
         <div className="max-h-[600px] overflow-y-auto space-y-3 pr-2 scrollbar-thin">
           {filtered.map(feat => {
             const isSelected = selectedFeats.some(sf => sf === feat.name || sf.startsWith(`${feat.name} (`));
+            const badge = getSourceBadgeInfo(feat.source, character.allowedSources);
+
             return (
               <div
                 key={feat.id || feat.name}
-                className={`p-4 rounded-xl border transition-all text-xs space-y-2 ${isSelected ? 'bg-amber-500/10 border-amber-500/30' : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'}`}
+                className={`p-4 rounded-xl border transition-all text-xs space-y-2 ${
+                  isSelected 
+                    ? 'bg-amber-500/10 border-amber-500/30' 
+                    : !badge.isAllowed
+                      ? 'bg-slate-950/40 border-rose-500/20 hover:border-rose-500/40'
+                      : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-bold text-sm text-slate-100">{feat.name}</span>
                   <div className="flex items-center gap-2">
-                    <span className="badge bg-slate-800 text-slate-400 font-mono text-[10px]">{feat.source || 'PH'}</span>
+                    <span className="font-bold text-sm text-slate-100">{feat.name}</span>
+                    {!badge.isAllowed && (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/40" title="Restricted Sourcebook">
+                        ⚠️ {badge.sourceCode}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`badge font-mono text-[10px] ${
+                      badge.isAllowed
+                        ? 'bg-slate-800 text-slate-400'
+                        : 'bg-rose-950/40 text-rose-400 border border-rose-500/20'
+                    }`}>
+                      {feat.source || 'PH'}
+                    </span>
                     <button
                       onClick={() => isSelected ? handleRemoveFeat(feat.name) : handleSelectLibraryFeat(feat)}
                       className={`btn text-[11px] py-1 px-3 ${isSelected ? 'btn-secondary text-rose-400' : 'btn-primary'}`}

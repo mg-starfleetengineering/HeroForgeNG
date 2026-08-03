@@ -1,6 +1,6 @@
 import React from 'react';
 import { CharacterState, RaceData, ClassData, WeaponData, Equipment } from '../types/character';
-import { calculateTotalScore, getAbilityMod } from '../engine/stats';
+import { calculateTotalScore, getAbilityMod, parseRaceMods } from '../engine/stats';
 import { calculateBAB, calculateBaseSave, calculateTotalHP } from '../engine/classes';
 import {
   resolveWeapon, resolveArmor, resolveShield, calculateFeatCombatBonuses,
@@ -17,17 +17,14 @@ interface SheetViewTabProps {
 
 export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData, classesData, weaponsData }) => {
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
-  const raceMods = {
-    str: raceObj.strAdj || 0, dex: raceObj.dexAdj || 0, con: raceObj.conAdj || 0,
-    int: raceObj.intAdj || 0, wis: raceObj.wisAdj || 0, cha: raceObj.chaAdj || 0
-  };
-
-  const strScore = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
-  const dexScore = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
-  const conScore = calculateTotalScore('con', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
-  const intScore = calculateTotalScore('int', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
-  const wisScore = calculateTotalScore('wis', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
-  const chaScore = calculateTotalScore('cha', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
+  const raceMods = parseRaceMods(raceObj);
+  const totalLevel = character.levelProgression.filter(l => l.primaryClass).length || 1;
+  const strScore = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
+  const dexScore = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
+  const conScore = calculateTotalScore('con', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
+  const intScore = calculateTotalScore('int', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
+  const wisScore = calculateTotalScore('wis', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
+  const chaScore = calculateTotalScore('cha', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
 
   const strMod = getAbilityMod(strScore);
   const dexMod = getAbilityMod(dexScore);
@@ -150,7 +147,6 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData
     if (l.primaryClass) classMap[l.primaryClass] = (classMap[l.primaryClass] || 0) + 1;
   });
   const classSummary = Object.entries(classMap).map(([c, count]) => `${c} ${count}`).join(' / ') || 'None 1';
-  const totalLevel = character.levelProgression.filter(l => l.primaryClass).length || 1;
 
   return (
     <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-4">

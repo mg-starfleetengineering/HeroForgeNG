@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CharacterState, WeaponData, RaceData, ClassData, Equipment, CustomArmorData, WondrousItem, InventoryItem, Funds } from '../types/character';
 import { getSourceBadgeInfo } from '../utils/sourceFilter';
-import { calculateTotalScore, getAbilityMod } from '../engine/stats';
+import { calculateTotalScore, getAbilityMod, parseRaceMods } from '../engine/stats';
 import { calculateBAB } from '../engine/classes';
 import {
   resolveWeapon, resolveArmor, resolveShield, calculateFeatCombatBonuses,
@@ -117,13 +117,10 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   };
 
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
-  const raceMods = {
-    str: raceObj.strAdj || 0, dex: raceObj.dexAdj || 0, con: raceObj.conAdj || 0,
-    int: raceObj.intAdj || 0, wis: raceObj.wisAdj || 0, cha: raceObj.chaAdj || 0
-  };
-
-  const strScore = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
-  const dexScore = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
+  const raceMods = parseRaceMods(raceObj);
+  const totalLevel = character.levelProgression?.filter(l => l.primaryClass).length || 1;
+  const strScore = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
+  const dexScore = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
   const strMod = getAbilityMod(strScore);
   const dexMod = getAbilityMod(dexScore);
   const bab = calculateBAB(character.levelProgression, classesData);

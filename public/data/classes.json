@@ -11,6 +11,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -34,6 +35,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -57,6 +59,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -80,6 +83,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -103,6 +107,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -126,6 +131,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -149,6 +155,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -172,6 +179,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -195,6 +203,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -218,6 +227,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -241,29 +251,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_players_handbook_ii_\u2013",
-    "name": "\u2013 Base Classes Players Handbook II \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -287,6 +275,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PH2",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -310,6 +299,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PH2",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -333,6 +323,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PH2",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -356,6 +347,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PH2",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -364,29 +356,6 @@
       "towerShield": false,
       "simpleWeapons": true,
       "martialWeapons": true
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_complete_warrior_\u2013",
-    "name": "\u2013 Base Classes Complete Warrior \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
     },
     "classSkills": []
   },
@@ -402,6 +371,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -425,6 +395,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -448,6 +419,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -456,29 +428,6 @@
       "towerShield": false,
       "simpleWeapons": true,
       "martialWeapons": true
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_complete_divine_\u2013",
-    "name": "\u2013 Base Classes Complete Divine \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
     },
     "classSkills": []
   },
@@ -494,6 +443,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -517,6 +467,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -540,34 +491,12 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
       "heavyArmor": false,
       "shield": true,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_complete_arcane_\u2013",
-    "name": "\u2013 Base Classes Complete Arcane \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
       "towerShield": false,
       "simpleWeapons": false,
       "martialWeapons": false
@@ -586,6 +515,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -609,6 +539,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -632,6 +563,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -639,29 +571,6 @@
       "shield": false,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_complete_adventurer_\u2013",
-    "name": "\u2013 Base Classes Complete Adventurer \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -678,6 +587,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -701,6 +611,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -724,6 +635,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -731,29 +643,6 @@
       "shield": false,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_complete_psionics_\u2013",
-    "name": "\u2013 Base Classes Complete Psionics \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -770,6 +659,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -793,6 +683,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -816,6 +707,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -824,29 +716,6 @@
       "towerShield": false,
       "simpleWeapons": true,
       "martialWeapons": true
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_heroes_of_horror_\u2013",
-    "name": "\u2013 Base Classes Heroes of Horror \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
     },
     "classSkills": []
   },
@@ -862,6 +731,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "HH",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -885,6 +755,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "HH",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -892,29 +763,6 @@
       "shield": false,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_dungeonscape_\u2013",
-    "name": "\u2013 Base Classes Dungeonscape \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -931,6 +779,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -939,29 +788,6 @@
       "towerShield": false,
       "simpleWeapons": true,
       "martialWeapons": true
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_tome_of_battle_\u2013",
-    "name": "\u2013 Base Classes Tome of Battle \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
     },
     "classSkills": []
   },
@@ -977,6 +803,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "ToB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1000,6 +827,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "ToB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1023,6 +851,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "ToB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1031,29 +860,6 @@
       "towerShield": false,
       "simpleWeapons": true,
       "martialWeapons": true
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_tome_of_magic_\u2013",
-    "name": "\u2013 Base Classes Tome of Magic \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
     },
     "classSkills": []
   },
@@ -1069,6 +875,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "TM",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1092,6 +899,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "TM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -1115,6 +923,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "TM",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1122,29 +931,6 @@
       "shield": false,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_magic_of_incarnum_\u2013",
-    "name": "\u2013 Base Classes Magic of Incarnum \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -1161,6 +947,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1184,6 +971,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1207,6 +995,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1214,29 +1003,6 @@
       "shield": true,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_miniatures_handbook_\u2013",
-    "name": "\u2013 Base Classes Miniatures Handbook \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -1253,6 +1019,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1276,6 +1043,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1284,29 +1052,6 @@
       "towerShield": false,
       "simpleWeapons": true,
       "martialWeapons": true
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_expanded_psionics_handbook_\u2013",
-    "name": "\u2013 Base Classes Expanded Psionics Handbook \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
     },
     "classSkills": []
   },
@@ -1322,6 +1067,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "XPH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -1345,6 +1091,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "XPH",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1368,6 +1115,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "XPH",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1391,6 +1139,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "XPH",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1398,29 +1147,6 @@
       "shield": true,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_oriental_adventures_\u2013",
-    "name": "\u2013 Base Classes Oriental Adventures \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -1437,6 +1163,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1460,6 +1187,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1483,6 +1211,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1506,6 +1235,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -1529,6 +1259,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1552,6 +1283,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1575,6 +1307,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1598,6 +1331,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1621,6 +1355,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -1644,6 +1379,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1667,6 +1403,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1690,6 +1427,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1713,6 +1451,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1736,6 +1475,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1759,6 +1499,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1766,29 +1507,6 @@
       "shield": false,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_alternate_base_classes_unearthed_arcana_\u2013",
-    "name": "\u2013 Alternate Base Classes Unearthed Arcana \u2013",
-    "abbr": "\u2013 A",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -1805,6 +1523,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1828,6 +1547,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -1851,6 +1571,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -1858,29 +1579,6 @@
       "shield": false,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_eberron_campaign_setting_\u2013",
-    "name": "\u2013 Base Classes Eberron Campaign Setting \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -1897,6 +1595,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1904,29 +1603,6 @@
       "shield": true,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_base_classes_dragonlance_campaign_setting_\u2013",
-    "name": "\u2013 Base Classes Dragonlance Campaign Setting \u2013",
-    "abbr": "\u2013 B",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -1943,6 +1619,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -1966,6 +1643,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -1974,29 +1652,6 @@
       "towerShield": false,
       "simpleWeapons": true,
       "martialWeapons": true
-    },
-    "classSkills": []
-  },
-  {
-    "id": "--_base_classes_age_of_mortals_--",
-    "name": "-- Base Classes Age of Mortals --",
-    "abbr": "-- ",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
     },
     "classSkills": []
   },
@@ -2012,6 +1667,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -2019,29 +1675,6 @@
       "shield": false,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "--_base_classes_players_companion_--",
-    "name": "-- Base Classes Players Companion --",
-    "abbr": "-- ",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -2058,6 +1691,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -2081,6 +1715,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -2104,6 +1739,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -2127,6 +1763,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -2150,6 +1787,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2173,6 +1811,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2196,6 +1835,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -2219,6 +1859,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2242,6 +1883,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -2265,6 +1907,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -2288,6 +1931,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2295,29 +1939,6 @@
       "shield": false,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_dmg_\u2013",
-    "name": "\u2013 Prestige Classes DMG \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -2334,6 +1955,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -2357,6 +1979,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2380,6 +2003,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2403,6 +2027,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -2426,6 +2051,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -2449,6 +2075,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2472,6 +2099,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2495,6 +2123,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -2518,6 +2147,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2541,6 +2171,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2564,6 +2195,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2587,6 +2219,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2610,6 +2243,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2633,6 +2267,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2656,6 +2291,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -2679,29 +2315,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_complete_warrior_\u2013",
-    "name": "\u2013 Prestige Classes Complete Warrior \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2725,6 +2339,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2748,6 +2363,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -2771,6 +2387,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -2794,6 +2411,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2817,6 +2435,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2840,6 +2459,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2863,6 +2483,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2886,6 +2507,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2909,6 +2531,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2932,6 +2555,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -2955,6 +2579,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -2978,6 +2603,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3001,6 +2627,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3024,6 +2651,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3047,6 +2675,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3070,6 +2699,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3093,6 +2723,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3116,6 +2747,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3139,6 +2771,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3162,6 +2795,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3185,6 +2819,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3208,6 +2843,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3231,6 +2867,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3254,6 +2891,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -3277,6 +2915,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3300,6 +2939,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3323,6 +2963,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3346,6 +2987,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3369,6 +3011,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3392,6 +3035,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3415,6 +3059,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3438,6 +3083,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3461,6 +3107,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3484,6 +3131,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3507,6 +3155,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3530,29 +3179,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_complete_divine_\u2013",
-    "name": "\u2013 Prestige Classes Complete Divine \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "CW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3576,6 +3203,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3599,6 +3227,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3622,6 +3251,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3645,6 +3275,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3668,6 +3299,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3691,6 +3323,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3714,6 +3347,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3737,6 +3371,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3760,6 +3395,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3783,6 +3419,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3806,6 +3443,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3829,6 +3467,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -3852,6 +3491,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -3875,6 +3515,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3898,6 +3539,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -3921,6 +3563,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3944,6 +3587,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3967,6 +3611,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -3990,6 +3635,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -4013,6 +3659,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -4036,6 +3683,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4059,6 +3707,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -4082,6 +3731,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4105,6 +3755,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4128,6 +3779,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "CD",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -4136,29 +3788,6 @@
       "towerShield": true,
       "simpleWeapons": true,
       "martialWeapons": true
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_complete_arcane_\u2013",
-    "name": "\u2013 Prestige Classes Complete Arcane \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
     },
     "classSkills": []
   },
@@ -4174,6 +3803,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4197,6 +3827,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4220,6 +3851,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4243,6 +3875,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4266,6 +3899,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4289,6 +3923,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4312,6 +3947,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4335,6 +3971,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4358,6 +3995,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4381,6 +4019,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4404,6 +4043,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4427,6 +4067,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4450,6 +4091,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4473,6 +4115,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4496,6 +4139,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4519,6 +4163,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4542,6 +4187,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4565,6 +4211,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4588,29 +4235,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_complete_adventurer_\u2013",
-    "name": "\u2013 Prestige Classes Complete Adventurer \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "CAr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4634,6 +4259,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4657,6 +4283,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4680,6 +4307,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4703,6 +4331,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4726,6 +4355,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4749,6 +4379,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4772,6 +4403,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4795,6 +4427,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4818,6 +4451,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4841,6 +4475,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -4864,6 +4499,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4887,6 +4523,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4910,6 +4547,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -4933,6 +4571,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4956,6 +4595,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -4979,6 +4619,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5002,6 +4643,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -5025,6 +4667,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -5048,6 +4691,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5071,6 +4715,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5094,6 +4739,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -5117,6 +4763,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5140,6 +4787,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -5163,6 +4811,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -5186,6 +4835,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5209,6 +4859,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5232,6 +4883,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -5255,6 +4907,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5278,6 +4931,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5301,6 +4955,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5324,6 +4979,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5347,6 +5003,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5370,29 +5027,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_complete_psionic_\u2013",
-    "name": "\u2013 Prestige Classes Complete Psionic \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "CAd",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5416,6 +5051,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5439,6 +5075,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5462,6 +5099,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5485,6 +5123,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5508,6 +5147,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5531,6 +5171,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5554,6 +5195,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5577,29 +5219,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_complete_mage_\u2013",
-    "name": "\u2013 Prestige Classes Complete Mage \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5623,6 +5243,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5646,6 +5267,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5669,6 +5291,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5692,6 +5315,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5715,6 +5339,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5738,6 +5363,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5761,6 +5387,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5784,6 +5411,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5807,6 +5435,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5830,6 +5459,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5853,29 +5483,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_complete_scoundrel_\u2013",
-    "name": "\u2013 Prestige Classes Complete Scoundrel \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "CM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5899,6 +5507,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5922,6 +5531,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5945,6 +5555,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "CS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5968,6 +5579,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -5991,6 +5603,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "CS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6014,6 +5627,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6037,6 +5651,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6060,6 +5675,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6083,6 +5699,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6106,6 +5723,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6129,6 +5747,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6152,6 +5771,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6175,29 +5795,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_complete_champion_\u2013",
-    "name": "\u2013 Prestige Classes Complete Champion \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "CS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6221,6 +5819,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CC",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6244,6 +5843,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CC",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6267,6 +5867,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CC",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6290,6 +5891,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "CC",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6313,6 +5915,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CC",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6336,6 +5939,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CC",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6359,6 +5963,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "CC",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6382,6 +5987,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CC",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6405,6 +6011,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "CC",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6428,6 +6035,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "CC",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6451,29 +6059,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_races_of_stone_\u2013",
-    "name": "\u2013 Prestige Classes Races of Stone \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "CC",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6497,6 +6083,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6520,6 +6107,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6543,6 +6131,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6566,6 +6155,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6589,6 +6179,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -6612,6 +6203,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6635,6 +6227,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6658,6 +6251,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -6681,6 +6275,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6704,6 +6299,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6727,6 +6323,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6750,6 +6347,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6773,6 +6371,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6796,6 +6395,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6819,29 +6419,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_races_of_destiny_\u2013",
-    "name": "\u2013 Prestige Classes Races of Destiny \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "RoS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6865,6 +6443,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RoD",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -6888,6 +6467,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "RoD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6911,6 +6491,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RoD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6934,6 +6515,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RoD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6957,6 +6539,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "RoD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -6980,6 +6563,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RoD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7003,29 +6587,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_races_of_the_wild_\u2013",
-    "name": "\u2013 Prestige Classes Races of the Wild \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "RoD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7049,6 +6611,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "RotW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7072,6 +6635,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "RotW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7095,6 +6659,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "RotW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7118,6 +6683,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "RotW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7141,6 +6707,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "RotW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7164,6 +6731,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RotW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7187,6 +6755,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RotW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7210,29 +6779,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_races_of_the_dragon_\u2013",
-    "name": "\u2013 Prestige Classes Races of the Dragon \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "RotW",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7256,6 +6803,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "RotD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7279,6 +6827,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "RotD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7302,6 +6851,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "RotD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7325,6 +6875,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "RotD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7348,29 +6899,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_frostburn_\u2013",
-    "name": "\u2013 Prestige Classes Frostburn \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "RotD",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7394,6 +6923,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "Frost",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7417,6 +6947,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "Frost",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7440,6 +6971,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "Frost",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -7463,6 +6995,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Frost",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7486,6 +7019,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "Frost",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7509,6 +7043,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "Frost",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7532,6 +7067,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "Frost",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7555,6 +7091,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Frost",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7578,6 +7115,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Frost",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7601,6 +7139,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Frost",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -7608,29 +7147,6 @@
       "shield": false,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_sandstorm_\u2013",
-    "name": "\u2013 Prestige Classes Sandstorm \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -7647,6 +7163,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "Sand",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7670,6 +7187,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Sand",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7693,6 +7211,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Sand",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7716,6 +7235,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Sand",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7739,6 +7259,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "Sand",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7762,29 +7283,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_stormwrack_\u2013",
-    "name": "\u2013 Prestige Classes Stormwrack \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "Sand",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7808,6 +7307,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "Sto",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7831,6 +7331,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "Sto",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7854,6 +7355,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "Sto",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7877,6 +7379,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "Sto",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7900,6 +7403,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Sto",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7923,6 +7427,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "Sto",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7946,29 +7451,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_heroes_of_battle_\u2013",
-    "name": "\u2013 Prestige Classes Heroes of Battle \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "Sto",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -7992,6 +7475,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "HB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8015,6 +7499,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "HB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8038,6 +7523,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "HB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8061,29 +7547,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_heroes_of_horror_\u2013",
-    "name": "\u2013 Prestige Classes Heroes of Horror \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "HB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8107,6 +7571,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "HH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8130,6 +7595,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "HH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8153,6 +7619,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "HH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8176,6 +7643,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "HH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8199,6 +7667,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "HH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8222,29 +7691,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_dungeonscape_\u2013",
-    "name": "\u2013 Prestige Classes Dungeonscape \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "HH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8268,6 +7715,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8291,29 +7739,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_npc_only_prestige_classes_dungeonscape_\u2013",
-    "name": "\u2013 NPC Only Prestige Classes Dungeonscape \u2013",
-    "abbr": "\u2013 N",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8337,29 +7763,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_cityscape_\u2013",
-    "name": "\u2013 Prestige Classes Cityscape \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8383,6 +7787,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -8406,6 +7811,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8429,29 +7835,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_tome_of_battle_\u2013",
-    "name": "\u2013 Prestige Classes Tome of Battle \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8475,6 +7859,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "ToB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8498,6 +7883,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "ToB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8521,6 +7907,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "ToB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8544,6 +7931,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "ToB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8567,6 +7955,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "ToB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8590,6 +7979,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "ToB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8613,6 +8003,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "ToB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8636,29 +8027,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_tome_of_magic_\u2013",
-    "name": "\u2013 Prestige Classes Tome of Magic \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "ToB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8682,6 +8051,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "TM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8705,6 +8075,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "TM",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -8728,6 +8099,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "TM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8751,6 +8123,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "TM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8774,29 +8147,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_magic_of_incarnum_\u2013",
-    "name": "\u2013 Prestige Classes Magic of Incarnum \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "TM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8820,6 +8171,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8843,6 +8195,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8866,6 +8219,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8889,6 +8243,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8912,6 +8267,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8935,6 +8291,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8958,6 +8315,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -8981,6 +8339,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9004,6 +8363,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9027,6 +8387,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9050,29 +8411,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_miniatures_handbook_\u2013",
-    "name": "\u2013 Prestige Classes Miniatures Handbook \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "MoI",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9096,6 +8435,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9119,6 +8459,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9142,6 +8483,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9165,6 +8507,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9188,6 +8531,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -9211,6 +8555,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9234,29 +8579,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_expanded_psionics_handbook_\u2013",
-    "name": "\u2013 Prestige Classes Expanded Psionics Handbook \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9280,6 +8603,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "XPH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9303,6 +8627,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "XPH",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -9326,6 +8651,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "XPH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9349,6 +8675,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "XPH",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -9372,6 +8699,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "XPH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9395,6 +8723,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "XPH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9418,6 +8747,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "XPH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9441,6 +8771,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "XPH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9464,29 +8795,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_planar_handbook_\u2013",
-    "name": "\u2013 Prestige Classes Planar Handbook \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "XPH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9510,6 +8819,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PlH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9533,6 +8843,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PlH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9556,6 +8867,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PlH",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -9579,6 +8891,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PlH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9602,6 +8915,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PlH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9625,6 +8939,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PlH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9648,6 +8963,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PlH",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -9671,6 +8987,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PlH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9694,29 +9011,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_players_guide_to_faerun_\u2013",
-    "name": "\u2013 Prestige Classes Players Guide to Faerun \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PlH",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9740,6 +9035,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9763,6 +9059,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9786,6 +9083,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9809,6 +9107,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9832,6 +9131,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9855,6 +9155,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -9878,6 +9179,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9901,6 +9203,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9924,6 +9227,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -9947,6 +9251,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -9970,6 +9275,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -9993,6 +9299,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10016,6 +9323,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10039,6 +9347,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10062,6 +9371,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10085,6 +9395,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10108,6 +9419,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10131,6 +9443,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10154,6 +9467,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10177,6 +9491,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10200,6 +9515,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10223,6 +9539,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -10246,6 +9563,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10269,6 +9587,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10292,6 +9611,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10315,6 +9635,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -10322,29 +9643,6 @@
       "shield": true,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_faiths_and_pantheons_\u2013",
-    "name": "\u2013 Prestige Classes Faiths and Pantheons \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -10361,6 +9659,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10384,6 +9683,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10407,6 +9707,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10430,6 +9731,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10453,6 +9755,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10476,6 +9779,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10499,6 +9803,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10522,6 +9827,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10545,6 +9851,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10568,6 +9875,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10591,6 +9899,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10614,6 +9923,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10637,6 +9947,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10660,6 +9971,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10683,6 +9995,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10706,6 +10019,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10729,6 +10043,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10752,29 +10067,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_magic_of_faerun_\u2013",
-    "name": "\u2013 Prestige Classes Magic of Faerun \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10798,6 +10091,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -10821,6 +10115,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10844,6 +10139,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10867,6 +10163,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -10890,6 +10187,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10913,6 +10211,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10936,6 +10235,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10959,6 +10259,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -10982,6 +10283,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11005,29 +10307,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_races_of_faerun_\u2013",
-    "name": "\u2013 Prestige Classes Races of Faerun \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11051,6 +10331,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11074,6 +10355,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -11097,6 +10379,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11120,6 +10403,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -11143,6 +10427,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11166,6 +10451,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11189,6 +10475,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -11212,29 +10499,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_underdark_\u2013",
-    "name": "\u2013 Prestige Classes Underdark \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11258,6 +10523,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11281,6 +10547,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -11304,6 +10571,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11327,6 +10595,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -11350,6 +10619,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -11373,6 +10643,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11396,6 +10667,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11419,6 +10691,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11442,6 +10715,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11465,6 +10739,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11488,6 +10763,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11511,31 +10787,9 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_champions_of_ruin_\u2013",
-    "name": "\u2013 Prestige Classes Champions of Ruin \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
       "mediumArmor": false,
       "heavyArmor": false,
       "shield": false,
@@ -11557,6 +10811,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11580,6 +10835,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11603,6 +10859,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11626,6 +10883,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11649,6 +10907,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11672,29 +10931,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_champions_of_valor_\u2013",
-    "name": "\u2013 Prestige Classes Champions of Valor \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11718,6 +10955,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -11741,6 +10979,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11764,6 +11003,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11787,29 +11027,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_silver_marches_\u2013",
-    "name": "\u2013 Prestige Classes Silver Marches \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11833,6 +11051,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11856,6 +11075,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11879,6 +11099,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11902,6 +11123,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -11925,6 +11147,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11948,6 +11171,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11971,6 +11195,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -11994,6 +11219,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12017,6 +11243,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12040,6 +11267,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12063,6 +11291,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12070,29 +11299,6 @@
       "shield": false,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_eberron_campaign_setting_\u2013",
-    "name": "\u2013 Prestige Classes Eberron Campaign Setting \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -12109,6 +11315,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12132,6 +11339,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -12155,6 +11363,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12178,6 +11387,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12201,6 +11411,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12224,6 +11435,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12247,6 +11459,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12270,29 +11483,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_five_nations_\u2013",
-    "name": "\u2013 Prestige Classes Five Nations \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12316,6 +11507,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12339,6 +11531,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12362,6 +11555,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12385,6 +11579,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -12408,29 +11603,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_races_of_eberron_\u2013",
-    "name": "\u2013 Prestige Classes Races of Eberron \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12454,6 +11627,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12477,6 +11651,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12500,6 +11675,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12523,6 +11699,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12546,6 +11723,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12569,6 +11747,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12592,6 +11771,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12615,29 +11795,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_sharn:_city_of_towers_\u2013",
-    "name": "\u2013 Prestige Classes Sharn: City of Towers \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12661,6 +11819,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -12684,6 +11843,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -12707,6 +11867,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -12715,29 +11876,6 @@
       "towerShield": true,
       "simpleWeapons": true,
       "martialWeapons": true
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_explorer's_handbook_\u2013",
-    "name": "\u2013 Prestige Classes Explorer's Handbook \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
     },
     "classSkills": []
   },
@@ -12753,6 +11891,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12776,6 +11915,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12799,29 +11939,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_secrets_of_xendrik_\u2013",
-    "name": "\u2013 Prestige Classes Secrets of Xendrik \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12845,6 +11963,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12868,6 +11987,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12891,29 +12011,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_player's_guide_to_eberron_\u2013",
-    "name": "\u2013 Prestige Classes Player's Guide to Eberron \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12937,6 +12035,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -12960,29 +12059,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_magic_of_eberron_\u2013",
-    "name": "\u2013 Prestige Classes Magic of Eberron \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13006,6 +12083,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13029,6 +12107,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13052,6 +12131,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13075,6 +12155,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13098,6 +12179,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13121,6 +12203,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13144,6 +12227,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13167,29 +12251,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_secrets_of_sarlona",
-    "name": "\u2013 Prestige Classes Secrets of Sarlona",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "ECS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13213,6 +12275,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13236,29 +12299,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_dragonlance_campaign_setting_\u2013",
-    "name": "\u2013 Prestige Classes DragonLance Campaign Setting \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13282,6 +12323,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13305,6 +12347,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13328,6 +12371,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13351,6 +12395,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -13374,6 +12419,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13397,6 +12443,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13420,6 +12467,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13443,6 +12491,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13466,6 +12515,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13489,6 +12539,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13512,6 +12563,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -13535,29 +12587,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_bestiary_of_krynn_\u2013",
-    "name": "\u2013 Prestige Classes Bestiary of Krynn \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "DLCS",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13581,6 +12611,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13604,6 +12635,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13627,6 +12659,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13650,6 +12683,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -13658,29 +12692,6 @@
       "towerShield": true,
       "simpleWeapons": true,
       "martialWeapons": true
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_age_of_mortals_\u2013",
-    "name": "\u2013 Prestige Classes Age of Mortals \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
     },
     "classSkills": []
   },
@@ -13696,6 +12707,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13719,6 +12731,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13742,6 +12755,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13765,6 +12779,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13788,6 +12803,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13811,6 +12827,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13834,6 +12851,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13857,6 +12875,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -13880,6 +12899,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -13903,6 +12923,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13926,6 +12947,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -13949,29 +12971,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_oriental_adventures_\u2013",
-    "name": "\u2013 Prestige Classes Oriental Adventures \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -13995,6 +12995,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14018,6 +13019,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -14041,6 +13043,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -14064,6 +13067,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -14087,6 +13091,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14110,6 +13115,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14133,6 +13139,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14156,6 +13163,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14179,6 +13187,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14202,6 +13211,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -14225,6 +13235,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14248,6 +13259,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14271,6 +13283,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -14294,6 +13307,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14317,6 +13331,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -14340,6 +13355,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14363,6 +13379,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14386,6 +13403,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14409,6 +13427,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -14432,6 +13451,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14455,6 +13475,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -14478,29 +13499,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_draconomicon_\u2013",
-    "name": "\u2013 Prestige Classes Draconomicon \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "OA",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14524,6 +13523,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14547,6 +13547,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14570,6 +13571,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -14593,6 +13595,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -14616,6 +13619,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -14639,6 +13643,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -14662,6 +13667,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14685,6 +13691,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14708,6 +13715,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -14731,6 +13739,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -14754,6 +13763,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14777,6 +13787,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14800,6 +13811,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14823,6 +13835,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14846,6 +13859,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14869,6 +13883,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14892,6 +13907,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14915,29 +13931,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_dragon_magic_\u2013",
-    "name": "\u2013 Prestige Classes Dragon Magic \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "Dr",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14961,6 +13955,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "DrM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -14984,6 +13979,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "DrM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15007,6 +14003,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "DrM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15030,6 +14027,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "DrM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15053,6 +14051,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "DrM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15076,6 +14075,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "DrM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15099,29 +14099,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_fiendish_codex_ii_\u2013",
-    "name": "\u2013 Prestige Classes Fiendish Codex II \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "DrM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15145,6 +14123,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15168,6 +14147,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15191,6 +14171,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15214,29 +14195,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_libris_mortis_\u2013",
-    "name": "\u2013 Prestige Classes Libris Mortis \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15260,6 +14219,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "LM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15283,6 +14243,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "LM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15306,6 +14267,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "LM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15329,6 +14291,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "LM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15352,6 +14315,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "LM",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -15375,6 +14339,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "LM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15398,29 +14363,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_undead_prestige_classes_libris_mortis_\u2013",
-    "name": "\u2013 Undead Prestige Classes Libris Mortis \u2013",
-    "abbr": "\u2013 U",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "LM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15444,6 +14387,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "LM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15467,6 +14411,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "LM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15490,6 +14435,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "LM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15513,6 +14459,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "LM",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -15521,29 +14468,6 @@
       "towerShield": false,
       "simpleWeapons": true,
       "martialWeapons": true
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_lords_of_madness_\u2013",
-    "name": "\u2013 Prestige Classes Lords of Madness \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
     },
     "classSkills": []
   },
@@ -15559,6 +14483,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "LoM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15582,6 +14507,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "LoM",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -15605,6 +14531,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "LoM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15628,6 +14555,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "LoM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15651,6 +14579,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "LoM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15674,29 +14603,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_book_of_vile_darkness_\u2013",
-    "name": "\u2013 Prestige Classes Book of Vile Darkness \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "LoM",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15720,6 +14627,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -15743,6 +14651,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15766,6 +14675,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15789,6 +14699,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15812,6 +14723,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -15835,6 +14747,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -15858,6 +14771,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15881,6 +14795,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -15904,6 +14819,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15927,6 +14843,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15950,6 +14867,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15973,6 +14891,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -15996,6 +14915,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16019,6 +14939,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16042,6 +14963,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16065,6 +14987,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16088,6 +15011,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BV",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16096,29 +15020,6 @@
       "towerShield": true,
       "simpleWeapons": true,
       "martialWeapons": true
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_book_of_exalted_deeds_\u2013",
-    "name": "\u2013 Prestige Classes Book of Exalted Deeds \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
     },
     "classSkills": []
   },
@@ -16134,6 +15035,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16157,6 +15059,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16180,6 +15083,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -16203,6 +15107,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16226,6 +15131,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16249,6 +15155,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16272,6 +15179,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16295,6 +15203,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16318,6 +15227,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16341,6 +15251,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16364,6 +15275,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16387,6 +15299,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16410,6 +15323,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16433,6 +15347,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16456,6 +15371,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16479,6 +15395,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16502,6 +15419,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16525,6 +15443,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16548,6 +15467,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16571,6 +15491,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16594,6 +15515,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16617,29 +15539,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_manual_of_the_planes_\u2013",
-    "name": "\u2013 Prestige Classes Manual of the Planes \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "BoED",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16663,6 +15563,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16686,6 +15587,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -16709,6 +15611,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16732,29 +15635,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_heroes_of_light_\u2013",
-    "name": "\u2013 Prestige Classes Heroes of Light \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16778,6 +15659,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16801,6 +15683,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16824,6 +15707,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16847,6 +15731,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16870,6 +15755,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16893,6 +15779,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16916,6 +15803,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16939,6 +15827,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -16962,6 +15851,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16985,6 +15875,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17008,6 +15899,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17031,6 +15923,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17038,29 +15931,6 @@
       "shield": false,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_champions_of_darkness_\u2013",
-    "name": "\u2013 Prestige Classes Champions of Darkness \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -17077,6 +15947,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17100,6 +15971,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17123,6 +15995,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": false,
@@ -17146,6 +16019,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17169,6 +16043,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17192,6 +16067,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17215,6 +16091,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17238,6 +16115,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17261,6 +16139,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17284,6 +16163,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17307,6 +16187,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17330,6 +16211,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17337,29 +16219,6 @@
       "shield": false,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_ravenloft_players_handbook_\u2013",
-    "name": "\u2013 Prestige Classes Ravenloft Players Handbook \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -17376,6 +16235,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "RCS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17399,6 +16259,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "RCS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17422,6 +16283,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "RCS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17445,6 +16307,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "RCS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17468,6 +16331,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "RCS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17491,6 +16355,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "RCS",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17498,29 +16363,6 @@
       "shield": false,
       "towerShield": false,
       "simpleWeapons": true,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_van_richten's_arsenal_vol._1._\u2013",
-    "name": "\u2013 Prestige Classes Van Richten's Arsenal Vol. 1. \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
       "martialWeapons": false
     },
     "classSkills": []
@@ -17537,6 +16379,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17560,6 +16403,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17583,6 +16427,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17606,6 +16451,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17629,6 +16475,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17652,6 +16499,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17675,6 +16523,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17698,6 +16547,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17721,6 +16571,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17744,29 +16595,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_fiend_folio_\u2013",
-    "name": "\u2013 Prestige Classes Fiend Folio \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17790,6 +16619,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17813,6 +16643,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17836,29 +16667,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_player's_companion_\u2013",
-    "name": "\u2013 Prestige Classes Player's Companion \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17882,6 +16691,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -17905,29 +16715,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_dragon_magazine_compendium_\u2013",
-    "name": "\u2013 Prestige Classes Dragon Magazine Compendium \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17951,29 +16739,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_wizards_online_content_\u2013",
-    "name": "\u2013 Prestige Classes Wizards Online Content \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -17997,6 +16763,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -18020,6 +16787,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -18043,29 +16811,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_prestige_classes_sword_and_fist_\u2013",
-    "name": "\u2013 Prestige Classes Sword and Fist \u2013",
-    "abbr": "\u2013 P",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -18089,6 +16835,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -18112,6 +16859,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -18135,6 +16883,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -18158,6 +16907,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -18166,29 +16916,6 @@
       "towerShield": true,
       "simpleWeapons": true,
       "martialWeapons": true
-    },
-    "classSkills": []
-  },
-  {
-    "id": "\u2013_marker:_end_of_prestige_classes_\u2013",
-    "name": "\u2013 Marker: end of Prestige Classes \u2013",
-    "abbr": "\u2013 M",
-    "maxLevels": 20,
-    "hitDie": 6,
-    "skillPoints": 2,
-    "babFactor": 0.5,
-    "fortFactor": 0.34,
-    "refFactor": 0.34,
-    "willFactor": 0.34,
-    "bonusCaster": null,
-    "proficiencies": {
-      "lightArmor": false,
-      "mediumArmor": false,
-      "heavyArmor": false,
-      "shield": false,
-      "towerShield": false,
-      "simpleWeapons": false,
-      "martialWeapons": false
     },
     "classSkills": []
   },
@@ -18204,6 +16931,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -18227,6 +16955,7 @@
     "refFactor": 0.34,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -18250,6 +16979,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
+    "source": "PHB",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
