@@ -86,3 +86,26 @@ export function getSourceBadgeInfo(itemSource?: string, allowedSources?: string[
     isAllowed
   };
 }
+
+/**
+ * Sorts an array of items (like races, classes, weapons, feats) alphabetically by name,
+ * with items allowed by the current selected sources grouped at the top.
+ */
+export function sortDropdownItems<T extends { name?: string; source?: string }>(
+  items: T[],
+  allowedSources?: string[],
+  getName?: (item: T) => string
+): T[] {
+  const getItemName = getName || ((item: T) => item.name || '');
+  return [...items].sort((a, b) => {
+    const allowedA = isSourceAllowed(a.source, allowedSources);
+    const allowedB = isSourceAllowed(b.source, allowedSources);
+
+    if (allowedA !== allowedB) {
+      return allowedA ? -1 : 1; // Allowed items grouped at top
+    }
+
+    return getItemName(a).localeCompare(getItemName(b), undefined, { sensitivity: 'base' });
+  });
+}
+

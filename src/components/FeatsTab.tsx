@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { CharacterState, FeatData } from '../types/character';
-import { getSourceBadgeInfo } from '../utils/sourceFilter';
+import { getSourceBadgeInfo, sortDropdownItems } from '../utils/sourceFilter';
 
 interface FeatsTabProps {
   character: CharacterState;
@@ -31,6 +31,11 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, onChan
   const [paramTarget, setParamTarget] = useState('');
 
   const selectedFeats = character.selectedFeats || [];
+
+  const sortedFeatsData = useMemo(
+    () => sortDropdownItems(featsData, character.allowedSources),
+    [featsData, character.allowedSources]
+  );
 
   const handleRemoveFeat = (featName: string) => {
     const updated = selectedFeats.filter(f => f !== featName);
@@ -81,7 +86,7 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, onChan
     }
   };
 
-  const filtered = featsData.filter(f => {
+  const filtered = sortedFeatsData.filter(f => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
     return f.name.toLowerCase().includes(q) || 
