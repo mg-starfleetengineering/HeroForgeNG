@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <rect width="100" height="100" rx="20" fill="#020617"/>
+  <path d="M50 12 L78 28 L78 62 L50 88 L22 62 L22 28 Z" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M50 20 L70 33 L70 60 L50 78 L30 60 L30 33 Z" fill="#0f172a" stroke="#d97706" stroke-width="2"/>
+  <!-- Dragon Emblem Silhouette -->
+  <path d="M42 35 C42 35, 48 30, 56 34 C64 38, 62 46, 56 48 C50 50, 48 54, 52 58 C56 62, 60 56, 62 60 C58 64, 52 66, 46 62 C40 58, 44 50, 40 46 C36 42, 38 38, 42 35 Z" fill="#f59e0b"/>
+  <circle cx="58" cy="38" r="2.5" fill="#ef4444"/>
+  <path d="M36 44 Q 46 42 50 38" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+</svg>
