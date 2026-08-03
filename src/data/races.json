@@ -29,6 +29,35 @@
     "source": "CUST"
   },
   {
+    "id": "tibbit",
+    "name": "Tibbit",
+    "category": null,
+    "size": "Small",
+    "type": "Humanoid (Shapechanger)",
+    "hd": null,
+    "speed": {
+      "land": 20,
+      "fly": null,
+      "swim": null,
+      "burrow": null,
+      "climb": null
+    },
+    "strAdj": -2,
+    "dexAdj": 2,
+    "conAdj": 0,
+    "intAdj": 0,
+    "wisAdj": 0,
+    "chaAdj": 0,
+    "naturalArmor": 0,
+    "levelAdj": 0,
+    "favoredClass": "Rogue",
+    "automaticLanguages": "Common, Tibbit",
+    "bonusLanguages": "Any",
+    "bonusFeats": null,
+    "specialAbilities": "Cat Shape (Su): Transform into a domestic cat at will. +2 racial bonus on Jump, Climb, and Escape Artist checks. Low-light vision.",
+    "source": "DrComp"
+  },
+  {
     "id": "aarakocra",
     "name": "Aarakocra",
     "category": null,

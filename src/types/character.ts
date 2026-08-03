@@ -130,6 +130,7 @@ export interface CharacterState {
   customWeapons?: WeaponData[];
   customArmors?: CustomArmorData[];
   notes?: CharacterNotes;
+  allowedSources?: string[];
 }
 
 export interface ClassData {
@@ -144,6 +145,7 @@ export interface ClassData {
   refFactor: number;
   willFactor: number;
   bonusCaster?: string;
+  source?: string;
   proficiencies: {
     lightArmor: boolean;
     mediumArmor: boolean;

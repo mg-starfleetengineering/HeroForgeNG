@@ -1,5 +1,6 @@
 import React from 'react';
 import { CharacterState, RaceData, ClassData, LevelProgression } from '../types/character';
+import { getSourceBadgeInfo, isSourceAllowed } from '../utils/sourceFilter';
 
 interface RaceClassTabProps {
   character: CharacterState;
@@ -10,6 +11,7 @@ interface RaceClassTabProps {
 
 export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData, classesData, onChange }) => {
   const raceObj = racesData.find(r => r.name === character.selectedRace) || racesData[0];
+  const selectedRaceBadge = getSourceBadgeInfo(raceObj?.source, character.allowedSources);
 
   const handleLevelChange = (lvl: number, field: keyof LevelProgression, val: any) => {
     let prog = [...character.levelProgression];
@@ -37,9 +39,14 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
             onChange={e => onChange({ selectedRace: e.target.value })}
             className="input-field"
           >
-            {racesData.map((r, idx) => (
-              <option key={r.id || `${r.name}_${idx}`} value={r.name}>{r.name} ({r.type || 'Humanoid'})</option>
-            ))}
+            {racesData.map((r, idx) => {
+              const badge = getSourceBadgeInfo(r.source, character.allowedSources);
+              return (
+                <option key={r.id || `${r.name}_${idx}`} value={r.name}>
+                  {!badge.isAllowed ? `⚠️ ${r.name} (${r.type || 'Humanoid'}) [${badge.sourceCode} - Restricted]` : `${r.name} (${r.type || 'Humanoid'}) [${badge.sourceCode}]`}
+                </option>
+              );
+            })}
           </select>
         </div>
 
@@ -49,6 +56,22 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
               <span>{raceObj.name}</span>
               <span className="text-slate-400 font-normal">{raceObj.size || 'Medium'} {raceObj.type || 'Humanoid'}</span>
             </div>
+            
+            {/* Sourcebook Badge */}
+            <div className="flex items-center gap-2 pt-1">
+              <span className="text-slate-400 text-[11px]">Source:</span>
+              <span className={`px-2 py-0.5 rounded font-mono text-[10px] font-bold border ${
+                selectedRaceBadge.isAllowed
+                  ? selectedRaceBadge.isCore
+                    ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/30'
+                    : 'bg-amber-950/80 text-amber-300 border-amber-500/30'
+                  : 'bg-rose-950/80 text-rose-300 border-rose-500/40'
+              }`}>
+                {!selectedRaceBadge.isAllowed && '⚠️ '}
+                {selectedRaceBadge.sourceName} ({selectedRaceBadge.sourceCode})
+              </span>
+            </div>
+
             <p className="text-slate-300">Base Speed: {raceObj.speed ? raceObj.speed.land : 30} ft.</p>
             <p className="text-amber-400">Level Adjustment: +{raceObj.levelAdj || 0}</p>
             <p className="text-slate-400 text-[11px] italic">{raceObj.specialAbilities || raceObj.automaticLanguages || 'Racial Traits Active.'}</p>
@@ -107,9 +130,14 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
                         className="input-field text-xs py-1"
                       >
                         <option value="">-- None --</option>
-                        {classesData.map((c, idx) => (
-                          <option key={c.id || `${c.name}_${idx}`} value={c.name}>{c.name} (d{c.hitDie})</option>
-                        ))}
+                        {classesData.map((c, idx) => {
+                          const badge = getSourceBadgeInfo(c.source, character.allowedSources);
+                          return (
+                            <option key={c.id || `${c.name}_${idx}`} value={c.name}>
+                              {!badge.isAllowed ? `⚠️ ${c.name} (d${c.hitDie}) [${badge.sourceCode}]` : `${c.name} (d${c.hitDie}) [${badge.sourceCode}]`}
+                            </option>
+                          );
+                        })}
                       </select>
                     </td>
                     {character.isGestalt && (
@@ -120,9 +148,14 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
                           className="input-field text-xs py-1"
                         >
                           <option value="">-- None --</option>
-                          {classesData.map(c => (
-                            <option key={c.name} value={c.name}>{c.name} (d{c.hitDie})</option>
-                          ))}
+                          {classesData.map(c => {
+                            const badge = getSourceBadgeInfo(c.source, character.allowedSources);
+                            return (
+                              <option key={c.name} value={c.name}>
+                                {!badge.isAllowed ? `⚠️ ${c.name} (d${c.hitDie}) [${badge.sourceCode}]` : `${c.name} (d${c.hitDie}) [${badge.sourceCode}]`}
+                              </option>
+                            );
+                          })}
                         </select>
                       </td>
                     )}

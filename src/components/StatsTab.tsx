@@ -1,6 +1,6 @@
 import React from 'react';
 import { CharacterState, RaceData, StatType } from '../types/character';
-import { ABILITY_NAMES, getAbilityMod, getPointBuyCost, getTotalPointBuySpent, calculateTotalScore } from '../engine/stats';
+import { ABILITY_NAMES, getAbilityMod, getPointBuyCost, getTotalPointBuySpent, calculateTotalScore, parseRaceMods } from '../engine/stats';
 
 interface StatsTabProps {
   character: CharacterState;
@@ -10,13 +10,11 @@ interface StatsTabProps {
 
 export const StatsTab: React.FC<StatsTabProps> = ({ character, racesData, onChange }) => {
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
-  const raceMods = {
-    str: raceObj.strAdj || 0, dex: raceObj.dexAdj || 0, con: raceObj.conAdj || 0,
-    int: raceObj.intAdj || 0, wis: raceObj.wisAdj || 0, cha: raceObj.chaAdj || 0
-  };
+  const raceMods = parseRaceMods(raceObj);
 
   const spent = getTotalPointBuySpent(character.baseStats);
   const target = character.pointBuyTarget;
+  const totalLevel = character.levelProgression?.filter(l => l.primaryClass).length || 1;
 
   const handleBaseChange = (stat: StatType, val: number) => {
     const newBase = { ...character.baseStats, [stat]: val };
@@ -82,10 +80,10 @@ export const StatsTab: React.FC<StatsTabProps> = ({ character, racesData, onChan
                 const baseVal = character.baseStats[stat] || 10;
                 const cost = getPointBuyCost(baseVal);
                 const raceVal = raceMods[stat] || 0;
-                const bumpCount = Object.values(character.levelBumps || {}).filter(s => s === stat).length;
+                const bumpCount = Object.entries(character.levelBumps || {}).filter(([lvlStr, s]) => s === stat && totalLevel >= Number(lvlStr)).length;
                 const enhVal = character.enhancementMods[stat] || 0;
 
-                const totalScore = calculateTotalScore(stat, character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {});
+                const totalScore = calculateTotalScore(stat, character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
                 const mod = getAbilityMod(totalScore);
                 const modStr = mod >= 0 ? `+${mod}` : `${mod}`;
 
@@ -135,20 +133,26 @@ export const StatsTab: React.FC<StatsTabProps> = ({ character, racesData, onChan
         </p>
 
         <div className="space-y-3">
-          {[4, 8, 12, 16, 20].map(lvl => (
-            <div key={lvl} className="flex items-center justify-between text-xs bg-slate-950/60 p-2 rounded-lg border border-slate-800">
-              <span className="text-slate-300 font-semibold font-mono">Level {lvl} Bump:</span>
-              <select
-                value={character.levelBumps[lvl] || 'str'}
-                onChange={e => handleBumpChange(lvl, e.target.value as StatType)}
-                className="bg-slate-900 text-amber-400 font-mono font-bold rounded px-2 py-1 border border-slate-700"
-              >
-                {ABILITY_NAMES.map(s => (
-                  <option key={s} value={s}>{s.toUpperCase()}</option>
-                ))}
-              </select>
-            </div>
-          ))}
+          {[4, 8, 12, 16, 20].map(lvl => {
+            const isUnlocked = totalLevel >= lvl;
+            return (
+              <div key={lvl} className={`flex items-center justify-between text-xs p-2 rounded-lg border ${isUnlocked ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-950/30 border-slate-800/40 opacity-60'}`}>
+                <span className="text-slate-300 font-semibold font-mono flex items-center gap-1.5">
+                  Level {lvl} Bump:
+                  {!isUnlocked && <span className="text-[10px] text-amber-500/80 font-normal italic">(Active at Lvl {lvl})</span>}
+                </span>
+                <select
+                  value={character.levelBumps[lvl] || 'str'}
+                  onChange={e => handleBumpChange(lvl, e.target.value as StatType)}
+                  className="bg-slate-900 text-amber-400 font-mono font-bold rounded px-2 py-1 border border-slate-700"
+                >
+                  {ABILITY_NAMES.map(s => (
+                    <option key={s} value={s}>{s.toUpperCase()}</option>
+                  ))}
+                </select>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

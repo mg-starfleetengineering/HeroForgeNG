@@ -1,0 +1,42 @@
+/* Print Stylesheet for HeroForge Anew 3.5 */
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+  }
+
+  .app-header,
+  footer,
+  .btn,
+  .nav-tab,
+  #quick-summary,
+  .tab-content:not(#tab-sheet) {
+    display: none !important;
+  }
+
+  #tab-sheet {
+    display: block !important;
+  }
+
+  #printable-character-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .card {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  @page {
+    margin: 1cm;
+  }
+}
