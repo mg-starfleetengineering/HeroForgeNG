@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CharacterState, WeaponData, RaceData, ClassData, Equipment, CustomArmorData, WondrousItem, InventoryItem, Funds } from '../types/character';
+import { getSourceBadgeInfo } from '../utils/sourceFilter';
 import { calculateTotalScore, getAbilityMod } from '../engine/stats';
 import { calculateBAB } from '../engine/classes';
 import {
@@ -518,20 +519,41 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
               <span className="text-[10px] text-slate-400 italic">Supports aliasing e.g. Nodachi (Greatsword)</span>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <div className="col-span-2">
-                <input
-                  type="text"
-                  list="weapons-datalist"
-                  value={eq.primaryWeapon || 'Longsword'}
-                  onChange={e => handleEqChange('primaryWeapon', e.target.value)}
-                  placeholder="e.g. Nodachi (Greatsword) or Longsword"
+              <div className="col-span-2 space-y-1.5">
+                <select
+                  value={availableWeapons.some(w => w.name === eq.primaryWeapon) ? eq.primaryWeapon : '__CUSTOM__'}
+                  onChange={e => {
+                    if (e.target.value !== '__CUSTOM__') {
+                      handleEqChange('primaryWeapon', e.target.value);
+                    }
+                  }}
                   className="input-field text-xs font-semibold text-amber-300"
-                />
-                <datalist id="weapons-datalist">
-                  {availableWeapons.map(w => (
-                    <option key={w.id || w.name} value={w.name}>{w.name} ({w.damageM}, {w.type})</option>
-                  ))}
-                </datalist>
+                >
+                  <option value="none">-- None --</option>
+                  {!availableWeapons.some(w => w.name === eq.primaryWeapon) && eq.primaryWeapon && eq.primaryWeapon !== 'none' && (
+                    <option value="__CUSTOM__">Custom: {eq.primaryWeapon}</option>
+                  )}
+                  {availableWeapons.map((w, idx) => {
+                    const badge = getSourceBadgeInfo(w.source, character.allowedSources);
+                    return (
+                      <option key={w.id || `${w.name}_${idx}`} value={w.name}>
+                        {!badge.isAllowed ? `⚠️ ${w.name} (${w.damageM}, ${w.type}) [${badge.sourceCode} - Restricted]` : `${w.name} (${w.damageM}, ${w.type}) [${badge.sourceCode}]`}
+                      </option>
+                    );
+                  })}
+                  <option value="__CUSTOM__">+ Custom / Typed Weapon Name...</option>
+                </select>
+
+                {/* Freeform input if custom or user wants to edit name */}
+                {(!availableWeapons.some(w => w.name === eq.primaryWeapon) || eq.primaryWeapon === '__CUSTOM__') && (
+                  <input
+                    type="text"
+                    value={eq.primaryWeapon === '__CUSTOM__' ? '' : (eq.primaryWeapon || '')}
+                    onChange={e => handleEqChange('primaryWeapon', e.target.value)}
+                    placeholder="Type custom weapon name e.g. Nodachi (Greatsword)"
+                    className="input-field text-xs font-semibold text-amber-300 border-amber-500/40"
+                  />
+                )}
               </div>
               <div>
                 <select
@@ -583,15 +605,40 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           <div className="border-t border-slate-800 pt-3 space-y-2">
             <label className="label-text">Secondary / Off-Hand Weapon</label>
             <div className="grid grid-cols-3 gap-2">
-              <div className="col-span-2">
-                <input
-                  type="text"
-                  list="weapons-datalist"
-                  value={eq.secondaryWeapon || 'none'}
-                  onChange={e => handleEqChange('secondaryWeapon', e.target.value)}
-                  placeholder="e.g. Shortsword or none"
+              <div className="col-span-2 space-y-1.5">
+                <select
+                  value={availableWeapons.some(w => w.name === eq.secondaryWeapon) ? eq.secondaryWeapon : (eq.secondaryWeapon && eq.secondaryWeapon !== 'none' ? '__CUSTOM__' : 'none')}
+                  onChange={e => {
+                    if (e.target.value !== '__CUSTOM__') {
+                      handleEqChange('secondaryWeapon', e.target.value);
+                    }
+                  }}
                   className="input-field text-xs"
-                />
+                >
+                  <option value="none">-- None --</option>
+                  {!availableWeapons.some(w => w.name === eq.secondaryWeapon) && eq.secondaryWeapon && eq.secondaryWeapon !== 'none' && (
+                    <option value="__CUSTOM__">Custom: {eq.secondaryWeapon}</option>
+                  )}
+                  {availableWeapons.map((w, idx) => {
+                    const badge = getSourceBadgeInfo(w.source, character.allowedSources);
+                    return (
+                      <option key={w.id || `${w.name}_sec_${idx}`} value={w.name}>
+                        {!badge.isAllowed ? `⚠️ ${w.name} (${w.damageM}, ${w.type}) [${badge.sourceCode} - Restricted]` : `${w.name} (${w.damageM}, ${w.type}) [${badge.sourceCode}]`}
+                      </option>
+                    );
+                  })}
+                  <option value="__CUSTOM__">+ Custom / Typed Weapon Name...</option>
+                </select>
+
+                {(!availableWeapons.some(w => w.name === eq.secondaryWeapon) && eq.secondaryWeapon && eq.secondaryWeapon !== 'none') && (
+                  <input
+                    type="text"
+                    value={eq.secondaryWeapon === '__CUSTOM__' ? '' : (eq.secondaryWeapon || '')}
+                    onChange={e => handleEqChange('secondaryWeapon', e.target.value)}
+                    placeholder="Type custom secondary weapon name"
+                    className="input-field text-xs font-semibold text-amber-300 border-amber-500/40"
+                  />
+                )}
               </div>
               <div>
                 <select
@@ -619,15 +666,40 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           <div className="border-t border-slate-800 pt-3 space-y-2">
             <label className="label-text">Ranged Weapon</label>
             <div className="grid grid-cols-3 gap-2">
-              <div className="col-span-2">
-                <input
-                  type="text"
-                  list="weapons-datalist"
-                  value={eq.rangedWeapon || 'none'}
-                  onChange={e => handleEqChange('rangedWeapon', e.target.value)}
-                  placeholder="e.g. Composite Longbow or none"
+              <div className="col-span-2 space-y-1.5">
+                <select
+                  value={availableWeapons.some(w => w.name === eq.rangedWeapon) ? eq.rangedWeapon : (eq.rangedWeapon && eq.rangedWeapon !== 'none' ? '__CUSTOM__' : 'none')}
+                  onChange={e => {
+                    if (e.target.value !== '__CUSTOM__') {
+                      handleEqChange('rangedWeapon', e.target.value);
+                    }
+                  }}
                   className="input-field text-xs"
-                />
+                >
+                  <option value="none">-- None --</option>
+                  {!availableWeapons.some(w => w.name === eq.rangedWeapon) && eq.rangedWeapon && eq.rangedWeapon !== 'none' && (
+                    <option value="__CUSTOM__">Custom: {eq.rangedWeapon}</option>
+                  )}
+                  {availableWeapons.map((w, idx) => {
+                    const badge = getSourceBadgeInfo(w.source, character.allowedSources);
+                    return (
+                      <option key={w.id || `${w.name}_rng_${idx}`} value={w.name}>
+                        {!badge.isAllowed ? `⚠️ ${w.name} (${w.damageM}, ${w.type}) [${badge.sourceCode} - Restricted]` : `${w.name} (${w.damageM}, ${w.type}) [${badge.sourceCode}]`}
+                      </option>
+                    );
+                  })}
+                  <option value="__CUSTOM__">+ Custom / Typed Weapon Name...</option>
+                </select>
+
+                {(!availableWeapons.some(w => w.name === eq.rangedWeapon) && eq.rangedWeapon && eq.rangedWeapon !== 'none') && (
+                  <input
+                    type="text"
+                    value={eq.rangedWeapon === '__CUSTOM__' ? '' : (eq.rangedWeapon || '')}
+                    onChange={e => handleEqChange('rangedWeapon', e.target.value)}
+                    placeholder="Type custom ranged weapon name"
+                    className="input-field text-xs font-semibold text-amber-300 border-amber-500/40"
+                  />
+                )}
               </div>
               <div>
                 <select
