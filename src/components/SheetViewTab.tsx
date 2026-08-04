@@ -414,6 +414,29 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData
           </p>
         </div>
 
+        {/* Active Projected Auras & Emanations */}
+        {(character.auras || []).filter(a => a.active).length > 0 && (
+          <div className="border border-amber-300 rounded-lg p-4 bg-amber-50/50 space-y-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-amber-900 border-b border-amber-300 pb-1 flex items-center gap-1.5">
+              <span>Active Projected Auras & Emanations</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              {character.auras!.filter(a => a.active).map(aura => (
+                <div key={aura.id} className="p-2 bg-white rounded border border-amber-200 shadow-sm font-sans space-y-0.5">
+                  <div className="flex items-center justify-between font-bold text-slate-900 text-[11px]">
+                    <span>{aura.name}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 bg-amber-100 border border-amber-300 text-amber-800 rounded font-mono">
+                      {aura.radius} ft &bull; {aura.target}
+                    </span>
+                  </div>
+                  <p className="text-slate-700 text-[11px] font-mono leading-tight">{aura.effect}</p>
+                  {aura.source && <span className="text-[10px] text-slate-500 block italic">Source: {aura.source}</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Backstory & Campaign Notes Section */}
         {character.notes && (character.notes.backstory || character.notes.appearance || (character.notes.quests || []).length > 0) && (
           <div className="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-2">

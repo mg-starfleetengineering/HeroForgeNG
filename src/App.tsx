@@ -7,6 +7,7 @@ import { SkillsTab } from './components/SkillsTab';
 import { FeatsTab } from './components/FeatsTab';
 import { EquipmentTab } from './components/EquipmentTab';
 import { SpellsTab } from './components/SpellsTab';
+import { AurasTab } from './components/AurasTab';
 import { NotesTab } from './components/NotesTab';
 import { SheetViewTab } from './components/SheetViewTab';
 import { PortraitModal } from './components/PortraitModal';
@@ -61,6 +62,28 @@ const DEFAULT_CHARACTER: CharacterState = {
     { id: 'inv_8', name: 'Potion of Cure Light Wounds', quantity: 2, weight: 0.1, location: 'Belt Pouch', value: '50 gp', notes: 'Heals 1d8+1 HP' }
   ],
   allowedSources: [...CORE_SOURCES],
+  auras: [
+    {
+      id: 'aura_def_1',
+      name: 'Aura of Courage',
+      type: 'Class Feature',
+      radius: 10,
+      target: 'Allies',
+      effect: 'Immune to fear (self). Allies within 10 ft gain a +4 morale bonus on saving throws against fear effects.',
+      active: true,
+      source: 'Paladin 2nd level'
+    },
+    {
+      id: 'aura_def_2',
+      name: 'Draconic Aura: Power',
+      type: 'Feat',
+      radius: 30,
+      target: 'Self & Allies',
+      effect: 'Grants +1 bonus on melee damage rolls to all recipients.',
+      active: true,
+      source: 'Dragon Magic'
+    }
+  ],
   notes: {
     backstory: 'Valerius was raised in the borderlands of Oakhaven. After a band of goblins raided his village, he pledged himself to Pelor to protect the innocent and uphold justice across the continent.',
     appearance: 'Tall, broad-shouldered warrior with short dark hair and a faint scar along his left jaw line. Wears polished steel plate over chainmail with a crimson cloak.',
@@ -264,6 +287,7 @@ export const App: React.FC = () => {
         {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} onChange={updateCharacter} />}
         {activeTab === 'equipment' && <EquipmentTab character={character} weaponsData={weaponsData} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
         {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} />}
+        {activeTab === 'auras' && <AurasTab character={character} onChange={updateCharacter} />}
         {activeTab === 'sources' && <SourceBooksTab character={character} onChange={updateCharacter} />}
         {activeTab === 'notes' && <NotesTab character={character} onChange={updateCharacter} />}
         {activeTab === 'sheet' && <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} />}
