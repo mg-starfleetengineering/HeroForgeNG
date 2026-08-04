@@ -81,21 +81,52 @@ export function calculateTotalSkillPoints(
   return totalPts;
 }
 
+export function calculateSpentSkillPoints(
+  skillRanks: Record<string, number> = {},
+  levelProgression: LevelProgression[] = [],
+  classDatabase: ClassData[] = []
+): number {
+  let spentPts = 0;
+  for (const [sName, ranks] of Object.entries(skillRanks)) {
+    if (!ranks || ranks <= 0) continue;
+    const isClass = isClassSkillForCharacter(sName, levelProgression, classDatabase);
+    // In D&D 3.5e: Class skills cost 1pt per rank. Cross-class skills cost 2pts per rank (1pt per 0.5 rank).
+    spentPts += isClass ? ranks : ranks * 2;
+  }
+  return spentPts;
+}
+
 export function isClassSkillForCharacter(
   skillName: string,
-  levelProgression: LevelProgression[],
-  classDatabase: ClassData[]
+  levelProgression: LevelProgression[] = [],
+  classDatabase: ClassData[] = []
 ): boolean {
   const activeClasses = new Set<string>();
   levelProgression.forEach(lvl => {
-    if (lvl.primaryClass) activeClasses.add(lvl.primaryClass);
-    if (lvl.secondaryClass) activeClasses.add(lvl.secondaryClass);
+    if (lvl.primaryClass) activeClasses.add(lvl.primaryClass.toLowerCase());
+    if (lvl.secondaryClass) activeClasses.add(lvl.secondaryClass.toLowerCase());
   });
 
-  for (const className of activeClasses) {
-    const clsObj = classDatabase.find(c => c.name === className);
+  for (const clsName of activeClasses) {
+    const clsObj = classDatabase.find(c => c.name.toLowerCase() === clsName);
     if (clsObj && clsObj.classSkills) {
-      const match = clsObj.classSkills.some(s => s.toLowerCase().includes(skillName.toLowerCase()));
+      const match = clsObj.classSkills.some(s => {
+        const sClean = s.toLowerCase().trim();
+        const targetClean = skillName.toLowerCase().trim();
+        if (sClean === targetClean) return true;
+
+        // Group skills
+        const groups = ['craft', 'knowledge', 'perform', 'profession'];
+        for (const group of groups) {
+          if (sClean === group && targetClean.startsWith(group)) return true;
+          if (sClean.startsWith(group) && targetClean.startsWith(group)) return true;
+        }
+
+        // Compare after stripping punctuation and whitespace
+        if (sClean.replace(/[^a-z0-9]/g, '') === targetClean.replace(/[^a-z0-9]/g, '')) return true;
+
+        return false;
+      });
       if (match) return true;
     }
   }

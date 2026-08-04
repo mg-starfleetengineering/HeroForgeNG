@@ -11,6 +11,7 @@ interface HeaderProps {
   setActiveTab: (tab: string) => void;
   onReset: () => void;
   onExport: () => void;
+  onExportRoll20: () => void;
   onImport: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -22,8 +23,10 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   onReset,
   onExport,
+  onExportRoll20,
   onImport
 }) => {
+  const [showExportDropdown, setShowExportDropdown] = React.useState(false);
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
   const raceMods = parseRaceMods(raceObj);
 
@@ -124,9 +127,49 @@ export const Header: React.FC<HeaderProps> = ({
           <button onClick={onReset} className="btn btn-secondary text-xs" title="New Character">
             <i className="fa-solid fa-file-circle-plus"></i> <span className="hidden sm:inline">New</span>
           </button>
-          <button onClick={onExport} className="btn btn-secondary text-xs" title="Save JSON">
-            <i className="fa-solid fa-download"></i> <span className="hidden sm:inline">Export</span>
-          </button>
+          
+          {/* Export Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowExportDropdown(!showExportDropdown)}
+              className="btn btn-secondary text-xs flex items-center gap-1.5"
+              title="Export Options"
+            >
+              <i className="fa-solid fa-download"></i>
+              <span className="hidden sm:inline">Export</span>
+              <i className="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
+            </button>
+
+            {showExportDropdown && (
+              <div
+                className="absolute right-0 mt-2 w-56 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 py-1.5 text-xs overflow-hidden"
+                onMouseLeave={() => setShowExportDropdown(false)}
+              >
+                <button
+                  onClick={() => { onExport(); setShowExportDropdown(false); }}
+                  className="w-full px-4 py-2 text-left text-slate-200 hover:bg-slate-800 hover:text-amber-300 flex items-center gap-2 transition"
+                >
+                  <i className="fa-solid fa-file-code text-amber-400 w-4"></i>
+                  <div>
+                    <div className="font-medium">HeroForge Native JSON</div>
+                    <div className="text-[10px] text-slate-400">Save for re-importing into app</div>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => { onExportRoll20(); setShowExportDropdown(false); }}
+                  className="w-full px-4 py-2 text-left text-slate-200 hover:bg-slate-800 hover:text-red-300 flex items-center gap-2 transition border-t border-slate-800"
+                >
+                  <i className="fa-solid fa-dice-d20 text-red-400 w-4"></i>
+                  <div>
+                    <div className="font-medium">Roll20 3.5e Sheet JSON</div>
+                    <div className="text-[10px] text-slate-400">Import into Roll20 VTT sheets</div>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
+
           <label className="btn btn-secondary text-xs cursor-pointer" title="Load JSON">
             <i className="fa-solid fa-upload"></i> <span className="hidden sm:inline">Import</span>
             <input type="file" className="hidden" accept=".json" onChange={onImport} />

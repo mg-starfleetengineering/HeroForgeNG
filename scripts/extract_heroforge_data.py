@@ -108,11 +108,25 @@ def extract_classes():
         class_skills = []
         for col_idx in range(34, 114):
             if col_idx < len(headers):
-                skill_name = headers[col_idx]
-                if skill_name and not skill_name.startswith("col_") and "" not in skill_name:
-                    is_class_skill = bool(clean_val(row[col_idx]))
-                    if is_class_skill:
-                        class_skills.append(skill_name)
+                skill_name_raw = headers[col_idx]
+                val = clean_val(row[col_idx])
+                # Value 2 in HeroForge ClassInfo spreadsheet denotes a Class Skill
+                if skill_name_raw and not str(skill_name_raw).startswith("col_") and val == 2:
+                    import re
+                    h_clean = re.sub(r'[^\x00-\x7F]+', '', str(skill_name_raw)).strip()
+                    if 'Craft' in h_clean:
+                        skill_clean = 'Craft'
+                    elif 'Knowledge skills' in h_clean or h_clean == 'Knowledge ()':
+                        skill_clean = 'Knowledge'
+                    elif 'Perform' in h_clean:
+                        skill_clean = 'Perform'
+                    elif 'Profession' in h_clean:
+                        skill_clean = 'Profession'
+                    else:
+                        skill_clean = h_clean
+                    
+                    if skill_clean and skill_clean not in class_skills:
+                        class_skills.append(skill_clean)
         
         classes.append({
             "id": class_name.lower().replace(" ", "_").replace("/", "_"),
@@ -161,6 +175,7 @@ def extract_races():
             "category": clean_val(row.get("Category")),
             "size": clean_val(row.get("Size")) or "Medium",
             "type": clean_val(row.get("Type")) or "Humanoid",
+            "subtype": clean_val(row.get("Subtype")),
             "hd": clean_val(row.get("HD")),
             "speed": {
                 "land": clean_val(row.get("Land")) or 30,
@@ -182,6 +197,9 @@ def extract_races():
             "bonusLanguages": clean_val(row.get("Bonus Languages")),
             "bonusFeats": clean_val(row.get("Bonus Feat(s)")),
             "specialAbilities": clean_val(row.get("Other Special Abilities")),
+            "spellLikeAbilities": clean_val(row.get("Spell-like abilities")),
+            "psionicAbilities": clean_val(row.get("Psionic abilities")),
+            "racialSkills": clean_val(row.get("Racial Skills")),
             "source": clean_val(row.get("Src"))
         })
     

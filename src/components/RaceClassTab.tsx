@@ -86,7 +86,10 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
           <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs space-y-2">
             <div className="flex justify-between items-center text-amber-400 font-bold">
               <span>{raceObj.name}</span>
-              <span className="text-slate-400 font-normal">{raceObj.size || 'Medium'} {raceObj.type || 'Humanoid'}</span>
+              <span className="text-slate-400 font-normal">
+                {raceObj.size || 'Medium'} {raceObj.type || 'Humanoid'}
+                {raceObj.subtype ? ` (${raceObj.subtype})` : ''}
+              </span>
             </div>
             
             {/* Sourcebook Badge */}
@@ -106,7 +109,34 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
 
             <p className="text-slate-300">Base Speed: {raceObj.speed ? raceObj.speed.land : 30} ft.</p>
             <p className="text-amber-400">Level Adjustment: +{raceObj.levelAdj || 0}</p>
-            <p className="text-slate-400 text-[11px] italic">{raceObj.specialAbilities || raceObj.automaticLanguages || 'Racial Traits Active.'}</p>
+
+            {raceObj.spellLikeAbilities && (
+              <p className="text-emerald-400 font-semibold">
+                <i className="fa-solid fa-wand-magic-sparkles mr-1"></i>
+                Spell-Like: <span className="font-mono text-emerald-300">{raceObj.spellLikeAbilities}</span>
+              </p>
+            )}
+            {raceObj.psionicAbilities && (
+              <p className="text-purple-400 font-semibold">
+                <i className="fa-solid fa-brain mr-1"></i>
+                Psionics: <span className="font-mono text-purple-300">{raceObj.psionicAbilities}</span>
+              </p>
+            )}
+            {raceObj.racialSkills && (
+              <p className="text-sky-300">
+                <i className="fa-solid fa-bullseye mr-1"></i>
+                Racial Skills: <span className="font-mono">{raceObj.racialSkills}</span>
+              </p>
+            )}
+            {raceObj.bonusFeats && (
+              <p className="text-amber-300">
+                <i className="fa-solid fa-award mr-1"></i>
+                Bonus Feats: <span className="font-mono">{raceObj.bonusFeats}</span>
+              </p>
+            )}
+            <p className="text-slate-400 text-[11px] italic">
+              {raceObj.specialAbilities || (!raceObj.spellLikeAbilities && raceObj.automaticLanguages ? `Languages: ${raceObj.automaticLanguages}` : 'Racial Traits Active.')}
+            </p>
           </div>
         )}
       </div>
