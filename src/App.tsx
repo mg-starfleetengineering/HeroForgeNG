@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CharacterState, RaceData, ClassData, WeaponData, FeatData, TraitData, FlawData } from './types/character';
+import { CharacterState, RaceData, ClassData, WeaponData, FeatData, TraitData, FlawData, SkillTrickData } from './types/character';
 import { Header } from './components/Header';
 import { StatsTab } from './components/StatsTab';
 import { RaceClassTab } from './components/RaceClassTab';
@@ -123,6 +123,7 @@ export const App: React.FC = () => {
   const [featsData, setFeatsData] = useState<FeatData[]>([]);
   const [traitsData, setTraitsData] = useState<TraitData[]>([]);
   const [flawsData, setFlawsData] = useState<FlawData[]>([]);
+  const [skillTricksData, setSkillTricksData] = useState<SkillTrickData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -132,14 +133,16 @@ export const App: React.FC = () => {
       fetch('./data/weapons.json').then(res => res.json()),
       fetch('./data/feats.json').then(res => res.json()),
       fetch('./data/traits.json').then(res => res.json()),
-      fetch('./data/flaws.json').then(res => res.json())
-    ]).then(([races, classes, weapons, feats, traits, flaws]) => {
+      fetch('./data/flaws.json').then(res => res.json()),
+      fetch('./data/skill_tricks.json').then(res => res.json())
+    ]).then(([races, classes, weapons, feats, traits, flaws, tricks]) => {
       setRacesData(races);
       setClassesData(classes);
       setWeaponsData(weapons);
       setFeatsData(feats);
       setTraitsData(traits);
       setFlawsData(flaws);
+      setSkillTricksData(tricks);
       setLoading(false);
     }).catch(err => {
       console.error('Failed to load HeroForge JSON data:', err);
@@ -307,7 +310,7 @@ export const App: React.FC = () => {
         {/* Tab Views */}
         {activeTab === 'stats' && <StatsTab character={character} racesData={racesData} onChange={updateCharacter} />}
         {activeTab === 'race-class' && <RaceClassTab character={character} racesData={racesData} classesData={classesData} traitsData={traitsData} flawsData={flawsData} onChange={updateCharacter} />}
-        {activeTab === 'skills' && <SkillsTab character={character} racesData={racesData} classesData={classesData} traitsData={traitsData} flawsData={flawsData} onChange={updateCharacter} />}
+        {activeTab === 'skills' && <SkillsTab character={character} racesData={racesData} classesData={classesData} traitsData={traitsData} flawsData={flawsData} skillTricksData={skillTricksData} onChange={updateCharacter} />}
         {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} classesData={classesData} racesData={racesData} onChange={updateCharacter} />}
         {activeTab === 'equipment' && <EquipmentTab character={character} weaponsData={weaponsData} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
         {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} racesData={racesData} />}

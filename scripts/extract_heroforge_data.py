@@ -411,6 +411,79 @@ def extract_flaws():
         json.dump(flaws, f, indent=2)
     print(f"Extracted {len(flaws)} flaws -> src/data/flaws.json & public/data/flaws.json")
 
+def extract_skill_tricks():
+    print("Extracting Skill Tricks...")
+    import re
+    df = pd.read_excel("HeroForge Anew 3.5 v7.4.0.1.xlsm", sheet_name="Skill Tricks", header=None)
+    tricks = []
+    seen = set()
+
+    for idx in range(len(df)):
+        name = df.iloc[idx, 2]
+        if pd.isna(name):
+            continue
+        name_str = str(name).strip()
+        if name_str in ['Skill Trick', 'Avaliable Tricks', 'Bonus Tricks', 'Interaction', 'Manipulation', 'Mental', 'Movement'] or name_str in seen:
+            continue
+        
+        prereq = df.iloc[idx, 3]
+        desc = df.iloc[idx, 4]
+        cat = df.iloc[idx, 5]
+        page = df.iloc[idx, 12]
+        
+        desc_str = str(desc).strip() if pd.notna(desc) else "No description available."
+        if desc_str.startswith(':'):
+            desc_str = desc_str[1:].strip()
+            
+        page_str = f"CS p.{int(page)}" if pd.notna(page) and str(page).replace('.','').isdigit() else "CS"
+        prereq_str = str(prereq).strip() if pd.notna(prereq) else ""
+        
+        ranks = {}
+        feats = []
+        if prereq_str:
+            parts = [p.strip() for p in prereq_str.split(',')]
+            for part in parts:
+                match = re.search(r'([A-Za-z\s\(\)]+?)\s+(\d+)\s+ranks?', part, re.IGNORECASE)
+                if match:
+                    skill = match.group(1).strip()
+                    num = int(match.group(2))
+                    if 'knowledge' in skill.lower() and 'any' in skill.lower():
+                        skill = 'Knowledge (any)'
+                    elif 'bluff or sleight of hand' in skill.lower():
+                        ranks['Bluff/Sleight of Hand'] = num
+                    else:
+                        skill_clean = skill.title()
+                        if 'Of' in skill_clean:
+                            skill_clean = skill_clean.replace('Of', 'of')
+                        if 'To' in skill_clean:
+                            skill_clean = skill_clean.replace('To', 'to')
+                        if 'The' in skill_clean:
+                            skill_clean = skill_clean.replace('The', 'the')
+                        ranks[skill_clean] = num
+                elif 'quick draw' in part.lower():
+                    feats.append('Quick Draw')
+                    
+        trick_id = name_str.lower().replace(' ', '_').replace('-', '_').replace("'", "").replace('(', '').replace(')', '')
+        seen.add(name_str)
+        
+        item = {
+            "id": trick_id,
+            "name": name_str,
+            "category": str(cat).strip() if pd.notna(cat) else "General",
+            "description": desc_str,
+            "prerequisites": prereq_str,
+            "prereqRanks": ranks,
+            "prereqFeats": feats,
+            "source": page_str
+        }
+        tricks.append(item)
+
+    with open(os.path.join(OUTPUT_DIR, "skill_tricks.json"), "w", encoding="utf-8") as f:
+        json.dump(tricks, f, indent=2)
+    with open(os.path.join(PUBLIC_DATA_DIR, "skill_tricks.json"), "w", encoding="utf-8") as f:
+        json.dump(tricks, f, indent=2)
+    print(f"Extracted {len(tricks)} skill tricks -> src/data/skill_tricks.json & public/data/skill_tricks.json")
+
 if __name__ == "__main__":
     extract_classes()
     extract_races()
@@ -418,6 +491,8 @@ if __name__ == "__main__":
     extract_feats()
     extract_traits()
     extract_flaws()
+    extract_skill_tricks()
     extract_tables()
     print("Data extraction complete!")
+
 
