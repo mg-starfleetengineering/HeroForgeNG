@@ -151,6 +151,38 @@ export interface CharacterState {
     listenRanks: number;
     searchRanks: number;
   };
+  selectedTraits?: string[];
+  selectedFlaws?: string[];
+}
+
+export interface TraitData {
+  id: string;
+  name: string;
+  description: string;
+  source?: string;
+  statMods?: Partial<BaseStats>;
+  saveMods?: { fort?: number; ref?: number; will?: number };
+  skillMods?: Record<string, number>;
+  initiativeMod?: number;
+  acMod?: number;
+  hpPerLevelMod?: number;
+  speedMod?: number;
+  prerequisites?: string;
+}
+
+export interface FlawData {
+  id: string;
+  name: string;
+  description: string;
+  source?: string;
+  statMods?: Partial<BaseStats>;
+  saveMods?: { fort?: number; ref?: number; will?: number };
+  skillMods?: Record<string, number>;
+  initiativeMod?: number;
+  acMod?: number;
+  hpPerLevelMod?: number;
+  speedMod?: number;
+  prerequisites?: string;
 }
 
 export interface ClassData {

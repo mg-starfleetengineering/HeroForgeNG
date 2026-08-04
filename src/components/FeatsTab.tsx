@@ -1,10 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { CharacterState, FeatData } from '../types/character';
+import { CharacterState, FeatData, ClassData, RaceData } from '../types/character';
 import { getSourceBadgeInfo, sortDropdownItems } from '../utils/sourceFilter';
+import { calculateBonusFeatsFromFlaws, calculateTotalFeatSlots } from '../engine/stats';
 
 interface FeatsTabProps {
   character: CharacterState;
   featsData: FeatData[];
+  classesData?: ClassData[];
+  racesData?: RaceData[];
   onChange: (updated: Partial<CharacterState>) => void;
 }
 
@@ -22,7 +25,7 @@ const PARAMETERIZED_FEAT_BASES = [
   'Weapon Finesse'
 ];
 
-export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, onChange }) => {
+export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, classesData = [], racesData = [], onChange }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [customFeatInput, setCustomFeatInput] = useState('');
 
@@ -31,6 +34,9 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, onChan
   const [paramTarget, setParamTarget] = useState('');
 
   const selectedFeats = character.selectedFeats || [];
+  const selectedFlaws = character.selectedFlaws || [];
+  const flawBonusFeatCount = calculateBonusFeatsFromFlaws(selectedFlaws);
+  const featSlotInfo = calculateTotalFeatSlots(character, classesData, racesData);
 
   const sortedFeatsData = useMemo(
     () => sortDropdownItems(featsData, character.allowedSources),
@@ -115,11 +121,29 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, onChan
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Selected Feats Slots & Custom Add Bar */}
       <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-4">
-        <h2 className="text-lg font-bold font-heading text-slate-100 border-b border-slate-800 pb-3 flex items-center justify-between">
+        <h2 className="text-lg font-bold font-heading text-slate-100 border-b border-slate-800 pb-3 flex items-center justify-between flex-wrap gap-2">
           <span className="flex items-center gap-2">
-            <i className="fa-solid fa-award text-amber-500"></i> Active Feats ({selectedFeats.length})
+            <i className="fa-solid fa-award text-amber-500"></i> Active Feats ({selectedFeats.length} / {featSlotInfo.totalSlots})
+          </span>
+          <span className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-bold border ${
+            selectedFeats.length <= featSlotInfo.totalSlots
+              ? 'bg-amber-500/10 text-amber-300 border-amber-500/30'
+              : 'bg-rose-950/80 text-rose-300 border-rose-500/40'
+          }`}>
+            {selectedFeats.length} / {featSlotInfo.totalSlots} Slots
           </span>
         </h2>
+
+        {/* Flaw Bonus Feat Banner */}
+        {flawBonusFeatCount > 0 && (
+          <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-xs text-emerald-300 flex items-center gap-2 font-mono">
+            <i className="fa-solid fa-circle-check text-emerald-400 text-sm shrink-0"></i>
+            <div>
+              <span className="font-bold block">+{flawBonusFeatCount} Extra Feat Slot{flawBonusFeatCount > 1 ? 's' : ''} Active</span>
+              <span className="text-[10px] text-emerald-400/80">Granted by selected Flaw{flawBonusFeatCount > 1 ? 's' : ''}: {selectedFlaws.join(', ')}</span>
+            </div>
+          </div>
+        )}
 
         {/* Free-Text Custom Feat Entry */}
         <form onSubmit={handleAddCustomFeatSubmit} className="space-y-2">

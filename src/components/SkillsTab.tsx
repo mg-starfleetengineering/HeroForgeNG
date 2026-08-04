@@ -1,5 +1,5 @@
 import React from 'react';
-import { CharacterState, RaceData, ClassData } from '../types/character';
+import { CharacterState, RaceData, ClassData, TraitData, FlawData } from '../types/character';
 import {
   getAvailableSkills,
   calculateTotalSkillPoints,
@@ -9,25 +9,33 @@ import {
   revertPerceptionToSkills,
   calculatePerceptionStats
 } from '../engine/skills';
-import { calculateTotalScore, getAbilityMod, parseRaceMods } from '../engine/stats';
+import { calculateTotalScore, getAbilityMod, parseRaceMods, calculateTraitFlawStatMods, calculateTraitFlawSkillMods } from '../engine/stats';
 
 interface SkillsTabProps {
   character: CharacterState;
   racesData: RaceData[];
   classesData: ClassData[];
+  traitsData?: TraitData[];
+  flawsData?: FlawData[];
   onChange: (updated: Partial<CharacterState>) => void;
 }
 
-export const SkillsTab: React.FC<SkillsTabProps> = ({ character, racesData, classesData, onChange }) => {
+export const SkillsTab: React.FC<SkillsTabProps> = ({ character, racesData, classesData, traitsData = [], flawsData = [], onChange }) => {
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
   const raceMods = parseRaceMods(raceObj);
 
+  const selectedTraits = character.selectedTraits || [];
+  const selectedFlaws = character.selectedFlaws || [];
+
+  const traitFlawStatMods = calculateTraitFlawStatMods(selectedTraits, selectedFlaws, traitsData, flawsData);
+  const usePathfinder = !!character.usePathfinderPerception;
+  const traitFlawSkillMods = calculateTraitFlawSkillMods(selectedTraits, selectedFlaws, traitsData, flawsData, usePathfinder);
+
   const totalLevel = character.levelProgression?.filter(l => l.primaryClass).length || 1;
-  const intScore = calculateTotalScore('int', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
+  const intScore = calculateTotalScore('int', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
   const intMod = getAbilityMod(intScore);
   const isHuman = !!character.selectedRace && character.selectedRace.toLowerCase().includes('human');
 
-  const usePathfinder = !!character.usePathfinderPerception;
   const activeSkills = getAvailableSkills(usePathfinder);
 
   const totalBudget = calculateTotalSkillPoints(character.levelProgression, classesData, intMod, isHuman);
@@ -96,15 +104,16 @@ export const SkillsTab: React.FC<SkillsTabProps> = ({ character, racesData, clas
               const isClass = isClassSkillForCharacter(skill.name, character.levelProgression, classesData);
               const ranks = (character.skillRanks || {})[skill.name] || 0;
 
-              const abilityScore = calculateTotalScore(skill.keyAbility, character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
+              const abilityScore = calculateTotalScore(skill.keyAbility, character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
               const abMod = getAbilityMod(abilityScore);
+              const tfSkillMod = traitFlawSkillMods[skill.name] || 0;
 
-              let totalMod = Math.floor(ranks) + abMod;
+              let totalMod = Math.floor(ranks) + abMod + tfSkillMod;
               let featBonusText = '';
 
               if (skill.name === 'Perception') {
                 const percStats = calculatePerceptionStats(character, classesData, abMod);
-                totalMod = percStats.totalBonus;
+                totalMod = percStats.totalBonus + tfSkillMod;
                 if (percStats.alertnessBonus > 0) {
                   featBonusText = ` (includes +${percStats.alertnessBonus} Alertness)`;
                 }

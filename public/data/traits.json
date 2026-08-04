@@ -1,0 +1,327 @@
+[
+  {
+    "id": "abrasive",
+    "name": "Abrasive",
+    "description": ": Gain +1 to Intimidate checks, -1 to Diplomacy and Bluff.",
+    "source": "UA Pg 87)",
+    "skillMods": {
+      "Intimidate": 1,
+      "Diplomacy": -1,
+      "Bluff": -1
+    }
+  },
+  {
+    "id": "absent_minded",
+    "name": "Absent-Minded",
+    "description": ": Gain +1 on Knowledge checks, -1 to Spot and Listen.",
+    "source": "UA Pg 87)",
+    "skillMods": {
+      "Knowledge (Arcana)": 1,
+      "Knowledge (Dungeoneering)": 1,
+      "Knowledge (Local)": 1,
+      "Knowledge (Nature)": 1,
+      "Knowledge (Religion)": 1,
+      "Knowledge (The Planes)": 1,
+      "Spot": -1,
+      "Listen": -1
+    }
+  },
+  {
+    "id": "aggressive",
+    "name": "Aggressive",
+    "description": ": Gain +2 on initiative checks, -1 to AC.",
+    "source": "UA Pg 87)",
+    "initiativeMod": 2,
+    "acMod": -1
+  },
+  {
+    "id": "brawler",
+    "name": "Brawler",
+    "description": ": +1 on unarmed attacks rolls, -1 on all other attack rolls. This doesn't apply to natural weapons and can't be taken if you have the Improved Unarmed Strike feat.",
+    "source": "UA Pg 87)"
+  },
+  {
+    "id": "cautious",
+    "name": "Cautious",
+    "description": ": Gain +1 dodge bonus to AC when fighting defensively or taking otal defense, -1 to saves vs. fear. You can't take this trait if you are immune to fear.",
+    "source": "UA Pg 87)"
+  },
+  {
+    "id": "detached",
+    "name": "Detached",
+    "description": ": Gain +1 on Will saves, -1 on Reflex saves.",
+    "source": "UA Pg 87)",
+    "saveMods": {
+      "will": 1,
+      "ref": -1
+    }
+  },
+  {
+    "id": "dishonest",
+    "name": "Dishonest",
+    "description": ": +1 on Bluff checks, -2 on Diplomacy.",
+    "source": "UA Pg 87)",
+    "skillMods": {
+      "Bluff": 1,
+      "Diplomacy": -2
+    }
+  },
+  {
+    "id": "distinctive",
+    "name": "Distinctive",
+    "description": ": Gain +1 on Reputation checks, -1 on Disguise.",
+    "source": "UA Pg 87)",
+    "skillMods": {
+      "Disguise": -1
+    }
+  },
+  {
+    "id": "easygoing",
+    "name": "Easygoing",
+    "description": ": Gain +1 on Gather Information checks, -1 on Intimidate.",
+    "source": "UA Pg 87)",
+    "skillMods": {
+      "Gather Information": 1,
+      "Intimidate": -1
+    }
+  },
+  {
+    "id": "farsighted",
+    "name": "Farsighted",
+    "description": ": Gain +1 on Spot checks, -1 Search.",
+    "source": "UA Pg 87)",
+    "skillMods": {
+      "Spot": 1,
+      "Search": -1
+    }
+  },
+  {
+    "id": "focused",
+    "name": "Focused",
+    "description": ": Gain +1 on Concentration checks, -1 on Spot and Listen.",
+    "source": "UA Pg 88)",
+    "skillMods": {
+      "Concentration": 1,
+      "Spot": -1,
+      "Listen": -1
+    }
+  },
+  {
+    "id": "hard_of_hearing",
+    "name": "Hard of Hearing",
+    "description": ": Gain +1 on Spot checks, -2 to listen.",
+    "source": "UA Pg 88)",
+    "skillMods": {
+      "Spot": 1,
+      "Listen": -2
+    }
+  },
+  {
+    "id": "hardy",
+    "name": "Hardy",
+    "description": ": Gain +1 on Fortitude saves, -1 on Reflex saves.",
+    "source": "UA Pg 88)",
+    "saveMods": {
+      "fort": 1,
+      "ref": -1
+    }
+  },
+  {
+    "id": "honest",
+    "name": "Honest",
+    "description": ": Gain +1 on Diplomacy checks, -1 on Bluff and Sense Motive.",
+    "source": "UA Pg 88)",
+    "skillMods": {
+      "Diplomacy": 1,
+      "Bluff": -1,
+      "Sense Motive": -1
+    }
+  },
+  {
+    "id": "illiterate",
+    "name": "Illiterate",
+    "description": ": Choose any one skill except Decipher Script or Forgery, and gain a +1 to that skill. You are illiterate. You can spend 2 skill points in Speak Language to eliminate the negative effects of this trait.",
+    "source": "UA Pg 88)"
+  },
+  {
+    "id": "inattentive",
+    "name": "Inattentive",
+    "description": ": Choose a skill that allows complex skill checks, and gain a +1 bonus to simple skill checks made with that skill. This can be taken multiple time but each time you must choose a new skill.",
+    "source": "UA Pg 88)"
+  },
+  {
+    "id": "musclebound",
+    "name": "Musclebound",
+    "description": ": Gain +1 bonus on Strength-based skill checks and ability checks, -2 on Dexterity-based skill checks and ability checks.",
+    "source": "UA Pg 89)",
+    "skillMods": {
+      "Climb": 1,
+      "Jump": 1,
+      "Swim": 1,
+      "Balance": -2,
+      "Escape Artist": -2,
+      "Hide": -2,
+      "Move Silently": -2,
+      "Open Lock": -2,
+      "Ride": -2,
+      "Sleight of Hand": -2,
+      "Tumble": -2,
+      "Use Rope": -2
+    }
+  },
+  {
+    "id": "nearsighted",
+    "name": "Nearsighted",
+    "description": ": Gain +1 on Search checks, -1 Spot.",
+    "source": "UA Pg 89)",
+    "skillMods": {
+      "Search": 1,
+      "Spot": -1
+    }
+  },
+  {
+    "id": "nightsighted",
+    "name": "Nightsighted",
+    "description": ": +10 ft darkvision, -1 Spot in brightlight.",
+    "source": "UA Pg 89)",
+    "skillMods": {
+      "Spot": -1
+    }
+  },
+  {
+    "id": "passionate",
+    "name": "Passionate",
+    "description": ": Gain +1 on Fortitude saves, -1 on Will saves.",
+    "source": "UA Pg 89)",
+    "saveMods": {
+      "fort": 1,
+      "will": -1
+    }
+  },
+  {
+    "id": "plucky",
+    "name": "Plucky",
+    "description": ": Gain +1 on Will saves, -1 on Fortitude saves.",
+    "source": "UA Pg 89)",
+    "saveMods": {
+      "will": 1,
+      "fort": -1
+    }
+  },
+  {
+    "id": "polite",
+    "name": "Polite",
+    "description": ": Gain +1 bonus on Diplomacy checks, -2 on Intimidate.",
+    "source": "UA Pg 89)",
+    "skillMods": {
+      "Diplomacy": 1,
+      "Intimidate": -2
+    }
+  },
+  {
+    "id": "quick",
+    "name": "Quick",
+    "description": ": Your base land speed increases by 10 ft., subtract 1 from your hp gained at each level including first. Result of 0 is possible.",
+    "source": "UA Pg 89)",
+    "speedMod": 10,
+    "hpPerLevelMod": -1
+  },
+  {
+    "id": "reckless",
+    "name": "Reckless",
+    "description": ": Gain +1 on melee damage rolls, -1 to melee attack rolls.",
+    "source": "UA Pg 89)"
+  },
+  {
+    "id": "relentless",
+    "name": "Relentless",
+    "description": ": Gain +1 on Constitution checks made to continue tiring effects. If ever you would become fatigued you instead become exhasted.",
+    "source": "UA Pg 90)"
+  },
+  {
+    "id": "saddleborn",
+    "name": "Saddleborn",
+    "description": ": Gain +1 on Ride checks, -1 on Handle Animal.",
+    "source": "UA Pg 90)",
+    "skillMods": {
+      "Ride": 1,
+      "Handle Animal": -1
+    }
+  },
+  {
+    "id": "skinny",
+    "name": "Skinny",
+    "description": ": Gain +1 on Escape Artist checks, -2 on Strength checks to aviod being bull rushed or overrun.",
+    "source": "UA Pg 90)",
+    "skillMods": {
+      "Escape Artist": 1
+    }
+  },
+  {
+    "id": "slippery",
+    "name": "Slippery",
+    "description": ": Gain +1 on Escape Artist checks to escape a grapple, and on grapple checks to escape or avoid being grappled. -1 on all other grapple checks.",
+    "source": "UA Pg 90)",
+    "skillMods": {
+      "Escape Artist": 1
+    }
+  },
+  {
+    "id": "slow",
+    "name": "Slow",
+    "description": ": Add +1 to your hp gained at each level. Your base land speed is halved (rounded down to the nearest 5 foot). You must have a base land speed of 20 ft. to take this trait.",
+    "source": "UA Pg 90)",
+    "hpPerLevelMod": 1,
+    "speedMod": -0.5
+  },
+  {
+    "id": "specialized",
+    "name": "Specialized",
+    "description": ": Choose any one Craft, Knowledge, or Profession skill, and gain a +1 bonus on that skill. Take a -2 penalty on all other checks using the same skill (Craft, Knowledge, or Profession, based on the chosen skill).",
+    "source": "UA Pg 90)"
+  },
+  {
+    "id": "spellgifted",
+    "name": "Spellgifted",
+    "description": ": Choose a school of magic and gain +1 caster level when casting spells of that school. -1 to caster level when casting spells of any other school.",
+    "source": "UA Pg 90)"
+  },
+  {
+    "id": "stout",
+    "name": "Stout",
+    "description": ": +2 on Strength checks made to avoid being bull rushed or overrun. -1 on Escape Artist checks.",
+    "source": "UA Pg 90)",
+    "skillMods": {
+      "Escape Artist": -1
+    }
+  },
+  {
+    "id": "suspicious",
+    "name": "Suspicious",
+    "description": ": Gain +1 on Sense Motive checks, -1 on Diplomacy and Intimidate.",
+    "source": "UA Pg 90)",
+    "skillMods": {
+      "Sense Motive": 1,
+      "Diplomacy": -1,
+      "Intimidate": -1
+    }
+  },
+  {
+    "id": "torpid",
+    "name": "Torpid",
+    "description": ": Gain a +1 on saves vs. enchantment (compulsion) effects. -2 on initiative checks.",
+    "source": "UA Pg 90)",
+    "initiativeMod": -2
+  },
+  {
+    "id": "uncivilized",
+    "name": "Uncivilized",
+    "description": ": Gain +1 on Handle Animal checks, -1 on Bluff and Gather Information.",
+    "source": "UA Pg 90)",
+    "skillMods": {
+      "Handle Animal": 1,
+      "Bluff": -1,
+      "Gather Information": -1
+    }
+  }
+]

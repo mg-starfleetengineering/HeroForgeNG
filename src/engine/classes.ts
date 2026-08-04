@@ -60,7 +60,8 @@ export function calculateBaseSave(
 export function calculateTotalHP(
   levelProgression: LevelProgression[],
   classDatabase: ClassData[],
-  conMod: number
+  conMod: number,
+  hpPerLevelMod: number = 0
 ): number {
   let totalHP = 0;
 
@@ -79,9 +80,9 @@ export function calculateTotalHP(
       rolledHp = (idx === 0) ? hd : Math.floor(hd / 2) + 1;
     }
 
-    const hpWithCon = Math.max(1, rolledHp + conMod);
+    const hpWithCon = Math.max(0, rolledHp + conMod + hpPerLevelMod);
     totalHP += hpWithCon;
   });
 
-  return totalHP;
+  return Math.max(1, totalHP);
 }
