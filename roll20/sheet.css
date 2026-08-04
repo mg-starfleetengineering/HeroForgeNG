@@ -47,11 +47,29 @@
   border: 1px solid #1e293b;
   color: #f8fafc;
   border-radius: 6px;
-  padding: 5px 8px;
-  font-size: 12px;
+  padding: 4px 6px;
+  font-size: 11px;
   font-family: inherit;
   width: 100%;
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* REMOVE BROWSER NUMBER SPINNERS / INNER PADDING CLIPPING */
+.charsheet input[type="number"]::-webkit-outer-spin-button,
+.charsheet input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.charsheet input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+  padding: 4px 3px;
+  text-align: center;
+}
+
+.charsheet select {
+  padding: 4px 18px 4px 6px;
 }
 
 .charsheet input[type="text"]:focus,
@@ -356,9 +374,15 @@
 }
 
 .charsheet .sheet-table td {
-  padding: 4px;
+  padding: 4px 2px;
   text-align: center;
   border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+}
+
+.charsheet .sheet-table input[type="number"] {
+  padding: 3px 2px !important;
+  text-align: center !important;
+  font-size: 11px;
 }
 
 .charsheet .sheet-stat-label {
@@ -543,8 +567,8 @@
 /* SPELL METADATA */
 .charsheet .sheet-caster-bar {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  grid-template-columns: 90px 1fr 100px;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
@@ -598,8 +622,14 @@
 .charsheet .sheet-currency-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+  gap: 4px;
   margin-bottom: 12px;
+}
+
+.charsheet .sheet-currency-grid input {
+  padding: 4px 2px !important;
+  text-align: center;
+  font-weight: 700;
 }
 
 .charsheet .sheet-networth-banner {
@@ -615,7 +645,7 @@
 /* CARRYING CAPACITY */
 .charsheet .sheet-capacity-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 130px 1fr;
   gap: 10px;
   margin-bottom: 10px;
 }
