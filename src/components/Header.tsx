@@ -1,12 +1,22 @@
 import React from 'react';
-import { CharacterState, RaceData, ClassData, Equipment } from '../types/character';
-import { calculateTotalScore, getAbilityMod, parseRaceMods } from '../engine/stats';
+import { CharacterState, RaceData, ClassData, Equipment, TraitData, FlawData } from '../types/character';
+import {
+  calculateTotalScore,
+  getAbilityMod,
+  parseRaceMods,
+  calculateTraitFlawStatMods,
+  calculateTraitFlawSaveMods,
+  calculateTraitFlawHpPerLevel,
+  calculateTraitFlawAcMod
+} from '../engine/stats';
 import { calculateBAB, calculateBaseSave, calculateTotalHP } from '../engine/classes';
 
 interface HeaderProps {
   character: CharacterState;
   racesData: RaceData[];
   classesData: ClassData[];
+  traitsData?: TraitData[];
+  flawsData?: FlawData[];
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onReset: () => void;
@@ -19,6 +29,8 @@ export const Header: React.FC<HeaderProps> = ({
   character,
   racesData,
   classesData,
+  traitsData = [],
+  flawsData = [],
   activeTab,
   setActiveTab,
   onReset,
@@ -30,24 +42,32 @@ export const Header: React.FC<HeaderProps> = ({
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
   const raceMods = parseRaceMods(raceObj);
 
+  const selectedTraits = character.selectedTraits || [];
+  const selectedFlaws = character.selectedFlaws || [];
+
+  const traitFlawStatMods = calculateTraitFlawStatMods(selectedTraits, selectedFlaws, traitsData, flawsData);
+  const traitFlawSaveMods = calculateTraitFlawSaveMods(selectedTraits, selectedFlaws, traitsData, flawsData);
+  const traitFlawHpMod = calculateTraitFlawHpPerLevel(selectedTraits, selectedFlaws, traitsData, flawsData);
+  const traitFlawAcMod = calculateTraitFlawAcMod(selectedTraits, selectedFlaws, traitsData, flawsData);
+
   const totalLevel = character.levelProgression.filter(l => l.primaryClass).length || 1;
-  const conScore = calculateTotalScore('con', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
-  const dexScore = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
-  const wisScore = calculateTotalScore('wis', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
+  const conScore = calculateTotalScore('con', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+  const dexScore = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+  const wisScore = calculateTotalScore('wis', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
 
   const conMod = getAbilityMod(conScore);
   const dexMod = getAbilityMod(dexScore);
   const wisMod = getAbilityMod(wisScore);
-  const hp = calculateTotalHP(character.levelProgression, classesData, conMod);
+  const hp = calculateTotalHP(character.levelProgression, classesData, conMod, traitFlawHpMod);
   const bab = calculateBAB(character.levelProgression, classesData);
 
   const baseFort = calculateBaseSave('fort', character.levelProgression, classesData);
   const baseRef = calculateBaseSave('ref', character.levelProgression, classesData);
   const baseWill = calculateBaseSave('will', character.levelProgression, classesData);
 
-  const totalFort = baseFort + conMod;
-  const totalRef = baseRef + dexMod;
-  const totalWill = baseWill + wisMod;
+  const totalFort = baseFort + conMod + traitFlawSaveMods.fort;
+  const totalRef = baseRef + dexMod + traitFlawSaveMods.ref;
+  const totalWill = baseWill + wisMod + traitFlawSaveMods.will;
 
   const eq: Equipment = character.equipment || {
     armor: 'chainshirt', armorEnhancement: 1, shield: 'heavy_shield', shieldEnhancement: 1,
@@ -55,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
   const armorBonusMap: Record<string, number> = { none: 0, padded: 1, leather: 2, studded: 3, chainshirt: 4, breastplate: 5, fullplate: 8 };
   const shieldBonusMap: Record<string, number> = { none: 0, buckler: 1, light_wooden: 1, heavy_shield: 2, tower_shield: 4 };
-  const totalAc = 10 + (armorBonusMap[eq.armor] || 0) + (eq.armorEnhancement || 0) + (shieldBonusMap[eq.shield] || 0) + (eq.shieldEnhancement || 0) + dexMod + (eq.deflection || 0) + (eq.natural || 0) + (eq.dodge || 0);
+  const totalAc = 10 + (armorBonusMap[eq.armor] || 0) + (eq.armorEnhancement || 0) + (shieldBonusMap[eq.shield] || 0) + (eq.shieldEnhancement || 0) + dexMod + (eq.deflection || 0) + (eq.natural || 0) + (eq.dodge || 0) + traitFlawAcMod;
 
   const tabs = [
     { id: 'stats', label: 'Ability Scores', icon: 'fa-chart-simple' },

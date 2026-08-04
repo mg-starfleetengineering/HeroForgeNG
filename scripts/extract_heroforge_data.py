@@ -293,10 +293,131 @@ def extract_tables():
         json.dump(tables_data, f, indent=2)
     print("Extracted game tables -> src/data/tables.json & public/data/tables.json")
 
+def extract_traits():
+    print("Extracting Traits...")
+    df = pd.read_excel("HeroForge Anew 3.5 v7.4.0.1.xlsm", sheet_name="Traits")
+    
+    TRAIT_MODIFIERS = {
+        "abrasive": {"skillMods": {"Intimidate": 1, "Diplomacy": -1, "Bluff": -1}},
+        "absent_minded": {"skillMods": {"Knowledge (Arcana)": 1, "Knowledge (Dungeoneering)": 1, "Knowledge (Local)": 1, "Knowledge (Nature)": 1, "Knowledge (Religion)": 1, "Knowledge (The Planes)": 1, "Spot": -1, "Listen": -1}},
+        "aggressive": {"initiativeMod": 2, "acMod": -1},
+        "detached": {"saveMods": {"will": 1, "ref": -1}},
+        "dishonest": {"skillMods": {"Bluff": 1, "Diplomacy": -2}},
+        "distinctive": {"skillMods": {"Disguise": -1}},
+        "easygoing": {"skillMods": {"Gather Information": 1, "Intimidate": -1}},
+        "farsighted": {"skillMods": {"Spot": 1, "Search": -1}},
+        "focused": {"skillMods": {"Concentration": 1, "Spot": -1, "Listen": -1}},
+        "hard_of_hearing": {"skillMods": {"Spot": 1, "Listen": -2}},
+        "hardy": {"saveMods": {"fort": 1, "ref": -1}},
+        "honest": {"skillMods": {"Diplomacy": 1, "Bluff": -1, "Sense Motive": -1}},
+        "musclebound": {"skillMods": {"Climb": 1, "Jump": 1, "Swim": 1, "Balance": -2, "Escape Artist": -2, "Hide": -2, "Move Silently": -2, "Open Lock": -2, "Ride": -2, "Sleight of Hand": -2, "Tumble": -2, "Use Rope": -2}},
+        "nearsighted": {"skillMods": {"Search": 1, "Spot": -1}},
+        "nightsighted": {"skillMods": {"Spot": -1}},
+        "passionate": {"saveMods": {"fort": 1, "will": -1}},
+        "plucky": {"saveMods": {"will": 1, "fort": -1}},
+        "polite": {"skillMods": {"Diplomacy": 1, "Intimidate": -2}},
+        "quick": {"speedMod": 10, "hpPerLevelMod": -1},
+        "saddleborn": {"skillMods": {"Ride": 1, "Handle Animal": -1}},
+        "skinny": {"skillMods": {"Escape Artist": 1}},
+        "slippery": {"skillMods": {"Escape Artist": 1}},
+        "slow": {"hpPerLevelMod": 1, "speedMod": -0.5},
+        "stout": {"skillMods": {"Escape Artist": -1}},
+        "suspicious": {"skillMods": {"Sense Motive": 1, "Diplomacy": -1, "Intimidate": -1}},
+        "torpid": {"initiativeMod": -2},
+        "uncivilized": {"skillMods": {"Handle Animal": 1, "Bluff": -1, "Gather Information": -1}}
+    }
+    
+    traits = []
+    seen = set()
+    for row_idx in range(len(df)):
+        name = clean_val(df.iloc[row_idx, 2])
+        if not name or name in seen or name in ["Trait", "Item Reset", "Selected"]:
+            continue
+        
+        src_raw = clean_val(df.iloc[row_idx, 8]) or "(UA"
+        pg_raw = clean_val(df.iloc[row_idx, 9]) or ""
+        desc_raw = clean_val(df.iloc[row_idx, 11]) or ""
+        if isinstance(desc_raw, str) and desc_raw.startswith(" : "):
+            desc_raw = desc_raw[3:]
+        
+        source = f"UA {pg_raw}".strip() if pg_raw else "UA"
+        trait_id = str(name).lower().replace(" ", "_").replace("-", "_").replace("'", "").replace("(", "").replace(")", "")
+        seen.add(name)
+        
+        item = {
+            "id": trait_id,
+            "name": str(name),
+            "description": desc_raw or "No description available.",
+            "source": source
+        }
+        if trait_id in TRAIT_MODIFIERS:
+            item.update(TRAIT_MODIFIERS[trait_id])
+            
+        traits.append(item)
+        
+    with open(os.path.join(OUTPUT_DIR, "traits.json"), "w", encoding="utf-8") as f:
+        json.dump(traits, f, indent=2)
+    with open(os.path.join(PUBLIC_DATA_DIR, "traits.json"), "w", encoding="utf-8") as f:
+        json.dump(traits, f, indent=2)
+    print(f"Extracted {len(traits)} traits -> src/data/traits.json & public/data/traits.json")
+
+def extract_flaws():
+    print("Extracting Flaws...")
+    df = pd.read_excel("HeroForge Anew 3.5 v7.4.0.1.xlsm", sheet_name="Flaws")
+    
+    FLAW_MODIFIERS = {
+        "feeble": {"skillMods": {"Climb": -2, "Jump": -2, "Swim": -2, "Balance": -2, "Escape Artist": -2, "Hide": -2, "Move Silently": -2, "Open Lock": -2, "Ride": -2, "Sleight of Hand": -2, "Tumble": -2, "Use Rope": -2, "Concentration": -2}},
+        "frail": {"hpPerLevelMod": -1},
+        "inattentive": {"skillMods": {"Listen": -4, "Spot": -4}},
+        "meager_fortitude": {"saveMods": {"fort": -3}},
+        "poor_reflexes": {"saveMods": {"ref": -3}},
+        "slow": {"speedMod": -0.5},
+        "unreactive": {"initiativeMod": -6},
+        "vulnerable": {"acMod": -1},
+        "weak_will": {"saveMods": {"will": -3}}
+    }
+    
+    flaws = []
+    seen = set()
+    for row_idx in range(len(df)):
+        name = clean_val(df.iloc[row_idx, 2])
+        if not name or name in seen or name in ["Available Flaws", "Bonus Flaws", "Flaw", "Selected"]:
+            continue
+        
+        src_raw = clean_val(df.iloc[row_idx, 6]) or "(UA"
+        pg_raw = clean_val(df.iloc[row_idx, 7]) or ""
+        desc_raw = clean_val(df.iloc[row_idx, 8]) or ""
+        if isinstance(desc_raw, str) and desc_raw.startswith(" : "):
+            desc_raw = desc_raw[3:]
+        
+        source = f"UA {pg_raw}".strip() if pg_raw else "UA"
+        flaw_id = str(name).lower().replace(" ", "_").replace("-", "_").replace("'", "").replace("(", "").replace(")", "")
+        seen.add(name)
+        
+        item = {
+            "id": flaw_id,
+            "name": str(name),
+            "description": desc_raw or "No description available.",
+            "source": source
+        }
+        if flaw_id in FLAW_MODIFIERS:
+            item.update(FLAW_MODIFIERS[flaw_id])
+            
+        flaws.append(item)
+        
+    with open(os.path.join(OUTPUT_DIR, "flaws.json"), "w", encoding="utf-8") as f:
+        json.dump(flaws, f, indent=2)
+    with open(os.path.join(PUBLIC_DATA_DIR, "flaws.json"), "w", encoding="utf-8") as f:
+        json.dump(flaws, f, indent=2)
+    print(f"Extracted {len(flaws)} flaws -> src/data/flaws.json & public/data/flaws.json")
+
 if __name__ == "__main__":
     extract_classes()
     extract_races()
     extract_weapons()
     extract_feats()
+    extract_traits()
+    extract_flaws()
     extract_tables()
     print("Data extraction complete!")
+

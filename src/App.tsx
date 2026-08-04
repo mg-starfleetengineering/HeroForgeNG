@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CharacterState, RaceData, ClassData, WeaponData, FeatData } from './types/character';
+import { CharacterState, RaceData, ClassData, WeaponData, FeatData, TraitData, FlawData } from './types/character';
 import { Header } from './components/Header';
 import { StatsTab } from './components/StatsTab';
 import { RaceClassTab } from './components/RaceClassTab';
@@ -35,6 +35,8 @@ const DEFAULT_CHARACTER: CharacterState = {
   ],
   skillRanks: {},
   selectedFeats: ['Power Attack', 'Weapon Focus (Longsword)', 'Cleave'],
+  selectedTraits: [],
+  selectedFlaws: [],
   equipment: {
     armor: 'chainshirt',
     armorEnhancement: 1,
@@ -119,6 +121,8 @@ export const App: React.FC = () => {
   const [classesData, setClassesData] = useState<ClassData[]>([]);
   const [weaponsData, setWeaponsData] = useState<WeaponData[]>([]);
   const [featsData, setFeatsData] = useState<FeatData[]>([]);
+  const [traitsData, setTraitsData] = useState<TraitData[]>([]);
+  const [flawsData, setFlawsData] = useState<FlawData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -126,12 +130,16 @@ export const App: React.FC = () => {
       fetch('./data/races.json').then(res => res.json()),
       fetch('./data/classes.json').then(res => res.json()),
       fetch('./data/weapons.json').then(res => res.json()),
-      fetch('./data/feats.json').then(res => res.json())
-    ]).then(([races, classes, weapons, feats]) => {
+      fetch('./data/feats.json').then(res => res.json()),
+      fetch('./data/traits.json').then(res => res.json()),
+      fetch('./data/flaws.json').then(res => res.json())
+    ]).then(([races, classes, weapons, feats, traits, flaws]) => {
       setRacesData(races);
       setClassesData(classes);
       setWeaponsData(weapons);
       setFeatsData(feats);
+      setTraitsData(traits);
+      setFlawsData(flaws);
       setLoading(false);
     }).catch(err => {
       console.error('Failed to load HeroForge JSON data:', err);
@@ -213,6 +221,8 @@ export const App: React.FC = () => {
         character={character}
         racesData={racesData}
         classesData={classesData}
+        traitsData={traitsData}
+        flawsData={flawsData}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onReset={handleReset}
@@ -296,15 +306,15 @@ export const App: React.FC = () => {
 
         {/* Tab Views */}
         {activeTab === 'stats' && <StatsTab character={character} racesData={racesData} onChange={updateCharacter} />}
-        {activeTab === 'race-class' && <RaceClassTab character={character} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
-        {activeTab === 'skills' && <SkillsTab character={character} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
-        {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} onChange={updateCharacter} />}
+        {activeTab === 'race-class' && <RaceClassTab character={character} racesData={racesData} classesData={classesData} traitsData={traitsData} flawsData={flawsData} onChange={updateCharacter} />}
+        {activeTab === 'skills' && <SkillsTab character={character} racesData={racesData} classesData={classesData} traitsData={traitsData} flawsData={flawsData} onChange={updateCharacter} />}
+        {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} classesData={classesData} racesData={racesData} onChange={updateCharacter} />}
         {activeTab === 'equipment' && <EquipmentTab character={character} weaponsData={weaponsData} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
         {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} racesData={racesData} />}
         {activeTab === 'auras' && <AurasTab character={character} onChange={updateCharacter} />}
         {activeTab === 'sources' && <SourceBooksTab character={character} onChange={updateCharacter} />}
         {activeTab === 'notes' && <NotesTab character={character} onChange={updateCharacter} />}
-        {activeTab === 'sheet' && <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} />}
+        {activeTab === 'sheet' && <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} traitsData={traitsData} flawsData={flawsData} />}
       </main>
 
       <footer className="mt-auto border-t border-slate-800/80 bg-slate-900/40 text-slate-400 text-xs py-4 px-4 text-center space-y-1">

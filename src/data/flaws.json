@@ -1,0 +1,112 @@
+[
+  {
+    "id": "feeble",
+    "name": "Feeble",
+    "description": ": -2 on Strength, Dexterty, and Constitution-based ability and skill checks.",
+    "source": "UA Pg 91)",
+    "skillMods": {
+      "Climb": -2,
+      "Jump": -2,
+      "Swim": -2,
+      "Balance": -2,
+      "Escape Artist": -2,
+      "Hide": -2,
+      "Move Silently": -2,
+      "Open Lock": -2,
+      "Ride": -2,
+      "Sleight of Hand": -2,
+      "Tumble": -2,
+      "Use Rope": -2,
+      "Concentration": -2
+    }
+  },
+  {
+    "id": "frail",
+    "name": "Frail",
+    "description": ": -1 to hp total at each level including first. (0 result is possible)",
+    "source": "UA Pg 91)",
+    "hpPerLevelMod": -1
+  },
+  {
+    "id": "inattentive",
+    "name": "Inattentive",
+    "description": ": -4 on Listen and Spot checks.",
+    "source": "UA Pg 91)",
+    "skillMods": {
+      "Listen": -4,
+      "Spot": -4
+    }
+  },
+  {
+    "id": "meager_fortitude",
+    "name": "Meager Fortitude",
+    "description": ": -3 on Fortitude saves.",
+    "source": "UA Pg 91)",
+    "saveMods": {
+      "fort": -3
+    }
+  },
+  {
+    "id": "murky_eyed",
+    "name": "Murky-Eyed",
+    "description": ": When attacking an opponent that has concealment, roll your miss chance twice. If either misses the attack fails.",
+    "source": "UA Pg 91)"
+  },
+  {
+    "id": "noncombatant",
+    "name": "Noncombatant",
+    "description": ": -2 on all melee attack rolls.",
+    "source": "UA Pg 91)"
+  },
+  {
+    "id": "pathetic",
+    "name": "Pathetic",
+    "description": ": Reduce on ability score by 2. You can't take this flaw if the total of your ability modifiers is 8 or higher.",
+    "source": "UA Pg 91)"
+  },
+  {
+    "id": "poor_reflexes",
+    "name": "Poor Reflexes",
+    "description": ": -3 on Reflex saves.",
+    "source": "UA Pg 91)",
+    "saveMods": {
+      "ref": -3
+    }
+  },
+  {
+    "id": "shaky",
+    "name": "Shaky",
+    "description": ": -2 on all ranged attack rolls.",
+    "source": "UA Pg 91)"
+  },
+  {
+    "id": "slow",
+    "name": "Slow",
+    "description": ": Your base land speed is halved (round down to the nearest 5 ft).",
+    "source": "UA Pg 91)",
+    "speedMod": -0.5
+  },
+  {
+    "id": "unreactive",
+    "name": "Unreactive",
+    "description": ": -6 on initiative checks.",
+    "source": "UA Pg 91)",
+    "initiativeMod": -6
+  },
+  {
+    "id": "vulnerable",
+    "name": "Vulnerable",
+    "description": ": -1 to AC.",
+    "source": "UA Pg 91)",
+    "acMod": -1
+  },
+  {
+    "id": "weak_will",
+    "name": "Weak Will",
+    "description": ": -3 on Will saves.",
+    "source": "UA Pg 91)",
+    "saveMods": {
+      "will": -3
+    }
+  }
+]

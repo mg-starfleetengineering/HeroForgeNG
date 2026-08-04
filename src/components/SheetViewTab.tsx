@@ -1,6 +1,16 @@
 import React from 'react';
-import { CharacterState, RaceData, ClassData, WeaponData, Equipment } from '../types/character';
-import { calculateTotalScore, getAbilityMod, parseRaceMods } from '../engine/stats';
+import { CharacterState, RaceData, ClassData, WeaponData, Equipment, TraitData, FlawData } from '../types/character';
+import {
+  calculateTotalScore,
+  getAbilityMod,
+  parseRaceMods,
+  calculateTraitFlawStatMods,
+  calculateTraitFlawSaveMods,
+  calculateTraitFlawHpPerLevel,
+  calculateTraitFlawAcMod,
+  calculateTraitFlawInitiativeMod,
+  calculateTraitFlawSpeedMod
+} from '../engine/stats';
 import { calculateBAB, calculateBaseSave, calculateTotalHP } from '../engine/classes';
 import {
   resolveWeapon, resolveArmor, resolveShield, calculateFeatCombatBonuses,
@@ -13,18 +23,32 @@ interface SheetViewTabProps {
   racesData: RaceData[];
   classesData: ClassData[];
   weaponsData: WeaponData[];
+  traitsData?: TraitData[];
+  flawsData?: FlawData[];
 }
 
-export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData, classesData, weaponsData }) => {
+export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData, classesData, weaponsData, traitsData = [], flawsData = [] }) => {
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
   const raceMods = parseRaceMods(raceObj);
+
+  const selectedTraits = character.selectedTraits || [];
+  const selectedFlaws = character.selectedFlaws || [];
+
+  const traitFlawStatMods = calculateTraitFlawStatMods(selectedTraits, selectedFlaws, traitsData, flawsData);
+  const traitFlawSaveMods = calculateTraitFlawSaveMods(selectedTraits, selectedFlaws, traitsData, flawsData);
+  const traitFlawHpMod = calculateTraitFlawHpPerLevel(selectedTraits, selectedFlaws, traitsData, flawsData);
+  const traitFlawAcMod = calculateTraitFlawAcMod(selectedTraits, selectedFlaws, traitsData, flawsData);
+  const traitFlawInitMod = calculateTraitFlawInitiativeMod(selectedTraits, selectedFlaws, traitsData, flawsData);
+  const baseLandSpeed = raceObj.speed ? raceObj.speed.land : 30;
+  const traitFlawSpeedDelta = calculateTraitFlawSpeedMod(selectedTraits, selectedFlaws, traitsData, flawsData, baseLandSpeed);
+
   const totalLevel = character.levelProgression.filter(l => l.primaryClass).length || 1;
-  const strScore = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
-  const dexScore = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
-  const conScore = calculateTotalScore('con', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
-  const intScore = calculateTotalScore('int', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
-  const wisScore = calculateTotalScore('wis', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
-  const chaScore = calculateTotalScore('cha', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
+  const strScore = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+  const dexScore = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+  const conScore = calculateTotalScore('con', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+  const intScore = calculateTotalScore('int', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+  const wisScore = calculateTotalScore('wis', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+  const chaScore = calculateTotalScore('cha', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
 
   const strMod = getAbilityMod(strScore);
   const dexMod = getAbilityMod(dexScore);
@@ -34,15 +58,18 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData
   const chaMod = getAbilityMod(chaScore);
 
   const bab = calculateBAB(character.levelProgression, classesData);
-  const hp = calculateTotalHP(character.levelProgression, classesData, conMod);
+  const hp = calculateTotalHP(character.levelProgression, classesData, conMod, traitFlawHpMod);
 
   const baseFort = calculateBaseSave('fort', character.levelProgression, classesData);
   const baseRef = calculateBaseSave('ref', character.levelProgression, classesData);
   const baseWill = calculateBaseSave('will', character.levelProgression, classesData);
 
-  const totalFort = baseFort + conMod;
-  const totalRef = baseRef + dexMod;
-  const totalWill = baseWill + wisMod;
+  const totalFort = baseFort + conMod + traitFlawSaveMods.fort;
+  const totalRef = baseRef + dexMod + traitFlawSaveMods.ref;
+  const totalWill = baseWill + wisMod + traitFlawSaveMods.will;
+
+  const totalInitiative = dexMod + traitFlawInitMod;
+  const finalSpeed = baseLandSpeed + traitFlawSpeedDelta;
 
   const eq: Equipment = character.equipment || {
     armor: 'chainshirt', armorEnhancement: 1, shield: 'heavy_shield', shieldEnhancement: 1,
@@ -67,9 +94,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData
   const armorAc = armorObj.acBonus + (eq.armorEnhancement || 0);
   const shieldAc = shieldObj.acBonus + (eq.shieldEnhancement || 0);
 
-  const totalAc = 10 + armorAc + shieldAc + dexMod + (eq.deflection || 0) + (eq.natural || 0) + (eq.dodge || 0);
-  const touchAc = 10 + dexMod + (eq.deflection || 0) + (eq.dodge || 0);
-  const flatAc = 10 + armorAc + shieldAc + (eq.deflection || 0) + (eq.natural || 0);
+  const totalAc = 10 + armorAc + shieldAc + dexMod + (eq.deflection || 0) + (eq.natural || 0) + (eq.dodge || 0) + traitFlawAcMod;
+  const touchAc = 10 + dexMod + (eq.deflection || 0) + (eq.dodge || 0) + traitFlawAcMod;
+  const flatAc = 10 + armorAc + shieldAc + (eq.deflection || 0) + (eq.natural || 0) + traitFlawAcMod;
 
   // Weapon Resolutions & Feat Combat Bonuses
   const activeWeaponsList: Array<{
@@ -199,7 +226,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData
           </div>
           <div>
             <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Initiative</span>
-            <span className="text-2xl font-bold text-slate-900">{dexMod >= 0 ? '+' : ''}{dexMod}</span>
+            <span className="text-2xl font-bold text-slate-900">{totalInitiative >= 0 ? '+' : ''}{totalInitiative}</span>
           </div>
           <div>
             <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Base Attack (BAB)</span>
@@ -207,7 +234,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData
           </div>
           <div>
             <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Speed</span>
-            <span className="text-2xl font-bold text-slate-900">{raceObj.speed ? raceObj.speed.land : 30} ft</span>
+            <span className="text-2xl font-bold text-slate-900">{finalSpeed} ft</span>
           </div>
         </div>
 
@@ -421,6 +448,12 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData
             )}
             {raceObj.racialSkills && (
               <p><span className="font-bold text-slate-900 font-sans">Racial Skill Bonuses:</span> {raceObj.racialSkills}</p>
+            )}
+            {selectedTraits.length > 0 && (
+              <p><span className="font-bold text-slate-900 font-sans">Active Traits:</span> {selectedTraits.join(', ')}</p>
+            )}
+            {selectedFlaws.length > 0 && (
+              <p><span className="font-bold text-slate-900 font-sans">Active Flaws:</span> {selectedFlaws.join(', ')} (+{selectedFlaws.length} Feat Slot{selectedFlaws.length > 1 ? 's' : ''})</p>
             )}
             <p><span className="font-bold text-slate-900 font-sans">Selected Feats:</span> {(character.selectedFeats || []).join(', ') || 'None selected.'}</p>
           </div>
