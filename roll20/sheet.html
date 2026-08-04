@@ -1,11 +1,26 @@
 <div class="charsheet">
-  <!-- TAB NAVIGATION -->
-  <div class="sheet-tabs">
-    <button type="action" name="act_tab_core" class="sheet-tab-btn"><i class="fa-solid fa-user-shield"></i> Core & Combat</button>
-    <button type="action" name="act_tab_skills" class="sheet-tab-btn"><i class="fa-solid fa-hand-sparkles"></i> Skills</button>
-    <button type="action" name="act_tab_feats_spells" class="sheet-tab-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> Feats & Spells</button>
-    <button type="action" name="act_tab_equipment" class="sheet-tab-btn"><i class="fa-solid fa-shield-halved"></i> Equipment & Inventory</button>
-    <button type="action" name="act_tab_notes" class="sheet-tab-btn"><i class="fa-solid fa-book"></i> Notes & Journal</button>
+  <!-- VISUAL TAB NAVIGATION BAR (5 Equal Grid Columns) -->
+  <div class="sheet-tabs-nav">
+    <label class="sheet-tab-unit">
+      <input type="radio" name="attr_tab" value="core" class="sheet-tab-radio sheet-tab-core" checked="checked" />
+      <span class="sheet-tab-btn"><i class="fa-solid fa-user-shield"></i> Core &amp; Combat</span>
+    </label>
+    <label class="sheet-tab-unit">
+      <input type="radio" name="attr_tab" value="skills" class="sheet-tab-radio sheet-tab-skills" />
+      <span class="sheet-tab-btn"><i class="fa-solid fa-hand-sparkles"></i> Skills</span>
+    </label>
+    <label class="sheet-tab-unit">
+      <input type="radio" name="attr_tab" value="feats_spells" class="sheet-tab-radio sheet-tab-feats_spells" />
+      <span class="sheet-tab-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> Feats &amp; Spells</span>
+    </label>
+    <label class="sheet-tab-unit">
+      <input type="radio" name="attr_tab" value="equipment" class="sheet-tab-radio sheet-tab-equipment" />
+      <span class="sheet-tab-btn"><i class="fa-solid fa-shield-halved"></i> Equipment</span>
+    </label>
+    <label class="sheet-tab-unit">
+      <input type="radio" name="attr_tab" value="notes" class="sheet-tab-radio sheet-tab-notes" />
+      <span class="sheet-tab-btn"><i class="fa-solid fa-book"></i> Notes &amp; Journal</span>
+    </label>
   </div>
 
   <!-- HEADER / BASIC INFO SECTION (Visible on all tabs) -->
@@ -61,9 +76,6 @@
       </div>
     </div>
   </div>
-
-  <!-- HIDDEN TAB STORE (Direct sibling to tab content divs) -->
-  <input type="hidden" name="attr_tab" class="sheet-tab-store" value="core" />
 
   <!-- TAB 1: CORE & COMBAT -->
   <div class="sheet-tab-content sheet-tab-core">

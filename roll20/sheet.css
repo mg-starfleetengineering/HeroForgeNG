@@ -88,33 +88,67 @@
   padding: 3px 4px;
 }
 
-/* TAB NAVIGATION SYSTEM (Action Buttons + Hidden Store) */
-.charsheet .sheet-tabs {
-  display: flex;
-  gap: 8px;
+/* TAB NAVIGATION BAR (5 Equal Grid Columns) */
+.charsheet .sheet-tabs-nav {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
   margin-bottom: 16px;
   border-bottom: 2px solid #1e293b;
   padding-bottom: 8px;
+  width: 100%;
+}
+
+.charsheet .sheet-tab-unit {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  margin: 0;
+  height: 36px;
+  width: 100%;
+}
+
+.charsheet input.sheet-tab-radio {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+  margin: 0;
 }
 
 .charsheet .sheet-tab-btn {
+  width: 100%;
+  height: 100%;
   background-color: #1e293b;
   color: #94a3b8;
   border: 1px solid #334155;
   border-radius: 8px;
-  padding: 8px 16px;
+  padding: 4px 6px;
   font-weight: 700;
-  font-size: 12px;
-  cursor: pointer;
+  font-size: 11px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
   transition: all 0.2s ease;
+  pointer-events: none;
 }
 
-.charsheet .sheet-tab-btn:hover {
+.charsheet .sheet-tab-unit:hover .sheet-tab-btn {
   color: #f8fafc;
   border-color: #f59e0b;
+}
+
+.charsheet input.sheet-tab-radio:checked + .sheet-tab-btn {
+  background-color: #f59e0b !important;
+  color: #0f172a !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4) !important;
 }
 
 /* TAB VISIBILITY LOGIC */
@@ -122,12 +156,16 @@
   display: none !important;
 }
 
-/* Display active tab based on hidden input value */
-.charsheet .sheet-tab-store[value="core"] ~ .sheet-tab-core,
-.charsheet .sheet-tab-store[value="skills"] ~ .sheet-tab-skills,
-.charsheet .sheet-tab-store[value="feats_spells"] ~ .sheet-tab-feats_spells,
-.charsheet .sheet-tab-store[value="equipment"] ~ .sheet-tab-equipment,
-.charsheet .sheet-tab-store[value="notes"] ~ .sheet-tab-notes {
+.charsheet:has(input.sheet-tab-core:checked) .sheet-tab-core,
+.charsheet:has(input.sheet-tab-skills:checked) .sheet-tab-skills,
+.charsheet:has(input.sheet-tab-feats_spells:checked) .sheet-tab-feats_spells,
+.charsheet:has(input.sheet-tab-equipment:checked) .sheet-tab-equipment,
+.charsheet:has(input.sheet-tab-notes:checked) .sheet-tab-notes,
+.charsheet input.sheet-tab-core:checked ~ .sheet-tab-core,
+.charsheet input.sheet-tab-skills:checked ~ .sheet-tab-skills,
+.charsheet input.sheet-tab-feats_spells:checked ~ .sheet-tab-feats_spells,
+.charsheet input.sheet-tab-equipment:checked ~ .sheet-tab-equipment,
+.charsheet input.sheet-tab-notes:checked ~ .sheet-tab-notes {
   display: block !important;
 }
 
