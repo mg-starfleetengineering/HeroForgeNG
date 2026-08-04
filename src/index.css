@@ -115,28 +115,38 @@ body {
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
+/* Hide scrollbar for Chrome, Safari, Edge, Firefox */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 .nav-tab {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1rem;
-  font-size: 0.825rem;
+  gap: 0.35rem;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #94a3b8;
   border-bottom: 2px solid transparent;
   transition: all 0.2s ease;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .nav-tab:hover {
   color: #f1f5f9;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .nav-tab.active {
   color: #fbbf24;
   border-bottom-color: #f59e0b;
-  background: rgba(245, 158, 11, 0.05);
+  background: rgba(245, 158, 11, 0.08);
 }
 
 @media print {

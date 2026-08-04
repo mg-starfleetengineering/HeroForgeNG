@@ -61,6 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'feats', label: 'Feats', icon: 'fa-award' },
     { id: 'equipment', label: 'Equipment', icon: 'fa-boxes-packing' },
     { id: 'spells', label: 'Spells & Powers', icon: 'fa-hat-wizard' },
+    { id: 'auras', label: 'Auras & Emanations', icon: 'fa-sun' },
     { id: 'sources', label: 'Source Books', icon: 'fa-book-atlas' },
     { id: 'notes', label: 'Notes & Journal', icon: 'fa-book-bookmark' },
     { id: 'sheet', label: 'Character Sheet', icon: 'fa-scroll' }
@@ -138,7 +139,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Navigation Tabs */}
       <nav className="border-t border-slate-800/80 bg-slate-900/40">
-        <div className="max-w-7xl mx-auto px-4 flex space-x-1 overflow-x-auto scrollbar-none">
+        <div className="max-w-7xl mx-auto px-4 flex flex-wrap lg:flex-nowrap gap-1 overflow-x-auto no-scrollbar py-1">
           {tabs.map(tab => (
             <button
               key={tab.id}

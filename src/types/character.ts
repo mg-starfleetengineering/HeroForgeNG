@@ -109,6 +109,19 @@ export interface CharacterNotes {
   sessions?: SessionLog[];
 }
 
+export interface Aura {
+  id: string;
+  name: string;
+  type: 'Class Feature' | 'Feat' | 'Spell/Power' | 'Item/Equipment' | 'Racial' | 'Custom';
+  radius: number; // radius in feet (e.g. 10, 20, 30, 60)
+  target: 'Allies' | 'Enemies' | 'Self & Allies' | 'All Creatures';
+  effect: string;
+  active: boolean;
+  saveDc?: string | number;
+  source?: string;
+  notes?: string;
+}
+
 export interface CharacterState {
   name: string;
   player: string;
@@ -129,6 +142,7 @@ export interface CharacterState {
   funds?: Funds;
   customWeapons?: WeaponData[];
   customArmors?: CustomArmorData[];
+  auras?: Aura[];
   notes?: CharacterNotes;
   allowedSources?: string[];
 }
