@@ -1,4 +1,4 @@
-import { BaseStats, RaceData, StatType, TraitData, FlawData, CharacterState, ClassData } from '../types/character';
+import { BaseStats, RaceData, StatType, TraitData, FlawData, CharacterState, ClassData, TemplateData } from '../types/character';
 
 export const ABILITY_NAMES: StatType[] = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 
@@ -20,6 +20,83 @@ export function parseRaceMods(raceObj?: Partial<RaceData>): BaseStats {
     int: parseVal(raceObj?.intAdj),
     wis: parseVal(raceObj?.wisAdj),
     cha: parseVal(raceObj?.chaAdj)
+  };
+}
+
+export function parseTemplateMods(templateObj?: Partial<TemplateData>): BaseStats {
+  return {
+    str: parseVal(templateObj?.strAdj),
+    dex: parseVal(templateObj?.dexAdj),
+    con: parseVal(templateObj?.conAdj),
+    int: parseVal(templateObj?.intAdj),
+    wis: parseVal(templateObj?.wisAdj),
+    cha: parseVal(templateObj?.chaAdj)
+  };
+}
+
+export function getEffectiveRaceMods(raceObj?: Partial<RaceData>, templateObj?: Partial<TemplateData>): BaseStats {
+  const rMods = parseRaceMods(raceObj);
+  const tMods = parseTemplateMods(templateObj);
+  return {
+    str: rMods.str + tMods.str,
+    dex: rMods.dex + tMods.dex,
+    con: rMods.con + tMods.con,
+    int: rMods.int + tMods.int,
+    wis: rMods.wis + tMods.wis,
+    cha: rMods.cha + tMods.cha
+  };
+}
+
+export function getEffectiveLevelAdj(raceObj?: Partial<RaceData>, templateObj?: Partial<TemplateData>): number {
+  const rLA = parseVal(raceObj?.levelAdj, 0);
+  const tLA = parseVal(templateObj?.levelAdj, 0);
+  return rLA + tLA;
+}
+
+export function getEffectiveRaceType(raceObj?: Partial<RaceData>, templateObj?: Partial<TemplateData>): { type: string; subtype: string } {
+  const baseType = raceObj?.type || 'Humanoid';
+  const baseSubtype = raceObj?.subtype || '';
+
+  const tType = templateObj?.type;
+  const tSubtype = templateObj?.subtype;
+
+  const finalType = tType || baseType;
+
+  let finalSubtype = baseSubtype;
+  if (tSubtype) {
+    if (!finalSubtype) {
+      finalSubtype = tSubtype;
+    } else if (!finalSubtype.toLowerCase().includes(tSubtype.toLowerCase())) {
+      finalSubtype = `${finalSubtype}, ${tSubtype}`;
+    }
+  }
+
+  return { type: finalType, subtype: finalSubtype };
+}
+
+export function getEffectiveSpeed(raceObj?: Partial<RaceData>, templateObj?: Partial<TemplateData>): {
+  land: number;
+  fly?: number;
+  flyManeuverability?: string;
+  swim?: number;
+  burrow?: number;
+  climb?: number;
+} {
+  const baseLand = raceObj?.speed?.land ?? 30;
+  const baseFly = raceObj?.speed?.fly;
+  const baseSwim = raceObj?.speed?.swim;
+  const baseBurrow = raceObj?.speed?.burrow;
+  const baseClimb = raceObj?.speed?.climb;
+
+  const tSpeed = templateObj?.speed;
+
+  return {
+    land: tSpeed?.land !== undefined ? tSpeed.land : baseLand,
+    fly: tSpeed?.fly !== undefined ? tSpeed.fly : baseFly,
+    flyManeuverability: tSpeed?.flyManeuverability,
+    swim: tSpeed?.swim !== undefined ? tSpeed.swim : baseSwim,
+    burrow: tSpeed?.burrow !== undefined ? tSpeed.burrow : baseBurrow,
+    climb: tSpeed?.climb !== undefined ? tSpeed.climb : baseClimb
   };
 }
 
@@ -337,7 +414,8 @@ export function calculateTotalScore(
   levelBumps: Record<number, StatType>,
   enhancementMods: Partial<BaseStats> = {},
   characterLevelOrProgression: number | Array<{ primaryClass?: string }> = 1,
-  traitFlawMods: Partial<BaseStats> = {}
+  traitFlawMods: Partial<BaseStats> = {},
+  templateMods: Partial<BaseStats> = {}
 ): number {
   const characterLevel = typeof characterLevelOrProgression === 'number'
     ? characterLevelOrProgression
@@ -345,6 +423,7 @@ export function calculateTotalScore(
 
   const base = parseVal(baseStats?.[attribute], 10);
   const race = parseVal(raceMods?.[attribute], 0);
+  const tmpl = parseVal(templateMods?.[attribute], 0);
   const bumpCount = Object.entries(levelBumps || {}).filter(([lvlStr, stat]) => {
     const lvl = Number(lvlStr);
     return stat === attribute && characterLevel >= lvl;
@@ -352,6 +431,6 @@ export function calculateTotalScore(
   const enh = parseVal(enhancementMods?.[attribute], 0);
   const tf = parseVal(traitFlawMods?.[attribute], 0);
 
-  return base + race + bumpCount + enh + tf;
+  return base + race + tmpl + bumpCount + enh + tf;
 }
 

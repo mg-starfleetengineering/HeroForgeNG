@@ -154,6 +154,35 @@ export interface CharacterState {
   selectedTraits?: string[];
   selectedFlaws?: string[];
   selectedSkillTricks?: string[];
+  selectedTemplate?: string;
+}
+
+export interface TemplateData {
+  id: string;
+  name: string;
+  shortDescription?: string;
+  size?: string;
+  type?: string;
+  subtype?: string;
+  strAdj?: number;
+  dexAdj?: number;
+  conAdj?: number;
+  intAdj?: number;
+  wisAdj?: number;
+  chaAdj?: number;
+  naturalArmor?: number;
+  levelAdj?: number;
+  speed?: {
+    land?: number;
+    fly?: number;
+    flyManeuverability?: string;
+    swim?: number;
+    burrow?: number;
+    climb?: number;
+  };
+  specialAbilities?: string;
+  source?: string;
+  prerequisites?: string;
 }
 
 export interface SkillTrickData {

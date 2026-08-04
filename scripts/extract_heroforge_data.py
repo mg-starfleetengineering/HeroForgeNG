@@ -484,6 +484,113 @@ def extract_skill_tricks():
         json.dump(tricks, f, indent=2)
     print(f"Extracted {len(tricks)} skill tricks -> src/data/skill_tricks.json & public/data/skill_tricks.json")
 
+def extract_templates():
+    print("Extracting Templates...")
+    df = pd.read_excel("HeroForge Anew 3.5 v7.4.0.1.xlsm", sheet_name="Template Info", header=13)
+    templates = []
+    seen = set()
+
+    for idx, row in df.iterrows():
+        name = clean_val(row.get("Template*"))
+        if not name or str(name).startswith("ref:") or str(name) in ["Custom Template", "Template*"]:
+            continue
+        name_str = str(name).strip()
+        if name_str in seen:
+            continue
+        seen.add(name_str)
+
+        template_id = name_str.lower().replace(" ", "_").replace("/", "_").replace("-", "_").replace("'", "").replace("(", "").replace(")", "")
+        
+        speed = {}
+        for spd_key, col_name in [("land", "Land"), ("fly", "Fly"), ("swim", "Swim"), ("burrow", "Burrow"), ("climb", "Climb")]:
+            val = clean_val(row.get(col_name))
+            if val is not None and str(val) != "0":
+                try:
+                    speed[spd_key] = int(val)
+                except (ValueError, TypeError):
+                    pass
+        maneuver = clean_val(row.get("Maneuver"))
+        if maneuver and "fly" in speed:
+            speed["flyManeuverability"] = str(maneuver)
+
+        str_adj = clean_val(row.get("Str"))
+        dex_adj = clean_val(row.get("Dex"))
+        con_adj = clean_val(row.get("Con"))
+        int_adj = clean_val(row.get("Int"))
+        wis_adj = clean_val(row.get("Wis"))
+        cha_adj = clean_val(row.get("Cha"))
+        nat_arm = clean_val(row.get("Natural Armor"))
+        la_val = clean_val(row.get("Level Adj."))
+
+        templates.append({
+            "id": template_id,
+            "name": name_str,
+            "shortDescription": clean_val(row.get("Short description")),
+            "size": clean_val(row.get("Size")),
+            "type": clean_val(row.get("Type")),
+            "subtype": clean_val(row.get("Subtype")),
+            "strAdj": int(str_adj) if isinstance(str_adj, (int, float)) and not pd.isna(str_adj) else 0,
+            "dexAdj": int(dex_adj) if isinstance(dex_adj, (int, float)) and not pd.isna(dex_adj) else 0,
+            "conAdj": int(con_adj) if isinstance(con_adj, (int, float)) and not pd.isna(con_adj) else 0,
+            "intAdj": int(int_adj) if isinstance(int_adj, (int, float)) and not pd.isna(int_adj) else 0,
+            "wisAdj": int(wis_adj) if isinstance(wis_adj, (int, float)) and not pd.isna(wis_adj) else 0,
+            "chaAdj": int(cha_adj) if isinstance(cha_adj, (int, float)) and not pd.isna(cha_adj) else 0,
+            "naturalArmor": int(nat_arm) if isinstance(nat_arm, (int, float)) and not pd.isna(nat_arm) else 0,
+            "levelAdj": float(la_val) if isinstance(la_val, (int, float)) and not pd.isna(la_val) else 0,
+            "speed": speed if speed else None,
+            "specialAbilities": clean_val(row.get("Other Special Abilities")),
+            "source": clean_val(row.get("Src")) or "Core"
+        })
+
+    extra_templates = [
+        {
+            "id": "dragonborn_of_bahamut",
+            "name": "Dragonborn of Bahamut",
+            "shortDescription": "Acquired template applied to any humanoid. Gains Dragonblood subtype and Draconic Aspect.",
+            "type": "Humanoid",
+            "subtype": "Dragonblood",
+            "strAdj": 0,
+            "dexAdj": -2,
+            "conAdj": 2,
+            "intAdj": 0,
+            "wisAdj": 0,
+            "chaAdj": 0,
+            "naturalArmor": 0,
+            "levelAdj": 0,
+            "specialAbilities": "Draconic Aspect (Heart, Wings, or Mind), Low-Light Vision, +2 to Listen, Spot, and Search.",
+            "source": "RotD"
+        },
+        {
+            "id": "phaerimm",
+            "name": "Phaerimm",
+            "shortDescription": "Aberration template granting innate magic, fly speed, and telepathy.",
+            "type": "Aberration",
+            "subtype": "Extraplanar",
+            "strAdj": 2,
+            "dexAdj": 2,
+            "conAdj": 2,
+            "intAdj": 4,
+            "wisAdj": 4,
+            "chaAdj": 4,
+            "naturalArmor": 2,
+            "levelAdj": 2,
+            "speed": {"land": 10, "fly": 30, "flyManeuverability": "good"},
+            "specialAbilities": "Telepathy 100 ft., Full Caster Spellcasting progression, Natural Weapons (4 Claws, 1 Stinger).",
+            "source": "LEoF"
+        }
+    ]
+
+    for extra in extra_templates:
+        if extra["id"] not in [t["id"] for t in templates] and extra["name"] not in seen:
+            templates.append(extra)
+            seen.add(extra["name"])
+
+    with open(os.path.join(OUTPUT_DIR, "templates.json"), "w", encoding="utf-8") as f:
+        json.dump(templates, f, indent=2)
+    with open(os.path.join(PUBLIC_DATA_DIR, "templates.json"), "w", encoding="utf-8") as f:
+        json.dump(templates, f, indent=2)
+    print(f"Extracted {len(templates)} templates -> src/data/templates.json & public/data/templates.json")
+
 if __name__ == "__main__":
     extract_classes()
     extract_races()
@@ -492,7 +599,9 @@ if __name__ == "__main__":
     extract_traits()
     extract_flaws()
     extract_skill_tricks()
+    extract_templates()
     extract_tables()
     print("Data extraction complete!")
+
 
 

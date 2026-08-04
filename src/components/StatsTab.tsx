@@ -1,16 +1,21 @@
 import React from 'react';
-import { CharacterState, RaceData, StatType } from '../types/character';
-import { ABILITY_NAMES, getAbilityMod, getPointBuyCost, getTotalPointBuySpent, calculateTotalScore, parseRaceMods } from '../engine/stats';
+import { CharacterState, RaceData, StatType, TemplateData } from '../types/character';
+import { ABILITY_NAMES, getAbilityMod, getPointBuyCost, getTotalPointBuySpent, calculateTotalScore, parseRaceMods, parseTemplateMods, calculateTraitFlawStatMods } from '../engine/stats';
 
 interface StatsTabProps {
   character: CharacterState;
   racesData: RaceData[];
+  templatesData?: TemplateData[];
   onChange: (updated: Partial<CharacterState>) => void;
 }
 
-export const StatsTab: React.FC<StatsTabProps> = ({ character, racesData, onChange }) => {
+export const StatsTab: React.FC<StatsTabProps> = ({ character, racesData, templatesData = [], onChange }) => {
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
+  const templateObj = templatesData.find(t => t.name === character.selectedTemplate || t.id === character.selectedTemplate);
+  
   const raceMods = parseRaceMods(raceObj);
+  const templateMods = parseTemplateMods(templateObj);
+  const traitFlawMods = calculateTraitFlawStatMods(character.selectedTraits, character.selectedFlaws);
 
   const spent = getTotalPointBuySpent(character.baseStats);
   const target = character.pointBuyTarget;
@@ -68,7 +73,7 @@ export const StatsTab: React.FC<StatsTabProps> = ({ character, racesData, onChan
                 <th className="py-3 px-2">Attribute</th>
                 <th className="py-3 px-2 text-center">Base Score</th>
                 <th className="py-3 px-2 text-center">Cost</th>
-                <th className="py-3 px-2 text-center">Racial</th>
+                <th className="py-3 px-2 text-center">Racial/Tmpl</th>
                 <th className="py-3 px-2 text-center">Level Bumps</th>
                 <th className="py-3 px-2 text-center">Enhancement</th>
                 <th className="py-3 px-2 text-center">Total Score</th>
@@ -80,10 +85,12 @@ export const StatsTab: React.FC<StatsTabProps> = ({ character, racesData, onChan
                 const baseVal = character.baseStats[stat] || 10;
                 const cost = getPointBuyCost(baseVal);
                 const raceVal = raceMods[stat] || 0;
+                const tmplVal = templateMods[stat] || 0;
+                const combinedRaceTmpl = raceVal + tmplVal;
                 const bumpCount = Object.entries(character.levelBumps || {}).filter(([lvlStr, s]) => s === stat && totalLevel >= Number(lvlStr)).length;
                 const enhVal = character.enhancementMods[stat] || 0;
 
-                const totalScore = calculateTotalScore(stat, character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
+                const totalScore = calculateTotalScore(stat, character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawMods, templateMods);
                 const mod = getAbilityMod(totalScore);
                 const modStr = mod >= 0 ? `+${mod}` : `${mod}`;
 
@@ -101,7 +108,9 @@ export const StatsTab: React.FC<StatsTabProps> = ({ character, racesData, onChan
                       />
                     </td>
                     <td className="py-3 px-2 text-center font-mono text-slate-400 text-xs">{cost} pt</td>
-                    <td className="py-3 px-2 text-center font-mono text-slate-300 text-xs">{raceVal >= 0 ? '+' + raceVal : raceVal}</td>
+                    <td className="py-3 px-2 text-center font-mono text-slate-300 text-xs" title={tmplVal ? `Race: ${raceVal >= 0 ? '+' + raceVal : raceVal}, Template: ${tmplVal >= 0 ? '+' + tmplVal : tmplVal}` : undefined}>
+                      {combinedRaceTmpl >= 0 ? '+' + combinedRaceTmpl : combinedRaceTmpl}
+                    </td>
                     <td className="py-3 px-2 text-center font-mono text-slate-300 text-xs">+{bumpCount}</td>
                     <td className="py-3 px-2 text-center">
                       <input
