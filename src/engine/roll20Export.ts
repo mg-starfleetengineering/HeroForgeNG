@@ -1,7 +1,7 @@
 import { CharacterState, RaceData, ClassData, WeaponData, FeatData, Equipment } from '../types/character';
 import { calculateTotalScore, getAbilityMod, parseRaceMods, getCharacterLevel } from './stats';
 import { calculateBAB, calculateBaseSave, calculateTotalHP } from './classes';
-import { ALL_SKILLS } from './skills';
+import { ALL_SKILLS, getAvailableSkills } from './skills';
 
 export interface Roll20Attribute {
   name: string;
@@ -169,7 +169,8 @@ export function generateRoll20JSON(
   ];
 
   // Skill Ranks Mapping
-  ALL_SKILLS.forEach(skill => {
+  const exportSkills = getAvailableSkills(character.usePathfinderPerception);
+  exportSkills.forEach(skill => {
     const ranks = character.skillRanks[skill.name] || 0;
     const cleanKey = skill.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
     attribs.push({ name: `skill_ranks_${cleanKey}`, current: ranks });

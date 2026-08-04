@@ -1,6 +1,14 @@
 import React from 'react';
 import { CharacterState, RaceData, ClassData } from '../types/character';
-import { ALL_SKILLS, calculateTotalSkillPoints, calculateSpentSkillPoints, isClassSkillForCharacter } from '../engine/skills';
+import {
+  getAvailableSkills,
+  calculateTotalSkillPoints,
+  calculateSpentSkillPoints,
+  isClassSkillForCharacter,
+  convertSkillsToPerception,
+  revertPerceptionToSkills,
+  calculatePerceptionStats
+} from '../engine/skills';
 import { calculateTotalScore, getAbilityMod, parseRaceMods } from '../engine/stats';
 
 interface SkillsTabProps {
@@ -19,12 +27,26 @@ export const SkillsTab: React.FC<SkillsTabProps> = ({ character, racesData, clas
   const intMod = getAbilityMod(intScore);
   const isHuman = !!character.selectedRace && character.selectedRace.toLowerCase().includes('human');
 
+  const usePathfinder = !!character.usePathfinderPerception;
+  const activeSkills = getAvailableSkills(usePathfinder);
+
   const totalBudget = calculateTotalSkillPoints(character.levelProgression, classesData, intMod, isHuman);
-  const spentPts = calculateSpentSkillPoints(character.skillRanks, character.levelProgression, classesData);
+  const spentPts = calculateSpentSkillPoints(character.skillRanks, character.levelProgression, classesData, usePathfinder);
 
   const handleRankChange = (skillName: string, ranks: number) => {
     const updatedRanks = { ...character.skillRanks, [skillName]: ranks };
     onChange({ skillRanks: updatedRanks });
+  };
+
+  const handleTogglePerception = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const shouldEnable = e.target.checked;
+    if (shouldEnable) {
+      const updatedChar = convertSkillsToPerception(character);
+      onChange(updatedChar);
+    } else {
+      const updatedChar = revertPerceptionToSkills(character);
+      onChange(updatedChar);
+    }
   };
 
   return (
@@ -37,9 +59,23 @@ export const SkillsTab: React.FC<SkillsTabProps> = ({ character, racesData, clas
           <p className="text-xs text-slate-400">Class skills cost 1pt per rank (max Level + 3). Cross-class cost 1pt per 0.5 rank.</p>
         </div>
 
-        <div className="flex items-center gap-4 bg-slate-950/80 px-4 py-2 rounded-xl border border-slate-800">
-          <span className="text-xs text-slate-400">Total Skill Points Available:</span>
-          <span className="badge badge-amber font-mono text-sm">{spentPts} / {totalBudget}</span>
+        <div className="flex flex-wrap items-center gap-4">
+          <label className="flex items-center gap-2.5 cursor-pointer bg-slate-950/80 px-3.5 py-2 rounded-xl border border-slate-800 hover:border-amber-500/40 transition">
+            <input
+              type="checkbox"
+              checked={usePathfinder}
+              onChange={handleTogglePerception}
+              className="w-4 h-4 rounded accent-amber-500 bg-slate-900 border-slate-700 focus:ring-amber-500 cursor-pointer"
+            />
+            <span className="text-xs font-semibold text-slate-200">
+              Consolidate Spot/Listen/Search into Perception (Pathfinder Style)
+            </span>
+          </label>
+
+          <div className="flex items-center gap-4 bg-slate-950/80 px-4 py-2 rounded-xl border border-slate-800">
+            <span className="text-xs text-slate-400">Total Skill Points Available:</span>
+            <span className="badge badge-amber font-mono text-sm">{spentPts} / {totalBudget}</span>
+          </div>
         </div>
       </div>
 
@@ -56,13 +92,24 @@ export const SkillsTab: React.FC<SkillsTabProps> = ({ character, racesData, clas
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/40">
-            {ALL_SKILLS.map(skill => {
+            {activeSkills.map(skill => {
               const isClass = isClassSkillForCharacter(skill.name, character.levelProgression, classesData);
               const ranks = (character.skillRanks || {})[skill.name] || 0;
 
               const abilityScore = calculateTotalScore(skill.keyAbility, character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
               const abMod = getAbilityMod(abilityScore);
-              const totalMod = Math.floor(ranks) + abMod;
+
+              let totalMod = Math.floor(ranks) + abMod;
+              let featBonusText = '';
+
+              if (skill.name === 'Perception') {
+                const percStats = calculatePerceptionStats(character, classesData, abMod);
+                totalMod = percStats.totalBonus;
+                if (percStats.alertnessBonus > 0) {
+                  featBonusText = ` (includes +${percStats.alertnessBonus} Alertness)`;
+                }
+              }
+
               const modStr = totalMod >= 0 ? `+${totalMod}` : `${totalMod}`;
 
               return (
@@ -74,7 +121,14 @@ export const SkillsTab: React.FC<SkillsTabProps> = ({ character, racesData, clas
                       <span className="text-slate-600 text-[10px] uppercase font-mono">CROSS</span>
                     )}
                   </td>
-                  <td className="py-2 px-2 font-semibold text-slate-200">{skill.name}</td>
+                  <td className="py-2 px-2 font-semibold text-slate-200">
+                    {skill.name}
+                    {skill.name === 'Perception' && (
+                      <span className="ml-2 text-[10px] text-amber-400/90 font-normal italic">
+                        (Pathfinder: Merged Spot/Listen/Search &bull; Wisdom{featBonusText})
+                      </span>
+                    )}
+                  </td>
                   <td className="py-2 px-2 text-center uppercase font-mono text-amber-400 font-bold">{skill.keyAbility}</td>
                   <td className="py-2 px-2 text-center font-mono text-slate-300">{abMod >= 0 ? '+' + abMod : abMod}</td>
                   <td className="py-2 px-2 text-center">

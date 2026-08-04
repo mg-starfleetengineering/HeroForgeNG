@@ -145,6 +145,12 @@ export interface CharacterState {
   auras?: Aura[];
   notes?: CharacterNotes;
   allowedSources?: string[];
+  usePathfinderPerception?: boolean;
+  prePerceptionSkillsCache?: {
+    spotRanks: number;
+    listenRanks: number;
+    searchRanks: number;
+  };
 }
 
 export interface ClassData {
