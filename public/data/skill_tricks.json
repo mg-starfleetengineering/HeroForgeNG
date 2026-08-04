@@ -1,0 +1,524 @@
+[
+  {
+    "id": "assume_quirk",
+    "name": "Assume Quirk",
+    "category": "Interaction",
+    "description": "Familiar viewers get no bonus to see through your disguise.",
+    "prerequisites": "Disguise 5 ranks",
+    "prereqRanks": {
+      "Disguise": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.85"
+  },
+  {
+    "id": "group_fake_out",
+    "name": "Group Fake-Out",
+    "category": "Interaction",
+    "description": "Feint against multiple foes simultaneously",
+    "prerequisites": "Bluff 8 ranks",
+    "prereqRanks": {
+      "Bluff": 8
+    },
+    "prereqFeats": [],
+    "source": "CS p.87"
+  },
+  {
+    "id": "never_outnumbered",
+    "name": "Never Outnumbered",
+    "category": "Interaction",
+    "description": "Demoralize multiple foes simultaneously.",
+    "prerequisites": "Intimidate 8 ranks",
+    "prereqRanks": {
+      "Intimidate": 8
+    },
+    "prereqFeats": [],
+    "source": "CS p.87"
+  },
+  {
+    "id": "second_impression",
+    "name": "Second Impression",
+    "category": "Interaction",
+    "description": "Make Bluff check to reestablish blown disguise.",
+    "prerequisites": "Bluff 5 ranks, Disguise 5 ranks",
+    "prereqRanks": {
+      "Bluff": 5,
+      "Disguise": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.88"
+  },
+  {
+    "id": "social_recovery",
+    "name": "Social Recovery",
+    "category": "Interaction",
+    "description": "Make a Bluff check to replace a failed Diplomacy check.",
+    "prerequisites": "Bluff 8 ranks, Diplomacy 5 ranks",
+    "prereqRanks": {
+      "Bluff": 8,
+      "Diplomacy": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.89"
+  },
+  {
+    "id": "timely_misdirection",
+    "name": "Timely Misdirection",
+    "category": "Interaction",
+    "description": "Successful feint allows you to avoid Attacks of Opportunity",
+    "prerequisites": "Bluff 8 ranks",
+    "prereqRanks": {
+      "Bluff": 8
+    },
+    "prereqFeats": [],
+    "source": "CS p.90"
+  },
+  {
+    "id": "clever_improviser",
+    "name": "Clever Improviser",
+    "category": "Manipulation",
+    "description": "Ignore penalty for Disable Device and Open Lock checks made without tools.",
+    "prerequisites": "Disable Device 5 ranks, Open Lock 5 ranks",
+    "prereqRanks": {
+      "Disable Device": 5,
+      "Open Lock": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.85"
+  },
+  {
+    "id": "conceal_spellcasting",
+    "name": "Conceal Spellcasting",
+    "category": "Manipulation",
+    "description": "Conceal your spellcasting from onlookers.",
+    "prerequisites": "Concentration 1 ranks, Sleight of Hand 5 ranks, Spellcraft 1 rank",
+    "prereqRanks": {
+      "Concentration": 1,
+      "Sleight of Hand": 5,
+      "Spellcraft": 1
+    },
+    "prereqFeats": [],
+    "source": "CS p.85"
+  },
+  {
+    "id": "easy_escape",
+    "name": "Easy Escape",
+    "category": "Manipulation",
+    "description": "Gain Bonus on check to escape grapple or pin.",
+    "prerequisites": "Medium or smaller size (not verified), Escape Artist 8 ranks",
+    "prereqRanks": {
+      "Escape Artist": 8
+    },
+    "prereqFeats": [],
+    "source": "CS p.86"
+  },
+  {
+    "id": "false_theurgy",
+    "name": "False Theurgy",
+    "category": "Manipulation",
+    "description": "Your spell appears to be another spell of the same level.",
+    "prerequisites": "Bluff or Sleight of Hand 8 ranks, Spellcraft 8 rank",
+    "prereqRanks": {
+      "Bluff/Sleight of Hand": 8,
+      "Spellcraft": 8
+    },
+    "prereqFeats": [],
+    "source": "CS p.86"
+  },
+  {
+    "id": "healing_hands",
+    "name": "Healing Hands",
+    "category": "Manipulation",
+    "description": "Heal 1d6 damage when you stabilize a dying character.",
+    "prerequisites": "Heal 5 ranks",
+    "prereqRanks": {
+      "Heal": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.87"
+  },
+  {
+    "id": "hidden_blade",
+    "name": "Hidden Blade",
+    "category": "Manipulation",
+    "description": "Draw hidden weapon as move action; treat foe as flat-footed.",
+    "prerequisites": "Sleight of Hand 5 ranks, Quick Draw",
+    "prereqRanks": {
+      "Sleight of Hand": 5
+    },
+    "prereqFeats": [
+      "Quick Draw"
+    ],
+    "source": "CS p.87"
+  },
+  {
+    "id": "mosquitos_bite",
+    "name": "Mosquito's Bite",
+    "category": "Manipulation",
+    "description": "Flat-footed target does not notice damage you deal with a light weapon.",
+    "prerequisites": "Sleight of Hand 12 ranks",
+    "prereqRanks": {
+      "Sleight of Hand": 12
+    },
+    "prereqFeats": [],
+    "source": "CS p.87"
+  },
+  {
+    "id": "opening_tap",
+    "name": "Opening Tap",
+    "category": "Manipulation",
+    "description": "Open a lock as a swift action.",
+    "prerequisites": "Open Lock 12 ranks",
+    "prereqRanks": {
+      "Open Lock": 12
+    },
+    "prereqFeats": [],
+    "source": "CS p.88"
+  },
+  {
+    "id": "quick_escape",
+    "name": "Quick Escape",
+    "category": "Manipulation",
+    "description": "Escape from grapple or restraints more quickly than normal.",
+    "prerequisites": "Escape Artist 12 ranks",
+    "prereqRanks": {
+      "Escape Artist": 12
+    },
+    "prereqFeats": [],
+    "source": "CS p.88"
+  },
+  {
+    "id": "shrouded_dance",
+    "name": "Shrouded Dance",
+    "category": "Manipulation",
+    "description": "Use move action to gain concealment for 1 round.",
+    "prerequisites": "Hide 8 ranks, Perform (dance) 5 ranks",
+    "prereqRanks": {
+      "Hide": 8,
+      "Perform (Dance)": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.89"
+  },
+  {
+    "id": "sudden_draw",
+    "name": "Sudden Draw",
+    "category": "Manipulation",
+    "description": "Draw hidden weapon as part of Attack of Opportunity.",
+    "prerequisites": "Sleight of Hand 8 ranks, Quick Draw",
+    "prereqRanks": {
+      "Sleight of Hand": 8
+    },
+    "prereqFeats": [
+      "Quick Draw"
+    ],
+    "source": "CS p.89"
+  },
+  {
+    "id": "whip_climber",
+    "name": "Whip Climber",
+    "category": "Manipulation",
+    "description": "Use a whip as a grappling hook.",
+    "prerequisites": "Use Rope 5 ranks, proficiency with whip",
+    "prereqRanks": {
+      "Use Rope": 5
+    },
+    "prereqFeats": [],
+    "source": "CS"
+  },
+  {
+    "id": "clarity_of_vision",
+    "name": "Clarity of Vision",
+    "category": "Mental",
+    "description": "Notice invisible enemies for 1 round.",
+    "prerequisites": "Spot 12 ranks",
+    "prereqRanks": {
+      "Spot": 12
+    },
+    "prereqFeats": [],
+    "source": "CS p.85"
+  },
+  {
+    "id": "collector_of_stories",
+    "name": "Collector of Stories",
+    "category": "Mental",
+    "description": "Gain +5 bonus on Knowledge checks to identify monsters.",
+    "prerequisites": "Knowledge (any) 5 ranks",
+    "prereqRanks": {},
+    "prereqFeats": [],
+    "source": "CS p.85"
+  },
+  {
+    "id": "listen_to_this",
+    "name": "Listen to This",
+    "category": "Mental",
+    "description": "Perfectly repeat what you've recently heard.",
+    "prerequisites": "Listen 5 ranks",
+    "prereqRanks": {
+      "Listen": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.87"
+  },
+  {
+    "id": "magical_appraisal",
+    "name": "Magical Appraisal",
+    "category": "Mental",
+    "description": "Determine properties of magic items.",
+    "prerequisites": "Appraise 5 ranks, Knowledge (arcana) 5 ranks, Spellcraft 12 ranks",
+    "prereqRanks": {
+      "Appraise": 5,
+      "Knowledge (Arcana)": 5,
+      "Spellcraft": 12
+    },
+    "prereqFeats": [],
+    "source": "CS p.87"
+  },
+  {
+    "id": "point_it_out",
+    "name": "Point it Out",
+    "category": "Mental",
+    "description": "Grant ally a free Spot check to see something you've spotted.",
+    "prerequisites": "Spot 8 ranks",
+    "prereqRanks": {
+      "Spot": 8
+    },
+    "prereqFeats": [],
+    "source": "CS p.88"
+  },
+  {
+    "id": "spot_the_weak_point",
+    "name": "Spot the Weak Point",
+    "category": "Mental",
+    "description": "Make your next attack a touch attack.",
+    "prerequisites": "Spot 12 ranks",
+    "prereqRanks": {
+      "Spot": 12
+    },
+    "prereqFeats": [],
+    "source": "CS p.89"
+  },
+  {
+    "id": "swift_concentration",
+    "name": "Swift Concentration",
+    "category": "Mental",
+    "description": "Maintain concentration on a spell as a swift action.",
+    "prerequisites": "Concentration 12 ranks",
+    "prereqRanks": {
+      "Concentration": 12
+    },
+    "prereqFeats": [],
+    "source": "CS p.90"
+  },
+  {
+    "id": "acrobatic_backstab",
+    "name": "Acrobatic Backstab",
+    "category": "Movement",
+    "description": "Move through foe's space to render it flat-footed.",
+    "prerequisites": "Tumble 12 ranks",
+    "prereqRanks": {
+      "Tumble": 12
+    },
+    "prereqFeats": [],
+    "source": "CS p.84"
+  },
+  {
+    "id": "back_on_your_feet",
+    "name": "Back on Your Feet",
+    "category": "Movement",
+    "description": "React immediately to stand up from prone.",
+    "prerequisites": "Tumble 12 ranks",
+    "prereqRanks": {
+      "Tumble": 12
+    },
+    "prereqFeats": [],
+    "source": "CS p.85"
+  },
+  {
+    "id": "corner_perch",
+    "name": "Corner Perch",
+    "category": "Movement",
+    "description": "Perch in chimney or corner to leave hands free.",
+    "prerequisites": "Climb 8 ranks",
+    "prereqRanks": {
+      "Climb": 8
+    },
+    "prereqFeats": [],
+    "source": "CS p.85"
+  },
+  {
+    "id": "dismount_attack",
+    "name": "Dismount Attack",
+    "category": "Movement",
+    "description": "Make a fast dismount from moving mount to charge a foe.",
+    "prerequisites": "Ride 5 ranks",
+    "prereqRanks": {
+      "Ride": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.86"
+  },
+  {
+    "id": "escape_attack",
+    "name": "Escape Attack",
+    "category": "Movement",
+    "description": "Make an attack the same round you escape a grapple.",
+    "prerequisites": "Escape Artist 8 ranks",
+    "prereqRanks": {
+      "Escape Artist": 8
+    },
+    "prereqFeats": [],
+    "source": "CS p.86"
+  },
+  {
+    "id": "extreme_leap",
+    "name": "Extreme Leap",
+    "category": "Movement",
+    "description": "Horizontal jump of at least 10 feet allows 10 extra feet of movement that round.",
+    "prerequisites": "Jump 5 ranks",
+    "prereqRanks": {
+      "Jump": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.86"
+  },
+  {
+    "id": "leaping_climber",
+    "name": "Leaping Climber",
+    "category": "Movement",
+    "description": "Add jump distance to start of climb.",
+    "prerequisites": "Climb 5 ranks, Jump 5 ranks",
+    "prereqRanks": {
+      "Climb": 5,
+      "Jump": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.87"
+  },
+  {
+    "id": "nimble_charge",
+    "name": "Nimble Charge",
+    "category": "Movement",
+    "description": "Run or charge across difficult surface without Balance check.",
+    "prerequisites": "Balance 5 ranks",
+    "prereqRanks": {
+      "Balance": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.87"
+  },
+  {
+    "id": "nimble_stand",
+    "name": "Nimble Stand",
+    "category": "Movement",
+    "description": "Stand from prone safely.",
+    "prerequisites": "Tumble 8 ranks",
+    "prereqRanks": {
+      "Tumble": 8
+    },
+    "prereqFeats": [],
+    "source": "CS p.88"
+  },
+  {
+    "id": "quick_swimmer",
+    "name": "Quick Swimmer",
+    "category": "Movement",
+    "description": "Swim 10 additional feet with successful check.",
+    "prerequisites": "Swim 5 ranks",
+    "prereqRanks": {
+      "Swim": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.88"
+  },
+  {
+    "id": "slipping_past",
+    "name": "Slipping Past",
+    "category": "Movement",
+    "description": "Move into tight space without penalties.",
+    "prerequisites": "Escape Artist 5 ranks, Tumble 5 ranks",
+    "prereqRanks": {
+      "Escape Artist": 5,
+      "Tumble": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.89"
+  },
+  {
+    "id": "speedy_ascent",
+    "name": "Speedy Ascent",
+    "category": "Movement",
+    "description": "Climb 10 additional feet with successful check.",
+    "prerequisites": "Climb 5 ranks, Jump 5 ranks",
+    "prereqRanks": {
+      "Climb": 5,
+      "Jump": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.89"
+  },
+  {
+    "id": "tumbling_crawl",
+    "name": "Tumbling Crawl",
+    "category": "Movement",
+    "description": "Crawl 5 feet without provoking Attacks of Opportunity.",
+    "prerequisites": "Tumble 5 ranks",
+    "prereqRanks": {
+      "Tumble": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.90"
+  },
+  {
+    "id": "twisted_charge",
+    "name": "Twisted Charge",
+    "category": "Movement",
+    "description": "Make 1 direction change during a charge.",
+    "prerequisites": "Balance 5 ranks, Tumble 5 ranks",
+    "prereqRanks": {
+      "Balance": 5,
+      "Tumble": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.90"
+  },
+  {
+    "id": "up_the_hill",
+    "name": "Up the Hill",
+    "category": "Movement",
+    "description": "Move up slope or stairs at normal speed.",
+    "prerequisites": "Balance 5 ranks, Jump 5 ranks",
+    "prereqRanks": {
+      "Balance": 5,
+      "Jump": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.90"
+  },
+  {
+    "id": "walk_the_walls",
+    "name": "Walk the Walls",
+    "category": "Movement",
+    "description": "Run straight up wall for 1 round.",
+    "prerequisites": "Climb 12 ranks, Tumble 5 ranks",
+    "prereqRanks": {
+      "Climb": 12,
+      "Tumble": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.90"
+  },
+  {
+    "id": "wall_jumper",
+    "name": "Wall Jumper",
+    "category": "Movement",
+    "description": "Leap from wall as if making a running jump.",
+    "prerequisites": "Climb 5 ranks, Jump 5 ranks",
+    "prereqRanks": {
+      "Climb": 5,
+      "Jump": 5
+    },
+    "prereqFeats": [],
+    "source": "CS p.90"
+  }
+]

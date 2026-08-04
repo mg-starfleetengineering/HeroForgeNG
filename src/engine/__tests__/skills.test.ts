@@ -6,7 +6,10 @@ import {
   revertPerceptionToSkills,
   calculateSpentSkillPoints,
   calculateTotalSkillPoints,
-  calculatePerceptionStats
+  calculatePerceptionStats,
+  getMaxSkillTricks,
+  calculateSkillTrickPoints,
+  validateSkillTrickPrerequisites
 } from '../skills';
 
 const mockClasses: ClassData[] = [
@@ -220,4 +223,77 @@ describe('Pathfinder Perception Skill Logic', () => {
       expect(stats.totalBonus).toBe(6); // 4 ranks + 2 wis
     });
   });
+
+  describe('Complete Scoundrel Skill Tricks Logic', () => {
+    it('calculates max skill tricks based on character level (1 per 2 levels)', () => {
+      expect(getMaxSkillTricks(1)).toBe(0);
+      expect(getMaxSkillTricks(2)).toBe(1);
+      expect(getMaxSkillTricks(3)).toBe(1);
+      expect(getMaxSkillTricks(4)).toBe(2);
+      expect(getMaxSkillTricks(10)).toBe(5);
+    });
+
+    it('deducts 2 skill points per selected trick in calculateSpentSkillPoints', () => {
+      const char = createBaseCharacter();
+      char.skillRanks = { Jump: 5 }; // Fighter class skill -> 5 pts
+      const spent0 = calculateSpentSkillPoints(char.skillRanks, char.levelProgression, mockClasses, false, []);
+      expect(spent0).toBe(5);
+
+      const spent2 = calculateSpentSkillPoints(char.skillRanks, char.levelProgression, mockClasses, false, ['acrobatic_backstab', 'nimble_stand']);
+      expect(spent2).toBe(9); // 5 skill ranks + 4 trick points
+    });
+
+    it('validates skill ranks and feat prerequisites correctly', () => {
+      const char = createBaseCharacter();
+      char.skillRanks = { Tumble: 12, Jump: 7 };
+      char.selectedFeats = ['Quick Draw'];
+
+      const trick1 = {
+        id: 'acrobatic_backstab',
+        name: 'Acrobatic Backstab',
+        category: 'Movement',
+        description: 'Move through foe space',
+        prereqRanks: { Tumble: 12 },
+        prereqFeats: []
+      };
+
+      const result1 = validateSkillTrickPrerequisites(trick1, char);
+      expect(result1.valid).toBe(true);
+
+      const trick2 = {
+        id: 'sudden_draw',
+        name: 'Sudden Draw',
+        category: 'Manipulation',
+        description: 'Draw hidden weapon',
+        prereqRanks: { 'Sleight of Hand': 8 },
+        prereqFeats: ['Quick Draw']
+      };
+
+      const result2 = validateSkillTrickPrerequisites(trick2, char);
+      expect(result2.valid).toBe(false);
+      expect(result2.missing).toContain('Requires Sleight of Hand 8 ranks (current: 0)');
+
+      char.skillRanks['Sleight of Hand'] = 8;
+      const result3 = validateSkillTrickPrerequisites(trick2, char);
+      expect(result3.valid).toBe(true);
+    });
+
+    it('supports Pathfinder Perception fallback for Spot/Listen/Search skill trick prerequisites', () => {
+      const char = createBaseCharacter();
+      char.usePathfinderPerception = true;
+      char.skillRanks = { Perception: 12 };
+
+      const spotTrick = {
+        id: 'spot_the_weak_point',
+        name: 'Spot the Weak Point',
+        category: 'Mental',
+        description: 'Touch attack',
+        prereqRanks: { Spot: 12 }
+      };
+
+      const result = validateSkillTrickPrerequisites(spotTrick, char);
+      expect(result.valid).toBe(true);
+    });
+  });
 });
+

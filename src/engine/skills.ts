@@ -1,4 +1,4 @@
-import { CharacterState, ClassData, LevelProgression, StatType } from '../types/character';
+import { CharacterState, ClassData, LevelProgression, StatType, SkillTrickData } from '../types/character';
 
 export interface SkillDefinition {
   name: string;
@@ -97,7 +97,8 @@ export function calculateSpentSkillPoints(
   skillRanks: Record<string, number> = {},
   levelProgression: LevelProgression[] = [],
   classDatabase: ClassData[] = [],
-  usePathfinderPerception: boolean = false
+  usePathfinderPerception: boolean = false,
+  selectedSkillTricks: string[] = []
 ): number {
   let spentPts = 0;
   const activeSkillNames = new Set(getAvailableSkills(usePathfinderPerception).map(s => s.name));
@@ -109,6 +110,10 @@ export function calculateSpentSkillPoints(
     // In D&D 3.5e: Class skills cost 1pt per rank. Cross-class skills cost 2pts per rank (1pt per 0.5 rank).
     spentPts += isClass ? ranks : ranks * 2;
   }
+
+  // Deduct 2 skill points per selected skill trick
+  spentPts += (selectedSkillTricks?.length || 0) * 2;
+
   return spentPts;
 }
 
@@ -252,3 +257,66 @@ export function calculatePerceptionStats(
     totalBonus
   };
 }
+
+export function calculateSkillTrickPoints(selectedSkillTricks: string[] = []): number {
+  return (selectedSkillTricks?.length || 0) * 2;
+}
+
+export function getMaxSkillTricks(totalLevel: number): number {
+  return Math.floor(Math.max(0, totalLevel) / 2);
+}
+
+export function validateSkillTrickPrerequisites(
+  trick: SkillTrickData,
+  character: CharacterState
+): { valid: boolean; missing: string[] } {
+  const missing: string[] = [];
+  const ranksMap = character.skillRanks || {};
+  const selectedFeats = character.selectedFeats || [];
+  const usePathfinder = !!character.usePathfinderPerception;
+
+  // Check skill ranks
+  if (trick.prereqRanks) {
+    for (const [sName, reqRanks] of Object.entries(trick.prereqRanks)) {
+      if (sName === 'Knowledge (any)') {
+        const hasAnyKnowledge = Object.entries(ranksMap).some(
+          ([k, r]) => k.toLowerCase().startsWith('knowledge') && r >= reqRanks
+        );
+        if (!hasAnyKnowledge) {
+          missing.push(`Requires ${reqRanks} ranks in any Knowledge skill`);
+        }
+      } else if (sName === 'Bluff/Sleight of Hand') {
+        const bluffRanks = ranksMap['Bluff'] || 0;
+        const sohRanks = ranksMap['Sleight of Hand'] || 0;
+        if (bluffRanks < reqRanks && sohRanks < reqRanks) {
+          missing.push(`Requires Bluff ${reqRanks} ranks OR Sleight of Hand ${reqRanks} ranks`);
+        }
+      } else {
+        let charRanks = ranksMap[sName] || 0;
+        // Pathfinder Perception fallback: if target skill is Spot, Listen, or Search and usePathfinder is active
+        if (usePathfinder && (sName === 'Spot' || sName === 'Listen' || sName === 'Search')) {
+          charRanks = Math.max(charRanks, ranksMap['Perception'] || 0);
+        }
+        if (charRanks < reqRanks) {
+          missing.push(`Requires ${sName} ${reqRanks} ranks (current: ${charRanks})`);
+        }
+      }
+    }
+  }
+
+  // Check feat prerequisites
+  if (trick.prereqFeats) {
+    for (const featName of trick.prereqFeats) {
+      const hasFeat = selectedFeats.some(f => f.toLowerCase() === featName.toLowerCase());
+      if (!hasFeat) {
+        missing.push(`Requires ${featName} feat`);
+      }
+    }
+  }
+
+  return {
+    valid: missing.length === 0,
+    missing
+  };
+}
+

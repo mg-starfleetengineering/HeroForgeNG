@@ -153,6 +153,18 @@ export interface CharacterState {
   };
   selectedTraits?: string[];
   selectedFlaws?: string[];
+  selectedSkillTricks?: string[];
+}
+
+export interface SkillTrickData {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  prerequisites?: string;
+  prereqRanks?: Record<string, number>;
+  prereqFeats?: string[];
+  source?: string;
 }
 
 export interface TraitData {
