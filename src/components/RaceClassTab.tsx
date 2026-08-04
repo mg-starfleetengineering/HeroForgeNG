@@ -1,19 +1,21 @@
 import React, { useMemo } from 'react';
-import { CharacterState, RaceData, ClassData, LevelProgression, TraitData, FlawData } from '../types/character';
+import { CharacterState, RaceData, ClassData, LevelProgression, TraitData, FlawData, TemplateData } from '../types/character';
 import { getSourceBadgeInfo, isSourceAllowed, sortDropdownItems } from '../utils/sourceFilter';
 import { SearchableSelect, SearchableOption } from './SearchableSelect';
 import { TraitsFlawsSection } from './TraitsFlawsSection';
+import { getEffectiveRaceMods, getEffectiveLevelAdj, getEffectiveRaceType, getEffectiveSpeed } from '../engine/stats';
 
 interface RaceClassTabProps {
   character: CharacterState;
   racesData: RaceData[];
   classesData: ClassData[];
+  templatesData?: TemplateData[];
   traitsData: TraitData[];
   flawsData: FlawData[];
   onChange: (updated: Partial<CharacterState>) => void;
 }
 
-export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData, classesData, traitsData, flawsData, onChange }) => {
+export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData, classesData, templatesData = [], traitsData, flawsData, onChange }) => {
   const sortedRaces = useMemo(
     () => sortDropdownItems(racesData, character.allowedSources),
     [racesData, character.allowedSources]
@@ -22,6 +24,11 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
   const sortedClasses = useMemo(
     () => sortDropdownItems(classesData, character.allowedSources),
     [classesData, character.allowedSources]
+  );
+
+  const sortedTemplates = useMemo(
+    () => sortDropdownItems(templatesData, character.allowedSources),
+    [templatesData, character.allowedSources]
   );
 
   const raceOptions: SearchableOption[] = useMemo(() => {
@@ -36,6 +43,23 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
       };
     });
   }, [sortedRaces, character.allowedSources]);
+
+  const templateOptions: SearchableOption[] = useMemo(() => {
+    return [
+      { value: '', label: '-- None (Base Race Only) --', isAllowed: true },
+      ...sortedTemplates.map(t => {
+        const badge = getSourceBadgeInfo(t.source, character.allowedSources);
+        const laStr = t.levelAdj ? ` +${t.levelAdj} LA` : '';
+        return {
+          value: t.name,
+          label: t.name,
+          sublabel: `(${t.type || t.subtype || 'Template'}${laStr})`,
+          badge: badge.sourceCode,
+          isAllowed: badge.isAllowed
+        };
+      })
+    ];
+  }, [sortedTemplates, character.allowedSources]);
 
   const classOptions: SearchableOption[] = useMemo(() => {
     return [
@@ -54,7 +78,14 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
   }, [sortedClasses, character.allowedSources]);
 
   const raceObj = racesData.find(r => r.name === character.selectedRace) || racesData[0];
+  const templateObj = templatesData.find(t => t.name === character.selectedTemplate || t.id === character.selectedTemplate);
   const selectedRaceBadge = getSourceBadgeInfo(raceObj?.source, character.allowedSources);
+  const selectedTemplateBadge = templateObj ? getSourceBadgeInfo(templateObj.source, character.allowedSources) : null;
+
+  const effectiveTypeInfo = getEffectiveRaceType(raceObj, templateObj);
+  const totalLA = getEffectiveLevelAdj(raceObj, templateObj);
+  const effectiveSpeed = getEffectiveSpeed(raceObj, templateObj);
+  const effectiveMods = getEffectiveRaceMods(raceObj, templateObj);
 
   const handleLevelChange = (lvl: number, field: keyof LevelProgression, val: any) => {
     let prog = [...character.levelProgression];
@@ -70,35 +101,47 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Race Selector */}
+        {/* Race & Template Selector */}
         <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-4">
           <h2 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-3">
             <i className="fa-solid fa-dna text-amber-500"></i> Race & Template Selection
           </h2>
 
-          <div>
-            <label className="label-text">Base Race</label>
-            <SearchableSelect
-              value={character.selectedRace}
-              options={raceOptions}
-              onChange={val => onChange({ selectedRace: val })}
-              placeholder="Search base race..."
-            />
+          <div className="space-y-3">
+            <div>
+              <label className="label-text">Base Race</label>
+              <SearchableSelect
+                value={character.selectedRace}
+                options={raceOptions}
+                onChange={val => onChange({ selectedRace: val })}
+                placeholder="Search base race..."
+              />
+            </div>
+
+            <div>
+              <label className="label-text">Racial Template (Optional)</label>
+              <SearchableSelect
+                value={character.selectedTemplate || ''}
+                options={templateOptions}
+                onChange={val => onChange({ selectedTemplate: val })}
+                placeholder="Search template (e.g. Half-Celestial, Vampire)..."
+              />
+            </div>
           </div>
 
           {raceObj && (
             <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs space-y-2">
               <div className="flex justify-between items-center text-amber-400 font-bold">
-                <span>{raceObj.name}</span>
+                <span>{templateObj ? `${templateObj.name} ${raceObj.name}` : raceObj.name}</span>
                 <span className="text-slate-400 font-normal">
-                  {raceObj.size || 'Medium'} {raceObj.type || 'Humanoid'}
-                  {raceObj.subtype ? ` (${raceObj.subtype})` : ''}
+                  {raceObj.size || 'Medium'} {effectiveTypeInfo.type}
+                  {effectiveTypeInfo.subtype ? ` (${effectiveTypeInfo.subtype})` : ''}
                 </span>
               </div>
               
-              {/* Sourcebook Badge */}
-              <div className="flex items-center gap-2 pt-1">
-                <span className="text-slate-400 text-[11px]">Source:</span>
+              {/* Sourcebook Badges */}
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="text-slate-400 text-[11px]">Race Src:</span>
                 <span className={`px-2 py-0.5 rounded font-mono text-[10px] font-bold border ${
                   selectedRaceBadge.isAllowed
                     ? selectedRaceBadge.isCore
@@ -109,10 +152,52 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
                   {!selectedRaceBadge.isAllowed && '⚠️ '}
                   {selectedRaceBadge.sourceName} ({selectedRaceBadge.sourceCode})
                 </span>
+
+                {templateObj && selectedTemplateBadge && (
+                  <>
+                    <span className="text-slate-400 text-[11px] ml-1">Template Src:</span>
+                    <span className={`px-2 py-0.5 rounded font-mono text-[10px] font-bold border ${
+                      selectedTemplateBadge.isAllowed
+                        ? selectedTemplateBadge.isCore
+                          ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/30'
+                          : 'bg-amber-950/80 text-amber-300 border-amber-500/30'
+                        : 'bg-rose-950/80 text-rose-300 border-rose-500/40'
+                    }`}>
+                      {!selectedTemplateBadge.isAllowed && '⚠️ '}
+                      {selectedTemplateBadge.sourceName} ({selectedTemplateBadge.sourceCode})
+                    </span>
+                  </>
+                )}
               </div>
 
-              <p className="text-slate-300">Base Speed: {raceObj.speed ? raceObj.speed.land : 30} ft.</p>
-              <p className="text-amber-400">Level Adjustment: +{raceObj.levelAdj || 0}</p>
+              <div className="grid grid-cols-2 gap-2 pt-1 text-slate-300">
+                <p>Speed: <span className="font-mono text-amber-300">{effectiveSpeed.land} ft.</span>{effectiveSpeed.fly ? `, Fly ${effectiveSpeed.fly} ft. (${effectiveSpeed.flyManeuverability || 'good'})` : ''}</p>
+                <p className="text-amber-400 font-semibold">Total LA: <span className="font-mono">+{totalLA}</span></p>
+              </div>
+
+              {/* Stat Adjustments Summary */}
+              <div className="text-[11px] font-mono text-slate-300 bg-slate-900/80 p-2 rounded border border-slate-800 flex flex-wrap gap-2">
+                <span className="text-slate-400 font-sans">Combined Modifiers:</span>
+                {Object.entries(effectiveMods).map(([stat, mod]) => (
+                  <span key={stat} className={mod > 0 ? 'text-emerald-400' : mod < 0 ? 'text-rose-400' : 'text-slate-500'}>
+                    {stat.toUpperCase()} {mod >= 0 ? `+${mod}` : mod}
+                  </span>
+                ))}
+              </div>
+
+              {templateObj?.shortDescription && (
+                <p className="text-amber-200/90 text-[11px]">
+                  <i className="fa-solid fa-sparkles text-amber-400 mr-1"></i>
+                  {templateObj.shortDescription}
+                </p>
+              )}
+
+              {templateObj?.specialAbilities && (
+                <p className="text-emerald-300 text-[11px]">
+                  <i className="fa-solid fa-shield-halved mr-1"></i>
+                  Template Traits: <span className="font-mono">{templateObj.specialAbilities}</span>
+                </p>
+              )}
 
               {raceObj.spellLikeAbilities && (
                 <p className="text-emerald-400 font-semibold">
