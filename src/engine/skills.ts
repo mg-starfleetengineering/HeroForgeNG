@@ -1,4 +1,4 @@
-import { ClassData, LevelProgression, StatType } from '../types/character';
+import { CharacterState, ClassData, LevelProgression, StatType } from '../types/character';
 
 export interface SkillDefinition {
   name: string;
@@ -50,6 +50,18 @@ export const ALL_SKILLS: SkillDefinition[] = [
   { name: 'Use Rope', keyAbility: 'dex' }
 ];
 
+export const PERCEPTION_SKILL: SkillDefinition = { name: 'Perception', keyAbility: 'wis' };
+
+export function getAvailableSkills(usePathfinderPerception: boolean = false): SkillDefinition[] {
+  if (!usePathfinderPerception) {
+    return ALL_SKILLS;
+  }
+  const filtered = ALL_SKILLS.filter(s => s.name !== 'Spot' && s.name !== 'Listen' && s.name !== 'Search');
+  const result = [...filtered, PERCEPTION_SKILL];
+  result.sort((a, b) => a.name.localeCompare(b.name));
+  return result;
+}
+
 export function calculateTotalSkillPoints(
   levelProgression: LevelProgression[],
   classDatabase: ClassData[],
@@ -84,11 +96,15 @@ export function calculateTotalSkillPoints(
 export function calculateSpentSkillPoints(
   skillRanks: Record<string, number> = {},
   levelProgression: LevelProgression[] = [],
-  classDatabase: ClassData[] = []
+  classDatabase: ClassData[] = [],
+  usePathfinderPerception: boolean = false
 ): number {
   let spentPts = 0;
+  const activeSkillNames = new Set(getAvailableSkills(usePathfinderPerception).map(s => s.name));
+
   for (const [sName, ranks] of Object.entries(skillRanks)) {
     if (!ranks || ranks <= 0) continue;
+    if (!activeSkillNames.has(sName)) continue;
     const isClass = isClassSkillForCharacter(sName, levelProgression, classDatabase);
     // In D&D 3.5e: Class skills cost 1pt per rank. Cross-class skills cost 2pts per rank (1pt per 0.5 rank).
     spentPts += isClass ? ranks : ranks * 2;
@@ -101,6 +117,14 @@ export function isClassSkillForCharacter(
   levelProgression: LevelProgression[] = [],
   classDatabase: ClassData[] = []
 ): boolean {
+  if (skillName.toLowerCase() === 'perception') {
+    return (
+      isClassSkillForCharacter('Spot', levelProgression, classDatabase) ||
+      isClassSkillForCharacter('Listen', levelProgression, classDatabase) ||
+      isClassSkillForCharacter('Search', levelProgression, classDatabase)
+    );
+  }
+
   const activeClasses = new Set<string>();
   levelProgression.forEach(lvl => {
     if (lvl.primaryClass) activeClasses.add(lvl.primaryClass.toLowerCase());
@@ -132,4 +156,99 @@ export function isClassSkillForCharacter(
   }
 
   return false;
+}
+
+export function convertSkillsToPerception(character: CharacterState): CharacterState {
+  const ranks = character.skillRanks || {};
+  const spotRanks = ranks['Spot'] || 0;
+  const listenRanks = ranks['Listen'] || 0;
+  const searchRanks = ranks['Search'] || 0;
+
+  const maxRank = Math.max(spotRanks, listenRanks, searchRanks);
+
+  const prePerceptionSkillsCache = {
+    spotRanks,
+    listenRanks,
+    searchRanks
+  };
+
+  const updatedRanks = { ...ranks };
+  delete updatedRanks['Spot'];
+  delete updatedRanks['Listen'];
+  delete updatedRanks['Search'];
+
+  if (maxRank > 0) {
+    updatedRanks['Perception'] = maxRank;
+  } else {
+    delete updatedRanks['Perception'];
+  }
+
+  return {
+    ...character,
+    usePathfinderPerception: true,
+    prePerceptionSkillsCache,
+    skillRanks: updatedRanks
+  };
+}
+
+export function revertPerceptionToSkills(character: CharacterState): CharacterState {
+  const ranks = character.skillRanks || {};
+  const perceptionRanks = ranks['Perception'] || 0;
+  const cache = character.prePerceptionSkillsCache;
+
+  const updatedRanks = { ...ranks };
+  delete updatedRanks['Perception'];
+
+  if (cache) {
+    const originalMax = Math.max(cache.spotRanks, cache.listenRanks, cache.searchRanks);
+    const addedRanks = Math.max(0, perceptionRanks - originalMax);
+
+    updatedRanks['Spot'] = cache.spotRanks + addedRanks;
+    updatedRanks['Listen'] = cache.listenRanks + addedRanks;
+    updatedRanks['Search'] = cache.searchRanks + addedRanks;
+  } else {
+    if (perceptionRanks > 0) {
+      updatedRanks['Spot'] = perceptionRanks;
+      updatedRanks['Listen'] = perceptionRanks;
+      updatedRanks['Search'] = perceptionRanks;
+    }
+  }
+
+  const updatedChar: CharacterState = {
+    ...character,
+    usePathfinderPerception: false,
+    skillRanks: updatedRanks
+  };
+
+  delete updatedChar.prePerceptionSkillsCache;
+  return updatedChar;
+}
+
+export function calculatePerceptionStats(
+  character: CharacterState,
+  classDatabase: ClassData[] = [],
+  wisMod: number = 0
+): {
+  ranks: number;
+  wisMod: number;
+  isClass: boolean;
+  alertnessBonus: number;
+  totalBonus: number;
+} {
+  const ranks = (character.skillRanks || {})['Perception'] || 0;
+  const isClass = isClassSkillForCharacter('Perception', character.levelProgression, classDatabase);
+
+  const selectedFeats = character.selectedFeats || [];
+  const hasAlertness = selectedFeats.some(f => f.toLowerCase() === 'alertness');
+  const alertnessBonus = hasAlertness ? 2 : 0;
+
+  const totalBonus = Math.floor(ranks) + wisMod + alertnessBonus;
+
+  return {
+    ranks,
+    wisMod,
+    isClass,
+    alertnessBonus,
+    totalBonus
+  };
 }
