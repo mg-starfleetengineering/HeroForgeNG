@@ -408,10 +408,22 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData
 
         {/* Feats & Abilities Section */}
         <div>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mb-2">Feats & Special Abilities</h3>
-          <p className="text-xs text-slate-800 font-medium leading-relaxed">
-            {(character.selectedFeats || []).join(', ') || 'None selected.'}
-          </p>
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mb-2">Feats & Racial / Special Abilities</h3>
+          <div className="space-y-1 text-xs text-slate-800 font-medium leading-relaxed font-mono">
+            {raceObj.spellLikeAbilities && (
+              <p><span className="font-bold text-slate-900 font-sans">Racial Spell-Like Abilities:</span> {raceObj.spellLikeAbilities}</p>
+            )}
+            {raceObj.psionicAbilities && (
+              <p><span className="font-bold text-slate-900 font-sans">Racial Psionics:</span> {raceObj.psionicAbilities}</p>
+            )}
+            {raceObj.specialAbilities && (
+              <p><span className="font-bold text-slate-900 font-sans">Racial Traits:</span> {raceObj.specialAbilities}</p>
+            )}
+            {raceObj.racialSkills && (
+              <p><span className="font-bold text-slate-900 font-sans">Racial Skill Bonuses:</span> {raceObj.racialSkills}</p>
+            )}
+            <p><span className="font-bold text-slate-900 font-sans">Selected Feats:</span> {(character.selectedFeats || []).join(', ') || 'None selected.'}</p>
+          </div>
         </div>
 
         {/* Active Projected Auras & Emanations */}

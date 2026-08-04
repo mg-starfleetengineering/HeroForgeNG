@@ -178,6 +178,7 @@ export interface RaceData {
   category?: string;
   size?: string;
   type?: string;
+  subtype?: string;
   hd?: number;
   speed?: {
     land: number;
@@ -199,6 +200,9 @@ export interface RaceData {
   bonusLanguages?: string;
   bonusFeats?: string;
   specialAbilities?: string;
+  spellLikeAbilities?: string;
+  psionicAbilities?: string;
+  racialSkills?: string;
   source?: string;
 }
 

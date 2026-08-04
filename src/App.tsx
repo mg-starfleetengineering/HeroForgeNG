@@ -13,6 +13,7 @@ import { SheetViewTab } from './components/SheetViewTab';
 import { PortraitModal } from './components/PortraitModal';
 import { SourceBooksTab } from './components/SourceBooksTab';
 import { CORE_SOURCES } from './utils/sourceFilter';
+import { generateRoll20JSON } from './engine/roll20Export';
 
 const DEFAULT_CHARACTER: CharacterState = {
   name: 'Valerius the Brave',
@@ -167,6 +168,18 @@ export const App: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleExportRoll20 = () => {
+    const roll20Data = generateRoll20JSON(character, racesData, classesData, weaponsData, featsData);
+    const jsonStr = JSON.stringify(roll20Data, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${character.name.replace(/\s+/g, '_')}_Roll20_3.5e.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -204,6 +217,7 @@ export const App: React.FC = () => {
         setActiveTab={setActiveTab}
         onReset={handleReset}
         onExport={handleExport}
+        onExportRoll20={handleExportRoll20}
         onImport={handleImport}
       />
 
@@ -286,7 +300,7 @@ export const App: React.FC = () => {
         {activeTab === 'skills' && <SkillsTab character={character} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
         {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} onChange={updateCharacter} />}
         {activeTab === 'equipment' && <EquipmentTab character={character} weaponsData={weaponsData} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
-        {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} />}
+        {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} racesData={racesData} />}
         {activeTab === 'auras' && <AurasTab character={character} onChange={updateCharacter} />}
         {activeTab === 'sources' && <SourceBooksTab character={character} onChange={updateCharacter} />}
         {activeTab === 'notes' && <NotesTab character={character} onChange={updateCharacter} />}

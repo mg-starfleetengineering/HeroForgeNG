@@ -1,6 +1,6 @@
 import React from 'react';
 import { CharacterState, RaceData, ClassData } from '../types/character';
-import { ALL_SKILLS, calculateTotalSkillPoints, isClassSkillForCharacter } from '../engine/skills';
+import { ALL_SKILLS, calculateTotalSkillPoints, calculateSpentSkillPoints, isClassSkillForCharacter } from '../engine/skills';
 import { calculateTotalScore, getAbilityMod, parseRaceMods } from '../engine/stats';
 
 interface SkillsTabProps {
@@ -17,14 +17,10 @@ export const SkillsTab: React.FC<SkillsTabProps> = ({ character, racesData, clas
   const totalLevel = character.levelProgression?.filter(l => l.primaryClass).length || 1;
   const intScore = calculateTotalScore('int', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel);
   const intMod = getAbilityMod(intScore);
-  const isHuman = character.selectedRace === 'Human';
+  const isHuman = !!character.selectedRace && character.selectedRace.toLowerCase().includes('human');
 
   const totalBudget = calculateTotalSkillPoints(character.levelProgression, classesData, intMod, isHuman);
-
-  let spentPts = 0;
-  for (const [sName, ranks] of Object.entries(character.skillRanks || {})) {
-    spentPts += ranks;
-  }
+  const spentPts = calculateSpentSkillPoints(character.skillRanks, character.levelProgression, classesData);
 
   const handleRankChange = (skillName: string, ranks: number) => {
     const updatedRanks = { ...character.skillRanks, [skillName]: ranks };
@@ -84,7 +80,7 @@ export const SkillsTab: React.FC<SkillsTabProps> = ({ character, racesData, clas
                   <td className="py-2 px-2 text-center">
                     <input
                       type="number"
-                      step="0.5"
+                      step="1"
                       min="0"
                       value={ranks}
                       onChange={e => handleRankChange(skill.name, parseFloat(e.target.value) || 0)}
