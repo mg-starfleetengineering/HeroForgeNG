@@ -250,7 +250,7 @@ export const App: React.FC = () => {
 
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
         {/* Character Basic Info Bar */}
-        <section className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-4 rounded-2xl flex flex-wrap items-center gap-4">
+        <section className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-4 rounded-2xl flex flex-wrap items-center gap-4 print:hidden">
           {/* Portrait Thumbnail / Trigger */}
           <div className="flex items-center shrink-0">
             <button
@@ -322,16 +322,20 @@ export const App: React.FC = () => {
         </section>
 
         {/* Tab Views */}
-        {activeTab === 'stats' && <StatsTab character={character} racesData={racesData} onChange={updateCharacter} />}
-        {activeTab === 'race-class' && <RaceClassTab character={character} racesData={racesData} classesData={classesData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} onChange={updateCharacter} />}
-        {activeTab === 'skills' && <SkillsTab character={character} racesData={racesData} classesData={classesData} traitsData={traitsData} flawsData={flawsData} skillTricksData={skillTricksData} onChange={updateCharacter} />}
-        {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} classesData={classesData} racesData={racesData} onChange={updateCharacter} />}
-        {activeTab === 'equipment' && <EquipmentTab character={character} weaponsData={weaponsData} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
-        {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} racesData={racesData} />}
-        {activeTab === 'auras' && <AurasTab character={character} onChange={updateCharacter} />}
-        {activeTab === 'sources' && <SourceBooksTab character={character} onChange={updateCharacter} />}
-        {activeTab === 'notes' && <NotesTab character={character} onChange={updateCharacter} />}
-        {activeTab === 'sheet' && <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} />}
+        <div className="print:hidden">
+          {activeTab === 'stats' && <StatsTab character={character} racesData={racesData} onChange={updateCharacter} />}
+          {activeTab === 'race-class' && <RaceClassTab character={character} racesData={racesData} classesData={classesData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} onChange={updateCharacter} />}
+          {activeTab === 'skills' && <SkillsTab character={character} racesData={racesData} classesData={classesData} traitsData={traitsData} flawsData={flawsData} skillTricksData={skillTricksData} onChange={updateCharacter} />}
+          {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} classesData={classesData} racesData={racesData} onChange={updateCharacter} />}
+          {activeTab === 'equipment' && <EquipmentTab character={character} weaponsData={weaponsData} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
+          {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} racesData={racesData} />}
+          {activeTab === 'auras' && <AurasTab character={character} onChange={updateCharacter} />}
+          {activeTab === 'sources' && <SourceBooksTab character={character} onChange={updateCharacter} />}
+          {activeTab === 'notes' && <NotesTab character={character} onChange={updateCharacter} />}
+        </div>
+        <div className={activeTab === 'sheet' ? 'block' : 'hidden print:block'}>
+          <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} />
+        </div>
       </main>
 
       <footer className="mt-auto border-t border-slate-800/80 bg-slate-900/40 text-slate-400 text-xs py-4 px-4 text-center space-y-1">

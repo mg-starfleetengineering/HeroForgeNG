@@ -186,8 +186,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const classSummary = Object.entries(classMap).map(([c, count]) => `${c} ${count}`).join(' / ') || 'None 1';
 
   return (
-    <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-4">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+    <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-4 print:bg-transparent print:backdrop-blur-none print:border-none print:shadow-none print:p-0 print:space-y-0">
+      <div className="flex items-center justify-between border-b border-slate-800 pb-3 print:hidden">
         <h2 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2">
           <i className="fa-solid fa-scroll text-amber-500"></i> Printable Character Sheet View
         </h2>
@@ -196,7 +196,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         </button>
       </div>
 
-      <div id="printable-character-sheet" className="bg-white text-slate-900 p-8 rounded-xl shadow-2xl space-y-6 font-sans">
+      <div id="printable-character-sheet" className="bg-white text-slate-900 p-8 rounded-xl shadow-2xl space-y-6 font-sans print:p-0 print:shadow-none print:rounded-none print:border-none">
         {/* Header Section */}
         <div className="border-b-2 border-slate-900 pb-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -224,7 +224,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         </div>
 
         {/* Vitals Banner */}
-        <div className="grid grid-cols-5 gap-3 text-center font-mono py-2 bg-slate-100 rounded-lg border border-slate-300">
+        <div className="grid grid-cols-5 gap-3 text-center font-mono py-2 bg-slate-100 rounded-lg border border-slate-300 print:break-inside-avoid">
           <div>
             <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Hit Points</span>
             <span className="text-2xl font-bold text-slate-900">{hp}</span>
@@ -249,7 +249,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         </div>
 
         {/* Primary Attacks & Weapons Section */}
-        <div className="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-2">
+        <div className="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-2 print:break-inside-avoid">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Attacks & Weapon Arsenal</h3>
           <table className="w-full text-xs text-left border-collapse">
             <thead>
@@ -281,7 +281,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         </div>
 
         {/* Armor & Protective Gear Section */}
-        <div className="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-2">
+        <div className="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-2 print:break-inside-avoid">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Armor & Protective Gear</h3>
           <div className="grid grid-cols-2 gap-4 text-xs font-mono">
             <div className="p-2 bg-white rounded border border-slate-200 space-y-0.5">
@@ -322,7 +322,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
             {inventory.length === 0 ? (
               <p className="text-xs text-slate-500 italic">No general inventory recorded.</p>
             ) : (
-              <div className="max-h-[220px] overflow-y-auto pr-1">
+              <div className="max-h-[220px] overflow-y-auto pr-1 print:max-h-none print:overflow-visible print:pr-0">
                 <table className="w-full text-[11px] text-left border-collapse font-mono">
                   <thead>
                     <tr className="border-b border-slate-300 text-slate-500 uppercase font-sans font-bold">
@@ -386,7 +386,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         </div>
 
         {/* Ability Scores & Saving Throws */}
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-6 print:break-inside-avoid">
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mb-2">Ability Scores</h3>
             <table className="w-full text-xs text-left border-collapse">
@@ -444,7 +444,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         </div>
 
         {/* Feats & Abilities Section */}
-        <div>
+        <div className="print:break-inside-avoid">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mb-2">Feats & Racial / Special Abilities</h3>
           <div className="space-y-1 text-xs text-slate-800 font-medium leading-relaxed font-mono">
             {raceObj.spellLikeAbilities && (
@@ -494,7 +494,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
         {/* Backstory & Campaign Notes Section */}
         {character.notes && (character.notes.backstory || character.notes.appearance || (character.notes.quests || []).length > 0) && (
-          <div className="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-2">
+          <div className="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-2 print-page-break-before">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Backstory & Active Quests</h3>
             {character.notes.backstory && (
               <div className="text-xs space-y-1">
