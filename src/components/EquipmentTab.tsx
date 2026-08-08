@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { CharacterState, WeaponData, RaceData, ClassData, Equipment, CustomArmorData, WondrousItem, InventoryItem, Funds } from '../types/character';
 import { getSourceBadgeInfo, sortDropdownItems } from '../utils/sourceFilter';
 import { SearchableSelect, SearchableOption } from './SearchableSelect';
@@ -7,7 +7,8 @@ import { calculateBAB } from '../engine/classes';
 import {
   resolveWeapon, resolveArmor, resolveShield, calculateFeatCombatBonuses,
   calculateCarryingCapacity, calculateCoinWeight, calculateTotalNetWorthGP,
-  calculateTotalCarriedWeight, getEncumbranceStatus, ARMOR_WEIGHT_MAP, SHIELD_WEIGHT_MAP
+  calculateTotalCarriedWeight, getEncumbranceStatus, ARMOR_WEIGHT_MAP, SHIELD_WEIGHT_MAP,
+  ensureEquippedItemInInventory, isItemInInventory, syncEquippedItemsToInventory
 } from '../engine/equipment';
 
 interface EquipmentTabProps {
@@ -56,6 +57,13 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const [showCustomArmorModal, setShowCustomArmorModal] = useState(false);
   const [showWondrousModal, setShowWondrousModal] = useState(false);
   const [showAddInventoryModal, setShowAddInventoryModal] = useState(false);
+
+  useEffect(() => {
+    const syncedChar = syncEquippedItemsToInventory(character, weaponsData);
+    if (syncedChar.inventory !== character.inventory) {
+      onChange({ inventory: syncedChar.inventory });
+    }
+  }, [character.equipment, weaponsData]);
 
   // New Custom Weapon Form State
   const [customWpnName, setCustomWpnName] = useState('');
@@ -109,9 +117,31 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   };
 
   const inventory: InventoryItem[] = character.inventory || [];
+  const customWeapons = character.customWeapons || [];
+  const customArmors = character.customArmors || [];
 
   const handleEqChange = (field: keyof Equipment, val: any) => {
-    onChange({ equipment: { ...eq, [field]: val } });
+    const newEq = { ...eq, [field]: val };
+    let updatedInv = [...inventory];
+
+    if (val && val !== 'none' && val !== '__CUSTOM__') {
+      if (field === 'primaryWeapon' || field === 'secondaryWeapon' || field === 'rangedWeapon') {
+        const wpn = resolveWeapon(val, customWeapons, weaponsData);
+        updatedInv = ensureEquippedItemInInventory(updatedInv, { name: wpn.name, weight: wpn.weight });
+      } else if (field === 'armor') {
+        const arm = resolveArmor(val, customArmors);
+        const armorKey = val.toLowerCase().trim();
+        const w = ARMOR_WEIGHT_MAP[armorKey] !== undefined ? ARMOR_WEIGHT_MAP[armorKey] : 20;
+        updatedInv = ensureEquippedItemInInventory(updatedInv, { name: arm.name, weight: w });
+      } else if (field === 'shield') {
+        const shd = resolveShield(val, customArmors);
+        const shieldKey = val.toLowerCase().trim();
+        const w = SHIELD_WEIGHT_MAP[shieldKey] !== undefined ? SHIELD_WEIGHT_MAP[shieldKey] : 10;
+        updatedInv = ensureEquippedItemInInventory(updatedInv, { name: shd.name, weight: w });
+      }
+    }
+
+    onChange({ equipment: newEq, inventory: updatedInv });
   };
 
   const handleFundsChange = (field: keyof Funds, val: number) => {
@@ -133,9 +163,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const coinWeight = calculateCoinWeight(funds);
   const netWorthGP = calculateTotalNetWorthGP(funds);
   const encumbrance = getEncumbranceStatus(totalCarriedWeight, carryingCapacity);
-
-  const customWeapons = character.customWeapons || [];
-  const customArmors = character.customArmors || [];
 
   const armorObj = resolveArmor(eq.armor, customArmors);
   const shieldObj = resolveShield(eq.shield, customArmors);
@@ -267,7 +294,34 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   };
 
   const handleRemoveInventoryItem = (id: string) => {
-    onChange({ inventory: inventory.filter(item => item.id !== id) });
+    const itemToRemove = inventory.find(i => i.id === id);
+    const newInventory = inventory.filter(item => item.id !== id);
+    const newEq = { ...eq };
+
+    if (itemToRemove) {
+      const cleanName = itemToRemove.name.toLowerCase().trim();
+
+      if (eq.primaryWeapon && (resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData).name.toLowerCase().trim() === cleanName || eq.primaryWeapon.toLowerCase().trim() === cleanName)) {
+        newEq.primaryWeapon = 'none';
+      }
+      if (eq.secondaryWeapon && (resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData).name.toLowerCase().trim() === cleanName || eq.secondaryWeapon.toLowerCase().trim() === cleanName)) {
+        newEq.secondaryWeapon = 'none';
+      }
+      if (eq.rangedWeapon && (resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData).name.toLowerCase().trim() === cleanName || eq.rangedWeapon.toLowerCase().trim() === cleanName)) {
+        newEq.rangedWeapon = 'none';
+      }
+      if (eq.armor && (resolveArmor(eq.armor, customArmors).name.toLowerCase().trim() === cleanName || eq.armor.toLowerCase().trim() === cleanName)) {
+        newEq.armor = 'none';
+      }
+      if (eq.shield && (resolveShield(eq.shield, customArmors).name.toLowerCase().trim() === cleanName || eq.shield.toLowerCase().trim() === cleanName)) {
+        newEq.shield = 'none';
+      }
+      if (eq.wondrousItems && eq.wondrousItems.length > 0) {
+        newEq.wondrousItems = eq.wondrousItems.filter(w => w.name.toLowerCase().trim() !== cleanName);
+      }
+    }
+
+    onChange({ equipment: newEq, inventory: newInventory });
   };
 
   // Add Custom Weapon
@@ -289,9 +343,11 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     };
 
     const updatedCustoms = [...customWeapons, newWpn];
+    const updatedInv = ensureEquippedItemInInventory(inventory, { name: newWpn.name, weight: newWpn.weight });
     onChange({
       customWeapons: updatedCustoms,
-      equipment: { ...eq, primaryWeapon: newWpn.name }
+      equipment: { ...eq, primaryWeapon: newWpn.name },
+      inventory: updatedInv
     });
 
     setCustomWpnName('');
@@ -313,9 +369,13 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     };
 
     const updatedArmors = [...customArmors, newArmor];
+    const w = customArmorType === 'shield' ? 10 : 20;
+    const updatedInv = ensureEquippedItemInInventory(inventory, { name: newArmor.name, weight: w });
+    const slot = customArmorType === 'shield' ? 'shield' : 'armor';
     onChange({
       customArmors: updatedArmors,
-      equipment: { ...eq, armor: newArmor.name }
+      equipment: { ...eq, [slot]: newArmor.name },
+      inventory: updatedInv
     });
 
     setCustomArmorName('');
@@ -335,7 +395,11 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     };
 
     const currentItems = eq.wondrousItems || [];
-    handleEqChange('wondrousItems', [...currentItems, newItem]);
+    const updatedInv = ensureEquippedItemInInventory(inventory, { name: newItem.name, weight: 0, notes: newItem.effect });
+    onChange({
+      equipment: { ...eq, wondrousItems: [...currentItems, newItem] },
+      inventory: updatedInv
+    });
 
     setWondrousName('');
     setWondrousEffect('');
@@ -353,6 +417,96 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     return isNaN(num) ? 0 : num;
   };
 
+  const getEquippedSlotLabel = (itemName: string): string | null => {
+    if (!itemName || !itemName.trim()) return null;
+    const clean = itemName.toLowerCase().trim();
+
+    if (eq.primaryWeapon && eq.primaryWeapon !== 'none') {
+      const wpnObj = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
+      if (wpnObj.name.toLowerCase().trim() === clean || eq.primaryWeapon.toLowerCase().trim() === clean) {
+        return 'Equipped (Primary)';
+      }
+    }
+    if (eq.secondaryWeapon && eq.secondaryWeapon !== 'none') {
+      const secObj = resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData);
+      if (secObj.name.toLowerCase().trim() === clean || eq.secondaryWeapon.toLowerCase().trim() === clean) {
+        return 'Equipped (Off-Hand)';
+      }
+    }
+    if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
+      const rngObj = resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData);
+      if (rngObj.name.toLowerCase().trim() === clean || eq.rangedWeapon.toLowerCase().trim() === clean) {
+        return 'Equipped (Ranged)';
+      }
+    }
+    if (eq.armor && eq.armor !== 'none') {
+      const armObj = resolveArmor(eq.armor, customArmors);
+      if (armObj.name.toLowerCase().trim() === clean || eq.armor.toLowerCase().trim() === clean) {
+        return 'Equipped (Armor)';
+      }
+    }
+    if (eq.shield && eq.shield !== 'none') {
+      const shdObj = resolveShield(eq.shield, customArmors);
+      if (shdObj.name.toLowerCase().trim() === clean || eq.shield.toLowerCase().trim() === clean) {
+        return 'Equipped (Shield)';
+      }
+    }
+    if (eq.wondrousItems && eq.wondrousItems.length > 0) {
+      const itemMatch = eq.wondrousItems.find(w => w.name.toLowerCase().trim() === clean);
+      if (itemMatch) {
+        return `Equipped (${itemMatch.slot})`;
+      }
+    }
+    return null;
+  };
+
+  // Auto-sync any equipped items that are missing from inventory
+  const syncedInventory = useMemo(() => {
+    let updated = [...inventory];
+
+    if (eq.armor && eq.armor !== 'none') {
+      const arm = resolveArmor(eq.armor, customArmors);
+      if (!isItemInInventory(updated, arm.name) && !isItemInInventory(updated, eq.armor)) {
+        const armorKey = eq.armor.toLowerCase().trim();
+        const w = ARMOR_WEIGHT_MAP[armorKey] !== undefined ? ARMOR_WEIGHT_MAP[armorKey] : 20;
+        updated = ensureEquippedItemInInventory(updated, { name: arm.name, weight: w });
+      }
+    }
+    if (eq.shield && eq.shield !== 'none') {
+      const shd = resolveShield(eq.shield, customArmors);
+      if (!isItemInInventory(updated, shd.name) && !isItemInInventory(updated, eq.shield)) {
+        const shieldKey = eq.shield.toLowerCase().trim();
+        const w = SHIELD_WEIGHT_MAP[shieldKey] !== undefined ? SHIELD_WEIGHT_MAP[shieldKey] : 10;
+        updated = ensureEquippedItemInInventory(updated, { name: shd.name, weight: w });
+      }
+    }
+    if (eq.primaryWeapon && eq.primaryWeapon !== 'none') {
+      const wpn = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
+      if (!isItemInInventory(updated, wpn.name) && !isItemInInventory(updated, eq.primaryWeapon)) {
+        updated = ensureEquippedItemInInventory(updated, { name: wpn.name, weight: wpn.weight });
+      }
+    }
+    if (eq.secondaryWeapon && eq.secondaryWeapon !== 'none') {
+      const wpn = resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData);
+      if (!isItemInInventory(updated, wpn.name) && !isItemInInventory(updated, eq.secondaryWeapon)) {
+        updated = ensureEquippedItemInInventory(updated, { name: wpn.name, weight: wpn.weight });
+      }
+    }
+    if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
+      const wpn = resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData);
+      if (!isItemInInventory(updated, wpn.name) && !isItemInInventory(updated, eq.rangedWeapon)) {
+        updated = ensureEquippedItemInInventory(updated, { name: wpn.name, weight: wpn.weight });
+      }
+    }
+    (eq.wondrousItems || []).forEach(w => {
+      if (!isItemInInventory(updated, w.name)) {
+        updated = ensureEquippedItemInInventory(updated, { name: w.name, weight: w.weight || 0, notes: w.effect });
+      }
+    });
+
+    return updated;
+  }, [eq, inventory, customArmors, customWeapons, weaponsData]);
+
   // Build complete itemized list of all gear/items contributing to character weight
   const activeCarriedItemsBreakdown: Array<{
     id: string;
@@ -368,119 +522,10 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     isCurrency?: boolean;
     isStashed?: boolean;
     isHaversack?: boolean;
+    equippedLabel?: string | null;
   }> = [];
 
-  // 1. Equipped Armor
-  if (eq.armor && eq.armor !== 'none') {
-    const armorKey = eq.armor.toLowerCase().trim();
-    let armorW = 0;
-    if (ARMOR_WEIGHT_MAP[armorKey] !== undefined) {
-      armorW = ARMOR_WEIGHT_MAP[armorKey];
-    } else {
-      const customArmor = (character.customArmors || []).find(a => a.name.toLowerCase() === armorKey || a.id.toLowerCase() === armorKey);
-      armorW = parseWeight(customArmor?.weight || 20);
-    }
-    activeCarriedItemsBreakdown.push({
-      id: `eq_armor_${eq.armor}`,
-      name: armorObj.name + (eq.armorEnhancement ? ` +${eq.armorEnhancement}` : ''),
-      icon: '🛡️',
-      location: 'Equipped (Armor)',
-      quantity: 1,
-      unitWeight: armorW,
-      totalWeight: armorW,
-      notes: `AC +${armorAc}, Check ${armorObj.checkPenalty}`,
-      isEquippedGear: true
-    });
-  }
-
-  // 2. Equipped Shield
-  if (eq.shield && eq.shield !== 'none') {
-    const shieldKey = eq.shield.toLowerCase().trim();
-    let shieldW = 0;
-    if (SHIELD_WEIGHT_MAP[shieldKey] !== undefined) {
-      shieldW = SHIELD_WEIGHT_MAP[shieldKey];
-    } else {
-      const customShield = (character.customArmors || []).find(a => a.name.toLowerCase() === shieldKey || a.id.toLowerCase() === shieldKey);
-      shieldW = parseWeight(customShield?.weight || 10);
-    }
-    activeCarriedItemsBreakdown.push({
-      id: `eq_shield_${eq.shield}`,
-      name: shieldObj.name + (eq.shieldEnhancement ? ` +${eq.shieldEnhancement}` : ''),
-      icon: '🛡️',
-      location: 'Equipped (Shield)',
-      quantity: 1,
-      unitWeight: shieldW,
-      totalWeight: shieldW,
-      notes: `AC +${shieldAc}`,
-      isEquippedGear: true
-    });
-  }
-
-  // 3. Primary Weapon
-  if (eq.primaryWeapon && eq.primaryWeapon !== 'none') {
-    const wpnW = parseWeight(primaryWpnObj.weight);
-    activeCarriedItemsBreakdown.push({
-      id: `eq_primary_wpn`,
-      name: primaryWpnObj.name + (eq.primaryWeaponEnhancement ? ` +${eq.primaryWeaponEnhancement}` : ''),
-      icon: '⚔️',
-      location: 'Equipped (Primary Weapon)',
-      quantity: 1,
-      unitWeight: wpnW,
-      totalWeight: wpnW,
-      notes: `${primaryWpnObj.damageM}, Crit ${primaryWpnObj.threat < 20 ? `${primaryWpnObj.threat}-20` : '20'}/x${primaryWpnObj.critMultiplier || 2}`,
-      isEquippedGear: true
-    });
-  }
-
-  // 4. Secondary Weapon
-  if (hasSecondary && secondaryWpnObj) {
-    const wpnW = parseWeight(secondaryWpnObj.weight);
-    activeCarriedItemsBreakdown.push({
-      id: `eq_sec_wpn`,
-      name: secondaryWpnObj.name + (eq.secondaryWeaponEnhancement ? ` +${eq.secondaryWeaponEnhancement}` : ''),
-      icon: '⚔️',
-      location: 'Equipped (Off-Hand)',
-      quantity: 1,
-      unitWeight: wpnW,
-      totalWeight: wpnW,
-      notes: `${secondaryWpnObj.damageM}`,
-      isEquippedGear: true
-    });
-  }
-
-  // 5. Ranged Weapon
-  if (hasRanged && rangedWpnObj) {
-    const wpnW = parseWeight(rangedWpnObj.weight);
-    activeCarriedItemsBreakdown.push({
-      id: `eq_rng_wpn`,
-      name: rangedWpnObj.name + (eq.rangedWeaponEnhancement ? ` +${eq.rangedWeaponEnhancement}` : ''),
-      icon: '🏹',
-      location: 'Equipped (Ranged)',
-      quantity: 1,
-      unitWeight: wpnW,
-      totalWeight: wpnW,
-      notes: `${rangedWpnObj.damageM}`,
-      isEquippedGear: true
-    });
-  }
-
-  // 6. Wondrous Items
-  (eq.wondrousItems || []).forEach(item => {
-    const w = parseWeight(item.weight);
-    activeCarriedItemsBreakdown.push({
-      id: `eq_wondrous_${item.id}`,
-      name: item.name,
-      icon: '💎',
-      location: `Equipped (${item.slot})`,
-      quantity: 1,
-      unitWeight: w,
-      totalWeight: w,
-      notes: item.effect,
-      isEquippedGear: true
-    });
-  });
-
-  // 7. Coin Purse / Currency Weight
+  // 1. Coin Purse / Currency Weight
   const totalCoinsNum = (funds.cp || 0) + (funds.sp || 0) + (funds.gp || 0) + (funds.pp || 0);
   if (totalCoinsNum > 0 && coinWeight > 0) {
     activeCarriedItemsBreakdown.push({
@@ -497,18 +542,25 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     });
   }
 
-  // 8. General Inventory Items
-  inventory.forEach(item => {
+  // 2. All Inventory Items (includes weapons, armors, shields, wondrous items, and general gear)
+  syncedInventory.forEach(item => {
     const loc = (item.location || 'Carried').toLowerCase();
     const isStashed = loc === 'stash' || loc === 'mount';
     const isHaversack = loc === 'haversack';
     const unitW = parseWeight(item.weight);
     const totW = isStashed ? 0 : (isHaversack ? 0 : (item.quantity * unitW));
+    const equippedLabel = getEquippedSlotLabel(item.name);
+
+    let icon = '🎒';
+    if (equippedLabel?.includes('Weapon') || equippedLabel?.includes('Primary') || equippedLabel?.includes('Off-Hand')) icon = '⚔️';
+    else if (equippedLabel?.includes('Ranged')) icon = '🏹';
+    else if (equippedLabel?.includes('Armor') || equippedLabel?.includes('Shield')) icon = '🛡️';
+    else if (equippedLabel?.includes('Equipped')) icon = '💎';
 
     activeCarriedItemsBreakdown.push({
       id: item.id,
       name: item.name,
-      icon: '🎒',
+      icon,
       location: item.location || 'Carried',
       quantity: item.quantity,
       unitWeight: unitW,
@@ -516,48 +568,15 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       notes: item.notes,
       value: item.value,
       isStashed,
-      isHaversack
+      isHaversack,
+      isEquippedGear: !!equippedLabel,
+      equippedLabel
     });
   });
 
-  interface TableCarriedItem {
-    id: string;
-    name: string;
-    icon: string;
-    location: string;
-    quantity: number;
-    unitWeight: number;
-    totalWeight: number;
-    notes?: string;
-    value?: string;
-    isEquippedGear?: boolean;
-    isCurrency?: boolean;
-    isStashed?: boolean;
-    isHaversack?: boolean;
-  }
-
-  // Select items to display in the main inventory table
-  const tableSourceItems: TableCarriedItem[] = includeEquippedInTable ? activeCarriedItemsBreakdown : inventory.map(item => {
-    const loc = (item.location || 'Carried').toLowerCase();
-    const isStashed = loc === 'stash' || loc === 'mount';
-    const isHaversack = loc === 'haversack';
-    const unitW = parseWeight(item.weight);
-    return {
-      id: item.id,
-      name: item.name,
-      icon: '🎒',
-      location: item.location || 'Carried',
-      quantity: item.quantity,
-      unitWeight: unitW,
-      totalWeight: isStashed ? 0 : (isHaversack ? 0 : (item.quantity * unitW)),
-      notes: item.notes,
-      value: item.value,
-      isStashed,
-      isHaversack,
-      isEquippedGear: false,
-      isCurrency: false
-    };
-  });
+  const tableSourceItems = includeEquippedInTable
+    ? activeCarriedItemsBreakdown
+    : activeCarriedItemsBreakdown.filter(item => !item.isEquippedGear);
 
   const filteredInventoryTable = activeLocationFilter === 'All'
     ? tableSourceItems
@@ -1228,7 +1247,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                           <div>
                             <span className="font-bold text-amber-200 text-xs flex items-center gap-1.5">
                               {item.name}
-                              {isEquippedGear && <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 text-[9px] font-sans uppercase font-bold border border-amber-500/30">Equipped</span>}
+                              {isEquippedGear && <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 text-[9px] font-sans uppercase font-bold border border-amber-500/30">{item.equippedLabel || 'Equipped'}</span>}
                               {isCurrency && <span className="px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 text-[9px] font-sans uppercase font-bold border border-cyan-500/30">Coins</span>}
                             </span>
                             {item.notes && <span className="text-[10px] text-slate-400 font-sans block">{item.notes}</span>}
@@ -1236,7 +1255,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                         </div>
                       </td>
                       <td className="py-2.5 px-3 text-center">
-                        {!isEquippedGear && !isCurrency ? (
+                        {!isCurrency ? (
                           <select
                             value={item.location || 'Backpack'}
                             onChange={e => handleUpdateItemLocation(item.id, e.target.value)}
@@ -1254,7 +1273,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                         )}
                       </td>
                       <td className="py-2.5 px-3 text-center">
-                        {!isEquippedGear && !isCurrency ? (
+                        {!isCurrency ? (
                           <div className="flex items-center justify-center gap-1.5">
                             <button
                               onClick={() => handleUpdateItemQty(item.id, -1)}
@@ -1286,7 +1305,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                       </td>
                       <td className="py-2.5 px-3 text-center text-slate-400">{item.value || '-'}</td>
                       <td className="py-2.5 px-3 text-right">
-                        {!isEquippedGear && !isCurrency ? (
+                        {!isCurrency ? (
                           <button
                             onClick={() => handleRemoveInventoryItem(item.id)}
                             className="text-slate-500 hover:text-rose-400 p-1 text-xs"
@@ -1295,7 +1314,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                             <i className="fa-solid fa-trash-can"></i>
                           </button>
                         ) : (
-                          <span className="text-[10px] text-slate-500 font-sans italic">{isCurrency ? 'Coins' : 'Equipped'}</span>
+                          <span className="text-[10px] text-slate-500 font-sans italic">Coins</span>
                         )}
                       </td>
                     </tr>

@@ -1,4 +1,4 @@
-import { WeaponData, CustomArmorData, CharacterState } from '../types/character';
+import { WeaponData, CustomArmorData, CharacterState, InventoryItem } from '../types/character';
 
 export const DEFAULT_WEAPON: WeaponData = {
   id: 'unarmed',
@@ -316,12 +316,146 @@ export function calculateTotalNetWorthGP(funds?: { cp: number; sp: number; gp: n
 }
 
 /**
+ * Helper to check if an item by name is present in inventory.
+ */
+export function isItemInInventory(inventory: InventoryItem[] = [], name: string | undefined): boolean {
+  if (!name || !name.trim() || name.toLowerCase().trim() === 'none') return false;
+  const clean = name.toLowerCase().trim();
+  return inventory.some(i => {
+    const invName = i.name.toLowerCase().trim();
+    return invName === clean || invName.includes(clean) || clean.includes(invName);
+  });
+}
+
+/**
+ * Ensures an equipped item exists in character.inventory.
+ * Returns updated inventory array (or unchanged array if already present).
+ */
+export function ensureEquippedItemInInventory(
+  inventory: InventoryItem[] = [],
+  itemData: { name: string; weight: number; location?: string; value?: string; notes?: string }
+): InventoryItem[] {
+  if (!itemData.name || !itemData.name.trim() || itemData.name.toLowerCase().trim() === 'none') {
+    return inventory;
+  }
+  const cleanName = itemData.name.trim();
+
+  // Check if item already exists in inventory (case-insensitive)
+  const exists = inventory.some(i => i.name.toLowerCase().trim() === cleanName.toLowerCase());
+  if (exists) return inventory;
+
+  const newItem: InventoryItem = {
+    id: `inv_eq_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+    name: cleanName,
+    quantity: 1,
+    weight: Math.max(0, itemData.weight || 0),
+    location: itemData.location || 'Carried',
+    value: itemData.value || '',
+    notes: itemData.notes || ''
+  };
+
+  return [...inventory, newItem];
+}
+
+/**
+ * Automatically inspects a CharacterState and ensures all currently equipped items
+ * (armor, shield, primary weapon, secondary weapon, ranged weapon, wondrous items)
+ * exist persistently in character.inventory.
+ * Returns an updated CharacterState if missing items were added, or the original if unchanged.
+ */
+export function syncEquippedItemsToInventory(
+  character: CharacterState,
+  weaponsData: WeaponData[] = []
+): CharacterState {
+  const eq = character.equipment;
+  if (!eq) return character;
+
+  let currentInventory = character.inventory || [];
+  const customArmors = character.customArmors || [];
+  const customWeapons = character.customWeapons || [];
+  let modified = false;
+
+  if (eq.armor && eq.armor !== 'none') {
+    const arm = resolveArmor(eq.armor, customArmors);
+    if (!isItemInInventory(currentInventory, arm.name) && !isItemInInventory(currentInventory, eq.armor)) {
+      const armorKey = eq.armor.toLowerCase().trim();
+      const w = ARMOR_WEIGHT_MAP[armorKey] !== undefined ? ARMOR_WEIGHT_MAP[armorKey] : 20;
+      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: arm.name, weight: w });
+      if (nextInv !== currentInventory) {
+        currentInventory = nextInv;
+        modified = true;
+      }
+    }
+  }
+
+  if (eq.shield && eq.shield !== 'none') {
+    const shd = resolveShield(eq.shield, customArmors);
+    if (!isItemInInventory(currentInventory, shd.name) && !isItemInInventory(currentInventory, eq.shield)) {
+      const shieldKey = eq.shield.toLowerCase().trim();
+      const w = SHIELD_WEIGHT_MAP[shieldKey] !== undefined ? SHIELD_WEIGHT_MAP[shieldKey] : 10;
+      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: shd.name, weight: w });
+      if (nextInv !== currentInventory) {
+        currentInventory = nextInv;
+        modified = true;
+      }
+    }
+  }
+
+  if (eq.primaryWeapon && eq.primaryWeapon !== 'none') {
+    const wpn = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
+    if (!isItemInInventory(currentInventory, wpn.name) && !isItemInInventory(currentInventory, eq.primaryWeapon)) {
+      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: wpn.name, weight: wpn.weight });
+      if (nextInv !== currentInventory) {
+        currentInventory = nextInv;
+        modified = true;
+      }
+    }
+  }
+
+  if (eq.secondaryWeapon && eq.secondaryWeapon !== 'none') {
+    const wpn = resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData);
+    if (!isItemInInventory(currentInventory, wpn.name) && !isItemInInventory(currentInventory, eq.secondaryWeapon)) {
+      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: wpn.name, weight: wpn.weight });
+      if (nextInv !== currentInventory) {
+        currentInventory = nextInv;
+        modified = true;
+      }
+    }
+  }
+
+  if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
+    const wpn = resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData);
+    if (!isItemInInventory(currentInventory, wpn.name) && !isItemInInventory(currentInventory, eq.rangedWeapon)) {
+      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: wpn.name, weight: wpn.weight });
+      if (nextInv !== currentInventory) {
+        currentInventory = nextInv;
+        modified = true;
+      }
+    }
+  }
+
+  (eq.wondrousItems || []).forEach(w => {
+    if (!isItemInInventory(currentInventory, w.name)) {
+      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: w.name, weight: w.weight || 0, notes: w.effect });
+      if (nextInv !== currentInventory) {
+        currentInventory = nextInv;
+        modified = true;
+      }
+    }
+  });
+
+  return modified ? { ...character, inventory: currentInventory } : character;
+}
+
+/**
  * Calculates total carried weight on person (in lbs).
  * Excludes items located in 'Stash' or 'Mount'.
+ * Prevents double counting if equipped gear is already recorded in character.inventory.
  */
 export function calculateTotalCarriedWeight(character: CharacterState, weaponsData: WeaponData[] = []): number {
   let weight = 0;
   const eq = character.equipment;
+  const inv = character.inventory || [];
 
   const parseWeight = (val: any): number => {
     if (val === null || val === undefined) return 0;
@@ -330,53 +464,67 @@ export function calculateTotalCarriedWeight(character: CharacterState, weaponsDa
   };
 
   if (eq) {
-    // 1. Armor Weight
-    if (eq.armor) {
-      const armorKey = eq.armor.toLowerCase().trim();
-      if (ARMOR_WEIGHT_MAP[armorKey] !== undefined) {
-        weight += ARMOR_WEIGHT_MAP[armorKey];
-      } else {
-        const customArmor = (character.customArmors || []).find(a => a.name.toLowerCase() === armorKey || a.id.toLowerCase() === armorKey);
-        weight += parseWeight(customArmor?.weight || 20);
+    // 1. Armor Weight (if not already recorded in inventory)
+    if (eq.armor && eq.armor !== 'none') {
+      const armorObj = resolveArmor(eq.armor, character.customArmors || []);
+      if (!isItemInInventory(inv, armorObj.name) && !isItemInInventory(inv, eq.armor)) {
+        const armorKey = eq.armor.toLowerCase().trim();
+        if (ARMOR_WEIGHT_MAP[armorKey] !== undefined) {
+          weight += ARMOR_WEIGHT_MAP[armorKey];
+        } else {
+          const customArmor = (character.customArmors || []).find(a => a.name.toLowerCase() === armorKey || a.id.toLowerCase() === armorKey);
+          weight += parseWeight(customArmor?.weight || 20);
+        }
       }
     }
 
-    // 2. Shield Weight
-    if (eq.shield) {
-      const shieldKey = eq.shield.toLowerCase().trim();
-      if (SHIELD_WEIGHT_MAP[shieldKey] !== undefined) {
-        weight += SHIELD_WEIGHT_MAP[shieldKey];
-      } else {
-        const customShield = (character.customArmors || []).find(a => a.name.toLowerCase() === shieldKey || a.id.toLowerCase() === shieldKey);
-        weight += parseWeight(customShield?.weight || 10);
+    // 2. Shield Weight (if not already recorded in inventory)
+    if (eq.shield && eq.shield !== 'none') {
+      const shieldObj = resolveShield(eq.shield, character.customArmors || []);
+      if (!isItemInInventory(inv, shieldObj.name) && !isItemInInventory(inv, eq.shield)) {
+        const shieldKey = eq.shield.toLowerCase().trim();
+        if (SHIELD_WEIGHT_MAP[shieldKey] !== undefined) {
+          weight += SHIELD_WEIGHT_MAP[shieldKey];
+        } else {
+          const customShield = (character.customArmors || []).find(a => a.name.toLowerCase() === shieldKey || a.id.toLowerCase() === shieldKey);
+          weight += parseWeight(customShield?.weight || 10);
+        }
       }
     }
 
-    // 3. Equipped Weapons Weight
+    // 3. Equipped Weapons Weight (if not already recorded in inventory)
     if (eq.primaryWeapon && eq.primaryWeapon !== 'none') {
       const primaryWpn = resolveWeapon(eq.primaryWeapon, character.customWeapons || [], weaponsData);
-      weight += parseWeight(primaryWpn.weight);
+      if (!isItemInInventory(inv, primaryWpn.name) && !isItemInInventory(inv, eq.primaryWeapon)) {
+        weight += parseWeight(primaryWpn.weight);
+      }
     }
     if (eq.secondaryWeapon && eq.secondaryWeapon !== 'none') {
       const secWpn = resolveWeapon(eq.secondaryWeapon, character.customWeapons || [], weaponsData);
-      weight += parseWeight(secWpn.weight);
+      if (!isItemInInventory(inv, secWpn.name) && !isItemInInventory(inv, eq.secondaryWeapon)) {
+        weight += parseWeight(secWpn.weight);
+      }
     }
     if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
       const rngWpn = resolveWeapon(eq.rangedWeapon, character.customWeapons || [], weaponsData);
-      weight += parseWeight(rngWpn.weight);
+      if (!isItemInInventory(inv, rngWpn.name) && !isItemInInventory(inv, eq.rangedWeapon)) {
+        weight += parseWeight(rngWpn.weight);
+      }
     }
 
-    // 4. Wondrous Items Weight
+    // 4. Wondrous Items Weight (if not already recorded in inventory)
     if (eq.wondrousItems && eq.wondrousItems.length > 0) {
       eq.wondrousItems.forEach(item => {
-        weight += parseWeight(item.weight);
+        if (!isItemInInventory(inv, item.name)) {
+          weight += parseWeight(item.weight);
+        }
       });
     }
   }
 
   // 5. General Inventory Weight (excluding Stash & Mount)
-  if (character.inventory && character.inventory.length > 0) {
-    character.inventory.forEach(item => {
+  if (inv.length > 0) {
+    inv.forEach(item => {
       const loc = (item.location || 'Carried').toLowerCase();
       if (loc !== 'stash' && loc !== 'mount') {
         const qty = parseWeight(item.quantity) || 1;
