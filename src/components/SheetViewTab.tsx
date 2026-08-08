@@ -325,10 +325,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
         {/* Page 1 Lower Split Grid: Left (Stats & Saves) | Right (Feats & Auras) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-3 print:break-inside-avoid">
-          {/* Left Column: Ability Scores & Saving Throws */}
-          <div className="space-y-3">
+          {/* Left Column Card: Ability Scores & Saving Throws */}
+          <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 space-y-3">
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mb-1">Ability Scores</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 mb-1.5">Ability Scores</h3>
               <table className="w-full text-xs text-left border-collapse">
                 <thead>
                   <tr className="border-b border-slate-300 text-slate-500 uppercase">
@@ -349,7 +349,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
             </div>
 
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mb-1">Saving Throws</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 mb-1.5">Saving Throws</h3>
               <table className="w-full text-xs text-left border-collapse">
                 <thead>
                   <tr className="border-b border-slate-300 text-slate-500 uppercase">
@@ -383,10 +383,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
             </div>
           </div>
 
-          {/* Right Column: Feats & Racial Abilities + Active Auras */}
-          <div className="space-y-3">
+          {/* Right Column Card: Feats & Special Abilities + Active Auras */}
+          <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 space-y-3">
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mb-1">Feats & Special Abilities</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 mb-1.5">Feats & Special Abilities</h3>
               <div className="space-y-0.5 text-[11px] text-slate-800 font-medium leading-tight font-mono">
                 {raceObj.spellLikeAbilities && (
                   <p><span className="font-bold text-slate-900 font-sans">Spell-Likes:</span> {raceObj.spellLikeAbilities}</p>
@@ -411,16 +411,16 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
             </div>
 
             {(character.auras || []).filter(a => a.active).length > 0 && (
-              <div className="border border-amber-300 rounded-lg p-2.5 bg-amber-50/50 space-y-1.5">
-                <h3 className="text-[11px] font-bold uppercase tracking-wider text-amber-900 border-b border-amber-300 pb-0.5">
-                  Active Projected Auras & Emanations
+              <div className="space-y-1">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 mb-1.5">
+                  Active Projected Auras
                 </h3>
                 <div className="space-y-1.5 text-xs">
                   {character.auras!.filter(a => a.active).map(aura => (
-                    <div key={aura.id} className="p-1.5 bg-white rounded border border-amber-200 shadow-sm font-sans space-y-0.5">
+                    <div key={aura.id} className="p-1.5 bg-white rounded border border-slate-200 font-sans space-y-0.5">
                       <div className="flex items-center justify-between font-bold text-slate-900 text-[10px]">
                         <span>{aura.name}</span>
-                        <span className="text-[9px] px-1 py-0.2 bg-amber-100 border border-amber-300 text-amber-800 rounded font-mono">
+                        <span className="text-[9px] px-1 py-0.2 bg-slate-100 border border-slate-300 text-slate-700 rounded font-mono">
                           {aura.radius} ft &bull; {aura.target}
                         </span>
                       </div>
@@ -434,12 +434,12 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         </div>
 
         {/* Page 2: Inventory, Currency & Carrying Capacity Section */}
-        <div className="space-y-4 print:space-y-3 print-page-break-before">
+        <div className="space-y-3 print-page-break-before">
           <div className="hidden print:block">
             {renderHeader()}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border border-slate-300 rounded-lg p-4 bg-slate-50 print:grid-cols-3 print:break-inside-avoid">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border border-slate-300 rounded-lg p-3.5 bg-slate-50 print:grid-cols-3 print:break-inside-avoid">
             {/* General Inventory Table (2 cols) */}
             <div className="col-span-2 space-y-2">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Possessions & Adventuring Gear</h3>
@@ -512,23 +512,23 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
         {/* Page 3: Backstory & Campaign Notes Section */}
         {character.notes && (character.notes.backstory || character.notes.appearance || (character.notes.quests || []).length > 0) && (
-          <div className="space-y-4 print:space-y-3 print-page-break-before">
+          <div className="space-y-3 print-page-break-before">
             <div className="hidden print:block">
               {renderHeader()}
             </div>
 
-            <div className="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-2">
+            <div className="border border-slate-300 rounded-lg p-3.5 bg-slate-50 space-y-2">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Backstory & Active Quests</h3>
               {character.notes.backstory && (
                 <div className="text-xs space-y-1">
                   <span className="font-bold text-slate-900 block">Backstory:</span>
-                  <p className="text-slate-700 font-mono text-[11px] leading-relaxed whitespace-pre-wrap">{character.notes.backstory}</p>
+                  <p className="text-slate-700 font-mono text-[11px] print:text-[10.5px] leading-relaxed print:leading-normal whitespace-pre-wrap">{character.notes.backstory}</p>
                 </div>
               )}
               {(character.notes.quests || []).filter(q => q.status === 'active').length > 0 && (
                 <div className="text-xs space-y-1 border-t border-slate-200 pt-2">
                   <span className="font-bold text-slate-900 block">Active Quests:</span>
-                  <ul className="list-disc list-inside text-slate-700 font-mono text-[11px] space-y-0.5">
+                  <ul className="list-disc list-inside text-slate-700 font-mono text-[11px] print:text-[10.5px] space-y-0.5">
                     {character.notes.quests!.filter(q => q.status === 'active').map(q => (
                       <li key={q.id}>
                         <span className="font-bold">{q.title}</span> {q.location ? `(${q.location})` : ''} - {q.objectives || 'No objectives listed.'}
