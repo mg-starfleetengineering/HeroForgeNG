@@ -1,5 +1,5 @@
 import React from 'react';
-import { CharacterState, RaceData, ClassData, WeaponData, Equipment, TraitData, FlawData } from '../types/character';
+import { CharacterState, RaceData, ClassData, WeaponData, Equipment, TraitData, FlawData, TemplateData } from '../types/character';
 import {
   calculateTotalScore,
   getAbilityMod,
@@ -9,7 +9,7 @@ import {
   calculateTraitFlawHpPerLevel,
   calculateTraitFlawAcMod,
   calculateTraitFlawInitiativeMod,
-  calculateTraitFlawSpeedMod
+  calculateTotalSpeed
 } from '../engine/stats';
 import { calculateBAB, calculateBaseSave, calculateTotalHP } from '../engine/classes';
 import {
@@ -23,12 +23,22 @@ interface SheetViewTabProps {
   racesData: RaceData[];
   classesData: ClassData[];
   weaponsData: WeaponData[];
+  templatesData?: TemplateData[];
   traitsData?: TraitData[];
   flawsData?: FlawData[];
 }
 
-export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData, classesData, weaponsData, traitsData = [], flawsData = [] }) => {
+export const SheetViewTab: React.FC<SheetViewTabProps> = ({
+  character,
+  racesData,
+  classesData,
+  weaponsData,
+  templatesData = [],
+  traitsData = [],
+  flawsData = []
+}) => {
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
+  const templateObj: Partial<TemplateData> | undefined = templatesData.find(t => t.name === character.selectedTemplate || t.id === character.selectedTemplate);
   const raceMods = parseRaceMods(raceObj);
 
   const selectedTraits = character.selectedTraits || [];
@@ -39,8 +49,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData
   const traitFlawHpMod = calculateTraitFlawHpPerLevel(selectedTraits, selectedFlaws, traitsData, flawsData);
   const traitFlawAcMod = calculateTraitFlawAcMod(selectedTraits, selectedFlaws, traitsData, flawsData);
   const traitFlawInitMod = calculateTraitFlawInitiativeMod(selectedTraits, selectedFlaws, traitsData, flawsData);
-  const baseLandSpeed = raceObj.speed ? raceObj.speed.land : 30;
-  const traitFlawSpeedDelta = calculateTraitFlawSpeedMod(selectedTraits, selectedFlaws, traitsData, flawsData, baseLandSpeed);
+
+  const speedData = calculateTotalSpeed(character, raceObj, templateObj, traitsData, flawsData);
+  const finalSpeed = speedData.land;
 
   const totalLevel = character.levelProgression.filter(l => l.primaryClass).length || 1;
   const strScore = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
@@ -69,7 +80,6 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({ character, racesData
   const totalWill = baseWill + wisMod + traitFlawSaveMods.will;
 
   const totalInitiative = dexMod + traitFlawInitMod;
-  const finalSpeed = baseLandSpeed + traitFlawSpeedDelta;
 
   const eq: Equipment = character.equipment || {
     armor: 'chainshirt', armorEnhancement: 1, shield: 'heavy_shield', shieldEnhancement: 1,

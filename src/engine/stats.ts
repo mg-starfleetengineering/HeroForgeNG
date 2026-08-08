@@ -82,21 +82,27 @@ export function getEffectiveSpeed(raceObj?: Partial<RaceData>, templateObj?: Par
   burrow?: number;
   climb?: number;
 } {
-  const baseLand = raceObj?.speed?.land ?? 30;
-  const baseFly = raceObj?.speed?.fly;
-  const baseSwim = raceObj?.speed?.swim;
-  const baseBurrow = raceObj?.speed?.burrow;
-  const baseClimb = raceObj?.speed?.climb;
+  const baseLand = parseVal(raceObj?.speed?.land, 30);
+  const baseFly = raceObj?.speed?.fly != null ? parseVal(raceObj.speed.fly, 0) : undefined;
+  const baseSwim = raceObj?.speed?.swim != null ? parseVal(raceObj.speed.swim, 0) : undefined;
+  const baseBurrow = raceObj?.speed?.burrow != null ? parseVal(raceObj.speed.burrow, 0) : undefined;
+  const baseClimb = raceObj?.speed?.climb != null ? parseVal(raceObj.speed.climb, 0) : undefined;
 
   const tSpeed = templateObj?.speed;
 
+  const land = tSpeed?.land !== undefined && tSpeed?.land !== null ? parseVal(tSpeed.land, baseLand) : baseLand;
+  const fly = tSpeed?.fly !== undefined && tSpeed?.fly !== null ? parseVal(tSpeed.fly, baseFly || 0) : baseFly;
+  const swim = tSpeed?.swim !== undefined && tSpeed?.swim !== null ? parseVal(tSpeed.swim, baseSwim || 0) : baseSwim;
+  const burrow = tSpeed?.burrow !== undefined && tSpeed?.burrow !== null ? parseVal(tSpeed.burrow, baseBurrow || 0) : baseBurrow;
+  const climb = tSpeed?.climb !== undefined && tSpeed?.climb !== null ? parseVal(tSpeed.climb, baseClimb || 0) : baseClimb;
+
   return {
-    land: tSpeed?.land !== undefined ? tSpeed.land : baseLand,
-    fly: tSpeed?.fly !== undefined ? tSpeed.fly : baseFly,
+    land,
+    fly,
     flyManeuverability: tSpeed?.flyManeuverability,
-    swim: tSpeed?.swim !== undefined ? tSpeed.swim : baseSwim,
-    burrow: tSpeed?.burrow !== undefined ? tSpeed.burrow : baseBurrow,
-    climb: tSpeed?.climb !== undefined ? tSpeed.climb : baseClimb
+    swim,
+    burrow,
+    climb
   };
 }
 
@@ -366,6 +372,72 @@ export function calculateTraitFlawInitiativeMod(
   return initMod;
 }
 
+export function calculateClassSpeedBonus(
+  levelProgression: Array<{ primaryClass?: string }> = [],
+  armorType: string = 'none',
+  isEncumbered: boolean = false
+): number {
+  if (isEncumbered) return 0;
+
+  let bonus = 0;
+  const classCounts: Record<string, number> = {};
+  (levelProgression || []).forEach(l => {
+    if (l.primaryClass) {
+      classCounts[l.primaryClass] = (classCounts[l.primaryClass] || 0) + 1;
+    }
+  });
+
+  const armorLower = (armorType || 'none').toLowerCase();
+  const isHeavyArmor = armorLower === 'fullplate' || armorLower.includes('heavy');
+  const isMediumArmor = armorLower === 'breastplate' || armorLower.includes('medium');
+  const isArmored = armorLower !== 'none';
+
+  for (const [clsName, count] of Object.entries(classCounts)) {
+    const cLower = clsName.toLowerCase();
+
+    // Barbarian Fast Movement (+10 ft in light, medium, or no armor, not heavy)
+    if (cLower === 'barbarian' && count >= 1) {
+      if (!isHeavyArmor) {
+        bonus += 10;
+      }
+    }
+
+    // Monk Fast Movement (unarmored only)
+    if (cLower === 'monk' && count >= 3) {
+      if (!isArmored) {
+        if (count >= 18) bonus += 60;
+        else if (count >= 15) bonus += 50;
+        else if (count >= 12) bonus += 40;
+        else if (count >= 9) bonus += 30;
+        else if (count >= 6) bonus += 20;
+        else if (count >= 3) bonus += 10;
+      }
+    }
+
+    // Scout Fast Movement (light or no armor)
+    if (cLower === 'scout' && count >= 3) {
+      if (!isArmored || armorLower === 'padded' || armorLower === 'leather' || armorLower === 'studded' || armorLower === 'chainshirt' || armorLower.includes('light')) {
+        if (count >= 19) bonus += 30;
+        else if (count >= 11) bonus += 20;
+        else if (count >= 3) bonus += 10;
+      }
+    }
+  }
+
+  return bonus;
+}
+
+export function calculateFeatSpeedBonus(selectedFeats: string[] = []): number {
+  let bonus = 0;
+  (selectedFeats || []).forEach(f => {
+    const fLower = f.toLowerCase();
+    if (fLower.includes('dash')) bonus += 5;
+    if (fLower.includes('speed of thought')) bonus += 10;
+    if (fLower.includes('fleet of foot')) bonus += 10;
+  });
+  return bonus;
+}
+
 export function calculateTraitFlawSpeedMod(
   selectedTraits: string[] = [],
   selectedFlaws: string[] = [],
@@ -373,6 +445,7 @@ export function calculateTraitFlawSpeedMod(
   flawsData: FlawData[] = [],
   baseSpeed: number = 30
 ): number {
+  const numBaseSpeed = parseVal(baseSpeed, 30);
   let delta = 0;
   let halveCount = 0;
 
@@ -382,7 +455,7 @@ export function calculateTraitFlawSpeedMod(
       if (tObj.speedMod < 0 && tObj.speedMod > -1) {
         halveCount++;
       } else {
-        delta += tObj.speedMod;
+        delta += parseVal(tObj.speedMod);
       }
     }
   }
@@ -392,19 +465,79 @@ export function calculateTraitFlawSpeedMod(
       if (fObj.speedMod < 0 && fObj.speedMod > -1) {
         halveCount++;
       } else {
-        delta += fObj.speedMod;
+        delta += parseVal(fObj.speedMod);
       }
     }
   }
 
-  let finalSpeed = baseSpeed + delta;
+  let finalSpeed = numBaseSpeed + delta;
   if (halveCount > 0) {
     for (let i = 0; i < halveCount; i++) {
       finalSpeed = Math.floor(finalSpeed / 2 / 5) * 5; // rounded down to nearest 5 ft
     }
   }
 
-  return finalSpeed - baseSpeed;
+  return finalSpeed - numBaseSpeed;
+}
+
+export function calculateTotalSpeed(
+  character: CharacterState,
+  raceObj?: Partial<RaceData>,
+  templateObj?: Partial<TemplateData>,
+  traitsData: TraitData[] = [],
+  flawsData: FlawData[] = []
+): {
+  land: number;
+  fly?: number;
+  flyManeuverability?: string;
+  swim?: number;
+  burrow?: number;
+  climb?: number;
+  baseLand: number;
+  classBonus: number;
+  featBonus: number;
+  traitFlawDelta: number;
+} {
+  const effSpeed = getEffectiveSpeed(raceObj, templateObj);
+  const baseLand = parseVal(effSpeed.land, 30);
+
+  const armorKey = (character.equipment?.armor || 'none').toLowerCase();
+  const raceName = (character.selectedRace || '').toLowerCase();
+  const isDwarf = raceName.includes('dwarf');
+
+  const classBonus = calculateClassSpeedBonus(character.levelProgression, armorKey, false);
+  const featBonus = calculateFeatSpeedBonus(character.selectedFeats);
+
+  const selectedTraits = character.selectedTraits || [];
+  const selectedFlaws = character.selectedFlaws || [];
+  const traitFlawDelta = calculateTraitFlawSpeedMod(selectedTraits, selectedFlaws, traitsData, flawsData, baseLand);
+
+  let land = baseLand + classBonus + featBonus + traitFlawDelta;
+
+  const isHeavy = armorKey === 'fullplate' || armorKey.includes('heavy');
+  const isMedium = armorKey === 'breastplate' || armorKey.includes('medium');
+  if (!isDwarf && (isHeavy || isMedium)) {
+    if (land >= 40) {
+      land = Math.max(30, land - 10);
+    } else if (land >= 30) {
+      land = 20;
+    } else if (land >= 20) {
+      land = 15;
+    }
+  }
+
+  return {
+    land: Math.max(0, land),
+    fly: effSpeed.fly,
+    flyManeuverability: effSpeed.flyManeuverability,
+    swim: effSpeed.swim,
+    burrow: effSpeed.burrow,
+    climb: effSpeed.climb,
+    baseLand,
+    classBonus,
+    featBonus,
+    traitFlawDelta
+  };
 }
 
 export function calculateTotalScore(
