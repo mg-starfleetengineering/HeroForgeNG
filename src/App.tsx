@@ -331,7 +331,7 @@ export const App: React.FC = () => {
         {activeTab === 'auras' && <AurasTab character={character} onChange={updateCharacter} />}
         {activeTab === 'sources' && <SourceBooksTab character={character} onChange={updateCharacter} />}
         {activeTab === 'notes' && <NotesTab character={character} onChange={updateCharacter} />}
-        {activeTab === 'sheet' && <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} traitsData={traitsData} flawsData={flawsData} />}
+        {activeTab === 'sheet' && <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} />}
       </main>
 
       <footer className="mt-auto border-t border-slate-800/80 bg-slate-900/40 text-slate-400 text-xs py-4 px-4 text-center space-y-1">
