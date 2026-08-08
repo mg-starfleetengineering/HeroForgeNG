@@ -185,6 +185,38 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   });
   const classSummary = Object.entries(classMap).map(([c, count]) => `${c} ${count}`).join(' / ') || 'None 1';
 
+  const renderHeader = () => (
+    <div className="border-b-2 border-slate-900 pb-3 flex items-center justify-between gap-4">
+      <div className="flex items-center gap-4">
+        {character.portraitUrl ? (
+          <div className="w-14 h-14 rounded-xl border-2 border-slate-900 overflow-hidden shrink-0 shadow">
+            <img
+              src={character.portraitUrl}
+              alt={character.name}
+              className="w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          </div>
+        ) : (
+          <div className="w-14 h-14 rounded-xl border-2 border-slate-300 bg-slate-100 flex items-center justify-center shrink-0 text-slate-400">
+            <i className="fa-solid fa-user-shield text-2xl"></i>
+          </div>
+        )}
+        <div>
+          <h1 className="text-2xl font-extrabold font-heading text-slate-900">{character.name || 'Unnamed Hero'}</h1>
+          <p className="text-xs text-slate-600 font-semibold uppercase tracking-wider">
+            {character.selectedRace || 'Human'} &bull; {classSummary} &bull; Level {totalLevel}
+          </p>
+        </div>
+      </div>
+      <div className="text-right text-xs text-slate-600 shrink-0">
+        <p><span className="font-bold">Player:</span> {character.player || 'Shadow'}</p>
+        <p><span className="font-bold">Alignment:</span> {character.alignment || 'True Neutral'}</p>
+        <p><span className="font-bold">Deity:</span> {character.deity || 'Pelor'}</p>
+      </div>
+    </div>
+  );
+
   return (
     <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-4 print:bg-transparent print:backdrop-blur-none print:border-none print:shadow-none print:p-0 print:space-y-0">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3 print:hidden">
@@ -196,32 +228,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         </button>
       </div>
 
-      <div id="printable-character-sheet" className="bg-white text-slate-900 p-8 rounded-xl shadow-2xl space-y-6 font-sans print:p-0 print:shadow-none print:rounded-none print:border-none">
-        {/* Header Section */}
-        <div className="border-b-2 border-slate-900 pb-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            {character.portraitUrl ? (
-              <div className="w-16 h-16 rounded-xl border-2 border-slate-900 overflow-hidden shrink-0 shadow">
-                <img src={character.portraitUrl} alt={character.name} className="w-full h-full object-cover" />
-              </div>
-            ) : (
-              <div className="w-16 h-16 rounded-xl border-2 border-slate-300 bg-slate-100 flex items-center justify-center shrink-0 text-slate-400">
-                <i className="fa-solid fa-user-shield text-2xl"></i>
-              </div>
-            )}
-            <div>
-              <h1 className="text-3xl font-extrabold font-heading text-slate-900">{character.name || 'Unnamed Hero'}</h1>
-              <p className="text-xs text-slate-600 font-semibold uppercase tracking-wider">
-                {character.selectedRace || 'Human'} &bull; {classSummary} &bull; Level {totalLevel}
-              </p>
-            </div>
-          </div>
-          <div className="text-right text-xs text-slate-600 shrink-0">
-            <p><span className="font-bold">Player:</span> {character.player || 'Shadow'}</p>
-            <p><span className="font-bold">Alignment:</span> {character.alignment || 'True Neutral'}</p>
-            <p><span className="font-bold">Deity:</span> {character.deity || 'Pelor'}</p>
-          </div>
-        </div>
+      <div id="printable-character-sheet" className="bg-white text-slate-900 p-8 rounded-xl shadow-2xl space-y-5 font-sans print:p-0 print:shadow-none print:rounded-none print:border-none print:space-y-2.5">
+        {/* Page 1 Header */}
+        {renderHeader()}
 
         {/* Vitals Banner */}
         <div className="grid grid-cols-5 gap-3 text-center font-mono py-2 bg-slate-100 rounded-lg border border-slate-300 print:break-inside-avoid">
@@ -249,7 +258,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         </div>
 
         {/* Primary Attacks & Weapons Section */}
-        <div className="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-2 print:break-inside-avoid">
+        <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 space-y-1.5 print:break-inside-avoid">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Attacks & Weapon Arsenal</h3>
           <table className="w-full text-xs text-left border-collapse">
             <thead>
@@ -264,16 +273,16 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
             <tbody className="divide-y divide-slate-200 font-mono">
               {activeWeaponsList.map((item, idx) => (
                 <tr key={idx}>
-                  <td className="py-1.5 font-bold text-slate-900">
+                  <td className="py-1 font-bold text-slate-900">
                     <span className="text-[10px] font-sans font-semibold text-slate-500 uppercase mr-1">[{item.label}]</span>
                     {item.weapon.name}
                   </td>
-                  <td className="py-1.5 text-center font-bold text-slate-900">
+                  <td className="py-1 text-center font-bold text-slate-900">
                     {item.attackBonus >= 0 ? '+' : ''}{item.attackBonus}
                   </td>
-                  <td className="py-1.5 text-center text-slate-800">{item.damageStr}</td>
-                  <td className="py-1.5 text-center text-slate-800">{item.critStr}</td>
-                  <td className="py-1.5 text-center text-slate-800">{item.type}</td>
+                  <td className="py-1 text-center text-slate-800">{item.damageStr}</td>
+                  <td className="py-1 text-center text-slate-800">{item.critStr}</td>
+                  <td className="py-1 text-center text-slate-800">{item.type}</td>
                 </tr>
               ))}
             </tbody>
@@ -281,9 +290,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         </div>
 
         {/* Armor & Protective Gear Section */}
-        <div className="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-2 print:break-inside-avoid">
+        <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 space-y-1.5 print:break-inside-avoid">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Armor & Protective Gear</h3>
-          <div className="grid grid-cols-2 gap-4 text-xs font-mono">
+          <div className="grid grid-cols-2 gap-3 text-xs font-mono">
             <div className="p-2 bg-white rounded border border-slate-200 space-y-0.5">
               <span className="font-bold block text-slate-900">
                 Armor: {armorObj.name} {eq.armorEnhancement ? `+${eq.armorEnhancement}` : ''}
@@ -301,7 +310,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
         {/* Wondrous Items & Magic Gear Section */}
         {(eq.wondrousItems || []).length > 0 && (
-          <div className="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-2">
+          <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 space-y-1.5 print:break-inside-avoid">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Wondrous Items & Magic Gear</h3>
             <div className="grid grid-cols-2 gap-2 text-xs font-mono">
               {eq.wondrousItems!.map(w => (
@@ -314,206 +323,221 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
           </div>
         )}
 
-        {/* Inventory, Currency & Carrying Capacity Section */}
-        <div className="grid grid-cols-3 gap-4 border border-slate-300 rounded-lg p-4 bg-slate-50">
-          {/* General Inventory Table (2 cols) */}
-          <div className="col-span-2 space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Possessions & Adventuring Gear</h3>
-            {inventory.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">No general inventory recorded.</p>
-            ) : (
-              <div className="max-h-[220px] overflow-y-auto pr-1 print:max-h-none print:overflow-visible print:pr-0">
-                <table className="w-full text-[11px] text-left border-collapse font-mono">
-                  <thead>
-                    <tr className="border-b border-slate-300 text-slate-500 uppercase font-sans font-bold">
-                      <th className="py-1">Item</th>
-                      <th className="py-1 text-center">Container</th>
-                      <th className="py-1 text-center">Qty</th>
-                      <th className="py-1 text-right">Weight</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200">
-                    {inventory.map(item => {
-                      const totalWeight = item.quantity * item.weight;
-                      return (
-                        <tr key={item.id}>
-                          <td className="py-1 font-semibold text-slate-900">{item.name}</td>
-                          <td className="py-1 text-center text-slate-600 text-[10px]">{item.location || 'Carried'}</td>
-                          <td className="py-1 text-center text-slate-800 font-bold">{item.quantity}</td>
-                          <td className="py-1 text-right text-slate-800">{totalWeight > 0 ? `${totalWeight.toFixed(1)} lb` : '-'}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-
-          {/* Currency & Load Limits (1 col) */}
-          <div className="space-y-4 border-l border-slate-300 pl-4 font-mono text-xs">
+        {/* Page 1 Lower Split Grid: Left (Stats & Saves) | Right (Feats & Auras) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-3 print:break-inside-avoid">
+          {/* Left Column: Ability Scores & Saving Throws */}
+          <div className="space-y-3">
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 mb-2 font-sans">Currency & Wealth</h3>
-              <div className="space-y-1 text-slate-800 text-[11px]">
-                <div className="flex justify-between"><span>CP:</span> <span className="font-bold">{funds.cp || 0}</span></div>
-                <div className="flex justify-between"><span>SP:</span> <span className="font-bold">{funds.sp || 0}</span></div>
-                <div className="flex justify-between"><span>GP:</span> <span className="font-bold">{funds.gp || 0}</span></div>
-                <div className="flex justify-between"><span>PP:</span> <span className="font-bold">{funds.pp || 0}</span></div>
-                {funds.otherValuables ? (
-                  <div className="flex justify-between text-purple-700"><span>Gems/Art:</span> <span className="font-bold">{funds.otherValuables} GP</span></div>
-                ) : null}
-                <div className="border-t border-slate-300 pt-1 flex justify-between font-bold text-slate-900 text-xs font-sans">
-                  <span>Net Worth:</span>
-                  <span>{netWorthGP.toLocaleString()} GP</span>
-                </div>
-              </div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mb-1">Ability Scores</h3>
+              <table className="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-300 text-slate-500 uppercase">
+                    <th className="py-0.5">Stat</th>
+                    <th className="py-0.5 text-center">Score</th>
+                    <th className="py-0.5 text-center">Mod</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 font-mono">
+                  <tr><td className="py-1 font-bold">STR</td><td className="py-1 text-center">{strScore}</td><td className="py-1 text-center font-bold">{strMod >= 0 ? '+' : ''}{strMod}</td></tr>
+                  <tr><td className="py-1 font-bold">DEX</td><td className="py-1 text-center">{dexScore}</td><td className="py-1 text-center font-bold">{dexMod >= 0 ? '+' : ''}{dexMod}</td></tr>
+                  <tr><td className="py-1 font-bold">CON</td><td className="py-1 text-center">{conScore}</td><td className="py-1 text-center font-bold">{conMod >= 0 ? '+' : ''}{conMod}</td></tr>
+                  <tr><td className="py-1 font-bold">INT</td><td className="py-1 text-center">{intScore}</td><td className="py-1 text-center font-bold">{intMod >= 0 ? '+' : ''}{intMod}</td></tr>
+                  <tr><td className="py-1 font-bold">WIS</td><td className="py-1 text-center">{wisScore}</td><td className="py-1 text-center font-bold">{wisMod >= 0 ? '+' : ''}{wisMod}</td></tr>
+                  <tr><td className="py-1 font-bold">CHA</td><td className="py-1 text-center">{chaScore}</td><td className="py-1 text-center font-bold">{chaMod >= 0 ? '+' : ''}{chaMod}</td></tr>
+                </tbody>
+              </table>
             </div>
 
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 mb-2 font-sans">Carrying Capacity</h3>
-              <div className="space-y-1 text-[11px] text-slate-700">
-                <div className="flex justify-between"><span>Total Weight:</span> <span className="font-bold text-slate-900">{totalCarriedWeight} lbs</span></div>
-                <div className="flex justify-between"><span>Status:</span> <span className="font-bold uppercase text-slate-900">{encumbrance.label}</span></div>
-                <div className="border-t border-slate-200 pt-1 text-[10px] space-y-0.5">
-                  <div className="flex justify-between"><span>Light:</span> <span>Up to {carryingCapacity.light} lbs</span></div>
-                  <div className="flex justify-between"><span>Medium:</span> <span>Up to {carryingCapacity.medium} lbs</span></div>
-                  <div className="flex justify-between"><span>Heavy:</span> <span>Up to {carryingCapacity.heavy} lbs</span></div>
-                  <div className="flex justify-between"><span>Coin Weight:</span> <span>{coinWeight} lbs</span></div>
-                </div>
-              </div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mb-1">Saving Throws</h3>
+              <table className="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-300 text-slate-500 uppercase">
+                    <th className="py-0.5">Save</th>
+                    <th className="py-0.5 text-center">Total</th>
+                    <th className="py-0.5 text-center">Base</th>
+                    <th className="py-0.5 text-center">Ability</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 font-mono">
+                  <tr>
+                    <td className="py-1 font-bold">FORTITUDE (Con)</td>
+                    <td className="py-1 text-center font-bold text-xs">{totalFort >= 0 ? '+' : ''}{totalFort}</td>
+                    <td className="py-1 text-center">{baseFort}</td>
+                    <td className="py-1 text-center">{conMod >= 0 ? '+' : ''}{conMod}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-bold">REFLEX (Dex)</td>
+                    <td className="py-1 text-center font-bold text-xs">{totalRef >= 0 ? '+' : ''}{totalRef}</td>
+                    <td className="py-1 text-center">{baseRef}</td>
+                    <td className="py-1 text-center">{dexMod >= 0 ? '+' : ''}{dexMod}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-bold">WILL (Wis)</td>
+                    <td className="py-1 text-center font-bold text-xs">{totalWill >= 0 ? '+' : ''}{totalWill}</td>
+                    <td className="py-1 text-center">{baseWill}</td>
+                    <td className="py-1 text-center">{wisMod >= 0 ? '+' : ''}{wisMod}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
 
-        {/* Ability Scores & Saving Throws */}
-        <div className="grid grid-cols-2 gap-6 print:break-inside-avoid">
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mb-2">Ability Scores</h3>
-            <table className="w-full text-xs text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-300 text-slate-500 uppercase">
-                  <th className="py-1">Stat</th>
-                  <th className="py-1 text-center">Score</th>
-                  <th className="py-1 text-center">Mod</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 font-mono">
-                <tr><td className="py-1.5 font-bold">STR</td><td className="py-1.5 text-center">{strScore}</td><td className="py-1.5 text-center font-bold">{strMod >= 0 ? '+' : ''}{strMod}</td></tr>
-                <tr><td className="py-1.5 font-bold">DEX</td><td className="py-1.5 text-center">{dexScore}</td><td className="py-1.5 text-center font-bold">{dexMod >= 0 ? '+' : ''}{dexMod}</td></tr>
-                <tr><td className="py-1.5 font-bold">CON</td><td className="py-1.5 text-center">{conScore}</td><td className="py-1.5 text-center font-bold">{conMod >= 0 ? '+' : ''}{conMod}</td></tr>
-                <tr><td className="py-1.5 font-bold">INT</td><td className="py-1.5 text-center">{intScore}</td><td className="py-1.5 text-center font-bold">{intMod >= 0 ? '+' : ''}{intMod}</td></tr>
-                <tr><td className="py-1.5 font-bold">WIS</td><td className="py-1.5 text-center">{wisScore}</td><td className="py-1.5 text-center font-bold">{wisMod >= 0 ? '+' : ''}{wisMod}</td></tr>
-                <tr><td className="py-1.5 font-bold">CHA</td><td className="py-1.5 text-center">{chaScore}</td><td className="py-1.5 text-center font-bold">{chaMod >= 0 ? '+' : ''}{chaMod}</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mb-2">Saving Throws</h3>
-            <table className="w-full text-xs text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-300 text-slate-500 uppercase">
-                  <th className="py-1">Save</th>
-                  <th className="py-1 text-center">Total</th>
-                  <th className="py-1 text-center">Base</th>
-                  <th className="py-1 text-center">Ability</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 font-mono">
-                <tr>
-                  <td className="py-1.5 font-bold">FORTITUDE (Con)</td>
-                  <td className="py-1.5 text-center font-bold text-sm">{totalFort >= 0 ? '+' : ''}{totalFort}</td>
-                  <td className="py-1.5 text-center">{baseFort}</td>
-                  <td className="py-1.5 text-center">{conMod >= 0 ? '+' : ''}{conMod}</td>
-                </tr>
-                <tr>
-                  <td className="py-1.5 font-bold">REFLEX (Dex)</td>
-                  <td className="py-1.5 text-center font-bold text-sm">{totalRef >= 0 ? '+' : ''}{totalRef}</td>
-                  <td className="py-1.5 text-center">{baseRef}</td>
-                  <td className="py-1.5 text-center">{dexMod >= 0 ? '+' : ''}{dexMod}</td>
-                </tr>
-                <tr>
-                  <td className="py-1.5 font-bold">WILL (Wis)</td>
-                  <td className="py-1.5 text-center font-bold text-sm">{totalWill >= 0 ? '+' : ''}{totalWill}</td>
-                  <td className="py-1.5 text-center">{baseWill}</td>
-                  <td className="py-1.5 text-center">{wisMod >= 0 ? '+' : ''}{wisMod}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Feats & Abilities Section */}
-        <div className="print:break-inside-avoid">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mb-2">Feats & Racial / Special Abilities</h3>
-          <div className="space-y-1 text-xs text-slate-800 font-medium leading-relaxed font-mono">
-            {raceObj.spellLikeAbilities && (
-              <p><span className="font-bold text-slate-900 font-sans">Racial Spell-Like Abilities:</span> {raceObj.spellLikeAbilities}</p>
-            )}
-            {raceObj.psionicAbilities && (
-              <p><span className="font-bold text-slate-900 font-sans">Racial Psionics:</span> {raceObj.psionicAbilities}</p>
-            )}
-            {raceObj.specialAbilities && (
-              <p><span className="font-bold text-slate-900 font-sans">Racial Traits:</span> {raceObj.specialAbilities}</p>
-            )}
-            {raceObj.racialSkills && (
-              <p><span className="font-bold text-slate-900 font-sans">Racial Skill Bonuses:</span> {raceObj.racialSkills}</p>
-            )}
-            {selectedTraits.length > 0 && (
-              <p><span className="font-bold text-slate-900 font-sans">Active Traits:</span> {selectedTraits.join(', ')}</p>
-            )}
-            {selectedFlaws.length > 0 && (
-              <p><span className="font-bold text-slate-900 font-sans">Active Flaws:</span> {selectedFlaws.join(', ')} (+{selectedFlaws.length} Feat Slot{selectedFlaws.length > 1 ? 's' : ''})</p>
-            )}
-            <p><span className="font-bold text-slate-900 font-sans">Selected Feats:</span> {(character.selectedFeats || []).join(', ') || 'None selected.'}</p>
-          </div>
-        </div>
-
-        {/* Active Projected Auras & Emanations */}
-        {(character.auras || []).filter(a => a.active).length > 0 && (
-          <div className="border border-amber-300 rounded-lg p-4 bg-amber-50/50 space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-amber-900 border-b border-amber-300 pb-1 flex items-center gap-1.5">
-              <span>Active Projected Auras & Emanations</span>
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-              {character.auras!.filter(a => a.active).map(aura => (
-                <div key={aura.id} className="p-2 bg-white rounded border border-amber-200 shadow-sm font-sans space-y-0.5">
-                  <div className="flex items-center justify-between font-bold text-slate-900 text-[11px]">
-                    <span>{aura.name}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 bg-amber-100 border border-amber-300 text-amber-800 rounded font-mono">
-                      {aura.radius} ft &bull; {aura.target}
-                    </span>
-                  </div>
-                  <p className="text-slate-700 text-[11px] font-mono leading-tight">{aura.effect}</p>
-                  {aura.source && <span className="text-[10px] text-slate-500 block italic">Source: {aura.source}</span>}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Backstory & Campaign Notes Section */}
-        {character.notes && (character.notes.backstory || character.notes.appearance || (character.notes.quests || []).length > 0) && (
-          <div className="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-2 print-page-break-before">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Backstory & Active Quests</h3>
-            {character.notes.backstory && (
-              <div className="text-xs space-y-1">
-                <span className="font-bold text-slate-900 block">Backstory:</span>
-                <p className="text-slate-700 font-mono text-[11px] leading-relaxed whitespace-pre-wrap">{character.notes.backstory}</p>
+          {/* Right Column: Feats & Racial Abilities + Active Auras */}
+          <div className="space-y-3">
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mb-1">Feats & Special Abilities</h3>
+              <div className="space-y-0.5 text-[11px] text-slate-800 font-medium leading-tight font-mono">
+                {raceObj.spellLikeAbilities && (
+                  <p><span className="font-bold text-slate-900 font-sans">Spell-Likes:</span> {raceObj.spellLikeAbilities}</p>
+                )}
+                {raceObj.psionicAbilities && (
+                  <p><span className="font-bold text-slate-900 font-sans">Psionics:</span> {raceObj.psionicAbilities}</p>
+                )}
+                {raceObj.specialAbilities && (
+                  <p><span className="font-bold text-slate-900 font-sans">Racial:</span> {raceObj.specialAbilities}</p>
+                )}
+                {raceObj.racialSkills && (
+                  <p><span className="font-bold text-slate-900 font-sans">Skill Bonus:</span> {raceObj.racialSkills}</p>
+                )}
+                {selectedTraits.length > 0 && (
+                  <p><span className="font-bold text-slate-900 font-sans">Traits:</span> {selectedTraits.join(', ')}</p>
+                )}
+                {selectedFlaws.length > 0 && (
+                  <p><span className="font-bold text-slate-900 font-sans">Flaws:</span> {selectedFlaws.join(', ')} (+{selectedFlaws.length} Feat)</p>
+                )}
+                <p><span className="font-bold text-slate-900 font-sans">Feats:</span> {(character.selectedFeats || []).join(', ') || 'None selected.'}</p>
               </div>
-            )}
-            {(character.notes.quests || []).filter(q => q.status === 'active').length > 0 && (
-              <div className="text-xs space-y-1 border-t border-slate-200 pt-2">
-                <span className="font-bold text-slate-900 block">Active Quests:</span>
-                <ul className="list-disc list-inside text-slate-700 font-mono text-[11px] space-y-0.5">
-                  {character.notes.quests!.filter(q => q.status === 'active').map(q => (
-                    <li key={q.id}>
-                      <span className="font-bold">{q.title}</span> {q.location ? `(${q.location})` : ''} - {q.objectives || 'No objectives listed.'}
-                    </li>
+            </div>
+
+            {(character.auras || []).filter(a => a.active).length > 0 && (
+              <div className="border border-amber-300 rounded-lg p-2.5 bg-amber-50/50 space-y-1.5">
+                <h3 className="text-[11px] font-bold uppercase tracking-wider text-amber-900 border-b border-amber-300 pb-0.5">
+                  Active Projected Auras & Emanations
+                </h3>
+                <div className="space-y-1.5 text-xs">
+                  {character.auras!.filter(a => a.active).map(aura => (
+                    <div key={aura.id} className="p-1.5 bg-white rounded border border-amber-200 shadow-sm font-sans space-y-0.5">
+                      <div className="flex items-center justify-between font-bold text-slate-900 text-[10px]">
+                        <span>{aura.name}</span>
+                        <span className="text-[9px] px-1 py-0.2 bg-amber-100 border border-amber-300 text-amber-800 rounded font-mono">
+                          {aura.radius} ft &bull; {aura.target}
+                        </span>
+                      </div>
+                      <p className="text-slate-700 text-[10px] font-mono leading-tight">{aura.effect}</p>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Page 2: Inventory, Currency & Carrying Capacity Section */}
+        <div className="space-y-4 print:space-y-3 print-page-break-before">
+          <div className="hidden print:block">
+            {renderHeader()}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border border-slate-300 rounded-lg p-4 bg-slate-50 print:grid-cols-3 print:break-inside-avoid">
+            {/* General Inventory Table (2 cols) */}
+            <div className="col-span-2 space-y-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Possessions & Adventuring Gear</h3>
+              {inventory.length === 0 ? (
+                <p className="text-xs text-slate-500 italic">No general inventory recorded.</p>
+              ) : (
+                <div className="max-h-[220px] overflow-y-auto pr-1 print:max-h-none print:overflow-visible print:pr-0">
+                  <table className="w-full text-[11px] text-left border-collapse font-mono">
+                    <thead>
+                      <tr className="border-b border-slate-300 text-slate-500 uppercase font-sans font-bold">
+                        <th className="py-1">Item</th>
+                        <th className="py-1 text-center">Container</th>
+                        <th className="py-1 text-center">Qty</th>
+                        <th className="py-1 text-right">Weight</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200">
+                      {inventory.map(item => {
+                        const totalWeight = item.quantity * item.weight;
+                        return (
+                          <tr key={item.id}>
+                            <td className="py-1 font-semibold text-slate-900">{item.name}</td>
+                            <td className="py-1 text-center text-slate-600 text-[10px]">{item.location || 'Carried'}</td>
+                            <td className="py-1 text-center text-slate-800 font-bold">{item.quantity}</td>
+                            <td className="py-1 text-right text-slate-800">{totalWeight > 0 ? `${totalWeight.toFixed(1)} lb` : '-'}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Currency & Load Limits (1 col) */}
+            <div className="space-y-4 border-l border-slate-300 pl-4 font-mono text-xs">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 mb-2 font-sans">Currency & Wealth</h3>
+                <div className="space-y-1 text-slate-800 text-[11px]">
+                  <div className="flex justify-between"><span>CP:</span> <span className="font-bold">{funds.cp || 0}</span></div>
+                  <div className="flex justify-between"><span>SP:</span> <span className="font-bold">{funds.sp || 0}</span></div>
+                  <div className="flex justify-between"><span>GP:</span> <span className="font-bold">{funds.gp || 0}</span></div>
+                  <div className="flex justify-between"><span>PP:</span> <span className="font-bold">{funds.pp || 0}</span></div>
+                  {funds.otherValuables ? (
+                    <div className="flex justify-between text-purple-700"><span>Gems/Art:</span> <span className="font-bold">{funds.otherValuables} GP</span></div>
+                  ) : null}
+                  <div className="border-t border-slate-300 pt-1 flex justify-between font-bold text-slate-900 text-xs font-sans">
+                    <span>Net Worth:</span>
+                    <span>{netWorthGP.toLocaleString()} GP</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 mb-2 font-sans">Carrying Capacity</h3>
+                <div className="space-y-1 text-[11px] text-slate-700">
+                  <div className="flex justify-between"><span>Total Weight:</span> <span className="font-bold text-slate-900">{totalCarriedWeight} lbs</span></div>
+                  <div className="flex justify-between"><span>Status:</span> <span className="font-bold uppercase text-slate-900">{encumbrance.label}</span></div>
+                  <div className="border-t border-slate-200 pt-1 text-[10px] space-y-0.5">
+                    <div className="flex justify-between"><span>Light:</span> <span>Up to {carryingCapacity.light} lbs</span></div>
+                    <div className="flex justify-between"><span>Medium:</span> <span>Up to {carryingCapacity.medium} lbs</span></div>
+                    <div className="flex justify-between"><span>Heavy:</span> <span>Up to {carryingCapacity.heavy} lbs</span></div>
+                    <div className="flex justify-between"><span>Coin Weight:</span> <span>{coinWeight} lbs</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Page 3: Backstory & Campaign Notes Section */}
+        {character.notes && (character.notes.backstory || character.notes.appearance || (character.notes.quests || []).length > 0) && (
+          <div className="space-y-4 print:space-y-3 print-page-break-before">
+            <div className="hidden print:block">
+              {renderHeader()}
+            </div>
+
+            <div className="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Backstory & Active Quests</h3>
+              {character.notes.backstory && (
+                <div className="text-xs space-y-1">
+                  <span className="font-bold text-slate-900 block">Backstory:</span>
+                  <p className="text-slate-700 font-mono text-[11px] leading-relaxed whitespace-pre-wrap">{character.notes.backstory}</p>
+                </div>
+              )}
+              {(character.notes.quests || []).filter(q => q.status === 'active').length > 0 && (
+                <div className="text-xs space-y-1 border-t border-slate-200 pt-2">
+                  <span className="font-bold text-slate-900 block">Active Quests:</span>
+                  <ul className="list-disc list-inside text-slate-700 font-mono text-[11px] space-y-0.5">
+                    {character.notes.quests!.filter(q => q.status === 'active').map(q => (
+                      <li key={q.id}>
+                        <span className="font-bold">{q.title}</span> {q.location ? `(${q.location})` : ''} - {q.objectives || 'No objectives listed.'}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
