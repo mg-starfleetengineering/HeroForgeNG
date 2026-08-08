@@ -14,6 +14,7 @@ import { PortraitModal } from './components/PortraitModal';
 import { SourceBooksTab } from './components/SourceBooksTab';
 import { CORE_SOURCES } from './utils/sourceFilter';
 import { generateRoll20JSON } from './engine/roll20Export';
+import { syncEquippedItemsToInventory } from './engine/equipment';
 
 const DEFAULT_CHARACTER: CharacterState = {
   name: 'Valerius the Brave',
@@ -55,6 +56,9 @@ const DEFAULT_CHARACTER: CharacterState = {
     otherValuables: 100
   },
   inventory: [
+    { id: 'inv_eq_armor', name: 'Chain Shirt', quantity: 1, weight: 25, location: 'Carried', value: '100 gp' },
+    { id: 'inv_eq_shield', name: 'Heavy Shield', quantity: 1, weight: 15, location: 'Carried', value: '20 gp' },
+    { id: 'inv_eq_wpn', name: 'Longsword', quantity: 1, weight: 4, location: 'Carried', value: '15 gp' },
     { id: 'inv_1', name: "Explorer's Backpack", quantity: 1, weight: 2, location: 'Carried', value: '2 gp', notes: 'Capacity 2 cu. ft.' },
     { id: 'inv_2', name: 'Bedroll', quantity: 1, weight: 5, location: 'Backpack', value: '1 sp' },
     { id: 'inv_3', name: 'Trail Rations (1 day)', quantity: 5, weight: 1, location: 'Backpack', value: '5 sp/day' },
@@ -154,6 +158,12 @@ export const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (!loading) {
+      setCharacter(prev => syncEquippedItemsToInventory(prev, weaponsData));
+    }
+  }, [loading, weaponsData]);
+
+  useEffect(() => {
     try {
       localStorage.setItem('heroforge_active_character_v2', JSON.stringify(character));
     } catch (e) {
@@ -202,7 +212,8 @@ export const App: React.FC = () => {
         try {
           const parsed = JSON.parse(evt.target?.result as string);
           if (parsed && typeof parsed === 'object') {
-            setCharacter(parsed);
+            const synced = syncEquippedItemsToInventory(parsed, weaponsData);
+            setCharacter(synced);
           }
         } catch {
           alert('Invalid HeroForgeNG JSON file.');
