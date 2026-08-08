@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 
 export interface SearchableOption {
   value: string;
@@ -27,22 +28,110 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+  
   const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Find currently selected option
   const selectedOption = options.find(o => o.value === value);
 
-  // Close when clicking outside
+  // Calculate & update dropdown popover fixed position
+  const updatePosition = useCallback(() => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+
+    // Check if we should open upward (if space below is less than 240px and space above is greater)
+    const openUpward = spaceBelow < 240 && spaceAbove > spaceBelow;
+
+    const maxHeight = openUpward
+      ? Math.min(280, Math.max(120, spaceAbove - 16))
+      : Math.min(280, Math.max(120, spaceBelow - 16));
+
+    const minWidth = Math.max(rect.width, 220);
+    let left = rect.left;
+    if (left + minWidth > window.innerWidth - 10) {
+      left = Math.max(10, window.innerWidth - minWidth - 10);
+    }
+
+    setDropdownStyle({
+      position: 'fixed',
+      left: `${left}px`,
+      width: `${Math.max(rect.width, minWidth)}px`,
+      maxHeight: `${maxHeight}px`,
+      zIndex: 9999,
+      ...(openUpward
+        ? { bottom: `${window.innerHeight - rect.top + 4}px` }
+        : { top: `${rect.bottom + 4}px` })
+    });
+  }, []);
+
+  // Synchronously compute position right before render paint
+  useLayoutEffect(() => {
+    if (isOpen) {
+      updatePosition();
+    }
+  }, [isOpen, updatePosition]);
+
+  // Update position on window scroll and resize
   useEffect(() => {
+    if (!isOpen) return;
+
+    const handleScroll = (e: Event) => {
+      // Don't reposition if user is scrolling inside the options list itself
+      if (dropdownRef.current && dropdownRef.current.contains(e.target as Node)) {
+        return;
+      }
+      updatePosition();
+    };
+
+    const handleResize = () => {
+      updatePosition();
+    };
+
+    window.addEventListener('scroll', handleScroll, true);
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [isOpen, updatePosition]);
+
+  // Close when clicking outside both trigger container & portal dropdown
+  useEffect(() => {
+    if (!isOpen) return;
+
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (
+        containerRef.current && !containerRef.current.contains(target) &&
+        dropdownRef.current && !dropdownRef.current.contains(target)
+      ) {
         setIsOpen(false);
       }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [isOpen]);
+
+  // Handle ESC key to close
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
 
   // Auto-focus search input when opened
   useEffect(() => {
@@ -97,9 +186,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
         <i className={`fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform ${isOpen ? 'rotate-180 text-amber-400' : ''}`}></i>
       </button>
 
-      {/* Floating Search & Options Dropdown */}
-      {isOpen && (
-        <div className="absolute left-0 right-0 top-full mt-1 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl z-50 max-h-72 overflow-hidden flex flex-col p-2 space-y-2">
+      {/* Floating Search & Options Dropdown Portal */}
+      {isOpen && createPortal(
+        <div
+          ref={dropdownRef}
+          style={dropdownStyle}
+          className="bg-slate-900/95 backdrop-blur-xl border border-slate-700/90 rounded-xl shadow-2xl overflow-hidden flex flex-col p-2 space-y-2"
+        >
           {/* Search Header */}
           <div className="relative shrink-0">
             <i className="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
@@ -165,8 +258,10 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               })
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
 };
+
