@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { CharacterState, RaceData, ClassData, LevelProgression, TraitData, FlawData, TemplateData } from '../types/character';
+import { CharacterState, RaceData, ClassData, LevelProgression, TraitData, FlawData, TemplateData, DeityData, DomainData } from '../types/character';
 import { getSourceBadgeInfo, isSourceAllowed, sortDropdownItems } from '../utils/sourceFilter';
 import { SearchableSelect, SearchableOption } from './SearchableSelect';
 import { TraitsFlawsSection } from './TraitsFlawsSection';
@@ -12,10 +12,22 @@ interface RaceClassTabProps {
   templatesData?: TemplateData[];
   traitsData: TraitData[];
   flawsData: FlawData[];
+  deitiesData?: DeityData[];
+  domainsData?: DomainData[];
   onChange: (updated: Partial<CharacterState>) => void;
 }
 
-export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData, classesData, templatesData = [], traitsData, flawsData, onChange }) => {
+export const RaceClassTab: React.FC<RaceClassTabProps> = ({
+  character,
+  racesData,
+  classesData,
+  templatesData = [],
+  traitsData,
+  flawsData,
+  deitiesData = [],
+  domainsData = [],
+  onChange
+}) => {
   const sortedRaces = useMemo(
     () => sortDropdownItems(racesData, character.allowedSources),
     [racesData, character.allowedSources]
@@ -77,6 +89,86 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
     ];
   }, [sortedClasses, character.allowedSources]);
 
+  const deityOptions: SearchableOption[] = useMemo(() => {
+    return [
+      { value: '', label: '-- None / Philosophy / Custom --', isAllowed: true },
+      ...deitiesData.map(d => ({
+        value: d.name,
+        label: d.name,
+        sublabel: `(${d.alignment}) • Wpn: ${d.favoredWeapon}`,
+        isAllowed: true
+      }))
+    ];
+  }, [deitiesData]);
+
+  const activeDeityObj = useMemo(() => {
+    if (!character.deity) return null;
+    return deitiesData.find(d => d.name.toLowerCase() === character.deity.toLowerCase() || d.id === character.deity.toLowerCase());
+  }, [character.deity, deitiesData]);
+
+  const domainOptions: SearchableOption[] = useMemo(() => {
+    const deityDomainSet = new Set((activeDeityObj?.domains || []).map(d => d.toLowerCase()));
+    
+    const sorted = [...domainsData].sort((a, b) => {
+      const aIsDeity = deityDomainSet.has(a.name.toLowerCase());
+      const bIsDeity = deityDomainSet.has(b.name.toLowerCase());
+      if (aIsDeity && !bIsDeity) return -1;
+      if (!aIsDeity && bIsDeity) return 1;
+      return a.name.localeCompare(b.name);
+    });
+
+    return [
+      { value: '', label: '-- None --', isAllowed: true },
+      ...sorted.map(d => {
+        const isDeityDomain = deityDomainSet.has(d.name.toLowerCase());
+        const badge = getSourceBadgeInfo(d.source, character.allowedSources);
+        return {
+          value: d.name,
+          label: isDeityDomain ? `⭐ ${d.name} (Deity Domain)` : d.name,
+          sublabel: `(L1: ${d.spells[0] || 'N/A'})`,
+          badge: badge.sourceCode,
+          isAllowed: badge.isAllowed
+        };
+      })
+    ];
+  }, [domainsData, activeDeityObj, character.allowedSources]);
+
+  const selectedDomainsList = character.selectedDomains || [];
+
+  const handleDeityChange = (deityName: string) => {
+    const foundDeity = deitiesData.find(d => d.name === deityName);
+    let updatedDomains = [...selectedDomainsList];
+    
+    // Automatically pre-populate default domains if choosing a deity with known domains
+    if (foundDeity && foundDeity.domains && foundDeity.domains.length >= 2) {
+      updatedDomains = [foundDeity.domains[0], foundDeity.domains[1]];
+    }
+
+    onChange({
+      deity: deityName,
+      selectedDomains: updatedDomains
+    });
+  };
+
+  const handleDomainChange = (index: number, domainName: string) => {
+    let updated = [...selectedDomainsList];
+    while (updated.length <= index) {
+      updated.push('');
+    }
+    updated[index] = domainName;
+    // Filter trailing empty values but keep array length clean
+    onChange({ selectedDomains: updated });
+  };
+
+  const handleAddDomainSlot = () => {
+    onChange({ selectedDomains: [...selectedDomainsList, ''] });
+  };
+
+  const handleRemoveDomainSlot = (index: number) => {
+    const updated = selectedDomainsList.filter((_, i) => i !== index);
+    onChange({ selectedDomains: updated });
+  };
+
   const raceObj = racesData.find(r => r.name === character.selectedRace) || racesData[0];
   const templateObj = templatesData.find(t => t.name === character.selectedTemplate || t.id === character.selectedTemplate);
   const selectedRaceBadge = getSourceBadgeInfo(raceObj?.source, character.allowedSources);
@@ -97,6 +189,13 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
     prog[idx] = { ...prog[idx], [field]: val };
     onChange({ levelProgression: prog });
   };
+
+  // Check if character has cleric or divine levels
+  const isClericOrDivine = (character.levelProgression || []).some(l => {
+    const c1 = l.primaryClass.toLowerCase();
+    const c2 = l.secondaryClass?.toLowerCase() || '';
+    return c1.includes('cleric') || c2.includes('cleric') || c1.includes('favored') || c2.includes('favored') || c1.includes('paladin') || c1.includes('inquisitor');
+  });
 
   return (
     <div className="space-y-6">
@@ -310,6 +409,186 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
         </div>
       </div>
 
+      {/* Deity & Divine Domains Selection Card */}
+      <div className="card bg-slate-900/60 backdrop-blur border border-amber-500/30 p-6 rounded-2xl space-y-6">
+        <div className="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-3">
+          <div>
+            <h2 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2">
+              <i className="fa-solid fa-ankh text-amber-400"></i> Deity & Divine Domains Selection
+            </h2>
+            <p className="text-xs text-slate-400">
+              Choose your patron deity and divine domains. Clerics receive 2 domains by default. Granted domain powers & spell lists update automatically.
+            </p>
+          </div>
+          {isClericOrDivine && (
+            <span className="px-3 py-1 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/30 font-mono font-bold text-xs">
+              <i className="fa-solid fa-sparkles mr-1"></i> Cleric / Divine Caster Active
+            </span>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Deity Selector */}
+          <div className="space-y-3">
+            <label className="label-text flex items-center gap-1.5 text-amber-300">
+              <i className="fa-solid fa-sun"></i> Patron Deity
+            </label>
+            <SearchableSelect
+              value={character.deity || ''}
+              options={deityOptions}
+              onChange={handleDeityChange}
+              placeholder="Search deity (e.g. Pelor, Boccob, Heironeous)..."
+            />
+
+            {/* Custom Deity Name override if not in list */}
+            {!activeDeityObj && character.deity && (
+              <div className="text-xs text-slate-400 italic">
+                Custom Deity: <span className="font-semibold text-amber-300">{character.deity}</span>
+              </div>
+            )}
+
+            {activeDeityObj && (
+              <div className="p-3.5 rounded-xl bg-slate-950/80 border border-amber-500/30 text-xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-amber-300 text-sm">{activeDeityObj.name}</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300 font-mono text-[10px]">
+                    {activeDeityObj.alignment}
+                  </span>
+                </div>
+
+                <p className="text-slate-300">
+                  <span className="text-slate-400">Favored Weapon:</span>{' '}
+                  <span className="font-mono text-amber-200 font-bold">{activeDeityObj.favoredWeapon}</span>
+                </p>
+
+                <div>
+                  <span className="text-slate-400 block mb-1 text-[11px]">Deity Granted Domains:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {activeDeityObj.domains.map(d => (
+                      <span
+                        key={d}
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono border ${
+                          selectedDomainsList.includes(d)
+                            ? 'bg-amber-950 text-amber-300 border-amber-500/40 font-bold'
+                            : 'bg-slate-900 text-slate-400 border-slate-800'
+                        }`}
+                      >
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Domain Selection Inputs */}
+          <div className="md:col-span-2 space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="label-text text-amber-300 flex items-center gap-1.5">
+                <i className="fa-solid fa-hand-holding-hand"></i> Chosen Divine Domains
+              </label>
+              <button
+                onClick={handleAddDomainSlot}
+                className="btn btn-secondary text-xs py-1 px-2.5 flex items-center gap-1 text-amber-400 hover:text-amber-300"
+              >
+                <i className="fa-solid fa-plus text-[10px]"></i> Add Domain Slot
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {(selectedDomainsList.length > 0 ? selectedDomainsList : ['', '']).map((domName, idx) => (
+                <div key={idx} className="space-y-1">
+                  <div className="flex items-center justify-between text-xs text-slate-400">
+                    <span>Domain {idx + 1}</span>
+                    {idx >= 2 && (
+                      <button
+                        onClick={() => handleRemoveDomainSlot(idx)}
+                        className="text-rose-400 hover:text-rose-300 text-[11px]"
+                        title="Remove extra domain slot"
+                      >
+                        <i className="fa-solid fa-xmark"></i> Remove
+                      </button>
+                    )}
+                  </div>
+                  <SearchableSelect
+                    value={domName}
+                    options={domainOptions}
+                    onChange={val => handleDomainChange(idx, val)}
+                    placeholder={`Select Domain ${idx + 1}...`}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Granted Powers Cards */}
+            <div className="space-y-3 pt-2">
+              <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i className="fa-solid fa-shield-halved text-amber-400"></i> Active Domain Powers & Spell Lists
+              </h3>
+
+              {selectedDomainsList.filter(Boolean).length === 0 ? (
+                <p className="text-xs text-slate-500 italic p-3 rounded-xl bg-slate-950/40 border border-slate-800/60">
+                  No divine domains selected. Select domains above to display domain powers and spell lists.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {selectedDomainsList.filter(Boolean).map(domName => {
+                    const domObj = domainsData.find(d => d.name.toLowerCase() === domName.toLowerCase() || d.id === domName.toLowerCase());
+                    if (!domObj) {
+                      return (
+                        <div key={domName} className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-xs">
+                          <span className="font-bold text-amber-400">{domName}</span>
+                          <p className="text-slate-400 text-[11px]">Custom / Custom Domain</p>
+                        </div>
+                      );
+                    }
+
+                    const badge = getSourceBadgeInfo(domObj.source, character.allowedSources);
+
+                    return (
+                      <div key={domObj.id} className="p-4 rounded-xl bg-slate-950/80 border border-amber-500/20 space-y-2 text-xs shadow-md">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-amber-300 text-sm flex items-center gap-1.5">
+                            <i className="fa-solid fa-star text-amber-400 text-xs"></i> {domObj.name} Domain
+                          </span>
+                          <span className={`px-2 py-0.5 rounded font-mono text-[10px] font-bold border ${
+                            badge.isAllowed
+                              ? badge.isCore ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/30' : 'bg-amber-950/80 text-amber-300 border-amber-500/30'
+                              : 'bg-rose-950/80 text-rose-300 border-rose-500/40'
+                          }`}>
+                            {badge.sourceCode}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className="text-[10px] text-slate-400 uppercase font-semibold block">Granted Power:</span>
+                          <p className="text-slate-200 text-[11px] leading-relaxed font-mono bg-slate-900/90 p-2 rounded border border-slate-800 mt-0.5">
+                            {domObj.power}
+                          </p>
+                        </div>
+
+                        <div>
+                          <span className="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Domain Spells (1st - 9th):</span>
+                          <div className="grid grid-cols-1 gap-1 text-[11px] font-mono">
+                            {domObj.spells.map((sp, sIdx) => (
+                              <div key={sIdx} className="flex justify-between items-center py-0.5 border-b border-slate-800/40 last:border-none">
+                                <span className="text-amber-400 font-bold text-[10px] w-6">L{sIdx + 1}:</span>
+                                <span className="text-slate-200 flex-1">{sp}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Traits & Flaws Selection Section */}
       <TraitsFlawsSection
         character={character}
@@ -320,5 +599,6 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({ character, racesData
     </div>
   );
 };
+
 
 

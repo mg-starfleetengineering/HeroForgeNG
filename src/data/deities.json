@@ -1,0 +1,8148 @@
+[
+  {
+    "id": "aasterinian",
+    "name": "Aasterinian",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Chaos",
+      "Dragon",
+      "Luck",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "aengrist",
+    "name": "Aengrist",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Sword, Bastard",
+    "domains": [
+      "Law",
+      "Protection",
+      "War",
+      "Winter"
+    ]
+  },
+  {
+    "id": "afflux",
+    "name": "Afflux",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Deathbound",
+      "Evil",
+      "Knowledge",
+      "Undeath"
+    ]
+  },
+  {
+    "id": "al_ishtus",
+    "name": "Al-Ishtus",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Whip",
+    "domains": [
+      "Animal",
+      "Death",
+      "Destruction",
+      "Evil",
+      "War"
+    ]
+  },
+  {
+    "id": "alobal_lorfiril",
+    "name": "Alobal Lorfiril",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Magic",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "anshar",
+    "name": "Anshar",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Evil",
+      "Magic",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "anu",
+    "name": "Anu",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Air",
+      "Knowledge",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "anubis",
+    "name": "Anubis",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Law",
+      "Magic",
+      "Repose"
+    ]
+  },
+  {
+    "id": "apep",
+    "name": "Apep",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Pick, Heavy",
+    "domains": [
+      "Evil",
+      "Fire",
+      "Sand"
+    ]
+  },
+  {
+    "id": "arvoreen",
+    "name": "Arvoreen",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Good",
+      "Law",
+      "Protection",
+      "War"
+    ]
+  },
+  {
+    "id": "astilabor",
+    "name": "Astilabor",
+    "alignment": "Neutral",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Dragon",
+      "Protection",
+      "Wealth"
+    ]
+  },
+  {
+    "id": "aulasha",
+    "name": "Aulasha",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Good",
+      "Knowledge",
+      "Law"
+    ]
+  },
+  {
+    "id": "aurifar",
+    "name": "Aurifar",
+    "alignment": "Neutral",
+    "favoredWeapon": "Spiked Shield, Heavy",
+    "domains": [
+      "Fire",
+      "Luck",
+      "Summer",
+      "Sun",
+      "Travel"
+    ]
+  },
+  {
+    "id": "auril",
+    "name": "Auril",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Axe, Ice",
+    "domains": [
+      "Air",
+      "Cold",
+      "Evil",
+      "Storm",
+      "Water",
+      "Winter"
+    ]
+  },
+  {
+    "id": "aventernus",
+    "name": "Aventernus",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Good",
+      "Law",
+      "Ocean",
+      "Seafolk",
+      "Strength"
+    ]
+  },
+  {
+    "id": "azul",
+    "name": "Azul",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Whip",
+    "domains": [
+      "Evil",
+      "Law",
+      "Plant",
+      "Thirst",
+      "Water"
+    ]
+  },
+  {
+    "id": "bahamut",
+    "name": "Bahamut",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Pick, Heavy",
+    "domains": [
+      "Air",
+      "Celestia-1",
+      "Celestia-2",
+      "Dragon",
+      "Good",
+      "Luck",
+      "Protection"
+    ]
+  },
+  {
+    "id": "bast",
+    "name": "Bast",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Gauntlet, Spiked",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Protection",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "beltar",
+    "name": "Beltar",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Spiked Gauntlet",
+    "domains": [
+      "Chaos",
+      "Earth",
+      "Evil",
+      "War"
+    ]
+  },
+  {
+    "id": "blibdoolpoolp",
+    "name": "Blibdoolpoolp",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Pincer Staff",
+    "domains": [
+      "Abyss-1",
+      "Abyss-2",
+      "Blackwater",
+      "Destruction",
+      "Evil",
+      "Water"
+    ]
+  },
+  {
+    "id": "boccob",
+    "name": "Boccob",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Knowledge",
+      "Magic",
+      "Mind",
+      "Oracle",
+      "Planning",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "bralm",
+    "name": "Bralm",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Animal",
+      "Community",
+      "Law",
+      "Pact",
+      "Strength"
+    ]
+  },
+  {
+    "id": "brandobaris",
+    "name": "Brandobaris",
+    "alignment": "Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Luck",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "callarduran_smoothhands",
+    "name": "Callarduran Smoothhands",
+    "alignment": "Neutral",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Earth",
+      "Good",
+      "Healing",
+      "Protection"
+    ]
+  },
+  {
+    "id": "cas",
+    "name": "Cas",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "Destruction",
+      "Pain",
+      "Spite",
+      "Strength"
+    ]
+  },
+  {
+    "id": "celestian",
+    "name": "Celestian",
+    "alignment": "Neutral",
+    "favoredWeapon": "Shortspear",
+    "domains": [
+      "Knowledge",
+      "Oracle",
+      "Protection",
+      "Travel"
+    ]
+  },
+  {
+    "id": "chronepsis",
+    "name": "Chronepsis",
+    "alignment": "Neutral",
+    "favoredWeapon": "Scythe",
+    "domains": [
+      "Death",
+      "Dragon",
+      "Knowledge"
+    ]
+  },
+  {
+    "id": "corellon_larethian",
+    "name": "Corellon Larethian",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Arborea-1",
+      "Arborea-2",
+      "Chaos",
+      "Community",
+      "Good",
+      "Protection",
+      "War"
+    ]
+  },
+  {
+    "id": "cyndor",
+    "name": "Cyndor",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Sling",
+    "domains": [
+      "Law",
+      "Oracle",
+      "Protection",
+      "Travel"
+    ]
+  },
+  {
+    "id": "cyrrollalee",
+    "name": "Cyrrollalee",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Good",
+      "Law"
+    ]
+  },
+  {
+    "id": "dahak",
+    "name": "Dahak",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Chaos",
+      "Death",
+      "Evil"
+    ]
+  },
+  {
+    "id": "dallah_thaun",
+    "name": "Dallah Thaun",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Knowledge",
+      "Luck",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "deep_sashelas",
+    "name": "Deep Sashelas",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Trident",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Knowledge",
+      "Ocean",
+      "Water"
+    ]
+  },
+  {
+    "id": "delleb",
+    "name": "Delleb",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Dart",
+    "domains": [
+      "Good",
+      "Knowledge",
+      "Law",
+      "Magic"
+    ]
+  },
+  {
+    "id": "doresain",
+    "name": "Doresain",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Chaos",
+      "Evil",
+      "Hunger"
+    ]
+  },
+  {
+    "id": "druaga",
+    "name": "Druaga",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Evil",
+      "Law",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "duthila",
+    "name": "Duthila",
+    "alignment": "Neutral",
+    "favoredWeapon": "Scythe",
+    "domains": [
+      "Animal",
+      "Plant",
+      "Sky",
+      "Travel"
+    ]
+  },
+  {
+    "id": "eadro",
+    "name": "Eadro",
+    "alignment": "Neutral",
+    "favoredWeapon": "Longspear",
+    "domains": [
+      "Protection",
+      "Seafolk",
+      "Water"
+    ]
+  },
+  {
+    "id": "ehlonna",
+    "name": "Ehlonna",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Longbow",
+    "domains": [
+      "Animal",
+      "Celerity",
+      "Good",
+      "Plant",
+      "Sun"
+    ]
+  },
+  {
+    "id": "elebrin_liothiel",
+    "name": "Elebrin Liothiel",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Plant",
+      "Sun"
+    ]
+  },
+  {
+    "id": "enki",
+    "name": "Enki",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Earth",
+      "Magic",
+      "Water"
+    ]
+  },
+  {
+    "id": "enlil",
+    "name": "Enlil",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Pick, Heavy",
+    "domains": [
+      "Good",
+      "Luck",
+      "War"
+    ]
+  },
+  {
+    "id": "erythnul",
+    "name": "Erythnul",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Morningstar",
+    "domains": [
+      "Chaos",
+      "Evil",
+      "Madness",
+      "Trickery",
+      "War"
+    ]
+  },
+  {
+    "id": "evening_glory",
+    "name": "Evening Glory",
+    "alignment": "Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Good"
+    ]
+  },
+  {
+    "id": "falazure",
+    "name": "Falazure",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Death",
+      "Dragon",
+      "Evil"
+    ]
+  },
+  {
+    "id": "fharlanghn",
+    "name": "Fharlanghn",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Celerity",
+      "Luck",
+      "Protection",
+      "Travel",
+      "Weather"
+    ]
+  },
+  {
+    "id": "garl_glittergold",
+    "name": "Garl Glittergold",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Community",
+      "Creation",
+      "Good",
+      "Protection",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "garyx",
+    "name": "Garyx",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Sickle",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Dragon",
+      "Evil",
+      "Fire"
+    ]
+  },
+  {
+    "id": "gelf_darkhearth",
+    "name": "Gelf Darkhearth",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "War"
+    ]
+  },
+  {
+    "id": "geshtai",
+    "name": "Geshtai",
+    "alignment": "Neutral",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Plant",
+      "Travel",
+      "Water"
+    ]
+  },
+  {
+    "id": "ghaunadaur",
+    "name": "Ghaunadaur",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Chaos",
+      "Corruption",
+      "Evil",
+      "Hatred"
+    ]
+  },
+  {
+    "id": "gilgamesh",
+    "name": "Gilgamesh",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Good",
+      "Strength",
+      "Travel",
+      "War"
+    ]
+  },
+  {
+    "id": "girru",
+    "name": "Girru",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Morningstar",
+    "domains": [
+      "Fire",
+      "Good",
+      "Law",
+      "Magic"
+    ]
+  },
+  {
+    "id": "glautru",
+    "name": "Glautru",
+    "alignment": "Neutral",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Death",
+      "Destiny",
+      "Fire",
+      "Healing"
+    ]
+  },
+  {
+    "id": "glutton,_the",
+    "name": "Glutton, The",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Evil",
+      "Strength"
+    ]
+  },
+  {
+    "id": "great_mother",
+    "name": "Great Mother",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Greateaxe",
+    "domains": [
+      "Evil",
+      "Hatred",
+      "Law",
+      "Strength"
+    ]
+  },
+  {
+    "id": "gruumsh",
+    "name": "Gruumsh",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Chaos",
+      "Domination",
+      "Evil",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "haku",
+    "name": "Haku",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Air",
+      "Chaos",
+      "Good",
+      "Protection",
+      "Travel"
+    ]
+  },
+  {
+    "id": "hanali_celanil",
+    "name": "Hanali Celanil",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Magic",
+      "Protection"
+    ]
+  },
+  {
+    "id": "hanseath",
+    "name": "Hanseath",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Greataxe",
+    "domains": [
+      "Chaos",
+      "Strength",
+      "Travel",
+      "War"
+    ]
+  },
+  {
+    "id": "hathor",
+    "name": "Hathor",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Good",
+      "Luck",
+      "Protection"
+    ]
+  },
+  {
+    "id": "heironeous",
+    "name": "Heironeous",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Celestia-1",
+      "Celestia-2",
+      "Courage",
+      "Destiny",
+      "Glory",
+      "Good",
+      "Inquisition",
+      "Law",
+      "Nobility",
+      "War"
+    ]
+  },
+  {
+    "id": "hextor",
+    "name": "Hextor",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Flail",
+    "domains": [
+      "Destruction",
+      "Domination",
+      "Evil",
+      "Law",
+      "Tyranny",
+      "War"
+    ]
+  },
+  {
+    "id": "hlal",
+    "name": "Hlal",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Chaos",
+      "Dragon",
+      "Good",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "hleid",
+    "name": "Hleid",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Trident",
+    "domains": [
+      "Animal",
+      "Good",
+      "Healing",
+      "Winter"
+    ]
+  },
+  {
+    "id": "iborighu",
+    "name": "Iborighu",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Scythe",
+    "domains": [
+      "Chaos",
+      "Cold",
+      "Death",
+      "War"
+    ]
+  },
+  {
+    "id": "ilsensine",
+    "name": "Ilsensine",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Unarmed Strike",
+    "domains": [
+      "Evil",
+      "Knowledge",
+      "Law",
+      "Magic",
+      "Mind"
+    ]
+  },
+  {
+    "id": "imhotep",
+    "name": "Imhotep",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Earth",
+      "Healing",
+      "Knowledge",
+      "Rune"
+    ]
+  },
+  {
+    "id": "incabulos",
+    "name": "Incabulos",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Death",
+      "Destruction",
+      "Evil",
+      "Pestilence"
+    ]
+  },
+  {
+    "id": "io",
+    "name": "Io",
+    "alignment": "Neutral",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Dragon",
+      "Knowledge",
+      "Magic",
+      "Strength",
+      "Travel",
+      "Wealth"
+    ]
+  },
+  {
+    "id": "ishtar",
+    "name": "Ishtar",
+    "alignment": "Neutral",
+    "favoredWeapon": "Flail, Light",
+    "domains": [
+      "Magic",
+      "Strength",
+      "Summer",
+      "War"
+    ]
+  },
+  {
+    "id": "isis",
+    "name": "Isis",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Good",
+      "Magic",
+      "Protection",
+      "Water"
+    ]
+  },
+  {
+    "id": "istus",
+    "name": "Istus",
+    "alignment": "Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Destiny",
+      "Knowledge",
+      "Law",
+      "Luck",
+      "Oracle"
+    ]
+  },
+  {
+    "id": "iuz",
+    "name": "Iuz",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Greatsword",
+    "domains": [
+      "Chaos",
+      "Evil",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "joramy",
+    "name": "Joramy",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Destruction",
+      "Fire",
+      "War"
+    ]
+  },
+  {
+    "id": "kavaki",
+    "name": "Kavaki",
+    "alignment": "Neutral",
+    "favoredWeapon": "Greatclub",
+    "domains": [
+      "Protection",
+      "Strength",
+      "Travel",
+      "War"
+    ]
+  },
+  {
+    "id": "ki",
+    "name": "Ki",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Animal",
+      "Luck",
+      "Plant"
+    ]
+  },
+  {
+    "id": "kikanuti",
+    "name": "Kikanuti",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Earth",
+      "Good",
+      "Magic",
+      "Plant",
+      "Protection",
+      "Summer"
+    ]
+  },
+  {
+    "id": "kithin",
+    "name": "Kithin",
+    "alignment": "Neutral",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Animal",
+      "Death",
+      "Fire",
+      "Plant"
+    ]
+  },
+  {
+    "id": "kord",
+    "name": "Kord",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Greatsword",
+    "domains": [
+      "Chaos",
+      "Competition",
+      "Good",
+      "Luck",
+      "Strength"
+    ]
+  },
+  {
+    "id": "kuliak",
+    "name": "Kuliak",
+    "alignment": "Neutral",
+    "favoredWeapon": "Morningstar",
+    "domains": [
+      "Death",
+      "Magic",
+      "Travel",
+      "Water"
+    ]
+  },
+  {
+    "id": "laduguer",
+    "name": "Laduguer",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Evil",
+      "Law",
+      "Magic",
+      "Protection"
+    ]
+  },
+  {
+    "id": "lendys",
+    "name": "Lendys",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Destruction",
+      "Dragon",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "levistus",
+    "name": "Levistus",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Rapier",
+    "domains": [
+      "Cold",
+      "Evil",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "lirr",
+    "name": "Lirr",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Rapier",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Knowledge",
+      "Magic",
+      "Travel"
+    ]
+  },
+  {
+    "id": "llerg",
+    "name": "Llerg",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Animal",
+      "Chaos",
+      "Competition",
+      "Strength"
+    ]
+  },
+  {
+    "id": "lliendil",
+    "name": "Lliendil",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Fail, Heavy",
+    "domains": [
+      "Air",
+      "Destruction",
+      "Sky",
+      "Trickery",
+      "Water"
+    ]
+  },
+  {
+    "id": "lolth",
+    "name": "Lolth",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Abyss-1",
+      "Abyss-2",
+      "Destruction",
+      "Evil",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "mak_thuum_ngatha",
+    "name": "Mak Thuum Ngatha",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Morningstar",
+    "domains": [
+      "Destruction",
+      "Knowledge",
+      "Madness",
+      "Travel"
+    ]
+  },
+  {
+    "id": "manethak",
+    "name": "Manethak",
+    "alignment": "Neutral",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Animal",
+      "Knowledge",
+      "Luck"
+    ]
+  },
+  {
+    "id": "marduk",
+    "name": "Marduk",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Net",
+    "domains": [
+      "Air",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "moradin",
+    "name": "Moradin",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Celestia-1",
+      "Celestia-2",
+      "Creation",
+      "Earth",
+      "Good",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "mouqol",
+    "name": "Mouqol",
+    "alignment": "Neutral",
+    "favoredWeapon": "Crossbow, Light",
+    "domains": [
+      "Knowledge",
+      "Pact",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "mya",
+    "name": "Mya",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Morningstar",
+    "domains": [
+      "Good",
+      "Healing",
+      "Knowledge"
+    ]
+  },
+  {
+    "id": "naki_uthai",
+    "name": "Naki-Uthai",
+    "alignment": "Neutral",
+    "favoredWeapon": "Pick, Heavy",
+    "domains": [
+      "Earth",
+      "Strength",
+      "Sun"
+    ]
+  },
+  {
+    "id": "nanna_sin",
+    "name": "Nanna-Sin",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Luck"
+    ]
+  },
+  {
+    "id": "nephthys",
+    "name": "Nephthys",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Protection",
+      "Repose"
+    ]
+  },
+  {
+    "id": "nergal",
+    "name": "Nergal",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Death",
+      "Earth",
+      "Evil"
+    ]
+  },
+  {
+    "id": "nerull",
+    "name": "Nerull",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Scythe",
+    "domains": [
+      "Death",
+      "Evil",
+      "Fate",
+      "Pestilence",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "nilthina",
+    "name": "Nilthina",
+    "alignment": "Neutral",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Air",
+      "Animal",
+      "Plant",
+      "Sun"
+    ]
+  },
+  {
+    "id": "obad_hai",
+    "name": "Obad-Hai",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Air",
+      "Animal",
+      "Earth",
+      "Fate",
+      "Fire",
+      "Plant",
+      "Water",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "olidammara",
+    "name": "Olidammara",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Rapier",
+    "domains": [
+      "Celerity",
+      "Chaos",
+      "City",
+      "Luck",
+      "Mind",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "orcus",
+    "name": "Orcus",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Chaos",
+      "Death",
+      "Evil"
+    ]
+  },
+  {
+    "id": "osiris",
+    "name": "Osiris",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Flail, Light",
+    "domains": [
+      "Air",
+      "Earth",
+      "Good",
+      "Law",
+      "Plant",
+      "Repose"
+    ]
+  },
+  {
+    "id": "osprem",
+    "name": "Osprem",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Trident",
+    "domains": [
+      "Law",
+      "Protection",
+      "Travel",
+      "Water"
+    ]
+  },
+  {
+    "id": "pelor",
+    "name": "Pelor",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Community",
+      "Elysium-1",
+      "Elysium-2",
+      "Glory",
+      "Good",
+      "Healing",
+      "Nobility",
+      "Strength",
+      "Sun"
+    ]
+  },
+  {
+    "id": "pholtus",
+    "name": "Pholtus",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Good",
+      "Inquisition",
+      "Knowledge",
+      "Law",
+      "Sun"
+    ]
+  },
+  {
+    "id": "procan",
+    "name": "Procan",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Longspear",
+    "domains": [
+      "Chaos",
+      "Storm",
+      "Travel",
+      "Water"
+    ]
+  },
+  {
+    "id": "ptah",
+    "name": "Ptah",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Knowledge",
+      "Law",
+      "Travel"
+    ]
+  },
+  {
+    "id": "pyremius",
+    "name": "Pyremius",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Destruction",
+      "Evil",
+      "Fire"
+    ]
+  },
+  {
+    "id": "rao",
+    "name": "Rao",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Mace, Light",
+    "domains": [
+      "Community",
+      "Good",
+      "Knowledge",
+      "Law",
+      "Purification"
+    ]
+  },
+  {
+    "id": "re_horakhty",
+    "name": "Re-Horakhty",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Khopesh",
+    "domains": [
+      "Good",
+      "Law",
+      "Sun",
+      "War"
+    ]
+  },
+  {
+    "id": "rill_cleverthrush",
+    "name": "Rill Cleverthrush",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Air",
+      "Knowledge",
+      "Magic",
+      "Travel"
+    ]
+  },
+  {
+    "id": "roknar",
+    "name": "Roknar",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Destruction",
+      "Earth",
+      "Evil",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "sehanine_moonbow",
+    "name": "Sehanine Moonbow",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Knowledge",
+      "Travel"
+    ]
+  },
+  {
+    "id": "sekolah",
+    "name": "Sekolah",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Trident",
+    "domains": [
+      "Blackwater",
+      "Evil",
+      "Law",
+      "Strength",
+      "Water"
+    ]
+  },
+  {
+    "id": "set",
+    "name": "Set",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Air",
+      "Chaos",
+      "Destruction",
+      "Evil",
+      "Strength"
+    ]
+  },
+  {
+    "id": "sheela_peryroyl",
+    "name": "Sheela Peryroyl",
+    "alignment": "Neutral",
+    "favoredWeapon": "Sickle",
+    "domains": [
+      "Air",
+      "Plant"
+    ]
+  },
+  {
+    "id": "sheyanna_flaxenstrand",
+    "name": "Sheyanna Flaxenstrand",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Flail, Heavy",
+    "domains": [
+      "Chaos",
+      "Fire",
+      "Good",
+      "Healing"
+    ]
+  },
+  {
+    "id": "sobek",
+    "name": "Sobek",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Shortspear",
+    "domains": [
+      "Animal",
+      "Evil",
+      "Water"
+    ]
+  },
+  {
+    "id": "solanil",
+    "name": "Solanil",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Animal",
+      "Good",
+      "Healing",
+      "Protection",
+      "Summer",
+      "Travel",
+      "Water"
+    ]
+  },
+  {
+    "id": "soorinek",
+    "name": "Soorinek",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Evil",
+      "Luck",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "st._cuthbert",
+    "name": "St. Cuthbert",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Destruction",
+      "Domination",
+      "Law",
+      "Protection",
+      "Strength"
+    ]
+  },
+  {
+    "id": "syeret",
+    "name": "Syeret",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Chaos",
+      "Sun",
+      "Travel"
+    ]
+  },
+  {
+    "id": "tamara",
+    "name": "Tamara",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Dragon",
+      "Good",
+      "Healing",
+      "Strength",
+      "Sun"
+    ]
+  },
+  {
+    "id": "tarmuid",
+    "name": "Tarmuid",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Law",
+      "Magic",
+      "Protection"
+    ]
+  },
+  {
+    "id": "telchur",
+    "name": "Telchur",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Shortspear",
+    "domains": [
+      "Air",
+      "Chaos",
+      "Cold",
+      "Strength",
+      "Winter"
+    ]
+  },
+  {
+    "id": "tem_et_nu",
+    "name": "Tem-Et-Nu",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Kama",
+    "domains": [
+      "Knowledge",
+      "Magic",
+      "Nobility",
+      "Travel",
+      "War"
+    ]
+  },
+  {
+    "id": "tharizdun",
+    "name": "Tharizdun",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Evil",
+      "Force",
+      "Madness"
+    ]
+  },
+  {
+    "id": "tharmekh\u00fbl",
+    "name": "Tharmekh\u00fbl",
+    "alignment": "Neutral",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Destruction",
+      "Fire",
+      "War"
+    ]
+  },
+  {
+    "id": "thautam",
+    "name": "Thautam",
+    "alignment": "Neutral",
+    "favoredWeapon": "Pick, Heavy",
+    "domains": [
+      "Earth",
+      "Luck",
+      "Magic"
+    ]
+  },
+  {
+    "id": "theleya",
+    "name": "Theleya",
+    "alignment": "Neutral",
+    "favoredWeapon": "Sickle",
+    "domains": [
+      "Healing",
+      "Magic",
+      "Plant"
+    ]
+  },
+  {
+    "id": "thoth",
+    "name": "Thoth",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Knowledge",
+      "Magic",
+      "Rune"
+    ]
+  },
+  {
+    "id": "thrym",
+    "name": "Thrym",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Greataxe",
+    "domains": [
+      "Chaos",
+      "Cold",
+      "Earth",
+      "Evil",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "tiamat",
+    "name": "Tiamat",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Pick, Heavy",
+    "domains": [
+      "Baator-1",
+      "Baator-2",
+      "Destruction",
+      "Dragon",
+      "Evil",
+      "Greed",
+      "Law",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "trithereon",
+    "name": "Trithereon",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Liberation",
+      "Summoner"
+    ]
+  },
+  {
+    "id": "tuilviel_glithien",
+    "name": "Tuilviel Glithien",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Foot Spikes",
+    "domains": [
+      "Air",
+      "Chaos",
+      "Good",
+      "Protection",
+      "Sky"
+    ]
+  },
+  {
+    "id": "ulutiu",
+    "name": "Ulutiu",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Animal",
+      "Cold",
+      "Law",
+      "Protection",
+      "Strength"
+    ]
+  },
+  {
+    "id": "urbanus",
+    "name": "Urbanus",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "City",
+      "Good",
+      "Knowledge",
+      "Protection"
+    ]
+  },
+  {
+    "id": "urogalan",
+    "name": "Urogalan",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Flail",
+    "domains": [
+      "Earth",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "utu",
+    "name": "Utu",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Chaos",
+      "Fire",
+      "Good",
+      "Sun"
+    ]
+  },
+  {
+    "id": "valarian",
+    "name": "Valarian",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Gore",
+    "domains": [
+      "Animal",
+      "Fey",
+      "Good"
+    ]
+  },
+  {
+    "id": "valkauna",
+    "name": "Valkauna",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Fail, Heavy",
+    "domains": [
+      "Death",
+      "Law",
+      "Water"
+    ]
+  },
+  {
+    "id": "vandria_gilmadrith",
+    "name": "Vandria Gilmadrith",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Longbow",
+    "domains": [
+      "Law",
+      "Protection",
+      "War"
+    ]
+  },
+  {
+    "id": "vanua",
+    "name": "Vanua",
+    "alignment": "Neutral",
+    "favoredWeapon": "Flail, Heavy",
+    "domains": [
+      "Destruction",
+      "Fire",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "vatun",
+    "name": "Vatun",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Air",
+      "Animal",
+      "Chaos",
+      "Strength"
+    ]
+  },
+  {
+    "id": "vecna",
+    "name": "Vecna",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Destiny",
+      "Evil",
+      "Knowledge",
+      "Madness",
+      "Magic",
+      "Planning",
+      "Tyranny"
+    ]
+  },
+  {
+    "id": "ventila",
+    "name": "Ventila",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Animal",
+      "Healing",
+      "Plant",
+      "Water"
+    ]
+  },
+  {
+    "id": "wastri",
+    "name": "Wastri",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Glaive",
+    "domains": [
+      "Animal",
+      "Law",
+      "Purification",
+      "War"
+    ]
+  },
+  {
+    "id": "wathaku",
+    "name": "Wathaku",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Morningstar",
+    "domains": [
+      "Destruction",
+      "Evil",
+      "Strength"
+    ]
+  },
+  {
+    "id": "wee_jas",
+    "name": "Wee Jas",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Death",
+      "Domination",
+      "Law",
+      "Magic",
+      "Mind",
+      "Planning",
+      "Tyranny"
+    ]
+  },
+  {
+    "id": "whale_mother",
+    "name": "Whale Mother",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Paddle",
+    "domains": [
+      "Animal",
+      "Good",
+      "Law",
+      "Ocean",
+      "Seafolk"
+    ]
+  },
+  {
+    "id": "xan_yae",
+    "name": "Xan Yae",
+    "alignment": "Neutral",
+    "favoredWeapon": "Falchion",
+    "domains": [
+      "Celerity",
+      "Knowledge",
+      "Trickery",
+      "War"
+    ]
+  },
+  {
+    "id": "yeathan",
+    "name": "Yeathan",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Trident",
+    "domains": [
+      "Blackwater",
+      "Destruction",
+      "Evil"
+    ]
+  },
+  {
+    "id": "yondalla",
+    "name": "Yondalla",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Celestia-1",
+      "Celestia-2",
+      "Community",
+      "Courage",
+      "Creation",
+      "Good",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "zarus",
+    "name": "Zarus",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Greatsword",
+    "domains": [
+      "Destiny",
+      "Evil",
+      "Law",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "zoser",
+    "name": "Zoser",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Chain, Spiked",
+    "domains": [
+      "Air",
+      "Chaos",
+      "Destruction",
+      "Sand",
+      "Summer"
+    ]
+  },
+  {
+    "id": "zuoken",
+    "name": "Zuoken",
+    "alignment": "Neutral",
+    "favoredWeapon": "Nunchaku",
+    "domains": [
+      "Celerity",
+      "Knowledge",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "aasterinian_ligr",
+    "name": "Aasterinian (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Chaos",
+      "Dragon",
+      "Luck",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "abbathor_ligr",
+    "name": "Abbathor (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Evil",
+      "Greed",
+      "Luck",
+      "Madness",
+      "Pact",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "aerdrie_faenya_ligr",
+    "name": "Aerdrie Faenya (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Air",
+      "Animal",
+      "Chaos",
+      "Good",
+      "Liberation",
+      "Sky",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "alakbar_ligr",
+    "name": "Al'Akbar (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Falchion",
+    "domains": [
+      "Community",
+      "Good",
+      "Healing",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "allitur_ligr",
+    "name": "Allitur (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Community",
+      "Good",
+      "Inquisition",
+      "Knowledge",
+      "Law",
+      "Purification"
+    ]
+  },
+  {
+    "id": "annam_ligr",
+    "name": "Annam (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Unarmed Strike",
+    "domains": [
+      "Creation",
+      "Force",
+      "Knowledge",
+      "Magic",
+      "Plant",
+      "Sun"
+    ]
+  },
+  {
+    "id": "arvoreen_ligr",
+    "name": "Arvoreen (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Courage",
+      "Good",
+      "Law",
+      "Nobility",
+      "Protection",
+      "Purification",
+      "War"
+    ]
+  },
+  {
+    "id": "atroa_ligr",
+    "name": "Atroa (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Sling",
+    "domains": [
+      "Air",
+      "Good",
+      "Plant",
+      "Sun",
+      "Travel"
+    ]
+  },
+  {
+    "id": "azoralq_ligr",
+    "name": "Azor'alq (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Good",
+      "Sun",
+      "War"
+    ]
+  },
+  {
+    "id": "baervan_wildwanderer_ligr",
+    "name": "Baervan Wildwanderer (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Animal",
+      "Celerity",
+      "Good",
+      "Plant",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "bahamut_ligr",
+    "name": "Bahamut (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Pick, Heavy",
+    "domains": [
+      "Air",
+      "Cold",
+      "Dragon",
+      "Good",
+      "Law",
+      "Luck",
+      "Protection"
+    ]
+  },
+  {
+    "id": "bahgtru_ligr",
+    "name": "Bahgtru (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Gauntlet, Spiked",
+    "domains": [
+      "Chaos",
+      "Competition",
+      "Courage",
+      "Destruction",
+      "Evil",
+      "Strength"
+    ]
+  },
+  {
+    "id": "baravar_cloakshadow_ligr",
+    "name": "Baravar Cloakshadow (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Good",
+      "Magic",
+      "Mind",
+      "Protection",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "bargrivyek_ligr",
+    "name": "Bargrivyek (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Flail",
+    "domains": [
+      "Community",
+      "Evil",
+      "Knowledge",
+      "Protection",
+      "Travel"
+    ]
+  },
+  {
+    "id": "beltar_ligr",
+    "name": "Beltar (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Claws of Beltar (Unarmed Strike or Spiked Gauntlet)",
+    "domains": [
+      "Chaos",
+      "Earth",
+      "Evil",
+      "Mysticism",
+      "Summoner",
+      "War"
+    ]
+  },
+  {
+    "id": "beory_ligr",
+    "name": "Beory (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Club",
+    "domains": [
+      "Animal",
+      "Creation",
+      "Earth",
+      "Plant",
+      "Sand",
+      "Summer",
+      "Thirst",
+      "Water",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "berei_ligr",
+    "name": "Berei (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Sickle",
+    "domains": [
+      "Community",
+      "Creation",
+      "Good",
+      "Plant",
+      "Protection"
+    ]
+  },
+  {
+    "id": "berna_ligr",
+    "name": "Berna (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Club",
+    "domains": [
+      "Chaos",
+      "Courage",
+      "Healing",
+      "Protection"
+    ]
+  },
+  {
+    "id": "berronar_truesilver_ligr",
+    "name": "Berronar Truesilver (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "Community",
+      "Good",
+      "Healing",
+      "Inquisition",
+      "Law",
+      "Protection",
+      "Purification"
+    ]
+  },
+  {
+    "id": "bleredd_ligr",
+    "name": "Bleredd (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Creation",
+      "Earth",
+      "Fire",
+      "Strength"
+    ]
+  },
+  {
+    "id": "blibdoolpoolp_ligr",
+    "name": "Blibdoolpoolp (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Pincer Staff",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Evil",
+      "Madness",
+      "Mysticism",
+      "Oracle",
+      "Water"
+    ]
+  },
+  {
+    "id": "boccob_ligr",
+    "name": "Boccob (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Force",
+      "Knowledge",
+      "Magic",
+      "Mind",
+      "Oracle",
+      "Rune",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "bralm_ligr",
+    "name": "Bralm (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Animal",
+      "Community",
+      "Law",
+      "Pact",
+      "Strength"
+    ]
+  },
+  {
+    "id": "brandobaris_ligr",
+    "name": "Brandobaris (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Celerity",
+      "Luck",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "callarduran_smoothhands_ligr",
+    "name": "Callarduran Smoothhands (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Greataxe",
+    "domains": [
+      "Community",
+      "Earth",
+      "Healing",
+      "Protection",
+      "Summoner"
+    ]
+  },
+  {
+    "id": "camazotz_ligr",
+    "name": "Camazotz (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Javelin",
+    "domains": [
+      "Animal",
+      "Chaos",
+      "Destruction",
+      "Evil",
+      "Pestilence",
+      "Protection"
+    ]
+  },
+  {
+    "id": "celestian_ligr",
+    "name": "Celestian (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Destiny",
+      "Knowledge",
+      "Oracle",
+      "Protection",
+      "Travel"
+    ]
+  },
+  {
+    "id": "charmalaine_ligr",
+    "name": "Charmalaine (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "Luck",
+      "Protection"
+    ]
+  },
+  {
+    "id": "chitza_atlan_ligr",
+    "name": "Chitza-Atlan (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Evil",
+      "Law",
+      "Pestilence",
+      "Protection",
+      "Repose"
+    ]
+  },
+  {
+    "id": "chronepsis_ligr",
+    "name": "Chronepsis (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Scythe",
+    "domains": [
+      "Destiny",
+      "Dragon",
+      "Knowledge",
+      "Repose"
+    ]
+  },
+  {
+    "id": "clangeddin_silverbeard_ligr",
+    "name": "Clangeddin Silverbeard (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Competition",
+      "Courage",
+      "Good",
+      "Inquisition",
+      "Law",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "corellon_larethian_ligr",
+    "name": "Corellon Larethian (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Celerity",
+      "Chaos",
+      "Community",
+      "Good",
+      "Liberation",
+      "Magic",
+      "Protection",
+      "War"
+    ]
+  },
+  {
+    "id": "cyndor_ligr",
+    "name": "Cyndor (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Sling",
+    "domains": [
+      "Destiny",
+      "Law",
+      "Oracle",
+      "Protection",
+      "Rune",
+      "Travel"
+    ]
+  },
+  {
+    "id": "cyrrollalee_ligr",
+    "name": "Cyrrollalee (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Club",
+    "domains": [
+      "Community",
+      "Good",
+      "Healing",
+      "Inquisition",
+      "Law",
+      "Pact",
+      "Protection"
+    ]
+  },
+  {
+    "id": "daern_ligr",
+    "name": "Daern (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Shortspear",
+    "domains": [
+      "Earth",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "dalt_ligr",
+    "name": "Dalt (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Liberation",
+      "Protection",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "damaran_ligr",
+    "name": "Damaran (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Javelin",
+    "domains": [
+      "Animal",
+      "Evil",
+      "Pestilence",
+      "Travel"
+    ]
+  },
+  {
+    "id": "daoud_ligr",
+    "name": "Daoud (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Magic",
+      "Travel"
+    ]
+  },
+  {
+    "id": "deep_sashelas_ligr",
+    "name": "Deep Sashelas (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Trident",
+    "domains": [
+      "Animal",
+      "Chaos",
+      "Creation",
+      "Earth",
+      "Good",
+      "Protection",
+      "Water"
+    ]
+  },
+  {
+    "id": "delleb_ligr",
+    "name": "Delleb (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Dart",
+    "domains": [
+      "Good",
+      "Knowledge",
+      "Law",
+      "Magic",
+      "Mind",
+      "Oracle",
+      "Rune"
+    ]
+  },
+  {
+    "id": "diirinka_ligr",
+    "name": "Diirinka (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Domination",
+      "Dream",
+      "Evil",
+      "Madness",
+      "Magic",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "doresain_ligr",
+    "name": "Doresain (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Chaos",
+      "Death",
+      "Evil",
+      "Hunger",
+      "Pestilence"
+    ]
+  },
+  {
+    "id": "dugmaren_brightmantle_ligr",
+    "name": "Dugmaren Brightmantle (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Knowledge",
+      "Magic",
+      "Mind",
+      "Oracle",
+      "Rune"
+    ]
+  },
+  {
+    "id": "dumathoin_ligr",
+    "name": "Dumathoin (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Community",
+      "Earth",
+      "Knowledge",
+      "Oracle",
+      "Protection"
+    ]
+  },
+  {
+    "id": "eadro_ligr",
+    "name": "Eadro (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Animal",
+      "Community",
+      "Protection",
+      "Summoner",
+      "Water"
+    ]
+  },
+  {
+    "id": "earth_dragon_ligr",
+    "name": "Earth Dragon (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Pick, Heavy",
+    "domains": [
+      "Earth",
+      "Evil",
+      "Law",
+      "Protection",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "ehlonna_ligr",
+    "name": "Ehlonna (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Longbow",
+    "domains": [
+      "Animal",
+      "Celerity",
+      "Good",
+      "Plant",
+      "Purification",
+      "Sun"
+    ]
+  },
+  {
+    "id": "elder_elemental_eye_ligr",
+    "name": "Elder Elemental Eye (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Air",
+      "Chaos",
+      "Earth",
+      "Evil",
+      "Fire",
+      "Madness",
+      "Water"
+    ]
+  },
+  {
+    "id": "erevan_ilesere_ligr",
+    "name": "Erevan Ilesere (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Celerity",
+      "Chaos",
+      "Domination",
+      "Luck",
+      "Madness",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "erythnul_ligr",
+    "name": "Erythnul (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "Chaos",
+      "Evil",
+      "Greed",
+      "Madness",
+      "Mysticism",
+      "Trickery",
+      "War"
+    ]
+  },
+  {
+    "id": "falazure_ligr",
+    "name": "Falazure (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Death",
+      "Destruction",
+      "Dragon",
+      "Evil",
+      "Pestilence"
+    ]
+  },
+  {
+    "id": "fenmarel_mestarine_ligr",
+    "name": "Fenmarel Mestarine (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Animal",
+      "Chaos",
+      "Plant",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "fharlanghn_ligr",
+    "name": "Fharlanghn (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Celerity",
+      "Luck",
+      "Protection",
+      "Travel",
+      "Weather"
+    ]
+  },
+  {
+    "id": "flandal_steelskin_ligr",
+    "name": "Flandal Steelskin (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Creation",
+      "Earth",
+      "Fire",
+      "Good",
+      "Oracle",
+      "Strength"
+    ]
+  },
+  {
+    "id": "fortubo_ligr",
+    "name": "Fortubo (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Community",
+      "Earth",
+      "Good",
+      "Law",
+      "Mysticism",
+      "Protection"
+    ]
+  },
+  {
+    "id": "gadhelyn_ligr",
+    "name": "Gadhelyn (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Longbow",
+    "domains": [
+      "Animal",
+      "Chaos",
+      "Plant"
+    ]
+  },
+  {
+    "id": "gaerdal_ironhand_ligr",
+    "name": "Gaerdal Ironhand (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Courage",
+      "Good",
+      "Law",
+      "Nobility",
+      "Protection",
+      "War"
+    ]
+  },
+  {
+    "id": "gaknulak_ligr",
+    "name": "Gaknulak (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Dream",
+      "Evil",
+      "Law",
+      "Protection",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "garl_glittergold_ligr",
+    "name": "Garl Glittergold (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Greataxe",
+    "domains": [
+      "Community",
+      "Creation",
+      "Earth",
+      "Good",
+      "Liberation",
+      "Protection",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "gendwar_argrim_ligr",
+    "name": "Gendwar Argrim (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Waraxe, Dwarven",
+    "domains": [
+      "Destruction",
+      "Law",
+      "War"
+    ]
+  },
+  {
+    "id": "geshtai_ligr",
+    "name": "Geshtai (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Plant",
+      "Thirst",
+      "Travel",
+      "Water",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "grankhul_ligr",
+    "name": "Grankhul (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Celerity",
+      "Chaos",
+      "Evil",
+      "Knowledge",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "great_mother_ligr",
+    "name": "Great Mother (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Bite",
+    "domains": [
+      "Chaos",
+      "Death",
+      "Evil",
+      "Mysticism",
+      "Protection",
+      "Strength",
+      "Summoner",
+      "Tyranny"
+    ]
+  },
+  {
+    "id": "grolantor_ligr",
+    "name": "Grolantor (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Club",
+    "domains": [
+      "Chaos",
+      "Competition",
+      "Death",
+      "Earth",
+      "Evil",
+      "Madness",
+      "Mysticism"
+    ]
+  },
+  {
+    "id": "gruumsh_ligr",
+    "name": "Gruumsh (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Domination",
+      "Evil",
+      "Mysticism",
+      "Strength",
+      "Tyranny",
+      "War"
+    ]
+  },
+  {
+    "id": "hanali_celanil_ligr",
+    "name": "Hanali Celanil (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Community",
+      "Domination",
+      "Good",
+      "Magic",
+      "Nobility",
+      "Protection"
+    ]
+  },
+  {
+    "id": "heironeous_ligr",
+    "name": "Heironeous (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Courage",
+      "Glory",
+      "Good",
+      "Inquisition",
+      "Law",
+      "Nobility",
+      "War"
+    ]
+  },
+  {
+    "id": "heward_ligr",
+    "name": "Heward (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Good",
+      "Knowledge",
+      "Travel"
+    ]
+  },
+  {
+    "id": "hextor_ligr",
+    "name": "Hextor (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Flail",
+    "domains": [
+      "Competition",
+      "Destruction",
+      "Domination",
+      "Evil",
+      "Law",
+      "Tyranny",
+      "War"
+    ]
+  },
+  {
+    "id": "hiatea_ligr",
+    "name": "Hiatea (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Animal",
+      "Community",
+      "Fire",
+      "Good",
+      "Plant",
+      "Sun",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "hruggek_ligr",
+    "name": "Hruggek (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Morningstar",
+    "domains": [
+      "Chaos",
+      "Evil",
+      "Knowledge",
+      "Magic",
+      "Mysticism",
+      "Strength",
+      "Tyranny"
+    ]
+  },
+  {
+    "id": "huhueteotl_ligr",
+    "name": "Huhueteotl (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Javelin",
+    "domains": [
+      "Celerity",
+      "Chaos",
+      "Destiny",
+      "Destruction",
+      "Evil",
+      "Fire",
+      "Mysticism"
+    ]
+  },
+  {
+    "id": "hurakon_ligr",
+    "name": "Hurakon (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Water",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "iallanis_ligr",
+    "name": "Iallanis (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Unarmed Strike",
+    "domains": [
+      "Community",
+      "Good",
+      "Healing",
+      "Strength",
+      "Sun"
+    ]
+  },
+  {
+    "id": "ilneval_ligr",
+    "name": "Ilneval (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Courage",
+      "Destruction",
+      "Evil",
+      "Mysticism",
+      "War"
+    ]
+  },
+  {
+    "id": "ilsensine_ligr",
+    "name": "Ilsensine (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Unarmed Strike",
+    "domains": [
+      "Domination",
+      "Dream",
+      "Evil",
+      "Knowledge",
+      "Law",
+      "Magic",
+      "Mind",
+      "Tyranny"
+    ]
+  },
+  {
+    "id": "incabulos_ligr",
+    "name": "Incabulos (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Death",
+      "Destruction",
+      "Dream",
+      "Evil",
+      "Hunger",
+      "Madness",
+      "Pestilence"
+    ]
+  },
+  {
+    "id": "io_ligr",
+    "name": "Io (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Dragon",
+      "Knowledge",
+      "Magic",
+      "Strength",
+      "Travel"
+    ]
+  },
+  {
+    "id": "istus_ligr",
+    "name": "Istus (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Net",
+    "domains": [
+      "Celerity",
+      "Chaos",
+      "Destiny",
+      "Knowledge",
+      "Law",
+      "Luck",
+      "Mind",
+      "Oracle"
+    ]
+  },
+  {
+    "id": "iuz_ligr",
+    "name": "Iuz (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Greatsword",
+    "domains": [
+      "Chaos",
+      "Evil",
+      "Mind",
+      "Trickery",
+      "Tyranny"
+    ]
+  },
+  {
+    "id": "jascar_ligr",
+    "name": "Jascar (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Earth",
+      "Glory",
+      "Good",
+      "Law",
+      "Mysticism",
+      "Protection"
+    ]
+  },
+  {
+    "id": "johydee_ligr",
+    "name": "Johydee (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Good",
+      "Mind",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "joramy_ligr",
+    "name": "Joramy (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Competition",
+      "Destruction",
+      "Fire",
+      "War"
+    ]
+  },
+  {
+    "id": "karontor_ligr",
+    "name": "Karontor (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Club",
+    "domains": [
+      "Animal",
+      "Cold",
+      "Evil",
+      "Madness",
+      "Strength"
+    ]
+  },
+  {
+    "id": "katay_ligr",
+    "name": "Katay (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Destruction",
+      "Knowledge",
+      "Law",
+      "Oracle",
+      "Repose",
+      "Rune"
+    ]
+  },
+  {
+    "id": "kelanen_ligr",
+    "name": "Kelanen (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": [
+      "Travel",
+      "War"
+    ]
+  },
+  {
+    "id": "keoghtom_ligr",
+    "name": "Keoghtom (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Good",
+      "Knowledge",
+      "Travel"
+    ]
+  },
+  {
+    "id": "keptolo_ligr",
+    "name": "Keptolo (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Chaos",
+      "Domination",
+      "Evil",
+      "Knowledge",
+      "Travel"
+    ]
+  },
+  {
+    "id": "khurgorbaeyag_ligr",
+    "name": "Khurgorbaeyag (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Whip",
+    "domains": [
+      "Domination",
+      "Evil",
+      "Inquisition",
+      "Law",
+      "Protection",
+      "Tyranny"
+    ]
+  },
+  {
+    "id": "kiaransali_ligr",
+    "name": "Kiaransali (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Death",
+      "Evil",
+      "Madness",
+      "Pestilence"
+    ]
+  },
+  {
+    "id": "kord_ligr",
+    "name": "Kord (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Greatsword",
+    "domains": [
+      "Chaos",
+      "Competition",
+      "Courage",
+      "Good",
+      "Luck",
+      "Nobility",
+      "Strength"
+    ]
+  },
+  {
+    "id": "kundo_ligr",
+    "name": "Kundo (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Community",
+      "Earth",
+      "Good",
+      "Law",
+      "Nobility",
+      "Protection"
+    ]
+  },
+  {
+    "id": "kurell_ligr",
+    "name": "Kurell (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Chaos",
+      "Greed",
+      "Luck",
+      "Madness",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "kuroth_ligr",
+    "name": "Kuroth (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Luck",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "kurtulmak_ligr",
+    "name": "Kurtulmak (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Competition",
+      "Earth",
+      "Evil",
+      "Law",
+      "Madness",
+      "Trickery",
+      "War"
+    ]
+  },
+  {
+    "id": "kyuss_ligr",
+    "name": "Kyuss (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Club",
+    "domains": [
+      "Death",
+      "Evil",
+      "Pestilence"
+    ]
+  },
+  {
+    "id": "labelas_enoreth_ligr",
+    "name": "Labelas Enoreth (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Celerity",
+      "Chaos",
+      "Destiny",
+      "Good",
+      "Knowledge",
+      "Mind",
+      "Oracle",
+      "Rune"
+    ]
+  },
+  {
+    "id": "laduguer_ligr",
+    "name": "Laduguer (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Domination",
+      "Earth",
+      "Evil",
+      "Law",
+      "Magic",
+      "Mind",
+      "Protection"
+    ]
+  },
+  {
+    "id": "laogzed_ligr",
+    "name": "Laogzed (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Javelin",
+    "domains": [
+      "Chaos",
+      "Death",
+      "Destruction",
+      "Evil",
+      "Madness"
+    ]
+  },
+  {
+    "id": "lendor_ligr",
+    "name": "Lendor (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Greatsword",
+    "domains": [
+      "Destiny",
+      "Knowledge",
+      "Law",
+      "Mind",
+      "Oracle",
+      "Protection",
+      "Rune"
+    ]
+  },
+  {
+    "id": "lirr_ligr",
+    "name": "Lirr (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Knowledge",
+      "Liberation",
+      "Magic",
+      "Rune",
+      "Travel"
+    ]
+  },
+  {
+    "id": "llerg_ligr",
+    "name": "Llerg (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Animal",
+      "Chaos",
+      "Competition",
+      "Courage",
+      "Strength",
+      "Thirst"
+    ]
+  },
+  {
+    "id": "lolth_ligr",
+    "name": "Lolth (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Whip",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Domination",
+      "Evil",
+      "Oracle",
+      "Pestilence",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "luthic_ligr",
+    "name": "Luthic (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Gauntlet, Spiked",
+    "domains": [
+      "Community",
+      "Earth",
+      "Evil",
+      "Healing",
+      "Protection"
+    ]
+  },
+  {
+    "id": "lydia_ligr",
+    "name": "Lydia (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Good",
+      "Knowledge",
+      "Liberation",
+      "Sun",
+      "Travel"
+    ]
+  },
+  {
+    "id": "maglubiyet_ligr",
+    "name": "Maglubiyet (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Greataxe",
+    "domains": [
+      "Competition",
+      "Destruction",
+      "Evil",
+      "Strength",
+      "Trickery",
+      "Tyranny",
+      "War"
+    ]
+  },
+  {
+    "id": "mayaheine_ligr",
+    "name": "Mayaheine (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Sword, Bastard",
+    "domains": [
+      "Good",
+      "Law",
+      "Nobility",
+      "Protection",
+      "War"
+    ]
+  },
+  {
+    "id": "memnor_ligr",
+    "name": "Memnor (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Morningstar",
+    "domains": [
+      "Death",
+      "Domination",
+      "Evil",
+      "Mind",
+      "Sky",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "merikka_ligr",
+    "name": "Merikka (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Sickle",
+    "domains": [
+      "Community",
+      "Good",
+      "Law",
+      "Plant",
+      "Protection"
+    ]
+  },
+  {
+    "id": "merrshaulk_ligr",
+    "name": "Merrshaulk (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Domination",
+      "Evil",
+      "Mind",
+      "Plant",
+      "Tyranny"
+    ]
+  },
+  {
+    "id": "meyanok_ligr",
+    "name": "Meyanok (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Animal",
+      "Destruction",
+      "Evil",
+      "Pestilence",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "mictlantecuhtli_ligr",
+    "name": "Mictlantecuhtli (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Death",
+      "Destruction",
+      "Evil",
+      "Law",
+      "Mysticism",
+      "Pestilence",
+      "Tyranny",
+      "War"
+    ]
+  },
+  {
+    "id": "moradin_ligr",
+    "name": "Moradin (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Creation",
+      "Earth",
+      "Fire",
+      "Good",
+      "Law",
+      "Protection",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "mouqol_ligr",
+    "name": "Mouqol (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Knowledge",
+      "Pact",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "muamman_duathal_ligr",
+    "name": "Muamman Duathal (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "City",
+      "Community",
+      "Good",
+      "Protection",
+      "Travel"
+    ]
+  },
+  {
+    "id": "murlynd_ligr",
+    "name": "Murlynd (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Good",
+      "Knowledge",
+      "Law",
+      "Nobility"
+    ]
+  },
+  {
+    "id": "myrhiss_ligr",
+    "name": "Myrhiss (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Shortbow",
+    "domains": [
+      "Community",
+      "Domination",
+      "Good",
+      "Healing",
+      "Protection"
+    ]
+  },
+  {
+    "id": "nazarn_ligr",
+    "name": "Nazarn (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Luck",
+      "War"
+    ]
+  },
+  {
+    "id": "nerull_ligr",
+    "name": "Nerull (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Scythe",
+    "domains": [
+      "Cold",
+      "Death",
+      "Evil",
+      "Mysticism",
+      "Pestilence",
+      "Trickery",
+      "Winter"
+    ]
+  },
+  {
+    "id": "nola_ligr",
+    "name": "Nola (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Javelin",
+    "domains": [
+      "Air",
+      "Fire",
+      "Glory",
+      "Good",
+      "Healing",
+      "Sun"
+    ]
+  },
+  {
+    "id": "nomog_geaya_ligr",
+    "name": "Nomog-Geaya (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Courage",
+      "Evil",
+      "Law",
+      "Strength",
+      "Tyranny",
+      "War"
+    ]
+  },
+  {
+    "id": "norebo_ligr",
+    "name": "Norebo (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Competition",
+      "Courage",
+      "Luck",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "obad_hai_ligr",
+    "name": "Obad-Hai (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Air",
+      "Animal",
+      "Earth",
+      "Fire",
+      "Plant",
+      "Sand",
+      "Summer",
+      "Water"
+    ]
+  },
+  {
+    "id": "olidammara_ligr",
+    "name": "Olidammara (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Rapier",
+    "domains": [
+      "Celerity",
+      "Chaos",
+      "City",
+      "Luck",
+      "Mind",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "osprem_ligr",
+    "name": "Osprem (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Trident",
+    "domains": [
+      "Law",
+      "Protection",
+      "Travel",
+      "Water",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "panzuriel_ligr",
+    "name": "Panzuriel (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Destruction",
+      "Evil",
+      "Madness",
+      "Mind",
+      "War",
+      "Water"
+    ]
+  },
+  {
+    "id": "pelor_ligr",
+    "name": "Pelor (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "Glory",
+      "Good",
+      "Healing",
+      "Nobility",
+      "Purification",
+      "Strength",
+      "Summer",
+      "Sun"
+    ]
+  },
+  {
+    "id": "phaulkon_ligr",
+    "name": "Phaulkon (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Longbow",
+    "domains": [
+      "Air",
+      "Animal",
+      "Chaos",
+      "Good",
+      "Sky",
+      "War"
+    ]
+  },
+  {
+    "id": "pholtus_ligr",
+    "name": "Pholtus (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Glory",
+      "Good",
+      "Inquisition",
+      "Knowledge",
+      "Law",
+      "Purification",
+      "Sun"
+    ]
+  },
+  {
+    "id": "phyton_ligr",
+    "name": "Phyton (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Chaos",
+      "Community",
+      "Good",
+      "Plant",
+      "Summer",
+      "Sun",
+      "Water"
+    ]
+  },
+  {
+    "id": "procan_ligr",
+    "name": "Procan (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Trident",
+    "domains": [
+      "Animal",
+      "Chaos",
+      "Luck",
+      "Travel",
+      "Water",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "pyremius_ligr",
+    "name": "Pyremius (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Destruction",
+      "Evil",
+      "Fire",
+      "Madness",
+      "Mysticism"
+    ]
+  },
+  {
+    "id": "quetzalcoatl_ligr",
+    "name": "Quetzalcoatl (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Air",
+      "Animal",
+      "Domination",
+      "Knowledge",
+      "Law",
+      "Protection",
+      "Sky"
+    ]
+  },
+  {
+    "id": "ralishaz_ligr",
+    "name": "Ralishaz (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Liberation",
+      "Luck",
+      "Madness",
+      "Oracle"
+    ]
+  },
+  {
+    "id": "rao_ligr",
+    "name": "Rao (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Mace, Light",
+    "domains": [
+      "Community",
+      "Glory",
+      "Good",
+      "Inquisition",
+      "Knowledge",
+      "Law",
+      "Mind",
+      "Pact"
+    ]
+  },
+  {
+    "id": "raxivort_ligr",
+    "name": "Raxivort (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Animal",
+      "Chaos",
+      "Evil",
+      "Mysticism",
+      "Pestilence",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "rillifane_rallathil_ligr",
+    "name": "Rillifane Rallathil (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Celerity",
+      "Chaos",
+      "Good",
+      "Mysticism",
+      "Plant",
+      "Protection",
+      "Travel"
+    ]
+  },
+  {
+    "id": "roykyn_ligr",
+    "name": "Roykyn (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Gauntlet, Spiked",
+    "domains": [
+      "Earth",
+      "Madness",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "rudd_ligr",
+    "name": "Rudd (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Rapier",
+    "domains": [
+      "Chaos",
+      "Competition",
+      "Destiny",
+      "Luck"
+    ]
+  },
+  {
+    "id": "segojan_earthcaller_ligr",
+    "name": "Segojan Earthcaller (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "Animal",
+      "Community",
+      "Earth",
+      "Good",
+      "Mysticism",
+      "Summoner"
+    ]
+  },
+  {
+    "id": "sehanine_moonbow_ligr",
+    "name": "Sehanine Moonbow (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Chaos",
+      "Dream",
+      "Good",
+      "Knowledge",
+      "Oracle",
+      "Repose",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "sekolah_ligr",
+    "name": "Sekolah (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Trident",
+    "domains": [
+      "Competition",
+      "Evil",
+      "Law",
+      "Mysticism",
+      "Strength",
+      "Tyranny",
+      "War"
+    ]
+  },
+  {
+    "id": "semuanya_ligr",
+    "name": "Semuanya (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Greatclub",
+    "domains": [
+      "Animal",
+      "Creation",
+      "Plant",
+      "Water"
+    ]
+  },
+  {
+    "id": "shargaas_ligr",
+    "name": "Shargaas (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Chaos",
+      "Death",
+      "Evil",
+      "Mysticism",
+      "Pestilence",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "sheela_peryroyl_ligr",
+    "name": "Sheela Peryroyl (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Sickle",
+    "domains": [
+      "Air",
+      "Celerity",
+      "Earth",
+      "Plant",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "shekinester_ligr",
+    "name": "Shekinester (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Bite",
+    "domains": [
+      "Destruction",
+      "Knowledge",
+      "Magic",
+      "Mind",
+      "Oracle",
+      "Protection"
+    ]
+  },
+  {
+    "id": "sixin_ligr",
+    "name": "Sixin (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Evil",
+      "Law",
+      "Strength",
+      "Travel",
+      "Trickery",
+      "War"
+    ]
+  },
+  {
+    "id": "skerrit_ligr",
+    "name": "Skerrit (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Shortspear",
+    "domains": [
+      "Animal",
+      "Good",
+      "Healing",
+      "Plant",
+      "Summer",
+      "Sun"
+    ]
+  },
+  {
+    "id": "skoraeus_stonebones_ligr",
+    "name": "Skoraeus Stonebones (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Earth",
+      "Healing",
+      "Knowledge",
+      "Protection",
+      "Summoner"
+    ]
+  },
+  {
+    "id": "solonor_thelandira_ligr",
+    "name": "Solonor Thelandira (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Longbow",
+    "domains": [
+      "Animal",
+      "Celerity",
+      "Chaos",
+      "Good",
+      "Plant",
+      "War",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "sotillion_ligr",
+    "name": "Sotillion (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Net",
+    "domains": [
+      "Air",
+      "Chaos",
+      "Dream",
+      "Good",
+      "Healing",
+      "Plant",
+      "Summer"
+    ]
+  },
+  {
+    "id": "squerrik_ligr",
+    "name": "Squerrik (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Earth",
+      "Law",
+      "Mind",
+      "Pestilence",
+      "Protection",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "st._cuthbert_ligr",
+    "name": "St. Cuthbert (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Club",
+    "domains": [
+      "Destruction",
+      "Domination",
+      "Good",
+      "Inquisition",
+      "Law",
+      "Protection",
+      "Strength"
+    ]
+  },
+  {
+    "id": "stern_alia_ligr",
+    "name": "Stern Alia (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "Inquisition",
+      "Knowledge",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "stronmaus_ligr",
+    "name": "Stronmaus (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Air",
+      "Good",
+      "Protection",
+      "Sky",
+      "Sun",
+      "War",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "surtr_ligr",
+    "name": "Surtr (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Greatsword",
+    "domains": [
+      "Destruction",
+      "Evil",
+      "Fire",
+      "Law",
+      "Purification",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "syrul_ligr",
+    "name": "Syrul (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Domination",
+      "Evil",
+      "Knowledge",
+      "Mind",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "telchur_ligr",
+    "name": "Telchur (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Air",
+      "Chaos",
+      "Cold",
+      "Strength",
+      "Winter"
+    ]
+  },
+  {
+    "id": "tezcatlipoca_ligr",
+    "name": "Tezcatlipoca (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Air",
+      "Chaos",
+      "Evil",
+      "Mysticism",
+      "Sun",
+      "Trickery",
+      "War",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "tharizdun_ligr",
+    "name": "Tharizdun (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Dream",
+      "Evil",
+      "Force",
+      "Knowledge",
+      "Madness",
+      "Rune"
+    ]
+  },
+  {
+    "id": "thrym_ligr",
+    "name": "Thrym (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Greataxe",
+    "domains": [
+      "Chaos",
+      "Cold",
+      "Destruction",
+      "Earth",
+      "Evil",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "tiamat_ligr",
+    "name": "Tiamat (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Pick, Heavy",
+    "domains": [
+      "Destruction",
+      "Dragon",
+      "Evil",
+      "Greed",
+      "Law",
+      "Trickery",
+      "Tyranny"
+    ]
+  },
+  {
+    "id": "tlaloc_ligr",
+    "name": "Tlaloc (LiGr)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Javelin",
+    "domains": [
+      "Air",
+      "Evil",
+      "Law",
+      "Pestilence",
+      "Plant",
+      "Water",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "tlazoteotl_ligr",
+    "name": "Tlazoteotl (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Sickle",
+    "domains": [
+      "Animal",
+      "Community",
+      "Earth",
+      "Plant",
+      "Water"
+    ]
+  },
+  {
+    "id": "trithereon_ligr",
+    "name": "Trithereon (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Liberation",
+      "Mysticism",
+      "Protection",
+      "Strength",
+      "Summoner"
+    ]
+  },
+  {
+    "id": "tsolorandril_ligr",
+    "name": "Tsolorandril (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Chain, Spiked",
+    "domains": [
+      "Knowledge",
+      "Law",
+      "Oracle"
+    ]
+  },
+  {
+    "id": "ulaa_ligr",
+    "name": "Ulaa (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Earth",
+      "Good",
+      "Law",
+      "Liberation",
+      "Mysticism",
+      "Protection",
+      "Summoner"
+    ]
+  },
+  {
+    "id": "urdlen_ligr",
+    "name": "Urdlen (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Gauntlet, Spiked",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Earth",
+      "Evil",
+      "Greed",
+      "Madness",
+      "Pestilence"
+    ]
+  },
+  {
+    "id": "urogalan_ligr",
+    "name": "Urogalan (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Flail",
+    "domains": [
+      "Earth",
+      "Law",
+      "Protection",
+      "Repose"
+    ]
+  },
+  {
+    "id": "uvot_ligr",
+    "name": "Uvot (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Scythe",
+    "domains": [
+      "Community",
+      "Creation",
+      "Good",
+      "Knowledge",
+      "Luck",
+      "Plant",
+      "Protection"
+    ]
+  },
+  {
+    "id": "vaprak_ligr",
+    "name": "Vaprak (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Greatclub",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Evil",
+      "Greed",
+      "Madness",
+      "Strength"
+    ]
+  },
+  {
+    "id": "vara_ligr",
+    "name": "Vara (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Javelin",
+    "domains": [
+      "Destruction",
+      "Dream",
+      "Evil",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "vathris_ligr",
+    "name": "Vathris (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Longspear",
+    "domains": [
+      "Destruction",
+      "Law",
+      "Thirst",
+      "War"
+    ]
+  },
+  {
+    "id": "vatun_ligr",
+    "name": "Vatun (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Air",
+      "Animal",
+      "Chaos",
+      "Cold",
+      "Strength",
+      "Winter"
+    ]
+  },
+  {
+    "id": "vecna_ligr",
+    "name": "Vecna (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Destiny",
+      "Dream",
+      "Evil",
+      "Knowledge",
+      "Madness",
+      "Magic",
+      "Mind",
+      "Oracle",
+      "Tyranny"
+    ]
+  },
+  {
+    "id": "velnius_ligr",
+    "name": "Velnius (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Air",
+      "Travel",
+      "Water",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "vergadain_ligr",
+    "name": "Vergadain (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Knowledge",
+      "Luck",
+      "Mind",
+      "Pact",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "vhaeraun_ligr",
+    "name": "Vhaeraun (LiGr)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Celerity",
+      "Chaos",
+      "Evil",
+      "Mysticism",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "vogan_ligr",
+    "name": "Vogan (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Shortspear",
+    "domains": [
+      "Air",
+      "Chaos",
+      "Good",
+      "Healing",
+      "Sky",
+      "Water",
+      "Windstorm"
+    ]
+  },
+  {
+    "id": "wastri_ligr",
+    "name": "Wastri (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Glaive",
+    "domains": [
+      "Animal",
+      "Law",
+      "Purification",
+      "War"
+    ]
+  },
+  {
+    "id": "wee_jas_ligr",
+    "name": "Wee Jas (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Domination",
+      "Inquisition",
+      "Law",
+      "Magic",
+      "Mind",
+      "Repose"
+    ]
+  },
+  {
+    "id": "wenta_ligr",
+    "name": "Wenta (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Club",
+    "domains": [
+      "Air",
+      "Chaos",
+      "Creation",
+      "Good",
+      "Liberation",
+      "Plant"
+    ]
+  },
+  {
+    "id": "xan_yae_ligr",
+    "name": "Xan Yae (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Falchion",
+    "domains": [
+      "Knowledge",
+      "Mind",
+      "Trickery",
+      "War"
+    ]
+  },
+  {
+    "id": "xanag_ligr",
+    "name": "Xanag (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Creation",
+      "Domination",
+      "Earth",
+      "Fire"
+    ]
+  },
+  {
+    "id": "xerbo_ligr",
+    "name": "Xerbo (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Trident",
+    "domains": [
+      "Animal",
+      "Knowledge",
+      "Pact",
+      "Water"
+    ]
+  },
+  {
+    "id": "yecind_ligr",
+    "name": "Ye'Cind (LiGr)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Knowledge",
+      "Magic",
+      "Travel"
+    ]
+  },
+  {
+    "id": "yondalla_ligr",
+    "name": "Yondalla (LiGr)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Animal",
+      "Community",
+      "Creation",
+      "Good",
+      "Law",
+      "Mysticism",
+      "Plant",
+      "Protection"
+    ]
+  },
+  {
+    "id": "yurtrus_ligr",
+    "name": "Yurtrus (LiGr)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Unarmed Strike",
+    "domains": [
+      "Death",
+      "Destruction",
+      "Evil",
+      "Madness",
+      "Pestilence"
+    ]
+  },
+  {
+    "id": "zagyg_ligr",
+    "name": "Zagyg (LiGr)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Club",
+    "domains": [
+      "Chaos",
+      "Knowledge",
+      "Madness",
+      "Magic",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "zilchus_ligr",
+    "name": "Zilchus (LiGr)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "City",
+      "Knowledge",
+      "Law",
+      "Mind",
+      "Pact",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "zinzerena",
+    "name": "Zinzerena",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Chaos",
+      "Luck",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "zodal_ligr",
+    "name": "Zodal (LiGr)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Unarmed Strike",
+    "domains": [
+      "Community",
+      "Good",
+      "Healing",
+      "Liberation",
+      "Protection"
+    ]
+  },
+  {
+    "id": "zuoken_ligr",
+    "name": "Zuoken (LiGr)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Unarmed Strike",
+    "domains": [
+      "Celerity",
+      "Mind",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "abbathor_frcs",
+    "name": "Abbathor (FRCS)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Dwarf",
+      "Evil",
+      "Luck",
+      "Trade",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "aerdrie_faenya_frcs",
+    "name": "Aerdrie Faenya (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Air",
+      "Animal",
+      "Chaos",
+      "Elf",
+      "Good",
+      "Storm"
+    ]
+  },
+  {
+    "id": "akadi_frcs",
+    "name": "Akadi (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Flail, Heavy",
+    "domains": [
+      "Air",
+      "Illusion",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "angharradh_frcs",
+    "name": "Angharradh (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Chaos",
+      "Elf",
+      "Good",
+      "Knowledge",
+      "Plant",
+      "Protection",
+      "Renewal"
+    ]
+  },
+  {
+    "id": "anhur_frcs",
+    "name": "Anhur (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Falchion",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Storm",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "arvoreen_frcs",
+    "name": "Arvoreen (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Good",
+      "Halfling",
+      "Law",
+      "Protection",
+      "War"
+    ]
+  },
+  {
+    "id": "auril_frcs",
+    "name": "Auril (FRCS)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Air",
+      "Cold",
+      "Evil",
+      "Storm"
+    ]
+  },
+  {
+    "id": "azuth_frcs",
+    "name": "Azuth (FRCS)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Illusion",
+      "Knowledge",
+      "Law",
+      "Magic",
+      "Spell"
+    ]
+  },
+  {
+    "id": "baervan_wildwanderer_frcs",
+    "name": "Baervan Wildwanderer (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Halfspear",
+    "domains": [
+      "Animal",
+      "Gnome",
+      "Good",
+      "Plant",
+      "Travel"
+    ]
+  },
+  {
+    "id": "bahgtru_frcs",
+    "name": "Bahgtru (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Gauntlet, Spiked",
+    "domains": [
+      "Chaos",
+      "Evil",
+      "Orc",
+      "Strength"
+    ]
+  },
+  {
+    "id": "bane_frcs",
+    "name": "Bane (FRCS)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Morningstar",
+    "domains": [
+      "Destruction",
+      "Evil",
+      "Hatred",
+      "Law",
+      "Tyranny"
+    ]
+  },
+  {
+    "id": "baravar_cloakshadow_frcs",
+    "name": "Baravar Cloakshadow (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Gnome",
+      "Good",
+      "Illusion",
+      "Protection",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "berronar_truesilver_frcs",
+    "name": "Berronar Truesilver (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "Dwarf",
+      "Family",
+      "Good",
+      "Healing",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "beshaba_frcs",
+    "name": "Beshaba (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Scourge",
+    "domains": [
+      "Chaos",
+      "Evil",
+      "Fate",
+      "Luck",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "brandobaris_frcs",
+    "name": "Brandobaris (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Halfling",
+      "Luck",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "callarduran_smoothhands_frcs",
+    "name": "Callarduran Smoothhands (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Cavern",
+      "Craft",
+      "Earth",
+      "Gnome"
+    ]
+  },
+  {
+    "id": "chauntea_frcs",
+    "name": "Chauntea (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Scythe",
+    "domains": [
+      "Animal",
+      "Earth",
+      "Good",
+      "Plant",
+      "Protection",
+      "Renewal"
+    ]
+  },
+  {
+    "id": "clangeddin_silverbeard_frcs",
+    "name": "Clangeddin Silverbeard (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Dwarf",
+      "Good",
+      "Law",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "corellon_larethian_frcs",
+    "name": "Corellon Larethian (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Chaos",
+      "Elf",
+      "Good",
+      "Magic",
+      "Protection",
+      "War"
+    ]
+  },
+  {
+    "id": "cyric_frcs",
+    "name": "Cyric (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Evil",
+      "Illusion",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "cyrrollalee_frcs",
+    "name": "Cyrrollalee (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Family",
+      "Good",
+      "Halfling",
+      "Law"
+    ]
+  },
+  {
+    "id": "deep_duerra_duergar_frcs",
+    "name": "Deep Duerra (duergar) (FRCS)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Dwarf",
+      "Evil",
+      "Law",
+      "Mentalism",
+      "War"
+    ]
+  },
+  {
+    "id": "deep_sashelas_frcs",
+    "name": "Deep Sashelas (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Trident",
+    "domains": [
+      "Chaos",
+      "Elf",
+      "Good",
+      "Knowledge",
+      "Ocean",
+      "Water"
+    ]
+  },
+  {
+    "id": "deneir_frcs",
+    "name": "Deneir (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Good",
+      "Knowledge",
+      "Protection",
+      "Rune"
+    ]
+  },
+  {
+    "id": "dugmaren_brightmantle_frcs",
+    "name": "Dugmaren Brightmantle (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Chaos",
+      "Craft",
+      "Dwarf",
+      "Good",
+      "Knowledge",
+      "Rune"
+    ]
+  },
+  {
+    "id": "dumathoin_frcs",
+    "name": "Dumathoin (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Maul",
+    "domains": [
+      "Cavern",
+      "Craft",
+      "Dwarf",
+      "Earth",
+      "Knowledge",
+      "Metal",
+      "Protection"
+    ]
+  },
+  {
+    "id": "eilistraee_frcs",
+    "name": "Eilistraee (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Sword, Bastard",
+    "domains": [
+      "Chaos",
+      "Charm",
+      "Drow",
+      "Elf",
+      "Good",
+      "Moon",
+      "Portal",
+      "Portal (alternative)"
+    ]
+  },
+  {
+    "id": "eldath_frcs",
+    "name": "Eldath (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Net",
+    "domains": [
+      "Family",
+      "Good",
+      "Plant",
+      "Protection",
+      "Water"
+    ]
+  },
+  {
+    "id": "erevan_ilesere_frcs",
+    "name": "Erevan Ilesere (FRCS)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Chaos",
+      "Elf",
+      "Luck",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "fenmarel_mestarine_frcs",
+    "name": "Fenmarel Mestarine (FRCS)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Animal",
+      "Chaos",
+      "Elf",
+      "Plant",
+      "Travel"
+    ]
+  },
+  {
+    "id": "finder_wyvernspur_frcs",
+    "name": "Finder Wyvernspur (FRCS)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Sword, Bastard",
+    "domains": [
+      "Chaos",
+      "Charm",
+      "Renewal",
+      "Scalykind"
+    ]
+  },
+  {
+    "id": "flandal_steelskin_frcs",
+    "name": "Flandal Steelskin (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Craft",
+      "Gnome",
+      "Good",
+      "Metal"
+    ]
+  },
+  {
+    "id": "gaerdal_ironhand_frcs",
+    "name": "Gaerdal Ironhand (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Gnome",
+      "Good",
+      "Law",
+      "Protection",
+      "War"
+    ]
+  },
+  {
+    "id": "garagos_frcs",
+    "name": "Garagos (FRCS)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "gargauth_frcs",
+    "name": "Gargauth (FRCS)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Charm",
+      "Evil",
+      "Law",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "garl_glittergold_frcs",
+    "name": "Garl Glittergold (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Craft",
+      "Gnome",
+      "Good",
+      "Law",
+      "Protection",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "geb_frcs",
+    "name": "Geb (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Cavern",
+      "Craft",
+      "Earth",
+      "Protection"
+    ]
+  },
+  {
+    "id": "ghaunadaur_frcs",
+    "name": "Ghaunadaur (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Cavern",
+      "Chaos",
+      "Corruption",
+      "Drow",
+      "Evil",
+      "Hatred",
+      "Slime"
+    ]
+  },
+  {
+    "id": "gond_frcs",
+    "name": "Gond (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Craft",
+      "Earth",
+      "Fire",
+      "Knowledge",
+      "Metal",
+      "Planning"
+    ]
+  },
+  {
+    "id": "gorm_gulthyn_frcs",
+    "name": "Gorm Gulthyn (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Dwarf",
+      "Good",
+      "Law",
+      "Protection",
+      "War"
+    ]
+  },
+  {
+    "id": "grumbar_frcs",
+    "name": "Grumbar (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Cavern",
+      "Earth",
+      "Metal",
+      "Time"
+    ]
+  },
+  {
+    "id": "gruumsh_frcs",
+    "name": "Gruumsh (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Cavern",
+      "Chaos",
+      "Evil",
+      "Hatred",
+      "Orc",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "gwaeron_windstrom_frcs",
+    "name": "Gwaeron Windstrom (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Greatsword",
+    "domains": [
+      "Animal",
+      "Good",
+      "Knowledge",
+      "Plant",
+      "Travel"
+    ]
+  },
+  {
+    "id": "haela_brightaxe_frcs",
+    "name": "Haela Brightaxe (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Greatsword",
+    "domains": [
+      "Chaos",
+      "Dwarf",
+      "Good",
+      "Luck",
+      "War"
+    ]
+  },
+  {
+    "id": "hanali_celanil_frcs",
+    "name": "Hanali Celanil (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Charm",
+      "Elf",
+      "Good",
+      "Magic",
+      "Protection"
+    ]
+  },
+  {
+    "id": "hathor_frcs",
+    "name": "Hathor (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Family",
+      "Fate",
+      "Good",
+      "Moon"
+    ]
+  },
+  {
+    "id": "helm_frcs",
+    "name": "Helm (FRCS)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Sword, Bastard",
+    "domains": [
+      "Law",
+      "Planning",
+      "Protection",
+      "Strength"
+    ]
+  },
+  {
+    "id": "hoar_frcs",
+    "name": "Hoar (FRCS)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Javelin",
+    "domains": [
+      "Fate",
+      "Law",
+      "Retribution",
+      "Travel"
+    ]
+  },
+  {
+    "id": "horus_re_frcs",
+    "name": "Horus-Re (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Khopesh",
+    "domains": [
+      "Good",
+      "Law",
+      "Nobility",
+      "Retribution",
+      "Sun"
+    ]
+  },
+  {
+    "id": "ilmater_frcs",
+    "name": "Ilmater (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Unarmed Strike",
+    "domains": [
+      "Good",
+      "Healing",
+      "Law",
+      "Strength",
+      "Suffering"
+    ]
+  },
+  {
+    "id": "ilneval_frcs",
+    "name": "Ilneval (FRCS)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Destruction",
+      "Evil",
+      "Orc",
+      "Planning",
+      "War"
+    ]
+  },
+  {
+    "id": "isis_frcs",
+    "name": "Isis (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Dagger, Punching",
+    "domains": [
+      "Family",
+      "Good",
+      "Magic",
+      "Storm",
+      "Water"
+    ]
+  },
+  {
+    "id": "ishtishia_frcs",
+    "name": "Ishtishia (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Destruction",
+      "Ocean",
+      "Storm",
+      "Travel",
+      "Water"
+    ]
+  },
+  {
+    "id": "jergal_frcs",
+    "name": "Jergal (FRCS)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Scythe",
+    "domains": [
+      "Fate",
+      "Law",
+      "Repose",
+      "Rune",
+      "Suffering"
+    ]
+  },
+  {
+    "id": "kelemvor_frcs",
+    "name": "Kelemvor (FRCS)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Sword, Bastard",
+    "domains": [
+      "Fate",
+      "Law",
+      "Protection",
+      "Repose",
+      "Travel"
+    ]
+  },
+  {
+    "id": "kiaransalee_frcs",
+    "name": "Kiaransalee (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Drow",
+      "Evil",
+      "Retribution",
+      "Undeath"
+    ]
+  },
+  {
+    "id": "kossuth_frcs",
+    "name": "Kossuth (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Chain, Spiked",
+    "domains": [
+      "Destruction",
+      "Fire",
+      "Renewal",
+      "Suffering"
+    ]
+  },
+  {
+    "id": "labelas_enoreth_frcs",
+    "name": "Labelas Enoreth (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Chaos",
+      "Elf",
+      "Good",
+      "Knowledge",
+      "Time"
+    ]
+  },
+  {
+    "id": "laduguer_duergar_frcs",
+    "name": "Laduguer (duergar) (FRCS)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Craft",
+      "Dwarf",
+      "Evil",
+      "Law",
+      "Magic",
+      "Metal",
+      "Protection"
+    ]
+  },
+  {
+    "id": "lathander_frcs",
+    "name": "Lathander (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Good",
+      "Nobility",
+      "Protection",
+      "Renewal",
+      "Strength",
+      "Sun"
+    ]
+  },
+  {
+    "id": "lliira_frcs",
+    "name": "Lliira (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Shuriken",
+    "domains": [
+      "Chaos",
+      "Charm",
+      "Family",
+      "Good",
+      "Travel"
+    ]
+  },
+  {
+    "id": "lolth_frcs",
+    "name": "Lolth (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Darkness",
+      "Destruction",
+      "Drow",
+      "Evil",
+      "Spider",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "loviatar_frcs",
+    "name": "Loviatar (FRCS)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Scourge",
+    "domains": [
+      "Evil",
+      "Law",
+      "Retribution",
+      "Strength",
+      "Suffering"
+    ]
+  },
+  {
+    "id": "lurue_frcs",
+    "name": "Lurue (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Shortspear",
+    "domains": [
+      "Animal",
+      "Chaos",
+      "Good",
+      "Healing"
+    ]
+  },
+  {
+    "id": "luthic_frcs",
+    "name": "Luthic (FRCS)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Bracer, Claw",
+    "domains": [
+      "Cavern",
+      "Earth",
+      "Evil",
+      "Family",
+      "Healing",
+      "Orc"
+    ]
+  },
+  {
+    "id": "malar_frcs",
+    "name": "Malar (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Bracer, Claw",
+    "domains": [
+      "Animal",
+      "Chaos",
+      "Evil",
+      "Moon",
+      "Strength"
+    ]
+  },
+  {
+    "id": "marthammor_duin_frcs",
+    "name": "Marthammor Duin (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "Dwarf",
+      "Good",
+      "Protection",
+      "Travel"
+    ]
+  },
+  {
+    "id": "mask_frcs",
+    "name": "Mask (FRCS)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Darkness",
+      "Evil",
+      "Luck",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "mielikki_frcs",
+    "name": "Mielikki (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Animal",
+      "Good",
+      "Plant",
+      "Travel"
+    ]
+  },
+  {
+    "id": "milil_frcs",
+    "name": "Milil (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Rapier",
+    "domains": [
+      "Charm",
+      "Good",
+      "Knowledge",
+      "Nobility"
+    ]
+  },
+  {
+    "id": "moradin_frcs",
+    "name": "Moradin (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Craft",
+      "Dwarf",
+      "Earth",
+      "Good",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "mystra_frcs",
+    "name": "Mystra (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Shuriken",
+    "domains": [
+      "Good",
+      "Illusion",
+      "Knowledge",
+      "Magic",
+      "Rune",
+      "Spell"
+    ]
+  },
+  {
+    "id": "nephthys_frcs",
+    "name": "Nephthys (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Whip",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Protection",
+      "Trade"
+    ]
+  },
+  {
+    "id": "nobanion_frcs",
+    "name": "Nobanion (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Pick, Heavy",
+    "domains": [
+      "Animal",
+      "Good",
+      "Law",
+      "Nobility"
+    ]
+  },
+  {
+    "id": "oghma_frcs",
+    "name": "Oghma (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Charm",
+      "Knowledge",
+      "Luck",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "osiris_frcs",
+    "name": "Osiris (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Flail",
+    "domains": [
+      "Good",
+      "Law",
+      "Plant",
+      "Repose",
+      "Retribution"
+    ]
+  },
+  {
+    "id": "red_knight_frcs",
+    "name": "Red Knight (FRCS)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Law",
+      "Nobility",
+      "Planning",
+      "War"
+    ]
+  },
+  {
+    "id": "rillifane_rallathil_frcs",
+    "name": "Rillifane Rallathil (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Chaos",
+      "Elf",
+      "Good",
+      "Plant",
+      "Protection"
+    ]
+  },
+  {
+    "id": "savras_frcs",
+    "name": "Savras (FRCS)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Fate",
+      "Knowledge",
+      "Law",
+      "Magic",
+      "Spell"
+    ]
+  },
+  {
+    "id": "sebek_frcs",
+    "name": "Sebek (FRCS)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Animal",
+      "Evil",
+      "Scalykind",
+      "Water"
+    ]
+  },
+  {
+    "id": "segojan_earthcaller_frcs",
+    "name": "Segojan Earthcaller (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "Cavern",
+      "Earth",
+      "Gnome",
+      "Good"
+    ]
+  },
+  {
+    "id": "sehanine_moonhow_frcs",
+    "name": "Sehanine Moonhow (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Chaos",
+      "Elf",
+      "Good",
+      "Illusion",
+      "Knowledge",
+      "Moon",
+      "Travel"
+    ]
+  },
+  {
+    "id": "selune_frcs",
+    "name": "Selune (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Moon",
+      "Protection",
+      "Travel"
+    ]
+  },
+  {
+    "id": "selvetarm_frcs",
+    "name": "Selvetarm (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Mace, Heavy",
+    "domains": [
+      "Chaos",
+      "Drow",
+      "Evil",
+      "Spider",
+      "War"
+    ]
+  },
+  {
+    "id": "set_frcs",
+    "name": "Set (FRCS)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Air",
+      "Darkness",
+      "Evil",
+      "Hatred",
+      "Law",
+      "Magic",
+      "Scalykind"
+    ]
+  },
+  {
+    "id": "shar_frcs",
+    "name": "Shar (FRCS)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Chakram",
+    "domains": [
+      "Cavern",
+      "Darkness",
+      "Evil",
+      "Knowledge"
+    ]
+  },
+  {
+    "id": "sharess_frcs",
+    "name": "Sharess (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Bracer, Claw",
+    "domains": [
+      "Chaos",
+      "Charm",
+      "Good",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "shargaas_frcs",
+    "name": "Shargaas (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Chaos",
+      "Darkness",
+      "Evil",
+      "Orc",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "sharindlar_frcs",
+    "name": "Sharindlar (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Whip",
+    "domains": [
+      "Chaos",
+      "Charm",
+      "Dwarf",
+      "Good",
+      "Healing",
+      "Moon"
+    ]
+  },
+  {
+    "id": "shaundakul_frcs",
+    "name": "Shaundakul (FRCS)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Greatsword",
+    "domains": [
+      "Air",
+      "Chaos",
+      "Portal",
+      "Portal (alternative)",
+      "Protection",
+      "Trade",
+      "Travel"
+    ]
+  },
+  {
+    "id": "sheela_peryroyl_frcs",
+    "name": "Sheela Peryroyl (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Sickle",
+    "domains": [
+      "Air",
+      "Charm",
+      "Halfling",
+      "Plant"
+    ]
+  },
+  {
+    "id": "shevarash_frcs",
+    "name": "Shevarash (FRCS)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Longbow",
+    "domains": [
+      "Chaos",
+      "Elf",
+      "Retribution",
+      "War"
+    ]
+  },
+  {
+    "id": "shiallia_frcs",
+    "name": "Shiallia (FRCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Animal",
+      "Good",
+      "Plant",
+      "Renewal"
+    ]
+  },
+  {
+    "id": "siamorphe_frcs",
+    "name": "Siamorphe (FRCS)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Mace, Light",
+    "domains": [
+      "Knowledge",
+      "Law",
+      "Nobility",
+      "Planning"
+    ]
+  },
+  {
+    "id": "silvanus_frcs",
+    "name": "Silvanus (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Maul",
+    "domains": [
+      "Animal",
+      "Plant",
+      "Protection",
+      "Renewal",
+      "Water"
+    ]
+  },
+  {
+    "id": "solonor_thelandira_frcs",
+    "name": "Solonor Thelandira (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Longbow",
+    "domains": [
+      "Chaos",
+      "Elf",
+      "Good",
+      "Plant",
+      "War"
+    ]
+  },
+  {
+    "id": "sune_frcs",
+    "name": "Sune (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Whip",
+    "domains": [
+      "Chaos",
+      "Charm",
+      "Good",
+      "Protection"
+    ]
+  },
+  {
+    "id": "talona_frcs",
+    "name": "Talona (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Unarmed Strike",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Evil",
+      "Suffering"
+    ]
+  },
+  {
+    "id": "talos_frcs",
+    "name": "Talos (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Evil",
+      "Fire",
+      "Storm"
+    ]
+  },
+  {
+    "id": "tempus_frcs",
+    "name": "Tempus (FRCS)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Chaos",
+      "Protection",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "thard_harr_frcs",
+    "name": "Thard Harr (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Gauntlet, Spiked",
+    "domains": [
+      "Animal",
+      "Chaos",
+      "Dwarf",
+      "Good",
+      "Plant"
+    ]
+  },
+  {
+    "id": "thoth_frcs",
+    "name": "Thoth (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Craft",
+      "Knowledge",
+      "Magic",
+      "Rune",
+      "Spell"
+    ]
+  },
+  {
+    "id": "tiamat_frcs",
+    "name": "Tiamat (FRCS)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Pick, Heavy",
+    "domains": [
+      "Evil",
+      "Law",
+      "Scalykind",
+      "Tyranny"
+    ]
+  },
+  {
+    "id": "torm_frcs",
+    "name": "Torm (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Greatsword",
+    "domains": [
+      "Good",
+      "Healing",
+      "Law",
+      "Protection",
+      "Strength"
+    ]
+  },
+  {
+    "id": "tymora_frcs",
+    "name": "Tymora (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Shuriken",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Luck",
+      "Protection",
+      "Travel"
+    ]
+  },
+  {
+    "id": "tyr_frcs",
+    "name": "Tyr (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Good",
+      "Knowledge",
+      "Law",
+      "Retribution",
+      "War"
+    ]
+  },
+  {
+    "id": "ubtao_frcs",
+    "name": "Ubtao (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Pick, Heavy",
+    "domains": [
+      "Planning",
+      "Plant",
+      "Protection",
+      "Scalykind"
+    ]
+  },
+  {
+    "id": "ulutiu_slumbering_frcs",
+    "name": "Ulutiu (slumbering) (FRCS)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Animal",
+      "Cold",
+      "Law",
+      "Ocean",
+      "Protection"
+    ]
+  },
+  {
+    "id": "umberlee_frcs",
+    "name": "Umberlee (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Chaos",
+      "Destruction",
+      "Evil",
+      "Ocean",
+      "Storm"
+    ]
+  },
+  {
+    "id": "urdlen_frcs",
+    "name": "Urdlen (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Bracer, Claw",
+    "domains": [
+      "Chaos",
+      "Earth",
+      "Evil",
+      "Gnome",
+      "Hatred"
+    ]
+  },
+  {
+    "id": "urogalan_frcs",
+    "name": "Urogalan (FRCS)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Flail, Double Headed",
+    "domains": [
+      "Earth",
+      "Halfling",
+      "Law",
+      "Protection",
+      "Repose"
+    ]
+  },
+  {
+    "id": "uthgar_frcs",
+    "name": "Uthgar (FRCS)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Animal",
+      "Chaos",
+      "Retribution",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "valkur_frcs",
+    "name": "Valkur (FRCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Cutlass",
+    "domains": [
+      "Air",
+      "Chaos",
+      "Good",
+      "Ocean",
+      "Protection"
+    ]
+  },
+  {
+    "id": "velsharoon_frcs",
+    "name": "Velsharoon (FRCS)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Death",
+      "Evil",
+      "Magic",
+      "Undeath"
+    ]
+  },
+  {
+    "id": "vergadain_frcs",
+    "name": "Vergadain (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Dwarf",
+      "Luck",
+      "Trade",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "vhaeraun_frcs",
+    "name": "Vhaeraun (FRCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Chaos",
+      "Drow",
+      "Evil",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "waukeen_frcs",
+    "name": "Waukeen (FRCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Nunchaku",
+    "domains": [
+      "Knowledge",
+      "Protection",
+      "Trade",
+      "Travel"
+    ]
+  },
+  {
+    "id": "yondolla_frcs",
+    "name": "Yondolla (FRCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Sword, Short",
+    "domains": [
+      "Family",
+      "Good",
+      "Halfling",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "yurtrus_frcs",
+    "name": "Yurtrus (FRCS)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Unarmed Strike",
+    "domains": [
+      "Death",
+      "Destruction",
+      "Evil",
+      "Orc",
+      "Suffering"
+    ]
+  },
+  {
+    "id": "the_silver_flame_es",
+    "name": "The Silver Flame (ES)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Longbow",
+    "domains": [
+      "Exorcism",
+      "Good",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "the_sovereign_host_es",
+    "name": "The Sovereign Host (ES)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Air",
+      "Animal",
+      "Artifice",
+      "Chaos",
+      "Charm",
+      "Commerce",
+      "Community",
+      "Earth",
+      "Feast",
+      "Fire",
+      "Good",
+      "Healing",
+      "Knowledge",
+      "Law",
+      "Life",
+      "Luck",
+      "Magic",
+      "Plant",
+      "Protection",
+      "Strength",
+      "Sun",
+      "Travel",
+      "War",
+      "Water",
+      "Weather"
+    ]
+  },
+  {
+    "id": "arawai_es",
+    "name": "Arawai (ES)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Morningstar",
+    "domains": [
+      "Good",
+      "Life",
+      "Plant",
+      "Weather"
+    ]
+  },
+  {
+    "id": "aureon_es",
+    "name": "Aureon (ES)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Knowledge",
+      "Law",
+      "Magic"
+    ]
+  },
+  {
+    "id": "balinor_es",
+    "name": "Balinor (ES)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Battleaxe",
+    "domains": [
+      "Air",
+      "Animal",
+      "Earth"
+    ]
+  },
+  {
+    "id": "boldrei_es",
+    "name": "Boldrei (ES)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Spear",
+    "domains": [
+      "Community",
+      "Good",
+      "Law",
+      "Protection"
+    ]
+  },
+  {
+    "id": "dol_arrah_es",
+    "name": "Dol Arrah (ES)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Halberd",
+    "domains": [
+      "Good",
+      "Law",
+      "Sun",
+      "War"
+    ]
+  },
+  {
+    "id": "dol_dorn_es",
+    "name": "Dol Dorn (ES)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Chaos",
+      "Good",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "kol_korran_es",
+    "name": "Kol Korran (ES)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Mace",
+    "domains": [
+      "Charm",
+      "Commerce",
+      "Travel"
+    ]
+  },
+  {
+    "id": "olladra_es",
+    "name": "Olladra (ES)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Sickle",
+    "domains": [
+      "Feast",
+      "Good",
+      "Healing",
+      "Luck"
+    ]
+  },
+  {
+    "id": "onatar_es",
+    "name": "Onatar (ES)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Artifice",
+      "Fire",
+      "Good"
+    ]
+  },
+  {
+    "id": "the_dark_six",
+    "name": "The Dark Six",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Kama",
+    "domains": [
+      "Artifice",
+      "Chaos",
+      "Death",
+      "Decay",
+      "Destruction",
+      "Evil",
+      "Madness",
+      "Magic",
+      "Passion",
+      "Shadow",
+      "Travel",
+      "Trickery",
+      "War",
+      "Water",
+      "Weather"
+    ]
+  },
+  {
+    "id": "the_devourer_es",
+    "name": "The Devourer (ES)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Trident",
+    "domains": [
+      "Destruction",
+      "Evil",
+      "Water",
+      "Weather"
+    ]
+  },
+  {
+    "id": "the_fury_es",
+    "name": "The Fury (ES)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Rapier",
+    "domains": [
+      "Evil",
+      "Madness",
+      "Passion"
+    ]
+  },
+  {
+    "id": "the_keeper_es",
+    "name": "The Keeper (ES)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Scythe",
+    "domains": [
+      "Death",
+      "Decay",
+      "Evil"
+    ]
+  },
+  {
+    "id": "the_mockery_es",
+    "name": "The Mockery (ES)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Kama",
+    "domains": [
+      "Destruction",
+      "Evil",
+      "Storm",
+      "War"
+    ]
+  },
+  {
+    "id": "the_shadow_es",
+    "name": "The Shadow (ES)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Chaos",
+      "Evil",
+      "Magic",
+      "Shadow"
+    ]
+  },
+  {
+    "id": "the_traveler_es",
+    "name": "The Traveler (ES)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Artifice",
+      "Chaos",
+      "Travel",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "the_blood_of_vol_es",
+    "name": "The Blood of Vol (ES)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Death",
+      "Evil",
+      "Law",
+      "Necromancer"
+    ]
+  },
+  {
+    "id": "the_cults_of_the_dragon_below_es",
+    "name": "The Cults of the Dragon Below (ES)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Heavy Pick",
+    "domains": [
+      "Dragon Below",
+      "Earth",
+      "Evil",
+      "Madness"
+    ]
+  },
+  {
+    "id": "the_path_of_light_es",
+    "name": "The Path of Light (ES)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Unarmed Strike",
+    "domains": [
+      "Law",
+      "Meditation",
+      "Protection"
+    ]
+  },
+  {
+    "id": "the_undying_court_es",
+    "name": "The Undying Court (ES)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Deathless",
+      "Good",
+      "Protection"
+    ]
+  },
+  {
+    "id": "belenus_rvlt",
+    "name": "Belenus (RVLT)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Sickle",
+    "domains": [
+      "Fire",
+      "Good",
+      "Sun"
+    ]
+  },
+  {
+    "id": "the_eternal_order_rvlt",
+    "name": "The Eternal Order (RVLT)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Scythe",
+    "domains": [
+      "Death",
+      "Evil",
+      "Knowledge",
+      "Repose"
+    ]
+  },
+  {
+    "id": "ezra_rvlt",
+    "name": "Ezra (RVLT)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Destruction",
+      "Healing",
+      "Law",
+      "Mists",
+      "Protection"
+    ]
+  },
+  {
+    "id": "hala_rvlt",
+    "name": "Hala (RVLT)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Healing",
+      "Magic",
+      "Plant"
+    ]
+  },
+  {
+    "id": "kali_rvlt",
+    "name": "Kali (RVLT)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Sap",
+    "domains": [
+      "Destruction",
+      "Evil",
+      "Healing",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "the_lawgiver_rvlt",
+    "name": "The Lawgiver (RVLT)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Whip",
+    "domains": [
+      "Death",
+      "Evil",
+      "Law",
+      "War"
+    ]
+  },
+  {
+    "id": "the_morninglord_rvlt",
+    "name": "The Morninglord (RVLT)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Halfspear",
+    "domains": [
+      "Good",
+      "Luck",
+      "Protection",
+      "Sun"
+    ]
+  },
+  {
+    "id": "osiris_rvlt",
+    "name": "Osiris (RVLT)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Falchion",
+    "domains": [
+      "Good",
+      "Protection",
+      "Repose",
+      "Water"
+    ]
+  },
+  {
+    "id": "ra_rvlt",
+    "name": "Ra (RVLT)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Light Flail",
+    "domains": [
+      "Air",
+      "Good",
+      "Law",
+      "Sun"
+    ]
+  },
+  {
+    "id": "set_rvlt",
+    "name": "Set (RVLT)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Short Sword",
+    "domains": [
+      "Death",
+      "Evil",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "tvashtri_rvlt",
+    "name": "Tvashtri (RVLT)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Punching Dagger",
+    "domains": [
+      "Chaos",
+      "Knowledge",
+      "Magic",
+      "Plant"
+    ]
+  },
+  {
+    "id": "the_wolf_god_rvlt",
+    "name": "The Wolf God (RVLT)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "None",
+    "domains": [
+      "Animal",
+      "Strength",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "zhakata_rvlt",
+    "name": "Zhakata (RVLT)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Flail",
+    "domains": [
+      "Destruction",
+      "Earth",
+      "Fire",
+      "Protection"
+    ]
+  },
+  {
+    "id": "ancestral_fey_rvlt",
+    "name": "Ancestral Fey (RVLT)",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "branchala_dlcs",
+    "name": "Branchala (DLCS)",
+    "alignment": "Chaotic Good",
+    "favoredWeapon": "Rapier",
+    "domains": [
+      "Chaos",
+      "Dragon",
+      "Good",
+      "Luck",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "habbakuk_dlcs",
+    "name": "Habbakuk (DLCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Scimitar",
+    "domains": [
+      "Animal",
+      "Good",
+      "Water"
+    ]
+  },
+  {
+    "id": "kiri_jolith_dlcs",
+    "name": "Kiri-Jolith (DLCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Longsword",
+    "domains": [
+      "Good",
+      "Strength",
+      "War"
+    ]
+  },
+  {
+    "id": "majere_dlcs",
+    "name": "Majere (DLCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "Unarmed Strike",
+    "domains": [
+      "Good",
+      "Law",
+      "Meditation"
+    ]
+  },
+  {
+    "id": "mishakal_dlcs",
+    "name": "Mishakal (DLCS)",
+    "alignment": "Neutral Good",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Community",
+      "Good",
+      "Healing",
+      "Protection"
+    ]
+  },
+  {
+    "id": "solinari_dlcs",
+    "name": "Solinari (DLCS)",
+    "alignment": "Lawful Good",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "chislev_dlcs",
+    "name": "Chislev (DLCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Shortspear",
+    "domains": [
+      "Air",
+      "Animal",
+      "Earth",
+      "Plant"
+    ]
+  },
+  {
+    "id": "gilean_dlcs",
+    "name": "Gilean (DLCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Knowledge",
+      "Liberation",
+      "Protection"
+    ]
+  },
+  {
+    "id": "lunitari_dlcs",
+    "name": "Lunitari (DLCS)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "reorx_dlcs",
+    "name": "Reorx (DLCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Warhammer",
+    "domains": [
+      "Earth",
+      "Fire",
+      "Forge"
+    ]
+  },
+  {
+    "id": "shinare_dlcs",
+    "name": "Shinare (DLCS)",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Mace, Light",
+    "domains": [
+      "Law",
+      "Luck",
+      "Travel"
+    ]
+  },
+  {
+    "id": "sirrion_dlcs",
+    "name": "Sirrion (DLCS)",
+    "alignment": "Chaotic Neutral",
+    "favoredWeapon": "Flail, Heavy",
+    "domains": [
+      "Chaos",
+      "Fire",
+      "Passion"
+    ]
+  },
+  {
+    "id": "zivilyn_dlcs",
+    "name": "Zivilyn (DLCS)",
+    "alignment": "Neutral",
+    "favoredWeapon": "Quarterstaff",
+    "domains": [
+      "Insight",
+      "Knowledge",
+      "Meditation"
+    ]
+  },
+  {
+    "id": "chemosh_dlcs",
+    "name": "Chemosh (DLCS)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Sickle",
+    "domains": [
+      "Death",
+      "Evil",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "hiddukel_dlcs",
+    "name": "Hiddukel (DLCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Dagger",
+    "domains": [
+      "Evil",
+      "Treachery",
+      "Trickery"
+    ]
+  },
+  {
+    "id": "morgion_dlcs",
+    "name": "Morgion (DLCS)",
+    "alignment": "Neutral Evil",
+    "favoredWeapon": "Flail, Heavy",
+    "domains": [
+      "Destruction",
+      "Evil",
+      "Pestilence"
+    ]
+  },
+  {
+    "id": "nuitari_dlcs",
+    "name": "Nuitari (DLCS)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "sargonas_dlcs",
+    "name": "Sargonas (DLCS)",
+    "alignment": "Lawful Evil",
+    "favoredWeapon": "Greataxe",
+    "domains": [
+      "Evil",
+      "Fire",
+      "Law",
+      "War"
+    ]
+  },
+  {
+    "id": "zeboim_dlcs",
+    "name": "Zeboim (DLCS)",
+    "alignment": "Chaotic Evil",
+    "favoredWeapon": "Trident",
+    "domains": [
+      "Chaos",
+      "Evil",
+      "Storm",
+      "Water"
+    ]
+  },
+  {
+    "id": "__end_of_deity_marker",
+    "name": "--End of Deity Marker",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "0",
+    "name": "0",
+    "alignment": "2",
+    "favoredWeapon": "10",
+    "domains": []
+  },
+  {
+    "id": "domain",
+    "name": "Domain",
+    "alignment": "Ability",
+    "favoredWeapon": "Spell 8",
+    "domains": []
+  },
+  {
+    "id": "no",
+    "name": "No",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "variant_you_can_spontaneously_cast_lesser_restoration,_restoration,_or_greater_restoration",
+    "name": "(Variant) You can spontaneously cast Lesser Restoration, Restoration, or Greater Restoration",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "lawful_good",
+    "name": "Lawful Good",
+    "alignment": "Lawful Neutral",
+    "favoredWeapon": "Used to help build barred list",
+    "domains": []
+  },
+  {
+    "id": "1",
+    "name": "1",
+    "alignment": "True",
+    "favoredWeapon": "Barred from casting spells with specified descriptor",
+    "domains": []
+  },
+  {
+    "id": "law",
+    "name": "Law",
+    "alignment": "Chaos",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "lawful",
+    "name": "Lawful",
+    "alignment": "Chaotic",
+    "favoredWeapon": "Domains granted by class levels",
+    "domains": []
+  },
+  {
+    "id": "2",
+    "name": "2",
+    "alignment": "11",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "3",
+    "name": "3",
+    "alignment": "17",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "4",
+    "name": "4",
+    "alignment": "23",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "5",
+    "name": "5",
+    "alignment": "35",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "6",
+    "name": "6",
+    "alignment": "41",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "7",
+    "name": "7",
+    "alignment": "46",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "8",
+    "name": "8",
+    "alignment": "51",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "9",
+    "name": "9",
+    "alignment": "56",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "10",
+    "name": "10",
+    "alignment": "64",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "11",
+    "name": "11",
+    "alignment": "74",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "12",
+    "name": "12",
+    "alignment": "78",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "13",
+    "name": "13",
+    "alignment": "83",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "14",
+    "name": "14",
+    "alignment": "89",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "15",
+    "name": "15",
+    "alignment": "95",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "16",
+    "name": "16",
+    "alignment": "106",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "17",
+    "name": "17",
+    "alignment": "115",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "18",
+    "name": "18",
+    "alignment": "119",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "19",
+    "name": "19",
+    "alignment": "126",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "20",
+    "name": "20",
+    "alignment": "135",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "21",
+    "name": "21",
+    "alignment": "139",
+    "favoredWeapon": "None",
+    "domains": [
+      "Air",
+      "Animal",
+      "Chaos",
+      "Death",
+      "Destruction",
+      "Earth",
+      "Evil",
+      "Fire",
+      "Good",
+      "Healing",
+      "Knowledge",
+      "Law",
+      "Luck",
+      "Magic",
+      "Plant",
+      "Protection",
+      "Strength",
+      "Sun",
+      "Travel",
+      "Trickery",
+      "War",
+      "Water"
+    ]
+  },
+  {
+    "id": "22",
+    "name": "22",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "23",
+    "name": "23",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "24",
+    "name": "24",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "25",
+    "name": "25",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "26",
+    "name": "26",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "27",
+    "name": "27",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "28",
+    "name": "28",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "29",
+    "name": "29",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "30",
+    "name": "30",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "31",
+    "name": "31",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "32",
+    "name": "32",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "33",
+    "name": "33",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "34",
+    "name": "34",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "35",
+    "name": "35",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "36",
+    "name": "36",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "37",
+    "name": "37",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "38",
+    "name": "38",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "39",
+    "name": "39",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "40",
+    "name": "40",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "41",
+    "name": "41",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "42",
+    "name": "42",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "43",
+    "name": "43",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "44",
+    "name": "44",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "45",
+    "name": "45",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "46",
+    "name": "46",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "47",
+    "name": "47",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "48",
+    "name": "48",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "49",
+    "name": "49",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "50",
+    "name": "50",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "51",
+    "name": "51",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "52",
+    "name": "52",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "53",
+    "name": "53",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "54",
+    "name": "54",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "55",
+    "name": "55",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "56",
+    "name": "56",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "57",
+    "name": "57",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "58",
+    "name": "58",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "59",
+    "name": "59",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "60",
+    "name": "60",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "61",
+    "name": "61",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "62",
+    "name": "62",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "63",
+    "name": "63",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "64",
+    "name": "64",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "65",
+    "name": "65",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "66",
+    "name": "66",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "67",
+    "name": "67",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "68",
+    "name": "68",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "69",
+    "name": "69",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "70",
+    "name": "70",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "71",
+    "name": "71",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "72",
+    "name": "72",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "73",
+    "name": "73",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "74",
+    "name": "74",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "75",
+    "name": "75",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "76",
+    "name": "76",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "77",
+    "name": "77",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "78",
+    "name": "78",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "79",
+    "name": "79",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "80",
+    "name": "80",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "81",
+    "name": "81",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "82",
+    "name": "82",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "83",
+    "name": "83",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "84",
+    "name": "84",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "85",
+    "name": "85",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "86",
+    "name": "86",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "87",
+    "name": "87",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "88",
+    "name": "88",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "89",
+    "name": "89",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "90",
+    "name": "90",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "91",
+    "name": "91",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "92",
+    "name": "92",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "93",
+    "name": "93",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "94",
+    "name": "94",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "95",
+    "name": "95",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "96",
+    "name": "96",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "97",
+    "name": "97",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "98",
+    "name": "98",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "99",
+    "name": "99",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "100",
+    "name": "100",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "101",
+    "name": "101",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "102",
+    "name": "102",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "103",
+    "name": "103",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "104",
+    "name": "104",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "105",
+    "name": "105",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "106",
+    "name": "106",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "107",
+    "name": "107",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "108",
+    "name": "108",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "109",
+    "name": "109",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "110",
+    "name": "110",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "111",
+    "name": "111",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "112",
+    "name": "112",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "113",
+    "name": "113",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "114",
+    "name": "114",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "115",
+    "name": "115",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "116",
+    "name": "116",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "117",
+    "name": "117",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "118",
+    "name": "118",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "119",
+    "name": "119",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "120",
+    "name": "120",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "121",
+    "name": "121",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "122",
+    "name": "122",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "123",
+    "name": "123",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "124",
+    "name": "124",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "125",
+    "name": "125",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "126",
+    "name": "126",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "127",
+    "name": "127",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "128",
+    "name": "128",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "129",
+    "name": "129",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "130",
+    "name": "130",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "131",
+    "name": "131",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "132",
+    "name": "132",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "133",
+    "name": "133",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "134",
+    "name": "134",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "135",
+    "name": "135",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "136",
+    "name": "136",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "137",
+    "name": "137",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "138",
+    "name": "138",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "139",
+    "name": "139",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "140",
+    "name": "140",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "141",
+    "name": "141",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "142",
+    "name": "142",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "143",
+    "name": "143",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "144",
+    "name": "144",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "145",
+    "name": "145",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "146",
+    "name": "146",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "147",
+    "name": "147",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "148",
+    "name": "148",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "149",
+    "name": "149",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "150",
+    "name": "150",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "151",
+    "name": "151",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "152",
+    "name": "152",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "153",
+    "name": "153",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "154",
+    "name": "154",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "155",
+    "name": "155",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "156",
+    "name": "156",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "157",
+    "name": "157",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "158",
+    "name": "158",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "159",
+    "name": "159",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "160",
+    "name": "160",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "161",
+    "name": "161",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "162",
+    "name": "162",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "163",
+    "name": "163",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "164",
+    "name": "164",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "165",
+    "name": "165",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "166",
+    "name": "166",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "167",
+    "name": "167",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "168",
+    "name": "168",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "169",
+    "name": "169",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "170",
+    "name": "170",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "171",
+    "name": "171",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "172",
+    "name": "172",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "173",
+    "name": "173",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "174",
+    "name": "174",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "175",
+    "name": "175",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "176",
+    "name": "176",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "177",
+    "name": "177",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "178",
+    "name": "178",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "179",
+    "name": "179",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "180",
+    "name": "180",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "181",
+    "name": "181",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "182",
+    "name": "182",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "183",
+    "name": "183",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  },
+  {
+    "id": "184",
+    "name": "184",
+    "alignment": "Neutral",
+    "favoredWeapon": "None",
+    "domains": []
+  }
+]

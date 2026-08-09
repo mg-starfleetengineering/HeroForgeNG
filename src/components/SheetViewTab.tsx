@@ -1,5 +1,5 @@
 import React from 'react';
-import { CharacterState, RaceData, ClassData, WeaponData, Equipment, TraitData, FlawData, TemplateData } from '../types/character';
+import { CharacterState, RaceData, ClassData, WeaponData, Equipment, TraitData, FlawData, TemplateData, DomainData, DeityData } from '../types/character';
 import {
   calculateTotalScore,
   getAbilityMod,
@@ -32,6 +32,8 @@ interface SheetViewTabProps {
   templatesData?: TemplateData[];
   traitsData?: TraitData[];
   flawsData?: FlawData[];
+  domainsData?: DomainData[];
+  deitiesData?: DeityData[];
 }
 
 export const SheetViewTab: React.FC<SheetViewTabProps> = ({
@@ -41,7 +43,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   weaponsData,
   templatesData = [],
   traitsData = [],
-  flawsData = []
+  flawsData = [],
+  domainsData = [],
+  deitiesData = []
 }) => {
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
   const templateObj: Partial<TemplateData> | undefined = templatesData.find(t => t.name === character.selectedTemplate || t.id === character.selectedTemplate);
@@ -441,6 +445,21 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                 )}
                 {selectedFlaws.length > 0 && (
                   <p><span className="font-bold text-slate-900 font-sans">Flaws:</span> {selectedFlaws.join(', ')} (+{selectedFlaws.length} Feat)</p>
+                )}
+                {(character.selectedDomains || []).filter(Boolean).length > 0 && (
+                  <div className="pt-1 space-y-1 border-t border-slate-200 mt-1">
+                    <p><span className="font-bold text-slate-900 font-sans">Divine Domains:</span> {(character.selectedDomains || []).filter(Boolean).join(', ')}</p>
+                    {(character.selectedDomains || []).filter(Boolean).map(domName => {
+                      const domObj = domainsData.find(d => d.name.toLowerCase() === domName.toLowerCase() || d.id === domName.toLowerCase());
+                      if (!domObj) return null;
+                      return (
+                        <div key={domObj.id} className="text-[10px] bg-slate-100 p-1.5 rounded border border-slate-200">
+                          <span className="font-bold text-slate-900">{domObj.name} Domain Power:</span>{' '}
+                          <span className="text-slate-700">{domObj.power}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
                 <p><span className="font-bold text-slate-900 font-sans">Feats:</span> {(character.selectedFeats || []).join(', ') || 'None selected.'}</p>
               </div>

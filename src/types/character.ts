@@ -155,6 +155,7 @@ export interface CharacterState {
   selectedFlaws?: string[];
   selectedSkillTricks?: string[];
   selectedTemplate?: string;
+  selectedDomains?: string[];
 }
 
 export interface TemplateData {
@@ -307,3 +308,20 @@ export interface FeatData {
   description: string;
   source?: string;
 }
+
+export interface DomainData {
+  id: string;
+  name: string;
+  power: string;
+  spells: string[];
+  source?: string;
+}
+
+export interface DeityData {
+  id: string;
+  name: string;
+  alignment: string;
+  favoredWeapon: string;
+  domains: string[];
+}
+

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CharacterState, RaceData, ClassData, WeaponData, FeatData, TraitData, FlawData, SkillTrickData, TemplateData } from './types/character';
+import { CharacterState, RaceData, ClassData, WeaponData, FeatData, TraitData, FlawData, SkillTrickData, TemplateData, DomainData, DeityData } from './types/character';
 import { Header } from './components/Header';
 import { StatsTab } from './components/StatsTab';
 import { RaceClassTab } from './components/RaceClassTab';
@@ -21,6 +21,7 @@ const DEFAULT_CHARACTER: CharacterState = {
   player: 'Shadow',
   alignment: 'True Neutral',
   deity: 'Pelor',
+  selectedDomains: ['Good', 'Sun'],
   pointBuyTarget: '32',
   baseStats: { str: 14, dex: 12, con: 14, int: 10, wis: 10, cha: 14 },
   enhancementMods: { str: 0, dex: 0, con: 0, int: 0, wis: 0, cha: 0 },
@@ -129,6 +130,8 @@ export const App: React.FC = () => {
   const [flawsData, setFlawsData] = useState<FlawData[]>([]);
   const [skillTricksData, setSkillTricksData] = useState<SkillTrickData[]>([]);
   const [templatesData, setTemplatesData] = useState<TemplateData[]>([]);
+  const [domainsData, setDomainsData] = useState<DomainData[]>([]);
+  const [deitiesData, setDeitiesData] = useState<DeityData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -140,8 +143,10 @@ export const App: React.FC = () => {
       fetch('./data/traits.json').then(res => res.json()),
       fetch('./data/flaws.json').then(res => res.json()),
       fetch('./data/skill_tricks.json').then(res => res.json()),
-      fetch('./data/templates.json').then(res => res.json())
-    ]).then(([races, classes, weapons, feats, traits, flaws, tricks, templates]) => {
+      fetch('./data/templates.json').then(res => res.json()),
+      fetch('./data/domains.json').then(res => res.json()),
+      fetch('./data/deities.json').then(res => res.json())
+    ]).then(([races, classes, weapons, feats, traits, flaws, tricks, templates, domains, deities]) => {
       setRacesData(races);
       setClassesData(classes);
       setWeaponsData(weapons);
@@ -150,6 +155,8 @@ export const App: React.FC = () => {
       setFlawsData(flaws);
       setSkillTricksData(tricks);
       setTemplatesData(templates);
+      setDomainsData(domains);
+      setDeitiesData(deities);
       setLoading(false);
     }).catch(err => {
       console.error('Failed to load HeroForge JSON data:', err);
@@ -324,17 +331,17 @@ export const App: React.FC = () => {
         {/* Tab Views */}
         <div className="print:hidden">
           {activeTab === 'stats' && <StatsTab character={character} racesData={racesData} onChange={updateCharacter} />}
-          {activeTab === 'race-class' && <RaceClassTab character={character} racesData={racesData} classesData={classesData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} onChange={updateCharacter} />}
+          {activeTab === 'race-class' && <RaceClassTab character={character} racesData={racesData} classesData={classesData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} deitiesData={deitiesData} domainsData={domainsData} onChange={updateCharacter} />}
           {activeTab === 'skills' && <SkillsTab character={character} racesData={racesData} classesData={classesData} traitsData={traitsData} flawsData={flawsData} skillTricksData={skillTricksData} onChange={updateCharacter} />}
           {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} classesData={classesData} racesData={racesData} onChange={updateCharacter} />}
           {activeTab === 'equipment' && <EquipmentTab character={character} weaponsData={weaponsData} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
-          {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} racesData={racesData} />}
+          {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} racesData={racesData} domainsData={domainsData} deitiesData={deitiesData} onChange={updateCharacter} />}
           {activeTab === 'auras' && <AurasTab character={character} onChange={updateCharacter} />}
           {activeTab === 'sources' && <SourceBooksTab character={character} onChange={updateCharacter} />}
           {activeTab === 'notes' && <NotesTab character={character} onChange={updateCharacter} />}
         </div>
         <div className={activeTab === 'sheet' ? 'block' : 'hidden print:block'}>
-          <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} />
+          <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} domainsData={domainsData} deitiesData={deitiesData} />
         </div>
       </main>
 
