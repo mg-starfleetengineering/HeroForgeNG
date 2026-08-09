@@ -9,7 +9,8 @@ import {
   calculateTraitFlawHpPerLevel,
   calculateTraitFlawAcMod,
   calculateTraitFlawInitiativeMod,
-  calculateTotalSpeed
+  calculateTotalSpeed,
+  calculateTraitFlawSkillMods
 } from '../engine/stats';
 import { calculateBAB, calculateBaseSave, calculateTotalHP } from '../engine/classes';
 import {
@@ -17,6 +18,11 @@ import {
   calculateCarryingCapacity, calculateCoinWeight, calculateTotalNetWorthGP,
   calculateTotalCarriedWeight, getEncumbranceStatus
 } from '../engine/equipment';
+import {
+  getAvailableSkills,
+  isClassSkillForCharacter,
+  calculatePerceptionStats
+} from '../engine/skills';
 
 interface SheetViewTabProps {
   character: CharacterState;
@@ -97,6 +103,36 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
   const customWeapons = character.customWeapons || [];
   const customArmors = character.customArmors || [];
+
+  const usePathfinder = !!character.usePathfinderPerception;
+  const traitFlawSkillMods = calculateTraitFlawSkillMods(selectedTraits, selectedFlaws, traitsData, flawsData, usePathfinder);
+  const activeSkills = getAvailableSkills(usePathfinder);
+
+  const calculatedSkills = activeSkills.map(skill => {
+    const isClass = isClassSkillForCharacter(skill.name, character.levelProgression, classesData);
+    const ranks = (character.skillRanks || {})[skill.name] || 0;
+    const abilityScore = calculateTotalScore(skill.keyAbility, character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+    const abMod = getAbilityMod(abilityScore);
+    const tfSkillMod = traitFlawSkillMods[skill.name] || 0;
+
+    let totalMod = Math.floor(ranks) + abMod + tfSkillMod;
+    if (skill.name === 'Perception') {
+      const percStats = calculatePerceptionStats(character, classesData, abMod);
+      totalMod = percStats.totalBonus + tfSkillMod;
+    }
+
+    return {
+      name: skill.name,
+      keyAbility: skill.keyAbility.toUpperCase(),
+      isClass,
+      ranks,
+      totalMod
+    };
+  });
+
+  const halfIndex = Math.ceil(calculatedSkills.length / 2);
+  const leftSkills = calculatedSkills.slice(0, halfIndex);
+  const rightSkills = calculatedSkills.slice(halfIndex);
 
   const armorObj = resolveArmor(eq.armor, customArmors);
   const shieldObj = resolveShield(eq.shield, customArmors);
@@ -433,7 +469,101 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
           </div>
         </div>
 
-        {/* Page 2: Inventory, Currency & Carrying Capacity Section */}
+        {/* Page 2: Character Skills & Skill Tricks Section */}
+        <div className="space-y-3 print-page-break-before">
+          <div className="hidden print:block">
+            {renderHeader()}
+          </div>
+
+          <div className="border border-slate-300 rounded-lg p-3.5 bg-slate-50 space-y-3 print:break-inside-avoid">
+            <div className="flex items-center justify-between border-b border-slate-300 pb-1">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                Skills & Skill Modifiers
+              </h3>
+              {usePathfinder && (
+                <span className="text-[10px] text-amber-700 font-sans font-semibold uppercase">
+                  Pathfinder Perception Active
+                </span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-4 text-xs">
+              {/* Left Skills Table */}
+              <table className="w-full text-left border-collapse font-mono text-[11px]">
+                <thead>
+                  <tr className="border-b border-slate-300 text-slate-500 uppercase font-sans font-bold text-[10px]">
+                    <th className="py-1 px-1 text-center w-8">Type</th>
+                    <th className="py-1 px-1">Skill Name</th>
+                    <th className="py-1 px-1 text-center w-8">Key</th>
+                    <th className="py-1 px-1 text-center w-12">Ranks</th>
+                    <th className="py-1 px-1 text-right w-12">Mod</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {leftSkills.map(sk => (
+                    <tr key={sk.name}>
+                      <td className="py-0.5 px-1 text-center">
+                        {sk.isClass ? (
+                          <span className="font-bold text-[9px] text-slate-900 bg-slate-200 px-1 rounded">C</span>
+                        ) : (
+                          <span className="text-[9px] text-slate-400">-</span>
+                        )}
+                      </td>
+                      <td className="py-0.5 px-1 font-sans font-semibold text-slate-900">{sk.name}</td>
+                      <td className="py-0.5 px-1 text-center text-slate-600 text-[10px]">{sk.keyAbility}</td>
+                      <td className="py-0.5 px-1 text-center text-slate-700">{sk.ranks > 0 ? sk.ranks : '-'}</td>
+                      <td className="py-0.5 px-1 text-right font-bold text-slate-900">
+                        {sk.totalMod >= 0 ? `+${sk.totalMod}` : sk.totalMod}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Right Skills Table */}
+              <table className="w-full text-left border-collapse font-mono text-[11px]">
+                <thead>
+                  <tr className="border-b border-slate-300 text-slate-500 uppercase font-sans font-bold text-[10px]">
+                    <th className="py-1 px-1 text-center w-8">Type</th>
+                    <th className="py-1 px-1">Skill Name</th>
+                    <th className="py-1 px-1 text-center w-8">Key</th>
+                    <th className="py-1 px-1 text-center w-12">Ranks</th>
+                    <th className="py-1 px-1 text-right w-12">Mod</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {rightSkills.map(sk => (
+                    <tr key={sk.name}>
+                      <td className="py-0.5 px-1 text-center">
+                        {sk.isClass ? (
+                          <span className="font-bold text-[9px] text-slate-900 bg-slate-200 px-1 rounded">C</span>
+                        ) : (
+                          <span className="text-[9px] text-slate-400">-</span>
+                        )}
+                      </td>
+                      <td className="py-0.5 px-1 font-sans font-semibold text-slate-900">{sk.name}</td>
+                      <td className="py-0.5 px-1 text-center text-slate-600 text-[10px]">{sk.keyAbility}</td>
+                      <td className="py-0.5 px-1 text-center text-slate-700">{sk.ranks > 0 ? sk.ranks : '-'}</td>
+                      <td className="py-0.5 px-1 text-right font-bold text-slate-900">
+                        {sk.totalMod >= 0 ? `+${sk.totalMod}` : sk.totalMod}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Selected Skill Tricks Sub-block */}
+            {(character.selectedSkillTricks || []).length > 0 && (
+              <div className="pt-2 border-t border-slate-300 text-xs font-mono space-y-1">
+                <span className="font-bold text-slate-900 font-sans block">Acquired Skill Tricks:</span>
+                <p className="text-slate-700 text-[11px]">{character.selectedSkillTricks.join(', ')}</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Page 3: Inventory, Currency & Carrying Capacity Section */}
         <div className="space-y-3 print-page-break-before">
           <div className="hidden print:block">
             {renderHeader()}
@@ -510,7 +640,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
           </div>
         </div>
 
-        {/* Page 3: Backstory & Campaign Notes Section */}
+        {/* Page 4: Backstory & Campaign Notes Section */}
         {character.notes && (character.notes.backstory || character.notes.appearance || (character.notes.quests || []).length > 0) && (
           <div className="space-y-3 print-page-break-before">
             <div className="hidden print:block">
