@@ -1,0 +1,2687 @@
+[
+  {
+    "id": "air",
+    "name": "Air",
+    "power": "You can turn or destroy earth creatures; rebuke, command, or bolster air creatures 0 times per day as a Supernatural Ability.",
+    "spells": [
+      "Obscuring Mist",
+      "Wind Wall",
+      "Gaseous Form",
+      "Air Walk",
+      "Control Winds",
+      "Chain Lightning",
+      "Control Weather",
+      "Whirlwind",
+      "Elemental Swarm"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "animal",
+    "name": "Animal",
+    "power": "You can use speak with animals once per day as a spell-like ability.  Knowledge (nature) has been added to your list of cleric class skills.",
+    "spells": [
+      "Calm Animals",
+      "Hold Animal",
+      "Dominate Animal",
+      "Summon Nature's Ally IV",
+      "Commune with Nature",
+      "Antilife Shell",
+      "Animal Shapes",
+      "Summon Nature's Ally VIII",
+      "Shapechange"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "chaos",
+    "name": "Chaos",
+    "power": "You cast chaos spells at +1 caster level.",
+    "spells": [
+      "Protection from Law",
+      "Shatter",
+      "Magic Circle against Law",
+      "Chaos Hammer",
+      "Dispel Law",
+      "Animate Objects",
+      "Word of Chaos",
+      "Cloak of Chaos",
+      "Summon Monster IX"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "death",
+    "name": "Death",
+    "power": "You may use death touch once per day.  If you touch your victim, roll 0d6.  If this at least equals the victim's hit points, it dies.",
+    "spells": [
+      "Cause Fear",
+      "Death Knell",
+      "Animate Dead",
+      "Death Ward",
+      "Slay Living",
+      "Create Undead",
+      "Destruction",
+      "Create Greater Undead",
+      "Wail of the Banshee"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "destruction",
+    "name": "Destruction",
+    "power": "You can smite an opponent once per day, gaining a +4 bonus to your attack and +0 to damage.",
+    "spells": [
+      "Inflict Light Wounds",
+      "Shatter",
+      "Contagion",
+      "Inflict Critical Wounds",
+      "Inflict Light Wounds, Mass",
+      "Harm",
+      "Disintegrate",
+      "Earthquake",
+      "Implosion"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "earth",
+    "name": "Earth",
+    "power": "You can turn or destroy air creatures; rebuke, command, or bolster earth creatures 0 times per day as a Supernatural Ability.",
+    "spells": [
+      "Magic Stone",
+      "Soften Earth and Stone",
+      "Stone Shape",
+      "Spike Stones",
+      "Wall of Stone",
+      "Stoneskin",
+      "Earthquake",
+      "Iron Body",
+      "Elemental Swarm"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "evil",
+    "name": "Evil",
+    "power": "You cast evil spells at +1 caster level.",
+    "spells": [
+      "Protection from Good",
+      "Desecrate",
+      "Magic Circle against Good",
+      "Unholy Blight",
+      "Dispel Good",
+      "Create Undead",
+      "Blasphemy",
+      "Unholy Aura",
+      "Summon Monster IX"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "fire",
+    "name": "Fire",
+    "power": "You can turn or destroy water creatures; rebuke, command, or bolster fire creatures 0 times per day as a Supernatural Ability.",
+    "spells": [
+      "Burning Hands",
+      "Produce Flame",
+      "Resist Energy",
+      "Wall of Fire",
+      "Fire Shield",
+      "Fire Seeds",
+      "Fire Storm",
+      "Incendiary Cloud",
+      "Elemental Swarm"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "good",
+    "name": "Good",
+    "power": "You cast good spells at +1 caster level.",
+    "spells": [
+      "Protection from Evil",
+      "Aid",
+      "Magic Circle against Evil",
+      "Holy Smite",
+      "Dispel Evil",
+      "Blade Barrier",
+      "Holy Word",
+      "Holy Aura",
+      "Summon Monster IX"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "healing",
+    "name": "Healing",
+    "power": "You cast healing spells at +1 caster level.",
+    "spells": [
+      "Cure Light Wounds",
+      "Cure Moderate Wounds",
+      "Cure Serious Wounds",
+      "Cure Critical Wounds",
+      "Cure Light Wounds, Mass",
+      "Heal",
+      "Regenerate",
+      "Cure Critical Wounds, Mass",
+      "Heal, Mass"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "knowledge",
+    "name": "Knowledge",
+    "power": "All Knowledge skills have been added to your list of cleric class skills.  You cast divination spells at +1 caster level.",
+    "spells": [
+      "Detect Secret Doors",
+      "Detect Thoughts",
+      "Clairaudience/Clairvoyance",
+      "Divination",
+      "True Seeing",
+      "Find the Path",
+      "Legend Lore",
+      "Discern Location",
+      "Foresight"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "law",
+    "name": "Law",
+    "power": "You cast law spells at +1 caster level.",
+    "spells": [
+      "Protection from Chaos",
+      "Calm Emotions",
+      "Magic Circle against Chaos",
+      "Order's Wrath",
+      "Dispel Chaos",
+      "Hold Monster",
+      "Dictum",
+      "Shield of Law",
+      "Summon Monster IX"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "luck",
+    "name": "Luck",
+    "power": "You have good fortune, useable once per day.  When you use this ability, you may reroll any one roll that you have just made.  You must abide by the new roll.",
+    "spells": [
+      "Entropic Shield",
+      "Aid",
+      "Protection from Energy",
+      "Freedom of Movement",
+      "Break Enchantment",
+      "Mislead",
+      "Spell Turning",
+      "Moment of Prescience",
+      "Miracle"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "magic",
+    "name": "Magic",
+    "power": "You use spell completion or spell trigger devices as a 0-level wizard.",
+    "spells": [
+      "Nystul's Magic Aura",
+      "Identify",
+      "Dispel Magic",
+      "Imbue with Spell Ability",
+      "Spell Resistance",
+      "Antimagic Field",
+      "Spell Turning",
+      "Protection from Spells",
+      "Mordenkainen's Disjunction"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "plant",
+    "name": "Plant",
+    "power": "Rebuke or command plant creatures as an evil cleric rebukes or commands undead. 0 times per day as a supernatural ability. Knowledge (nature) has been added to your list of cleric class skills.",
+    "spells": [
+      "Entangle",
+      "Barkskin",
+      "Plant Growth",
+      "Command Plants",
+      "Wall of Thorns",
+      "Repel Wood",
+      "Animate Plants",
+      "Control Plants",
+      "Shambler"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "protection",
+    "name": "Protection",
+    "power": "You can generate a protective ward once per day, granting the person you touch a +0 resistance bonus to their next saving throw, if it is made within an hour.",
+    "spells": [
+      "Sanctuary",
+      "Shield Other",
+      "Protection from Energy",
+      "Spell Immunity",
+      "Spell Resistance",
+      "Antimagic Field",
+      "Repulsion",
+      "Mind Blank",
+      "Prismatic Sphere"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "strength",
+    "name": "Strength",
+    "power": "You can perform a feat of strength once per day, adding +0 to your Strength score for one round as a free action.",
+    "spells": [
+      "Enlarge Person",
+      "Bull's Strength",
+      "Magic Vestment",
+      "Spell Immunity",
+      "Righteous Might",
+      "Stoneskin",
+      "Bigby's Grasping Hand",
+      "Bigby's Clenched Fist",
+      "Bigby's Crushing Hand"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "sun",
+    "name": "Sun",
+    "power": "Once per day, you can perform a greater turning in place of a regular turning attempt.  Any undead affected by this are destroyed instead of turned or rebuked.",
+    "spells": [
+      "Endure Elements",
+      "Heat Metal",
+      "Searing Light",
+      "Fire Shield",
+      "Flame Strike",
+      "Fire Seeds",
+      "Sunbeam",
+      "Sunburst",
+      "Prismatic Sphere"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "travel",
+    "name": "Travel",
+    "power": "For 0 round per day, you can ignore all magical effects which hamper movement and mobility.  Survival added to your list of cleric class skills.",
+    "spells": [
+      "Longstrider",
+      "Locate Object",
+      "Fly",
+      "Dimension Door",
+      "Teleport",
+      "Find the Path",
+      "Teleport, Greater",
+      "Phase Door",
+      "Astral Projection"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "trickery",
+    "name": "Trickery",
+    "power": "Bluff, Disguise, and Hide have been added to your list of cleric class skills.",
+    "spells": [
+      "Disguise Self",
+      "Invisibility",
+      "Nondetection",
+      "Confusion",
+      "False Vision",
+      "Mislead",
+      "Screen",
+      "Polymorph Any Object",
+      "Time Stop"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "war",
+    "name": "War",
+    "power": "Free Martial Weapon Proficiency (if necessary) and Weapon Focus with your deities favored weapon.",
+    "spells": [
+      "Magic Weapon",
+      "Spiritual Weapon",
+      "Magic Vestment",
+      "Divine Power",
+      "Flame Strike",
+      "Blade Barrier",
+      "Power Word Blind",
+      "Power Word Stun",
+      "Power Word Kill"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "water",
+    "name": "Water",
+    "power": "You can turn or destroy fire creatures; rebuke, command, or bolster water creatures 0 times per day as a Supernatural Ability.",
+    "spells": [
+      "Obscuring Mist",
+      "Fog Cloud",
+      "Water Breathing",
+      "Control Water",
+      "Ice Storm",
+      "Cone of Cold",
+      "Acid Fog",
+      "Horrid Wilting",
+      "Elemental Swarm"
+    ],
+    "source": "PHB"
+  },
+  {
+    "id": "bestial",
+    "name": "Bestial",
+    "power": "Character gains the Scent extraordinary ability.",
+    "spells": [
+      "Magic Fang",
+      "Bull's Strength",
+      "Magic Fang, Greater",
+      "Claws of the Savage",
+      "Charm Monster",
+      "Hold Monster",
+      "Whirlwind of Teeth",
+      "Spread of Savagery",
+      "Were-doom"
+    ],
+    "source": "VD"
+  },
+  {
+    "id": "demonic",
+    "name": "Demonic",
+    "power": "Character gains +1 divine bonus on attack and damage rolls for unarmed attacks and attacks with natural weapons.",
+    "spells": [
+      "Demonflesh",
+      "Demoncall",
+      "Demon Wings",
+      "Dimensional Anchor",
+      "Planar Binding, Lesser",
+      "Planar Binding",
+      "Fiendish Clarity",
+      "Utterdark",
+      "Gate"
+    ],
+    "source": "VD"
+  },
+  {
+    "id": "diabolic",
+    "name": "Diabolic",
+    "power": "Once per day, character can add her class level as a bonus on a Bluff, Diplomacy, Intimidate or Sense Motive check.",
+    "spells": [
+      "Devil's Tail",
+      "Devil's Eye",
+      "Devil's Ego",
+      "Hellfire",
+      "Planar Binding, Lesser",
+      "Planar Binding",
+      "Hellfire Storm",
+      "Demand",
+      "Gate"
+    ],
+    "source": "VD"
+  },
+  {
+    "id": "pain",
+    "name": "Pain",
+    "power": "Character converts damage that he deals in one blow per day into healing for himself, up to 1  point of damage per level.",
+    "spells": [
+      "Angry Ache",
+      "Sadism",
+      "Wrack",
+      "Liquid Pain",
+      "Thousand Needles",
+      "Pox",
+      "Wave of Pain",
+      "Symbol",
+      "Eternity of Torture"
+    ],
+    "source": "VD"
+  },
+  {
+    "id": "celestial",
+    "name": "Celestial",
+    "power": "You can smite evil once per day, gaining a +4 bonus to your attack and +0 to damage.",
+    "spells": [
+      "Vision of Heaven",
+      "Consecrate",
+      "Blessed Sight",
+      "Planar Ally, Lesser",
+      "Heavenly Lightning",
+      "Call Faithful Servants",
+      "Heavenly Lightning Storm",
+      "Holy Aura",
+      "Gate"
+    ],
+    "source": "ED"
+  },
+  {
+    "id": "endurance",
+    "name": "Endurance",
+    "power": "You can perform a feat of endurance once per day, adding +0 to your Constitution score for one minute as a free action.",
+    "spells": [
+      "Endure Elements",
+      "Bear's Endurance",
+      "Refreshment",
+      "Sustain",
+      "Stoneskin",
+      "Bear's Endurance, Mass",
+      "Globe of Invulnerability",
+      "Spell Turning",
+      "Iron Body"
+    ],
+    "source": "ED"
+  },
+  {
+    "id": "fey",
+    "name": "Fey",
+    "power": "Gain a +4 bonus on saving throws against the spell-like abilities of feys.",
+    "spells": [
+      "Faerie Fire",
+      "Charm Person",
+      "Inspired Aim",
+      "Blinding Beauty",
+      "Tree Stride",
+      "Heroes' Feast",
+      "Liveoak",
+      "Unearthly Beauty",
+      "Summon Nature's Ally IX"
+    ],
+    "source": "ED"
+  },
+  {
+    "id": "herald",
+    "name": "Herald",
+    "power": "Intimidate is a class skill.  You gain a +4 sacred bonus on Diplomacy and Intimidate checks.",
+    "spells": [
+      "Comprehend Languages",
+      "Enthrall",
+      "Tongues",
+      "Sending",
+      "Command, Greater",
+      "Dream",
+      "Aspect of the Deity",
+      "Crown of Glory",
+      "Visage of the Deity, Greater"
+    ],
+    "source": "ED"
+  },
+  {
+    "id": "joy",
+    "name": "Joy",
+    "power": "You gain a +4 sacred bonus on Diplomacy checks.",
+    "spells": [
+      "Vision of Heaven",
+      "Elation",
+      "Distilled Joy",
+      "Good Hope",
+      "Chaav's Laugh",
+      "Heroism, Greater",
+      "Starmantle",
+      "Sympathy",
+      "Otto's Irresistible Dance"
+    ],
+    "source": "ED"
+  },
+  {
+    "id": "pleasure",
+    "name": "Pleasure",
+    "power": "You are immune to any effect that damages or drains your Charisma.",
+    "spells": [
+      "Remove Fear",
+      "Lastai's Caress",
+      "Heart's Ease",
+      "Remove Fatigue",
+      "Eagle's Splendor, Mass",
+      "Celestial Blood",
+      "Empyreal Ecstacy",
+      "Spread of Contentment",
+      "Sublime Revelry"
+    ],
+    "source": "ED"
+  },
+  {
+    "id": "artifice",
+    "name": "Artifice",
+    "power": "Gain +4 competence bonus on Craft check.  You cast creation spells at +1 caster level.",
+    "spells": [
+      "Animate Rope",
+      "Wood Shape",
+      "Stone Shape",
+      "Minor Creation",
+      "Fabricate",
+      "Major Creation",
+      "Hardening",
+      "True Creation",
+      "Prismatic Sphere"
+    ],
+    "source": "ES"
+  },
+  {
+    "id": "commerce",
+    "name": "Commerce",
+    "power": "You gain a +10 competence bonus on Profession checks made to earn a living.  Add appraise to your list of cleric class skills.",
+    "spells": [
+      "Comprehend Languages",
+      "Zone of Truth",
+      "Tongues",
+      "Glibness",
+      "True Seeing",
+      "Leomund's Secret Chest",
+      "Refuge",
+      "Analyze Dweomer",
+      "Polymorph Any Object"
+    ],
+    "source": "ES"
+  },
+  {
+    "id": "deathless",
+    "name": "Deathless",
+    "power": "Once per day, you can perform a greater rebuking against deathless creatures in place of a regular turning attempt.  Any deathless creatures affected by this are commanded instead of rebuked.",
+    "spells": [
+      "Detect Undead",
+      "Consecrate",
+      "Halt Deathless",
+      "Spirit Steed",
+      "Hallow",
+      "Create Deathless",
+      "Control Deathless",
+      "Create Greater Deathless",
+      "Hero's Blade"
+    ],
+    "source": "ES"
+  },
+  {
+    "id": "decay",
+    "name": "Decay",
+    "power": "You may use a touch of decay once per day.  You must succeed on a melee touch attack to deal 1d4 points of Constitution damage to living creatures, or 2d6+0 damage to undead, constructs or objects.",
+    "spells": [
+      "Doom",
+      "Ray of Enfeeblement",
+      "Contagion",
+      "Enervation",
+      "Blight",
+      "Antilife Shell",
+      "Withering Palm",
+      "Horrid Wilting",
+      "Energy Drain"
+    ],
+    "source": "ES"
+  },
+  {
+    "id": "dragon_below",
+    "name": "Dragon Below",
+    "power": "You gain Augment Summoning as a bonus feat.",
+    "spells": [
+      "Cause Fear",
+      "Death Knell",
+      "Bestow Curse",
+      "Planar Ally, Lesser",
+      "Slay Living",
+      "Planar Ally",
+      "Blasphemy",
+      "Planar Ally, Greater",
+      "Gate"
+    ],
+    "source": "ES"
+  },
+  {
+    "id": "exorcism",
+    "name": "Exorcism",
+    "power": "You have the supernatural ability to force possessing spirits out of the bodies they inhabit.",
+    "spells": [
+      "Protection from Evil",
+      "Magic Circle against Evil",
+      "Remove Curse",
+      "Dismissal",
+      "Dispel Evil",
+      "Banishment",
+      "Holy Word",
+      "Holy Aura",
+      "Freedom"
+    ],
+    "source": "ES"
+  },
+  {
+    "id": "feast",
+    "name": "Feast",
+    "power": "You have immunity to ingested poisons and to diseases spread by ingestion.",
+    "spells": [
+      "Goodberry",
+      "Delay Poison",
+      "Create Food and Water",
+      "Neutralize Poison",
+      "Leomund's Secure Shelter",
+      "Heroes' Feast",
+      "Mordenkainen's Magnificent Mansion",
+      "Detoxify",
+      "Feast of Champions"
+    ],
+    "source": "ES"
+  },
+  {
+    "id": "life",
+    "name": "Life",
+    "power": "Once per day, you can grant 1d6+0 temporary hit points to a creature you touch.  These temporary hit points last for a maximum of  0 hours.",
+    "spells": [
+      "Hide from Undead",
+      "Restoration, Lesser",
+      "Plant Growth",
+      "Death Ward",
+      "Disrupting Weapon",
+      "Animate Objects",
+      "Regenerate",
+      "Animate Plants",
+      "Heal, Mass"
+    ],
+    "source": "ES"
+  },
+  {
+    "id": "meditation",
+    "name": "Meditation",
+    "power": "Once per day, you can cast one spell as though it had the Empower Spell feat applied to it.  However, you cast the spell at its normal level, not two levels higher, and use the normal casting time of the spell.  You need not know the Empower Spell feat to use this ability.",
+    "spells": [
+      "Comprehend Languages",
+      "Owl's Wisdom",
+      "Locate Object",
+      "Tongues",
+      "Spell Resistance",
+      "Find the Path",
+      "Spell Turning",
+      "Mind Blank",
+      "Astral Projection"
+    ],
+    "source": "ES"
+  },
+  {
+    "id": "necromancer",
+    "name": "Necromancer",
+    "power": "You cast necromancy spells at +1 caster level.",
+    "spells": [
+      "Ray of Enfeeblement",
+      "Command Undead",
+      "Vampiric Touch",
+      "Enervation",
+      "Waves of Fatigue",
+      "Eyebite",
+      "Control Undead",
+      "Horrid Wilting",
+      "Energy Drain"
+    ],
+    "source": "ES"
+  },
+  {
+    "id": "passion",
+    "name": "Passion",
+    "power": "For a total time per day of 0 rounds, as a free action you can act as if under the effect of the Rage spell.  This granted power is a supernatural abiity.",
+    "spells": [
+      "Cause Fear",
+      "Tasha's Hideous Laughter",
+      "Confusion",
+      "Crushing Despair",
+      "Command, Greater",
+      "Heroism, Greater",
+      "Song of Discord",
+      "Otto's Irresistable Dance",
+      "Dominate Monster"
+    ],
+    "source": "ES"
+  },
+  {
+    "id": "shadow",
+    "name": "Shadow",
+    "power": "Gain Blind-Fight as a bonus feat.",
+    "spells": [
+      "Obscuring Mist",
+      "Darkness",
+      "Deeper Darkness",
+      "Shadow Conjuration",
+      "Shadow Evocation",
+      "Shadow Walk",
+      "Shadow Conjuration, Greater",
+      "Shadow Evocation, Greater",
+      "Shades"
+    ],
+    "source": "ES"
+  },
+  {
+    "id": "weather",
+    "name": "Weather",
+    "power": "Your vision is unobstructed by nonmagical weather conditions.  Add Survival to your list of cleric class skills.  You gain a +2 bonus on all weather related Survival checks.",
+    "spells": [
+      "Obscuring Mist",
+      "Fog Cloud",
+      "Call Lightning",
+      "Sleet Storm",
+      "Call Lightning Storm",
+      "Control Winds",
+      "Control Weather",
+      "Whirlwind",
+      "Storm of Vengeance"
+    ],
+    "source": "ES"
+  },
+  {
+    "id": "winter",
+    "name": "Winter",
+    "power": "You gain a +2 Sacred bonus to all wisdom-based skills (during the winter season).",
+    "spells": [
+      "Snowsight",
+      "Snow Walk",
+      "Winter's Embrace",
+      "Ice Storm",
+      "Blizzard",
+      "Death Hail",
+      "Control Weather",
+      "Summon Giants",
+      "Fimbulwinter"
+    ],
+    "source": "FB"
+  },
+  {
+    "id": "city",
+    "name": "City",
+    "power": "Add Gather Info and Knowledge: Local to your cleric skill list.",
+    "spells": [
+      "Rooftop Strider",
+      "City Lights",
+      "Winding Alleys",
+      "Commune with City",
+      "Skyline Runner",
+      "City Stride",
+      "Urban Shield",
+      "City's Might",
+      "Animate City"
+    ],
+    "source": "RD"
+  },
+  {
+    "id": "destiny",
+    "name": "Destiny",
+    "power": "Grant a reroll (attack, save, ability check, or skill check to a willing creature (not you) within 30 ft.",
+    "spells": [
+      "Omen of Peril",
+      "Augury",
+      "Delay Death",
+      "Bestow Curse",
+      "Stalwart Pact",
+      "Warp Destiny",
+      "Bestow Curse, Greater",
+      "Moment of Prescience",
+      "Choose Destiny"
+    ],
+    "source": "RD"
+  },
+  {
+    "id": "sky",
+    "name": "Sky",
+    "power": "Fly speed improves by 5 ft.  Add Spot to your list of cleric skills",
+    "spells": [
+      "Raptor's Sight",
+      "Summon Dire Hawk",
+      "Enduring Flight",
+      "Aerial Alacrity",
+      "Control Winds",
+      "Wind Walk",
+      "Reverse Gravity",
+      "Mastery of the Sky",
+      "Summon Devoted Roc"
+    ],
+    "source": "RW"
+  },
+  {
+    "id": "repose",
+    "name": "Repose",
+    "power": "You may use death touch once per day.  If you touch your victim, roll 0d6.  If this at least equals the victim's hit points, it dies.",
+    "spells": [
+      "Deathwatch",
+      "Gentle Repose",
+      "Speak with Dead",
+      "Discern Lies",
+      "Command, Greater",
+      "Undeath to Death",
+      "Destruction",
+      "Surelife",
+      "Wail of the Banshee"
+    ],
+    "source": "SS"
+  },
+  {
+    "id": "sand",
+    "name": "Sand",
+    "power": "Once per day you can shape a small amount of sand into any solid object you can imagine, up to 8 cubic feet in volume.  This effect lasts for 0 minutes.",
+    "spells": [
+      "Waste Strider",
+      "Black Sand",
+      "Haboob",
+      "Blast of Sand",
+      "Flaywind Burst",
+      "Awaken Sand",
+      "Vitrify",
+      "Desert Binding",
+      "Summon Desert Ally IX"
+    ],
+    "source": "SS"
+  },
+  {
+    "id": "summer",
+    "name": "Summer",
+    "power": "You are considered a native of the waste for purposes of heat resistance.  During the summer season, you gain +2 bonus on al Wisdom-based skill checks.",
+    "spells": [
+      "Impede Sun's Brilliance",
+      "Sunstroke",
+      "Protection from Dessication",
+      "Skin of the Cactus",
+      "Unearthly Heat",
+      "Sunbeam",
+      "Control Weather",
+      "Sunburst",
+      "Storm of Vengeance"
+    ],
+    "source": "SS"
+  },
+  {
+    "id": "thirst",
+    "name": "Thirst",
+    "power": "Rebuke or command oozes as an evil cleric rebukes or commands undead. 2 times per day as a supernatural ability. You also gain a +2 bonus on Constitution checks to avoid dehydration.",
+    "spells": [
+      "Parching Touch",
+      "Desiccate",
+      "Torment Thirst",
+      "Dispel Water",
+      "Desiccate, Mass",
+      "Symbol of Thirst",
+      "Mephit Mob",
+      "Horrid Wilting",
+      "Energy Drain"
+    ],
+    "source": "SS"
+  },
+  {
+    "id": "corruption",
+    "name": "Corruption",
+    "power": "Once per day, make a melee touch attack to deal 0d6 damage and sicken target for 1 round.",
+    "spells": [
+      "Doom",
+      "Blindness/Deafness",
+      "Contagion",
+      "Morality Undone",
+      "Feeblemind",
+      "Pox",
+      "Insanity",
+      "Befoul",
+      "Despoil"
+    ],
+    "source": "LM"
+  },
+  {
+    "id": "vile_darkness",
+    "name": "Vile Darkness",
+    "power": "Free Blind-Fight feat.",
+    "spells": [
+      "Darkvision",
+      "Darkbolt",
+      "Deeper Darkness",
+      "Damning Darkness",
+      "Evard's Black Tentacles",
+      "Wall of Force",
+      "Shadow Walk",
+      "Utterdark",
+      "Screen"
+    ],
+    "source": "LM"
+  },
+  {
+    "id": "blackwater",
+    "name": "Blackwater",
+    "power": "You are immune to pressure damage from descending into even the greatest of oceanic depths.",
+    "spells": [
+      "Cause Fear",
+      "Pressure Sphere",
+      "Evard's Black Tentacles",
+      "Transformation of the Deeps",
+      "Blackwater Tentacle",
+      "Blackwater Taint",
+      "Dark Tide",
+      "Maelstrom",
+      "Doom of the Seas"
+    ],
+    "source": "SW"
+  },
+  {
+    "id": "seafolk",
+    "name": "Seafolk",
+    "power": "You gain Expert Swimmer or Rapid Swimming (your choice) as a bonus feat.",
+    "spells": [
+      "Quickswim",
+      "Fins to Feet",
+      "Scales of the Sealord",
+      "Siren's Call",
+      "Commune with Nature",
+      "Airy Water",
+      "Megalodon Empowerment",
+      "Depthsurge",
+      "Foresight"
+    ],
+    "source": "SW"
+  },
+  {
+    "id": "spite",
+    "name": "Spite",
+    "power": "Once per day, make a melee touch attack to deal damage equal to the damage the target dealt to you in the last round, to a mximum of 5 hp per divine caster level you possess",
+    "spells": [
+      "Bestow Wound",
+      "Rage",
+      "Vampiric Touch",
+      "Procouncement of Fate",
+      "Fire in the Blood",
+      "Cloak of Hate",
+      "Pact of Return",
+      "Mantle of Pure Spite",
+      "Imprison Soul"
+    ],
+    "source": "Heroes of Horror"
+  },
+  {
+    "id": "balance",
+    "name": "Balance",
+    "power": "Once per day, as a free action, you may add your Wisdom modifier(-1) to your Armor Class. This bonus lasts for 0 rounds.",
+    "spells": [
+      "Make Whole",
+      "Calm Emotions",
+      "Clarity of Mind",
+      "Dismissal",
+      "Sanctuary, Mass",
+      "Banishment",
+      "Word of Balance",
+      "Protection from Spells",
+      "Weighed in the Balance"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "cavern",
+    "name": "Cavern",
+    "power": "You gain the dwarf ability of stonecunning. If you already have stonecunning, your racial bonus for stonecunning increases to +4 on checks to notice unusual stonework.",
+    "spells": [
+      "Detect Secret Doors",
+      "Darkness",
+      "Meld into Stone",
+      "Leomund's Secure Shelter",
+      "Passwall",
+      "Find the Path",
+      "Maw of Stone",
+      "Earthquake",
+      "Imprisonment"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "celerity",
+    "name": "Celerity",
+    "power": "Your land speed is faster than the normal for your race by 10 ft. This benefit is lost if you are wearing medium or heavy armor or carrying a medium or heavy load.",
+    "spells": [
+      "Expeditious Retreat",
+      "Cat's Grace",
+      "Blur",
+      "Haste",
+      "Tree Stride",
+      "Wind Walk",
+      "Cat's Grace, Mass",
+      "Blink, Greater",
+      "Time Stop"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "charm",
+    "name": "Charm",
+    "power": "You can boost your Charisma by 4 points once per day.  Activating this power is a free action.  The Charisma increase lasts 1 minute.",
+    "spells": [
+      "Charm Person",
+      "Calm Emotions",
+      "Suggestion",
+      "Good Hope",
+      "Charm Monster",
+      "Geas/Quest",
+      "Insanity",
+      "Demand",
+      "Dominate Monster"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "cold",
+    "name": "Cold",
+    "power": "As a supernatural ability you can turn/destroy fire creatures and rebuke/command cold creatures 0 times per day.",
+    "spells": [
+      "Chill Touch",
+      "Chill Metal",
+      "Sleet Storm",
+      "Ice Storm",
+      "Wall of Ice",
+      "Cone of Cold",
+      "Control Weather",
+      "Polar Ray",
+      "Obedient Avalanche"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "community",
+    "name": "Community",
+    "power": "You can use the calm emotions spell as a spell-like ability once per day.  You also gain a +2 bonus on Diplomacy checks.",
+    "spells": [
+      "Bless",
+      "Status",
+      "Prayer",
+      "Tongues",
+      "Rary's Telepathic Bond",
+      "Heroes' Feast",
+      "Refuge",
+      "Morenkainen's Magnificent Mansion",
+      "Heal, Mass"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "competition",
+    "name": "Competition",
+    "power": "As an extraordinary ability you gain a +1 bonus on all opposed checks you make.",
+    "spells": [
+      "Remove Fear",
+      "Zeal",
+      "Prayer",
+      "Divine Power",
+      "Righteous Might",
+      "Zealot Pact",
+      "Regenerate",
+      "Moment of Prescience",
+      "Visage of the Deity, Greater"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "courage",
+    "name": "Courage",
+    "power": "Your radiate an aura of courage that grants all allies within 10 feet (including yourself) a +4 morale bonus on saving throws against fear effects. This supernatural ability functions while you are conscious.",
+    "spells": [
+      "Remove Fear",
+      "Aid",
+      "Cloak of Bravery",
+      "Heroism",
+      "Valiant Fury",
+      "Heroes' Feast",
+      "Heroism, Greater",
+      "Lion's Roar",
+      "Cloak of Bravery, Greater"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "craft",
+    "name": "Craft",
+    "power": "You cast Conjuration (creation) spells at +1 caster level and gain Skill Focus in the Craft skill of your choice.",
+    "spells": [
+      "Animate Rope",
+      "Wood Shape",
+      "Stone Shape",
+      "Minor Creation",
+      "Wall of Stone",
+      "Fantastic Machine",
+      "Major Creation",
+      "Forcecage",
+      "Fantastic Machine, Greater"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "creation",
+    "name": "Creation",
+    "power": "You cast Conjuration (creation) spells at +1 caster level.",
+    "spells": [
+      "Create Water",
+      "Minor Image",
+      "Create Food and Water",
+      "Minor Creation",
+      "Major Creation",
+      "Heroes' Feast",
+      "Permanent Image",
+      "True Creation",
+      "Pavilion of Grandeur"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "darkness",
+    "name": "Darkness",
+    "power": "Free Blind-Fight feat.",
+    "spells": [
+      "Obscuring Mist",
+      "Blindness/Deafness",
+      "Blacklight",
+      "Armor of Darkness",
+      "Darkbolt",
+      "Prying Eyes",
+      "Nightmare",
+      "Power Word Blind",
+      "Power Word Kill"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "deathbound",
+    "name": "Deathbound",
+    "power": "Your limit for creating undead animated with spells increases to three times your caster level instead of the normal two times caster level",
+    "spells": [
+      "Chill of the Grave",
+      "Blade of Pain and Fear",
+      "Fangs of the Vampire King",
+      "Wither Limb",
+      "Revive Undead",
+      "Awaken Undead",
+      "Avasculate",
+      "Avascular, Mass",
+      "Wail of the Banshee"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "domination",
+    "name": "Domination",
+    "power": "You gain the Spell Focus(Enchantment) Feat.",
+    "spells": [
+      "Command",
+      "Enthrall",
+      "Suggestion",
+      "Dominate Person",
+      "Command, Greater",
+      "Geas/Quest",
+      "Suggestion, Mass",
+      "True Domination",
+      "Monstrous Thrall"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "dragon",
+    "name": "Dragon",
+    "power": "Add Bluff and Intimidate to your list of cleric class skills.",
+    "spells": [
+      "Magic Fang",
+      "Resist Energy",
+      "Magic Fang, Greater",
+      "Voice of the Dragon",
+      "True Seeing",
+      "Stoneskin",
+      "Dragon Ally",
+      "Suggestion, Mass",
+      "Dominate Monster"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "dream",
+    "name": "Dream",
+    "power": "You are immune to fear effects.",
+    "spells": [
+      "Sleep",
+      "Augury",
+      "Deep Slumber",
+      "Phantasmal Killer",
+      "Nightmare",
+      "Dream Sight",
+      "Scrying, Greater",
+      "Power Word Stun",
+      "Weird"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "drow",
+    "name": "Drow",
+    "power": "Free Lightning Reflexes feat.",
+    "spells": [
+      "Cloak of Dark Power",
+      "Clairaudience/Clairvoyance",
+      "Suggestion",
+      "Discern Lies",
+      "Spiderform",
+      "Dispel Magic, Greater",
+      "Word of Chaos",
+      "Planar Ally, Greater",
+      "Gate"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "dwarf",
+    "name": "Dwarf",
+    "power": "Free Great Fortitude feat.",
+    "spells": [
+      "Magic Weapon",
+      "Bear's Endurance",
+      "Glyph of Warding",
+      "Magic Weapon, Greater",
+      "Fabricate",
+      "Stone Tell",
+      "Dictum",
+      "Protection from Spells",
+      "Elemental Swarm"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "elf",
+    "name": "Elf",
+    "power": "Free Point Blank Shot feat.",
+    "spells": [
+      "True Strike",
+      "Cat's Grace",
+      "Snare",
+      "Tree Stride",
+      "Commune with Nature",
+      "Find the Path",
+      "Liveoak",
+      "Sunburst",
+      "Antipathy"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "envy",
+    "name": "Envy",
+    "power": "Add bluff to your list of cleric class skills.  You cast spells that damage or drain ability scores or bestow negative levels at +1 caster level.",
+    "spells": [
+      "Disguise Self",
+      "Ray of Enfeeblement",
+      "Touch of Idiocy",
+      "Vampiric Touch",
+      "Crushing Despair",
+      "Magic Jar",
+      "Limited Wish",
+      "Simulacrum",
+      "Wish"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "family",
+    "name": "Family",
+    "power": "As a free action, you may choose to protect 1 creatures(including yourself) within 10 feet with a +4 dodge bonus to AC. This supernatural ability lasts for 0 rounds.",
+    "spells": [
+      "Bless",
+      "Shield Other",
+      "Helping Hand",
+      "Imbue with Spell Ability",
+      "Rary's Telepathic Bond",
+      "Heroes' Feast",
+      "Refuge",
+      "Protection from Spells",
+      "Prismatic Sphere"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "fate",
+    "name": "Fate",
+    "power": "You gain the uncanny dodge ability.  If you already have it, your cleric levels add to that class's level for determining when you gain improved uncanny dodge.",
+    "spells": [
+      "True Strike",
+      "Augury",
+      "Bestow Curse",
+      "Status",
+      "Mark of Justice",
+      "Geas/Quest",
+      "Vision",
+      "Mind Blank",
+      "Foresight"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "force",
+    "name": "Force",
+    "power": "As a supernatural ability, once per day you can reroll any damage roll and take the better of the two rolls.",
+    "spells": [
+      "Mage Armor",
+      "Magic Missile",
+      "Blast of Force",
+      "Otiluke's Resilient Sphere",
+      "Wall of Force",
+      "Repulsion",
+      "Forcecage",
+      "Otiluke's Telekinetic Sphere",
+      "Bigby's Crushing Hand"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "glory",
+    "name": "Glory",
+    "power": "Turn undead with a +2 bonus on turning check and +1d6 on the turning damage roll.",
+    "spells": [
+      "Disrupt Undead",
+      "Bless Weapon",
+      "Searing Light",
+      "Holy Smite",
+      "Holy Sword",
+      "Bolt of Glory",
+      "Sunbeam",
+      "Crown of Glory",
+      "Gate"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "gluttony",
+    "name": "Gluttony",
+    "power": "For a total time per day of 0 rounds, as a free action you can act as if under the effect of the Enlarge Person spell.",
+    "spells": [
+      "Goodberry",
+      "Death Knell",
+      "Create Food and Water",
+      "Vampiric Touch",
+      "Baleful Polymorph",
+      "Heroes' Feast",
+      "Stone to Flesh",
+      "Bite of the King",
+      "Trap the Soul"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "gnome",
+    "name": "Gnome",
+    "power": "You cast all illusion spells at +1 caster level.",
+    "spells": [
+      "Silent Image",
+      "Gembomb",
+      "Minor Image",
+      "Minor Creation",
+      "Hallucinatory Terrain",
+      "Fantastic Machine",
+      "Screen",
+      "Otto's Irresistable Dance",
+      "Summon Nature's Ally IX"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "greed",
+    "name": "Greed",
+    "power": "You gain a +2 Competence bonus on Appraise, Open Lock, and Sleight of Hand checks.",
+    "spells": [
+      "Cheat",
+      "Entice Gift",
+      "Knock",
+      "Fire Trap",
+      "Fabricate",
+      "Guards and Wards",
+      "Teleport Object",
+      "Phantasmal Thief",
+      "Sympathy"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "halfling",
+    "name": "Halfling",
+    "power": "You gain the ability to add -1 to your Climb, Jump, Move Silently, and Hide checks.  This extraordinary ability is a free action that lasts 10 minutes.  It can be used once per day.",
+    "spells": [
+      "Magic Stone",
+      "Cat's Grace",
+      "Magic Vestment",
+      "Freedom of Movement",
+      "Mordenkainen's Faithful Hound",
+      "Move Earth",
+      "Shadow Walk",
+      "Word of Recall",
+      "Foresight"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "hatred",
+    "name": "Hatred",
+    "power": "Once per day, as a free action, choose one opponnent.  Against that opponent you gain a +2 profane bonus on attack rolls, saving throws, and Armor Class.  This supernatural ability lasts 1 minute.",
+    "spells": [
+      "Doom",
+      "Scare",
+      "Bestow Curse",
+      "Rage",
+      "Righteous Might",
+      "Forbiddance",
+      "Blasphemy",
+      "Antipathy",
+      "Wail of the Banshee"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "hunger",
+    "name": "Hunger",
+    "power": "You gain a bite attack. If you are Small, your bite attack deals 1d4 points of damage; Medium, 1d6; or Large, 1d8. You are proficient with your bite, and considered armed.",
+    "spells": [
+      "Ghoul Light",
+      "Ghoul Glyph",
+      "Ghoul Gesture",
+      "Enervation",
+      "Ghoul Gauntlet",
+      "Eyes of the King",
+      "Field of Ghouls",
+      "Bite of the King",
+      "Energy Drain"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "illusion",
+    "name": "Illusion",
+    "power": "You cast all illusion spells at +1 caster level.",
+    "spells": [
+      "Silent Image",
+      "Minor Image",
+      "Displacement",
+      "Phantasmal Killer",
+      "Persistant Image",
+      "Mislead",
+      "Project Image",
+      "Screen",
+      "Weird"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "inquisition",
+    "name": "Inquisition",
+    "power": "Gain a +4 bonus on all dispel checks.",
+    "spells": [
+      "Detect Chaos",
+      "Zone of Truth",
+      "Detect Thoughts",
+      "Discern Lies",
+      "True Seeing",
+      "Geas/Quest",
+      "Dictum",
+      "Shield of Law",
+      "Imprisonment"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "liberation",
+    "name": "Liberation",
+    "power": "As a supernatural ability, if affected by a charm, compulsion, or fear effect as a result of a failed save, you can attempt the save 1 round later at the same DC.",
+    "spells": [
+      "Omen of Peril",
+      "Undetectable Alignment",
+      "Rage",
+      "Freedom of Movement",
+      "Break Enchantment",
+      "Dispel Magic, Greater",
+      "Refuge",
+      "Mind Blank",
+      "Unbinding"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "lust",
+    "name": "Lust",
+    "power": "Once per day for 1 round, as a free action you gain a bonus of 0  to your charisma. This granted power is a supernatural abiity.",
+    "spells": [
+      "Charm Person",
+      "Invisibility",
+      "Clairaudience/Clairvoyance",
+      "Planar Ally, Lesser",
+      "Scrying",
+      "Symbol of Persuasion",
+      "Refuge",
+      "Sympathy",
+      "Trap the Soul"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "madness",
+    "name": "Madness",
+    "power": "You subtract 1 from all Wisdom-based skill checks and all Will saves. However, once per day you can add 1 to a single Wisdom-based check or Will save.",
+    "spells": [
+      "Confusion, Lesser",
+      "Touch of Madness",
+      "Rage",
+      "Confusion",
+      "Bolts of Bedevilment",
+      "Phantasmal Killer",
+      "Insanity",
+      "Maddening Scream",
+      "Weird"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "mentalism",
+    "name": "Mentalism",
+    "power": "Once per day you grant any creature you touch a +2 resistance bonus on their next Will save. This spell-like ability requires a standard action to activate, and lasts for 1 hour.",
+    "spells": [
+      "Confusion, Lesser",
+      "Detect Thoughts",
+      "Clairaudience/Clairvoyance",
+      "Modify Memory",
+      "Mind Fog",
+      "Rary's Telepathic Bond",
+      "Antipathy",
+      "Mind Blank",
+      "Astral Projection"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "metal",
+    "name": "Metal",
+    "power": "Free Martial Weapon Proficiency Feat and Weapon Focus feat with your choice of Light Hammer or Warhammer.",
+    "spells": [
+      "Magic Weapon",
+      "Heat Metal",
+      "Keen Edge",
+      "Rusting Grasp",
+      "Wall of Iron",
+      "Blade Barrier",
+      "Transmute Metal to Wood",
+      "Iron Body",
+      "Repel Metal or Stone"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "mind",
+    "name": "Mind",
+    "power": "Gain a +2 bonus on Bluff, Diplomacy, and Sense Motive Checks.",
+    "spells": [
+      "Comprehend Languages",
+      "Detect Thoughts",
+      "Telepathic Bond, Lesser",
+      "Discern Lies",
+      "Rary's Telepathic Bond",
+      "Probe Thoughts",
+      "Brain Spider",
+      "Mind Blank",
+      "Weird"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "moon",
+    "name": "Moon",
+    "power": "You can turn or destroy Lycanthropes 0 times per day as a Supernatural Ability.",
+    "spells": [
+      "Faerie Fire",
+      "Moonbeam",
+      "Moon Blade",
+      "Fear",
+      "Moon Path",
+      "Permanent Image",
+      "Insanity",
+      "Animal Shapes",
+      "Moonfire"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "mysticism",
+    "name": "Mysticism",
+    "power": "As a supernatural ability, once per day you can use a free action to grant yourself a +-1 luck bonus on your saving throws for 0 rounds.",
+    "spells": [
+      "Divine Favor",
+      "Spiritual Weapon",
+      "Visage of the Deity, Lesser",
+      "Weapon of the Deity",
+      "Righteous Might",
+      "Visage of the Deity",
+      "Blasphemy/Holy Word",
+      "Holy Aura/Unholy Aura",
+      "Visage of the Deity, Greater"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "nobility",
+    "name": "Nobility",
+    "power": "You have the spell-like ability(a standard action) to inspire allies, giving them a +2 morale bonus on saves, attacks, ability checks, skill checks, and weapon damage. It lasts 1 rounds and can be used once/day.",
+    "spells": [
+      "Divine Favor",
+      "Enthrall",
+      "Magic Vestment",
+      "Discern Lies",
+      "Command, Greater",
+      "Geas/Quest",
+      "Repulsion",
+      "Demand",
+      "Storm of Vengeance"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "ocean",
+    "name": "Ocean",
+    "power": "You have the supernatural ability to breathe water as water breathing spell for up to 0 rounds.  This effect occurs automatically as soon as it applies, lasts until it runs out or is no longer needed.",
+    "spells": [
+      "Endure Elements",
+      "Sound Burst",
+      "Water Breathing",
+      "Freedom of Movement",
+      "Wall of Ice",
+      "Otiluke's Freezing Sphere",
+      "Waterspout",
+      "Maelstrom",
+      "Elemental Swarm"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "oracle",
+    "name": "Oracle",
+    "power": "You cast divination spells at +2 caster levels.",
+    "spells": [
+      "Identify",
+      "Augury",
+      "Divination",
+      "Scrying",
+      "Commune",
+      "Legend Lore",
+      "Scrying, Greater",
+      "Discern Location",
+      "Foresight"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "orc",
+    "name": "Orc",
+    "power": "Once per day, as a supernatural ability, you can make a single melee attack with a damage bonus of +0.  If used against a dwarf or an elf you get +4 to the attack roll.",
+    "spells": [
+      "Cause Fear",
+      "Produce Flame",
+      "Prayer",
+      "Divine Power",
+      "Prying Eyes",
+      "Eyebite",
+      "Blasphemy",
+      "Cloak of Chaos",
+      "Power Word Kill"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "pact",
+    "name": "Pact",
+    "power": "Add Appraise, Intimidate, and Sense Motive to your list of cleric class skills.",
+    "spells": [
+      "Command",
+      "Shield Other",
+      "Speak with Dead",
+      "Divination",
+      "Stalwart Pact",
+      "Zealot Pact",
+      "Renewal Pact",
+      "Death Pact",
+      "Gate"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "pestilence",
+    "name": "Pestilence",
+    "power": "Immunity to the effects of all diseases, though you can still carry infectious diseases.",
+    "spells": [
+      "Doom",
+      "Summon Swarm",
+      "Contagion",
+      "Poison",
+      "Plague of Rats",
+      "Curse of Lycanthropy",
+      "Scourge",
+      "Horrid Wilting",
+      "Otyugh Swarm"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "planning",
+    "name": "Planning",
+    "power": "Free Extend Spell feat.",
+    "spells": [
+      "Deathwatch",
+      "Augury",
+      "Clairaudience/Clairvoyance",
+      "Status",
+      "Detect Scrying",
+      "Heroes' Feast",
+      "Scrying, Greater",
+      "Discern Location",
+      "Time Stop"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "portal",
+    "name": "Portal",
+    "power": "You can detect an active or inactive portal as if it were a normal secret door (DC 20).",
+    "spells": [
+      "Summon Monster I",
+      "Analyze Portal",
+      "Dimensional Anchor",
+      "Dimension Door",
+      "Teleport",
+      "Banishment",
+      "Etherealness",
+      "Maze",
+      "Gate"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "pride",
+    "name": "Pride",
+    "power": "Whenenver you roll a 1 on a save, you may reroll the save.  You must keep the result of the second roll.",
+    "spells": [
+      "Hypnotism",
+      "Eagle's Splendor",
+      "Heroism",
+      "Divine Power",
+      "Reduce Person, Mass",
+      "Forbiddance",
+      "Heroism, Greater",
+      "Spell Immunity, Greater",
+      "Charm Monster, Mass"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "purification",
+    "name": "Purification",
+    "power": "You cast abjuration spells at +1 caster level.",
+    "spells": [
+      "Nimbus of Light",
+      "Deific Vengeance",
+      "Recitation",
+      "Castigate",
+      "Dance of the Unicorn",
+      "Fires of Purity",
+      "Righteous Wrath of the Faithful",
+      "Sunburst",
+      "Visage of the Deity, Greater"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "renewal",
+    "name": "Renewal",
+    "power": "If you fall below 0 hit points, you regain a number of hitpoints equal to 1d8-1.  This supernatural ability functions once per day.  If an attack brings you to -10 hit points or less, you die before this power takes effect.",
+    "spells": [
+      "Charm Person",
+      "Restoration, Lesser",
+      "Remove Disease",
+      "Reincarnate",
+      "Atonement",
+      "Heroes' Feast",
+      "Restoration, Greater",
+      "Polymorph Any Object",
+      "Freedom"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "retribution",
+    "name": "Retribution",
+    "power": "Once per day, you may make a strike of vengeance with a melee or ranged weapon against an individual that harmed you on your next action, dealing maximum damage if you hit.",
+    "spells": [
+      "Shield of Faith",
+      "Bear's Endurance",
+      "Speak with Dead",
+      "Fire Shield",
+      "Mark of Justice",
+      "Banishment",
+      "Spell Turning",
+      "Discern Location",
+      "Storm of Vengeance"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "rune",
+    "name": "Rune",
+    "power": "Free Scribe Scroll feat.",
+    "spells": [
+      "Erase",
+      "Secret Page",
+      "Glyph of Warding",
+      "Explosive Runes",
+      "Planar Binding, Lesser",
+      "Glyph of Warding, Greater",
+      "Drawmij's Instant Summons",
+      "Symbol of Death",
+      "Teleportation Circle"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "scalykind",
+    "name": "Scalykind",
+    "power": "You can rebuke or command animals(reptilian/snakes) 0 times per day as a Supernatural Ability.",
+    "spells": [
+      "Magic Fang",
+      "Animal Trance",
+      "Magic Fang, Greater",
+      "Poison",
+      "Animal Growth",
+      "Eyebite",
+      "Creeping Doom",
+      "Animal Shapes",
+      "Shapechange"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "slime",
+    "name": "Slime",
+    "power": "You can rebuke or command oozes 0 times per day as a Supernatural Ability.",
+    "spells": [
+      "Grease",
+      "Melf's Acid Arrow",
+      "Poison",
+      "Rusting Grasp",
+      "Evard's Black Tentacles",
+      "Transmute Rock to Mud",
+      "Destruction",
+      "Power Word Blind",
+      "Implosion"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "sloth",
+    "name": "Sloth",
+    "power": "You take no penalty to AC against melee attacks while prone",
+    "spells": [
+      "Touch of Fatigue",
+      "Unseen Servant",
+      "Deep Slumber",
+      "Slow",
+      "Symbol of Sleep",
+      "Waves of Fatigue",
+      "Shadow Walk",
+      "Waves of Exhaustion",
+      "Astral Projection"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "spell",
+    "name": "Spell",
+    "power": "You get a +2 bonus on Concentration and Spellcraft checks.",
+    "spells": [
+      "Mage Armor",
+      "Silence",
+      "Anyspell",
+      "Rary's Mnemonic Enhancer",
+      "Break Enchantment",
+      "Anyspell, Greater",
+      "Limited Wish",
+      "Antimagic Field",
+      "Mordenkainen's Disjunction"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "spider",
+    "name": "Spider",
+    "power": "You can rebuke or command spiders 0 times per day as a Supernatural Ability.",
+    "spells": [
+      "Spider climb",
+      "Summon Swarm",
+      "Phantom Steed",
+      "Giant Vermin",
+      "Insect Plague",
+      "Spider Curse",
+      "Stone Spiders",
+      "Creeping Doom",
+      "Spider Shapes"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "storm",
+    "name": "Storm",
+    "power": "You gain resistance to electricity 5.",
+    "spells": [
+      "Entropic Shield",
+      "Gust of Wind",
+      "Call Lightning",
+      "Sleet Storm",
+      "Ice Storm",
+      "Summon Monster VI",
+      "Control Weather",
+      "Whirlwind",
+      "Storm of Vengeance"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "suffering",
+    "name": "Suffering",
+    "power": "Once per day you can make a melee touch attack against a living creature subject to critical hits, which bestows on that creature a -2 enhancement penalty to Str and Dex for 1 minute.",
+    "spells": [
+      "Bane",
+      "Bear's Endurance",
+      "Bestow Curse",
+      "Enervation",
+      "Feeblemind",
+      "Harm",
+      "Eyebite",
+      "Symbol of Pain",
+      "Horrid Wilting"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "summoner",
+    "name": "Summoner",
+    "power": "Add +2 to your caster level for all Conjuration(summoning) or Conjuration(calling) spells.",
+    "spells": [
+      "Summon Monster I",
+      "Summon Monster II",
+      "Summon Monster III",
+      "Planar Ally, Lesser",
+      "Summon Monster V",
+      "Planar Ally",
+      "Summon Monster VII",
+      "Planar Ally, Greater",
+      "Gate"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "time",
+    "name": "Time",
+    "power": "Free Improved Initiative feat.",
+    "spells": [
+      "True Strike",
+      "Gentle Repose",
+      "Haste",
+      "Freedom of Movement",
+      "Permanency",
+      "Contingency",
+      "Legend Lore",
+      "Foresight",
+      "Time Stop"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "trade",
+    "name": "Trade",
+    "power": "You may use detect thoughts once per day as a spell-like ability, affecting one target and lasting 1 minutes.  Activating this power is a free action.",
+    "spells": [
+      "Message",
+      "Gembomb",
+      "Eagle's Splendor",
+      "Sending",
+      "Fabricate",
+      "True Seeing",
+      "Mordenkainen's Magnificent Mansion",
+      "Mind Blank",
+      "Discern Location"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "tyranny",
+    "name": "Tyranny",
+    "power": "Add +1 to the saving throw DC of any Enchantment(compulsion) spell you cast.",
+    "spells": [
+      "Command",
+      "Enthrall",
+      "Discern Lies",
+      "Fear",
+      "Command, Greater",
+      "Geas/Quest",
+      "Bigby's Grasping Hand",
+      "Charm Monster, Mass",
+      "Dominate Monster"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "undeath",
+    "name": "Undeath",
+    "power": "Free Extra Turning feat.",
+    "spells": [
+      "Detect Undead",
+      "Desecrate",
+      "Animate Dead",
+      "Death Ward",
+      "Circle of Death",
+      "Create Undead",
+      "Control Undead",
+      "Create Greater Undead",
+      "Energy Drain"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "wealth",
+    "name": "Wealth",
+    "power": "Add Appraise to your list of cleric class skills. You gain Skill Focus (Appraise) as a bonus feat.",
+    "spells": [
+      "Alarm",
+      "Obscure Object",
+      "Glyph of Warding",
+      "Detect Scrying",
+      "Leomund's Secret Chest",
+      "Forbiddance",
+      "Sequester",
+      "Discern Location",
+      "Antipathy"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "windstorm",
+    "name": "Windstorm",
+    "power": "Rain and snow don't penalize your spot and search checks.  You can move through snow-covered and icy terrain at normal movement.  Wind effects affect you as if you were one size category larger.",
+    "spells": [
+      "Obscuring Mist",
+      "Binding Winds",
+      "Call Lightning",
+      "Ice Storm",
+      "Arc of Lightning",
+      "Cloudwalkers",
+      "Control Weather",
+      "Whirlwind",
+      "Whirlwind, Greater"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "wrath",
+    "name": "Wrath",
+    "power": "Once per day, you can subtract Wisdom points (equal to or less than your cleric level) and trade them (2 for 1) for Strength points. This effect lasts for 1 round per cleric level and cannot be ended prematurely.",
+    "spells": [
+      "Rhino's Rush",
+      "Bull's Strength",
+      "Rage",
+      "Shout",
+      "Righteous Might",
+      "Song of Discord",
+      "Tenser's Transformation",
+      "Shout, Greater",
+      "Storm of Vengeance"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "abyss_1",
+    "name": "Abyss-1",
+    "power": "Once per day as a free action, you may channel the power of demons, gaining a +4 bonus to Strength but a -2 penalty to Armor Class.  The effect lasts 5 rounds.",
+    "spells": [
+      "Align Weapon",
+      "Bull's Strength",
+      "Babau Slime",
+      "Balor Nimbus",
+      "Slay Living",
+      "Bull's Strength, Mass",
+      "Destruction",
+      "Finger of Death",
+      "Implosion"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "abyss_2",
+    "name": "Abyss-2",
+    "power": "No domain power listed.",
+    "spells": [
+      "Cause Fear",
+      "Death Knell",
+      "Summon Monster III",
+      "Poison",
+      "Summon Monster V",
+      "Harm",
+      "Summon Monster VII",
+      "Bodak's Glare",
+      "Summon Monster IX"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "arborea_1",
+    "name": "Arborea-1",
+    "power": "Once per day as a free action, you may channel the glory of the eladrin to grant yourself a +0 morale bonus to damage rolls and saves against charm and fear for 1 minute.",
+    "spells": [
+      "Endure Elements",
+      "Aid",
+      "Heroism",
+      "Neutralize Poison",
+      "Break Enchantment",
+      "Heroes' Feast",
+      "Spell Turning",
+      "Heroism, Greater",
+      "Freedom"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "arborea_2",
+    "name": "Arborea-2",
+    "power": "No domain power listed.",
+    "spells": [
+      "Longstrider",
+      "Eagle's Splendor",
+      "Summon Monster III",
+      "Opalescent Glare",
+      "Summon Monster V",
+      "Eagle's Splendor, Mass",
+      "Summon Monster VII",
+      "Mind Blank",
+      "Summon Monster IX"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "baator_1",
+    "name": "Baator-1",
+    "power": "You have the supernatural ability to see perfectly in darkness of any kind.",
+    "spells": [
+      "Bane",
+      "Darkness",
+      "Detect Thoughts",
+      "Deeper Darkness",
+      "Spell Resistance",
+      "Dominate Person",
+      "Repulsion",
+      "Demand",
+      "Imprisonment"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "baator_2",
+    "name": "Baator-2",
+    "power": "No domain power listed.",
+    "spells": [
+      "Disguise Self",
+      "Fox's Cunning",
+      "Summon Monster III",
+      "Suggestion",
+      "Summon Monster V",
+      "Fox's Cunning, Mass",
+      "Summon Monster VII",
+      "Spell Turning",
+      "Summon Monster IX"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "celestia_1",
+    "name": "Celestia-1",
+    "power": "Once per day, as a free action, you can generate an aura of menace similar to that of the archons.",
+    "spells": [
+      "Light of Lunia",
+      "Bear's Endurance",
+      "Magic Vestment",
+      "Divine Power",
+      "Righteous Might",
+      "Blade Barrier",
+      "Regenerate",
+      "Power Word Stun",
+      "Foresight"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "celestia_2",
+    "name": "Celestia-2",
+    "power": "No domain power listed.",
+    "spells": [
+      "Shield of Faith",
+      "Shield Other",
+      "Summon Monster III",
+      "Magic Weapon, Greater",
+      "Summon Monster V",
+      "Bear's Endurance, Mass",
+      "Summon Monster VII",
+      "Shield of Law",
+      "Summon Monster IX"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "elysium_1",
+    "name": "Elysium-1",
+    "power": "You can smite evil once per day, gaining a +0 bonus to your attack and +0 to damage.",
+    "spells": [
+      "Charm Person",
+      "Enthrall",
+      "Magic Circle against Evil",
+      "Charm Monster",
+      "Dispel Evil",
+      "Find the Path",
+      "Control Weather",
+      "Holy Aura",
+      "Heal, Mass"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "elysium_2",
+    "name": "Elysium-2",
+    "power": "No domain power listed.",
+    "spells": [
+      "Protection from Evil",
+      "Planar Tolerance",
+      "Mantle of Good",
+      "Holy Smite",
+      "Cure Light Wounds, Mass",
+      "Mind Fog",
+      "Holy Word",
+      "Sunburst",
+      "Moment of Prescience"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "hades_1",
+    "name": "Hades-1",
+    "power": "You can smite good once per day, gaining a +0 bonus to your attack and +0 to damage.",
+    "spells": [
+      "Doom",
+      "Resist Planar Alignment",
+      "Magic Circle against Good",
+      "Contagion",
+      "Crushing Despair",
+      "Mind Fog",
+      "Blasphemy",
+      "Unholy Aura",
+      "Energy Drain"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "hades_2",
+    "name": "Hades-2",
+    "power": "No domain power listed.",
+    "spells": [
+      "Protection from Good",
+      "Mantle of Evil",
+      "Unholy Blight",
+      "Dispel Good",
+      "Waves of Fatigue",
+      "Plane Shift",
+      "Waves of Exhaustion",
+      "Gate"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "limbo_1",
+    "name": "Limbo-1",
+    "power": "You can smite law once per day, gaining a +0 bonus to your attack and +0 to damage.",
+    "spells": [
+      "Lesser Confusion",
+      "Entropic Shield",
+      "Magic Circle against Law",
+      "Chaos Hammer",
+      "Baleful Polymorph",
+      "Animate Objects",
+      "Song of Discord",
+      "Cloak of Chaos",
+      "Perinarch, Planar"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "limbo_2",
+    "name": "Limbo-2",
+    "power": "No domain power listed.",
+    "spells": [
+      "Protection from Law",
+      "Resist Planar Alignment",
+      "Mantle of Chaos",
+      "Perinarch",
+      "Dispel Law",
+      "Insanity",
+      "Word of Chaos",
+      "Otto's Irresistable Dance",
+      "Shapechange"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "mechanus_1",
+    "name": "Mechanus-1",
+    "power": "You can smite chaos once per day, gaining a +0 bonus to your attack and +0 to damage.",
+    "spells": [
+      "Command",
+      "Calm Emotions",
+      "Magic Circle against Chaos",
+      "Discern Lies",
+      "Dispel Chaos",
+      "Hold Monster",
+      "Dictum",
+      "Iron Body",
+      "Call Marut"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "mechanus_2",
+    "name": "Mechanus-2",
+    "power": "No domain power listed.",
+    "spells": [
+      "Protection from Chaos",
+      "Mechanus Mind",
+      "Mantle of Law",
+      "Order's Wrath",
+      "Mark of Justice",
+      "Wall of Gears",
+      "Hold Person, Mass",
+      "Shield of Law",
+      "Mordenkainen's Disjunction"
+    ],
+    "source": "SpC"
+  },
+  {
+    "id": "portal_alternative",
+    "name": "Portal (alternative)",
+    "power": "You gain Portal Sensitive as a bonus feat.",
+    "spells": [
+      "Portal Stablization",
+      "Analyze Portal",
+      "Portal View",
+      "Dimension Door",
+      "Portal Barricade",
+      "Portal-to-Portal Redirect",
+      "Etherealness",
+      "Portal Reformat",
+      "Gate"
+    ],
+    "source": "Underdark"
+  },
+  {
+    "id": "watery_death",
+    "name": "Watery Death",
+    "power": "You gain the ability to smite any nonaquatic creature once per day with one normal melee attack. You add +-1 to your attack roll and deal 0 extra points of damage.",
+    "spells": [
+      "Entangle",
+      "Mark of the Outcast",
+      "Control Water",
+      "Rushing Water",
+      "Dehydrate",
+      "Drown",
+      "Contagious Fog",
+      "Horrid Wilting",
+      "Drown, Mass"
+    ],
+    "source": "Underdark"
+  },
+  {
+    "id": "mists",
+    "name": "Mists",
+    "power": "Once per day, you may call on the shield of Ezra, a film of luminous mist that envelops your body granting you protection based on your alignment.",
+    "spells": [
+      "Obscuring Mist",
+      "Fog Cloud",
+      "Gaseous Form",
+      "Solid Fog",
+      "Mind Fog",
+      "Wind Walk",
+      "Teleport, Greater",
+      "Vanish",
+      "Imprisonment"
+    ],
+    "source": "RVLT"
+  },
+  {
+    "id": "repose_2",
+    "name": "Repose",
+    "power": "You can grant final rest upon a newly dead body that allows the corpse a chance to resist any attempt to transform it into an undead creature.",
+    "spells": [
+      "Detect Undead",
+      "Gentle Repose",
+      "Speak with Dead",
+      "Halt Undead",
+      "Raise Dead",
+      "Antilife Shell",
+      "Resurrection",
+      "Control Undead",
+      "Soul Bind"
+    ],
+    "source": "RVLT"
+  },
+  {
+    "id": "curse",
+    "name": "Curse",
+    "power": "You may cast bestow curse with a +4 to the DC of the targets saving throw.   You may cast mark of justice once per day.",
+    "spells": [
+      "Doom",
+      "Hold Person",
+      "Bestow Curse",
+      "Poison",
+      "Insect Plague",
+      "Harm",
+      "Destruction",
+      "Horrid Wilting",
+      "Energy Drain"
+    ],
+    "source": "RVLT"
+  },
+  {
+    "id": "glamour",
+    "name": "Glamour",
+    "power": "You receive a +3 bonus to all Will saves vs mind-affecting enchantments or enchantments that alter the perceptions.",
+    "spells": [
+      "Charm Person",
+      "Glitterdust",
+      "Charm Monster",
+      "Modify Memory",
+      "Dream",
+      "Veil",
+      "Nightmare",
+      "Charm Monster, Mass",
+      "Weird"
+    ],
+    "source": "RVLT"
+  },
+  {
+    "id": "alteration",
+    "name": "Alteration",
+    "power": "You cast Transmutation spells on living targets at +1 caster level.",
+    "spells": [
+      "Enlarge Person",
+      "Alter self",
+      "Gaseous Form",
+      "Polymorph",
+      "Baleful Polymorph",
+      "Flesh to Stone",
+      "Regenerate",
+      "Polymorph Any Object",
+      "Shapechange"
+    ],
+    "source": "DragonLance"
+  },
+  {
+    "id": "forge",
+    "name": "Forge",
+    "power": "You gain a +2 insight bonus on Craft and Appraise checks releated to stone or metal items.",
+    "spells": [
+      "Magic Weapon",
+      "Heat Metal",
+      "Keen Edge",
+      "Minor Creation",
+      "Wall of Iron",
+      "Major Creation",
+      "Hardening",
+      "Repel Metal or Stone",
+      "Iron Body"
+    ],
+    "source": "DragonLance"
+  },
+  {
+    "id": "insight",
+    "name": "Insight",
+    "power": "You gain uncanny dodge. If you already have uncanny dodge from another class you gain Improved uncanny dodge.",
+    "spells": [
+      "True Strike",
+      "Augury",
+      "Locate Object",
+      "Divination",
+      "Commune",
+      "Mass Owl's Wisdom",
+      "Greater Arcane Sight",
+      "Moment of Prescience",
+      "Foresight"
+    ],
+    "source": "DragonLance"
+  },
+  {
+    "id": "liberation_2",
+    "name": "Liberation",
+    "power": "You gain a +2 morale bonus on all saving throws against Enchantment spells or effects.",
+    "spells": [
+      "Remove Fear",
+      "Remove Paralysis",
+      "Remove Curse",
+      "Freedom of Movement",
+      "Break Enchantment",
+      "Greater Dispel Magic",
+      "Refuge",
+      "Mind Blank",
+      "Unbinding"
+    ],
+    "source": "DragonLance"
+  },
+  {
+    "id": "mentalismdlcs",
+    "name": "Mentalism(DLCS)",
+    "power": "You gain +2 bonus on Bluff, Diplomacy, and Sense Motive checks. You also gain a +2 bonus on Will saves against Enchantment spells and effects.",
+    "spells": [
+      "Command",
+      "Detect Thoughts",
+      "Hold Person",
+      "Dicern Lies",
+      "Greater Command",
+      "Hold Monster",
+      "Mass Hold Person",
+      "Mass Charm",
+      "Dominate Monster"
+    ],
+    "source": "DragonLance"
+  },
+  {
+    "id": "necromancy",
+    "name": "Necromancy",
+    "power": "Rebuke, command, or bolster undead as an evil cleric. Use this ability a number of times per day equal to 2. This is a supernatural ability.",
+    "spells": [
+      "Detect Undead",
+      "Death Knell",
+      "Halt Undead",
+      "Animate Dead",
+      "Slay Living",
+      "Create Undead",
+      "Destruction",
+      "Create Greater Undead",
+      "Energy Drain"
+    ],
+    "source": "DragonLance"
+  },
+  {
+    "id": "restoration",
+    "name": "Restoration",
+    "power": "You cast healing spells at +1 caster level.",
+    "spells": [
+      "Remove Fear",
+      "Lesser Restoration",
+      "Remove Disease",
+      "Restoration",
+      "Raise Dead",
+      "Heal",
+      "Greater Restoration",
+      "Resurrection",
+      "True Resurection"
+    ],
+    "source": "DragonLance"
+  },
+  {
+    "id": "sundlcs",
+    "name": "Sun(DLCS)",
+    "power": "Turn or destroy undead as a good cleric. You can use this ability 2 times a day. This is a supernatural ability.",
+    "spells": [
+      "Endure Elements",
+      "Heat Metal",
+      "Searing Light",
+      "Fire Shield",
+      "Flame Strike",
+      "Fire Seeds",
+      "Sunbeam",
+      "Sunburst",
+      "Prismatic Sphere"
+    ],
+    "source": "DragonLance"
+  },
+  {
+    "id": "treachery",
+    "name": "Treachery",
+    "power": "Once a day when you attack a flat-footed opponent, you deal additional damage equal to 0d6 with a single melee attack. You must declare the use of the ability before the attack and if you miss it is wasted.",
+    "spells": [
+      "Undetectable Alignment",
+      "Eagle's Splendor",
+      "Bestow Curse",
+      "Glibness",
+      "Magic Jar",
+      "Symbol of Persuasion",
+      "Eyebite",
+      "Trap the Soul",
+      "Imprisonment"
+    ],
+    "source": "DragonLance"
+  },
+  {
+    "id": "channeling",
+    "name": "Channeling",
+    "power": "All Transmutation spells that affect living creatures are cast at +1 caster level.",
+    "spells": [
+      "Jump",
+      "Bear's Endurance",
+      "Haste",
+      "Stoneskin",
+      "Heroism, Greater",
+      "Tenser's Transformation",
+      "Regenerate",
+      "Iron Body",
+      "Diamond Body"
+    ],
+    "source": "Age Of Mortals"
+  },
+  {
+    "id": "sensitivity",
+    "name": "Sensitivity",
+    "power": "All Divination spells with a range of Personal are cast at +1 caster level.",
+    "spells": [
+      "Deathwatch",
+      "See Invisibility",
+      "Tongues",
+      "Discern Lies",
+      "Analyxe Dweomer",
+      "Legend Lore",
+      "Arcane Sight, Greater",
+      "Discern Location",
+      "Foresight"
+    ],
+    "source": "Age Of Mortals"
+  }
+]

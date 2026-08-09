@@ -591,6 +591,135 @@ def extract_templates():
         json.dump(templates, f, indent=2)
     print(f"Extracted {len(templates)} templates -> src/data/templates.json & public/data/templates.json")
 
+def extract_domains():
+    import re
+    print("Extracting Domains...")
+    df_dom = pd.read_excel("HeroForge Anew 3.5 v7.4.0.1.xlsm", sheet_name="Domains", header=None)
+
+    domains = []
+    seen_ids = set()
+    current_source = "PHB"
+
+    for idx, row in df_dom.iterrows():
+        raw_name = row[0]
+        if pd.isna(raw_name):
+            continue
+        s = str(raw_name).strip()
+        if s.startswith("-") and s.endswith("-"):
+            src_tag = s.strip("- ").replace(" Domains", "").strip()
+            current_source = src_tag
+            continue
+        if s.startswith("-") or s.lower() in ["no", "select domain", "nan"]:
+            continue
+        
+        clean_name = re.sub(r"^xx-|-xx$", "", s).strip()
+        if not clean_name:
+            continue
+        
+        dom_id = clean_name.lower().replace(" ", "_").replace("-", "_").replace("(", "").replace(")", "")
+        base_id = dom_id
+        counter = 1
+        while dom_id in seen_ids:
+            counter += 1
+            dom_id = f"{base_id}_{counter}"
+        seen_ids.add(dom_id)
+        
+        power = str(row[1]).strip() if pd.notna(row[1]) and str(row[1]).strip().lower() != "nan" else "No domain power listed."
+        spells = []
+        for i in range(2, 11):
+            sp_val = row[i]
+            if pd.notna(sp_val) and str(sp_val).strip().lower() != "nan":
+                sp_name = str(sp_val).strip()
+                sp_name = sp_name.replace("’", "'").replace("‘", "'")
+                spells.append(sp_name)
+                
+        domains.append({
+            "id": dom_id,
+            "name": clean_name,
+            "power": power,
+            "spells": spells,
+            "source": current_source
+        })
+
+    with open(os.path.join(OUTPUT_DIR, "domains.json"), "w", encoding="utf-8") as f:
+        json.dump(domains, f, indent=2)
+    with open(os.path.join(PUBLIC_DATA_DIR, "domains.json"), "w", encoding="utf-8") as f:
+        json.dump(domains, f, indent=2)
+    print(f"Extracted {len(domains)} domains -> src/data/domains.json & public/data/domains.json")
+    return domains
+
+def extract_deities(domains=None):
+    print("Extracting Deities...")
+    if domains is None:
+        if os.path.exists(os.path.join(OUTPUT_DIR, "domains.json")):
+            with open(os.path.join(OUTPUT_DIR, "domains.json"), "r", encoding="utf-8") as f:
+                domains = json.load(f)
+        else:
+            domains = []
+
+    df_deity = pd.read_excel("HeroForge Anew 3.5 v7.4.0.1.xlsm", sheet_name="Deities", header=None)
+    deities = []
+    seen_deity_names = set()
+
+    typo_map = {
+        "comunity": "Community",
+        "halfllng": "Halfling",
+        "inquistion": "Inquisition",
+        "strenght": "Strength"
+    }
+
+    domain_name_map = {d["name"].lower(): d["name"] for d in domains}
+    for d in domains:
+        domain_name_map[d["id"]] = d["name"]
+        domain_name_map[d["name"].lower().replace(" ", "")] = d["name"]
+
+    for idx in range(4, len(df_deity)):
+        r = df_deity.iloc[idx]
+        dname = r[0]
+        if pd.isna(dname) or str(dname).startswith("ref:") or str(dname) in ["Select A Deity", "Deity"]:
+            continue
+        name_str = str(dname).strip()
+        if name_str in seen_deity_names:
+            continue
+        seen_deity_names.add(name_str)
+        
+        alignment = str(r[1]).strip() if pd.notna(r[1]) else "Neutral"
+        weapon = str(r[9]).strip() if pd.notna(r[9]) and str(r[9]).strip().lower() != "nan" else "None"
+        
+        doms_set = set()
+        for col_idx in [8] + list(range(12, 27)):
+            v = r[col_idx]
+            if pd.notna(v):
+                for part in str(v).split(","):
+                    p_clean = part.strip().replace("*", "")
+                    if not p_clean or p_clean.startswith("--") or p_clean.startswith(",--") or p_clean in ["False", "9", "1", "2", "3", "4", "5", "6", "7", "8", "No", "Select A Domain Spell", "Domain Display", "Spell 7"]:
+                        continue
+                    p_lower = p_clean.lower()
+                    if p_lower in typo_map:
+                        p_clean = typo_map[p_lower]
+                    
+                    if p_clean in domain_name_map.values():
+                        doms_set.add(p_clean)
+                    elif p_lower in domain_name_map:
+                        doms_set.add(domain_name_map[p_lower])
+                    elif p_lower.replace(" ", "") in domain_name_map:
+                        doms_set.add(domain_name_map[p_lower.replace(" ", "")])
+
+        deities.append({
+            "id": name_str.lower().replace(" ", "_").replace("-", "_").replace("'", "").replace("(", "").replace(")", ""),
+            "name": name_str,
+            "alignment": alignment,
+            "favoredWeapon": weapon,
+            "domains": sorted(list(doms_set))
+        })
+
+    with open(os.path.join(OUTPUT_DIR, "deities.json"), "w", encoding="utf-8") as f:
+        json.dump(deities, f, indent=2)
+    with open(os.path.join(PUBLIC_DATA_DIR, "deities.json"), "w", encoding="utf-8") as f:
+        json.dump(deities, f, indent=2)
+    print(f"Extracted {len(deities)} deities -> src/data/deities.json & public/data/deities.json")
+    return deities
+
 if __name__ == "__main__":
     extract_classes()
     extract_races()
@@ -600,6 +729,8 @@ if __name__ == "__main__":
     extract_flaws()
     extract_skill_tricks()
     extract_templates()
+    doms = extract_domains()
+    extract_deities(doms)
     extract_tables()
     print("Data extraction complete!")
 
