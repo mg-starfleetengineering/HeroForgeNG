@@ -1,0 +1,941 @@
+[
+  {
+    "id": "bat",
+    "name": "Bat",
+    "type": "standard",
+    "prereqLevel": 1,
+    "size": "Diminutive",
+    "creatureType": "Animal",
+    "hd": 0.25,
+    "str": 1,
+    "dex": 15,
+    "con": 10,
+    "int": 2,
+    "wis": 14,
+    "cha": 4,
+    "naturalArmor": 0,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 5,
+      "fly": 40,
+      "flyManeuverability": "good"
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+3 bonus on Listen checks",
+    "specialAbilities": ["Blindsight 20 ft.", "Low-light vision"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Bite", "damage": "1d3-5" }
+    ],
+    "skillBonus": {
+      "Listen": 4,
+      "Spot": 4
+    },
+    "source": "PHB"
+  },
+  {
+    "id": "cat",
+    "name": "Cat",
+    "type": "standard",
+    "prereqLevel": 1,
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "hd": 0.5,
+    "str": 3,
+    "dex": 15,
+    "con": 10,
+    "int": 2,
+    "wis": 12,
+    "cha": 7,
+    "naturalArmor": 0,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 30
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+3 bonus on Move Silently checks",
+    "specialAbilities": ["Low-light vision", "Scent"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "2 Claws", "damage": "1d2-4" },
+      { "name": "Bite", "damage": "1d3-4" }
+    ],
+    "skillBonus": {
+      "Balance": 8,
+      "Climb": 4,
+      "Hide": 4,
+      "Move Silently": 4
+    },
+    "source": "PHB"
+  },
+  {
+    "id": "hawk",
+    "name": "Hawk",
+    "type": "standard",
+    "prereqLevel": 1,
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 6,
+    "dex": 17,
+    "con": 10,
+    "int": 2,
+    "wis": 14,
+    "cha": 6,
+    "naturalArmor": 0,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 10,
+      "fly": 60,
+      "flyManeuverability": "average"
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+3 bonus on Spot checks in bright daylight",
+    "specialAbilities": ["Low-light vision"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Talons", "damage": "1d4-2" }
+    ],
+    "skillBonus": {
+      "Spot": 8
+    },
+    "source": "PHB"
+  },
+  {
+    "id": "lizard",
+    "name": "Lizard",
+    "type": "standard",
+    "prereqLevel": 1,
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "hd": 0.5,
+    "str": 3,
+    "dex": 15,
+    "con": 10,
+    "int": 2,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 0,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 20,
+      "climb": 20
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+3 bonus on Climb checks",
+    "specialAbilities": ["Low-light vision"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Bite", "damage": "1d2-4" }
+    ],
+    "skillBonus": {
+      "Climb": 8,
+      "Hide": 4
+    },
+    "source": "PHB"
+  },
+  {
+    "id": "owl",
+    "name": "Owl",
+    "type": "standard",
+    "prereqLevel": 1,
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 4,
+    "dex": 17,
+    "con": 10,
+    "int": 2,
+    "wis": 14,
+    "cha": 4,
+    "naturalArmor": 0,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 10,
+      "fly": 40,
+      "flyManeuverability": "average"
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+3 bonus on Spot checks in shadows/dusk",
+    "specialAbilities": ["Low-light vision"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Talons", "damage": "1d4-3" }
+    ],
+    "skillBonus": {
+      "Listen": 8,
+      "Spot": 8
+    },
+    "source": "PHB"
+  },
+  {
+    "id": "rat",
+    "name": "Rat",
+    "type": "standard",
+    "prereqLevel": 1,
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "hd": 0.5,
+    "str": 2,
+    "dex": 15,
+    "con": 10,
+    "int": 2,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 0,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 15,
+      "climb": 15,
+      "swim": 15
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+2 bonus on Fortitude saves",
+    "specialAbilities": ["Low-light vision", "Scent"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Bite", "damage": "1d3-4" }
+    ],
+    "skillBonus": {
+      "Balance": 8,
+      "Climb": 8,
+      "Hide": 4,
+      "Move Silently": 4
+    },
+    "source": "PHB"
+  },
+  {
+    "id": "raven",
+    "name": "Raven",
+    "type": "standard",
+    "prereqLevel": 1,
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "hd": 0.25,
+    "str": 1,
+    "dex": 15,
+    "con": 10,
+    "int": 2,
+    "wis": 14,
+    "cha": 6,
+    "naturalArmor": 0,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 10,
+      "fly": 40,
+      "flyManeuverability": "good"
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+3 bonus on Appraise checks (Speaks 1 language)",
+    "specialAbilities": ["Low-light vision", "Speaks 1 language of master's choice"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Claws", "damage": "1d2-5" }
+    ],
+    "skillBonus": {
+      "Listen": 3,
+      "Spot": 5
+    },
+    "source": "PHB"
+  },
+  {
+    "id": "snake_tiny_viper",
+    "name": "Snake, Tiny Viper",
+    "type": "standard",
+    "prereqLevel": 1,
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "hd": 0.25,
+    "str": 4,
+    "dex": 17,
+    "con": 11,
+    "int": 2,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 0,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 15,
+      "climb": 15,
+      "swim": 15
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+3 bonus on Bluff checks",
+    "specialAbilities": ["Scent", "Poison (1d6 Con / 1d6 Con DC 10)"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Bite", "damage": "1 plus poison" }
+    ],
+    "skillBonus": {
+      "Balance": 8,
+      "Climb": 8,
+      "Hide": 8,
+      "Listen": 5,
+      "Spot": 5
+    },
+    "source": "PHB"
+  },
+  {
+    "id": "toad",
+    "name": "Toad",
+    "type": "standard",
+    "prereqLevel": 1,
+    "size": "Diminutive",
+    "creatureType": "Animal",
+    "hd": 0.25,
+    "str": 1,
+    "dex": 12,
+    "con": 11,
+    "int": 2,
+    "wis": 14,
+    "cha": 4,
+    "naturalArmor": 0,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 5
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+3 hit points",
+    "specialAbilities": ["Low-light vision"],
+    "feats": ["Alertness"],
+    "attacks": [
+      { "name": "None", "damage": "0" }
+    ],
+    "skillBonus": {
+      "Hide": 8,
+      "Listen": 4,
+      "Spot": 4
+    },
+    "source": "PHB"
+  },
+  {
+    "id": "weasel",
+    "name": "Weasel",
+    "type": "standard",
+    "prereqLevel": 1,
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "hd": 0.5,
+    "str": 3,
+    "dex": 15,
+    "con": 10,
+    "int": 2,
+    "wis": 12,
+    "cha": 5,
+    "naturalArmor": 0,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 20,
+      "climb": 20
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+2 bonus on Reflex saves",
+    "specialAbilities": ["Low-light vision", "Scent", "Attach"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Bite", "damage": "1d3-4" }
+    ],
+    "skillBonus": {
+      "Balance": 8,
+      "Climb": 8,
+      "Hide": 4,
+      "Move Silently": 4
+    },
+    "source": "PHB"
+  },
+  {
+    "id": "dog_small",
+    "name": "Dog, Small",
+    "type": "standard",
+    "prereqLevel": 1,
+    "size": "Small",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 13,
+    "dex": 17,
+    "con": 15,
+    "int": 2,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 1,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 40
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+3 bonus on Sense Motive checks",
+    "specialAbilities": ["Low-light vision", "Scent"],
+    "feats": ["Alertness"],
+    "attacks": [
+      { "name": "Bite", "damage": "1d4+1" }
+    ],
+    "skillBonus": {
+      "Survival": 4
+    },
+    "source": "CW"
+  },
+  {
+    "id": "monkey",
+    "name": "Monkey",
+    "type": "standard",
+    "prereqLevel": 1,
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 3,
+    "dex": 15,
+    "con": 10,
+    "int": 2,
+    "wis": 12,
+    "cha": 5,
+    "naturalArmor": 0,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 30,
+      "climb": 30
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+3 bonus on Balance checks",
+    "specialAbilities": ["Low-light vision"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Bite", "damage": "1d3-4" }
+    ],
+    "skillBonus": {
+      "Balance": 8,
+      "Climb": 8
+    },
+    "source": "PHB"
+  },
+  {
+    "id": "celestial_hawk",
+    "name": "Celestial Hawk",
+    "type": "improved",
+    "prereqLevel": 3,
+    "alignmentReq": "Good",
+    "size": "Tiny",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 6,
+    "dex": 17,
+    "con": 10,
+    "int": 3,
+    "wis": 14,
+    "cha": 6,
+    "naturalArmor": 0,
+    "dr": "5/magic",
+    "sr": 5,
+    "speed": {
+      "land": 10,
+      "fly": 60,
+      "flyManeuverability": "average"
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+3 bonus on Spot checks in bright daylight",
+    "specialAbilities": ["Darkvision 60 ft.", "Acid/Cold/Elec Resistance 5", "Smite Evil 1/day (+1 dmg)"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Talons", "damage": "1d4-2" }
+    ],
+    "skillBonus": {
+      "Spot": 8
+    },
+    "source": "DMG / Imp. Fam."
+  },
+  {
+    "id": "fiendish_rat",
+    "name": "Fiendish Rat",
+    "type": "improved",
+    "prereqLevel": 3,
+    "alignmentReq": "Evil",
+    "size": "Tiny",
+    "creatureType": "Magical Beast",
+    "hd": 0.5,
+    "str": 2,
+    "dex": 15,
+    "con": 10,
+    "int": 3,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 0,
+    "dr": "5/magic",
+    "sr": 5,
+    "speed": {
+      "land": 15,
+      "climb": 15,
+      "swim": 15
+    },
+    "baseFort": 2,
+    "baseRef": 2,
+    "baseWill": 0,
+    "baseBab": 0,
+    "masterBonus": "+2 bonus on Fortitude saves",
+    "specialAbilities": ["Darkvision 60 ft.", "Cold/Fire Resistance 5", "Smite Good 1/day (+1 dmg)"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Bite", "damage": "1d3-4" }
+    ],
+    "skillBonus": {
+      "Balance": 8,
+      "Climb": 8
+    },
+    "source": "DMG / Imp. Fam."
+  },
+  {
+    "id": "shocker_lizard",
+    "name": "Shocker Lizard",
+    "type": "improved",
+    "prereqLevel": 5,
+    "alignmentReq": "Neutral",
+    "size": "Small",
+    "creatureType": "Magical Beast",
+    "hd": 2,
+    "str": 10,
+    "dex": 15,
+    "con": 13,
+    "int": 4,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 3,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 40,
+      "climb": 20,
+      "swim": 20
+    },
+    "baseFort": 4,
+    "baseRef": 5,
+    "baseWill": 1,
+    "baseBab": 2,
+    "masterBonus": "Electricity Resistance 5 granted to master within 5 ft",
+    "specialAbilities": ["Shock 2d8 nonlethal (touch)", "Lethal Shock 3d8 (ring)", "Sense Electricity 100 ft.", "Immune to Electricity"],
+    "feats": ["Improved Initiative"],
+    "attacks": [
+      { "name": "Bite", "damage": "1d4" },
+      { "name": "Shock", "damage": "2d8 nonlethal touch" }
+    ],
+    "skillBonus": {
+      "Climb": 8,
+      "Hide": 4,
+      "Listen": 4,
+      "Spot": 4
+    },
+    "source": "DMG / Imp. Fam."
+  },
+  {
+    "id": "stirge",
+    "name": "Stirge",
+    "type": "improved",
+    "prereqLevel": 5,
+    "alignmentReq": "Any",
+    "size": "Tiny",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 3,
+    "dex": 19,
+    "con": 10,
+    "int": 1,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 0,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 10,
+      "fly": 40,
+      "flyManeuverability": "average"
+    },
+    "baseFort": 2,
+    "baseRef": 6,
+    "baseWill": 1,
+    "baseBab": 1,
+    "masterBonus": "+2 bonus on grapple checks",
+    "specialAbilities": ["Attach", "Blood Drain (1d4 Con/round)", "Darkvision 60 ft.", "Low-light vision"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Touch (Attach)", "damage": "Attach + Blood Drain" }
+    ],
+    "skillBonus": {
+      "Hide": 4,
+      "Spot": 4
+    },
+    "source": "DMG / Imp. Fam."
+  },
+  {
+    "id": "imp",
+    "name": "Imp",
+    "type": "improved",
+    "prereqLevel": 7,
+    "alignmentReq": "Lawful Evil",
+    "size": "Tiny",
+    "creatureType": "Outsider",
+    "hd": 3,
+    "str": 10,
+    "dex": 17,
+    "con": 10,
+    "int": 10,
+    "wis": 12,
+    "cha": 14,
+    "naturalArmor": 3,
+    "dr": "5/good or silver",
+    "sr": 0,
+    "speed": {
+      "land": 20,
+      "fly": 50,
+      "flyManeuverability": "perfect"
+    },
+    "baseFort": 3,
+    "baseRef": 6,
+    "baseWill": 4,
+    "baseBab": 3,
+    "masterBonus": "Telepathic link & shared darkvision 60 ft",
+    "specialAbilities": ["Invisibility at will", "Poison (1d4 Dex / 2d4 Dex DC 13)", "Fast Healing 2", "Alternate Form", "Immune to Fire/Poison", "Acid/Cold Resistance 10"],
+    "feats": ["Dodge", "Weapon Finesse"],
+    "attacks": [
+      { "name": "Sting", "damage": "1d4 plus poison" }
+    ],
+    "skillBonus": {
+      "Bluff": 8,
+      "Hide": 8,
+      "Listen": 7,
+      "Move Silently": 8,
+      "Spot": 7
+    },
+    "source": "MM / Imp. Fam."
+  },
+  {
+    "id": "quasit",
+    "name": "Quasit",
+    "type": "improved",
+    "prereqLevel": 7,
+    "alignmentReq": "Chaotic Evil",
+    "size": "Tiny",
+    "creatureType": "Outsider",
+    "hd": 3,
+    "str": 8,
+    "dex": 17,
+    "con": 10,
+    "int": 10,
+    "wis": 12,
+    "cha": 10,
+    "naturalArmor": 3,
+    "dr": "5/cold iron or good",
+    "sr": 0,
+    "speed": {
+      "land": 20,
+      "fly": 50,
+      "flyManeuverability": "perfect"
+    },
+    "baseFort": 3,
+    "baseRef": 6,
+    "baseWill": 4,
+    "baseBab": 3,
+    "masterBonus": "Telepathic link & shared darkvision 60 ft",
+    "specialAbilities": ["Invisibility at will", "Poison (1d4 Dex / 2d4 Dex DC 13)", "Fast Healing 2", "Alternate Form", "Immune to Electricity/Poison", "Acid/Cold/Fire Resistance 10"],
+    "feats": ["Improved Initiative", "Weapon Finesse"],
+    "attacks": [
+      { "name": "2 Claws", "damage": "1d3-1 plus poison" },
+      { "name": "Bite", "damage": "1d4-1" }
+    ],
+    "skillBonus": {
+      "Bluff": 6,
+      "Hide": 8,
+      "Listen": 7,
+      "Move Silently": 8,
+      "Spot": 7
+    },
+    "source": "MM / Imp. Fam."
+  },
+  {
+    "id": "pseudodragon",
+    "name": "Pseudodragon",
+    "type": "improved",
+    "prereqLevel": 7,
+    "alignmentReq": "Neutral Good",
+    "size": "Tiny",
+    "creatureType": "Dragon",
+    "hd": 2,
+    "str": 6,
+    "dex": 15,
+    "con": 13,
+    "int": 10,
+    "wis": 12,
+    "cha": 10,
+    "naturalArmor": 4,
+    "dr": "None",
+    "sr": 19,
+    "speed": {
+      "land": 15,
+      "fly": 60,
+      "flyManeuverability": "good"
+    },
+    "baseFort": 4,
+    "baseRef": 5,
+    "baseWill": 4,
+    "baseBab": 2,
+    "masterBonus": "Telepathy 60 ft & SR 19 within 1 mile of master",
+    "specialAbilities": ["Blindsense 60 ft.", "Telepathy 60 ft.", "Poison Sting (Sleep 1d3 hrs DC 14)", "Immune to Sleep & Paralysis", "Dragon Traits"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Sting", "damage": "1d3-2 plus poison" },
+      { "name": "Bite", "damage": "1" }
+    ],
+    "skillBonus": {
+      "Hide": 8,
+      "Listen": 5,
+      "Spot": 5
+    },
+    "source": "MM / Imp. Fam."
+  },
+  {
+    "id": "coure_eladrin",
+    "name": "Coure Eladrin",
+    "type": "improved",
+    "prereqLevel": 7,
+    "alignmentReq": "Chaotic Good",
+    "size": "Tiny",
+    "creatureType": "Outsider",
+    "hd": 2,
+    "str": 6,
+    "dex": 20,
+    "con": 10,
+    "int": 12,
+    "wis": 13,
+    "cha": 14,
+    "naturalArmor": 1,
+    "dr": "5/cold iron or evil",
+    "sr": 12,
+    "speed": {
+      "land": 20,
+      "fly": 60,
+      "flyManeuverability": "perfect"
+    },
+    "baseFort": 3,
+    "baseRef": 8,
+    "baseWill": 4,
+    "baseBab": 2,
+    "masterBonus": "Incorporeal light form & Magic Resistance",
+    "specialAbilities": ["Incorporeal Light Form", "Invisibility at will", "Spell-like Abilities (Dancing Lights, Detect Magic)", "Immune to Electricity/Petrification", "Cold/Fire Resistance 10"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Tiny Dagger", "damage": "1d2-2" }
+    ],
+    "skillBonus": {
+      "Concentration": 5,
+      "Hide": 8,
+      "Listen": 6,
+      "Spot": 6
+    },
+    "source": "BoED / CAr"
+  },
+  {
+    "id": "musteval_guardinal",
+    "name": "Musteval Guardinal",
+    "type": "improved",
+    "prereqLevel": 7,
+    "alignmentReq": "Neutral Good",
+    "size": "Tiny",
+    "creatureType": "Outsider",
+    "hd": 2,
+    "str": 6,
+    "dex": 19,
+    "con": 10,
+    "int": 12,
+    "wis": 13,
+    "cha": 14,
+    "naturalArmor": 2,
+    "dr": "5/silver or evil",
+    "sr": 12,
+    "speed": {
+      "land": 30,
+      "burrow": 20
+    },
+    "baseFort": 3,
+    "baseRef": 7,
+    "baseWill": 4,
+    "baseBab": 2,
+    "masterBonus": "+2 bonus on Escape Artist & Listen checks",
+    "specialAbilities": ["Burrow speed 20 ft.", "Invisibility at will", "Magic Missile 1/day", "Immune to Electricity/Petrification", "Cold/Sonic Resistance 10"],
+    "feats": ["Weapon Finesse"],
+    "attacks": [
+      { "name": "Bite", "damage": "1d3-2" }
+    ],
+    "skillBonus": {
+      "Escape Artist": 6,
+      "Hide": 8,
+      "Listen": 6,
+      "Spot": 6
+    },
+    "source": "BoED / CAr"
+  },
+  {
+    "id": "homunculus",
+    "name": "Homunculus",
+    "type": "improved",
+    "prereqLevel": 7,
+    "alignmentReq": "Any",
+    "size": "Tiny",
+    "creatureType": "Construct",
+    "hd": 2,
+    "str": 8,
+    "dex": 15,
+    "con": 10,
+    "int": 10,
+    "wis": 12,
+    "cha": 7,
+    "naturalArmor": 2,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 20,
+      "fly": 50,
+      "flyManeuverability": "good"
+    },
+    "baseFort": 0,
+    "baseRef": 4,
+    "baseWill": 1,
+    "baseBab": 1,
+    "masterBonus": "Telepathic link up to 1500 ft (master knows whatever homunculus senses)",
+    "specialAbilities": ["Construct Traits", "Poison Bite (Sleep 5d6 mins DC 11)", "Darkvision 60 ft.", "Low-light vision"],
+    "feats": ["Lightning Reflexes"],
+    "attacks": [
+      { "name": "Bite", "damage": "1d3-1 plus poison" }
+    ],
+    "skillBonus": {
+      "Hide": 4,
+      "Listen": 3,
+      "Spot": 3
+    },
+    "source": "MM / Imp. Fam."
+  },
+  {
+    "id": "formian_worker",
+    "name": "Formian Worker",
+    "type": "improved",
+    "prereqLevel": 5,
+    "alignmentReq": "Lawful Neutral",
+    "size": "Small",
+    "creatureType": "Outsider",
+    "hd": 1,
+    "str": 13,
+    "dex": 14,
+    "con": 13,
+    "int": 6,
+    "wis": 10,
+    "cha": 9,
+    "naturalArmor": 4,
+    "dr": "None",
+    "sr": 0,
+    "speed": {
+      "land": 40
+    },
+    "baseFort": 3,
+    "baseRef": 4,
+    "baseWill": 2,
+    "baseBab": 1,
+    "masterBonus": "+2 bonus on Craft checks & Hive Mind link",
+    "specialAbilities": ["Hive Mind telepathy 50 miles", "Immune to Poison/Petrification/Cold", "Fire/Resistance 5", "Make Whole 1/day"],
+    "feats": ["Skill Focus (Craft)"],
+    "attacks": [
+      { "name": "Bite", "damage": "1d4+1" }
+    ],
+    "skillBonus": {
+      "Climb": 4,
+      "Craft": 4
+    },
+    "source": "MM / Imp. Fam."
+  },
+  {
+    "id": "ice_mephit",
+    "name": "Ice Mephit",
+    "type": "improved",
+    "prereqLevel": 7,
+    "alignmentReq": "Neutral",
+    "size": "Small",
+    "creatureType": "Outsider",
+    "hd": 3,
+    "str": 10,
+    "dex": 13,
+    "con": 10,
+    "int": 12,
+    "wis": 11,
+    "cha": 15,
+    "naturalArmor": 4,
+    "dr": "5/magic",
+    "sr": 0,
+    "speed": {
+      "land": 30,
+      "fly": 50,
+      "flyManeuverability": "perfect"
+    },
+    "baseFort": 3,
+    "baseRef": 4,
+    "baseWill": 3,
+    "baseBab": 3,
+    "masterBonus": "+2 bonus on Cold spell caster level checks",
+    "specialAbilities": ["Breath Weapon (Cold 1d4 DC 13 cone)", "Magic-Missile 1/hr", "Chill Touch 1/day", "Immune to Cold", "Vulnerable to Fire"],
+    "feats": ["Dodge"],
+    "attacks": [
+      { "name": "2 Claws", "damage": "1d3 plus 1 cold" }
+    ],
+    "skillBonus": {
+      "Bluff": 8,
+      "Hide": 7,
+      "Listen": 6,
+      "Spot": 6
+    },
+    "source": "MM / Imp. Fam."
+  }
+]

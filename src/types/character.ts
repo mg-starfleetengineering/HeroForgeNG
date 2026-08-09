@@ -168,6 +168,7 @@ export interface CharacterState {
   selectedTemplate?: string;
   selectedDomains?: string[];
   tacticalCombat?: TacticalCombatState;
+  familiar?: FamiliarState;
 }
 
 export interface TemplateData {
@@ -336,4 +337,92 @@ export interface DeityData {
   favoredWeapon: string;
   domains: string[];
 }
+
+export interface FamiliarAttack {
+  name: string;
+  damage: string;
+  strMultiplier?: number;
+}
+
+export interface FamiliarData {
+  id: string;
+  name: string;
+  type: 'standard' | 'improved';
+  prereqLevel: number;
+  alignmentReq?: string;
+  size: string;
+  creatureType: string;
+  hd: number;
+  str: number;
+  dex: number;
+  con: number;
+  int: number;
+  wis: number;
+  cha: number;
+  naturalArmor: number;
+  dr: string;
+  sr: number;
+  speed: {
+    land: number;
+    fly?: number;
+    flyManeuverability?: string;
+    swim?: number;
+    climb?: number;
+    burrow?: number;
+  };
+  baseFort: number;
+  baseRef: number;
+  baseWill: number;
+  baseBab: number;
+  masterBonus: string;
+  specialAbilities: string[];
+  feats: string[];
+  attacks: FamiliarAttack[];
+  skillBonus?: Record<string, number>;
+  source?: string;
+}
+
+export interface CustomFamiliarData {
+  name: string;
+  size: string;
+  creatureType: string;
+  str: number;
+  dex: number;
+  con: number;
+  int: number;
+  wis: number;
+  cha: number;
+  naturalArmor: number;
+  dr: string;
+  sr: number;
+  speedLand: number;
+  speedFly?: number;
+  speedFlyManeuverability?: string;
+  speedSwim?: number;
+  speedClimb?: number;
+  speedBurrow?: number;
+  baseFort: number;
+  baseRef: number;
+  baseWill: number;
+  baseBab: number;
+  masterBonus: string;
+  specialAbilities: string;
+  feats: string;
+  attack1Name: string;
+  attack1Damage: string;
+  attack2Name?: string;
+  attack2Damage?: string;
+  skillBonus?: Record<string, number>;
+  notes?: string;
+}
+
+export interface FamiliarState {
+  hasFamiliar: boolean;
+  selectedFamiliarId: string; // 'bat', 'cat', ..., or 'custom'
+  customFamiliar?: CustomFamiliarData;
+  overrideName?: string;
+  customHp?: number;
+  notes?: string;
+}
+
 
