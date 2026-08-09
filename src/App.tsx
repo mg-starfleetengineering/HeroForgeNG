@@ -70,6 +70,16 @@ const DEFAULT_CHARACTER: CharacterState = {
     { id: 'inv_8', name: 'Potion of Cure Light Wounds', quantity: 2, weight: 0.1, location: 'Belt Pouch', value: '50 gp', notes: 'Heals 1d8+1 HP' }
   ],
   allowedSources: [...CORE_SOURCES],
+  tacticalCombat: {
+    powerAttack: 0,
+    combatExpertise: 0,
+    fightingDefensively: false,
+    haste: false,
+    rage: false,
+    whirlingFrenzy: false,
+    flurryOfBlows: false,
+    isCollapsed: false
+  },
   auras: [
     {
       id: 'aura_def_1',
@@ -341,7 +351,7 @@ export const App: React.FC = () => {
           {activeTab === 'notes' && <NotesTab character={character} onChange={updateCharacter} />}
         </div>
         <div className={activeTab === 'sheet' ? 'block' : 'hidden print:block'}>
-          <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} domainsData={domainsData} deitiesData={deitiesData} />
+          <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} domainsData={domainsData} deitiesData={deitiesData} onChange={updateCharacter} />
         </div>
       </main>
 
