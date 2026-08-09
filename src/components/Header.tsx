@@ -10,6 +10,7 @@ import {
   calculateTraitFlawAcMod
 } from '../engine/stats';
 import { calculateBAB, calculateBaseSave, calculateTotalHP } from '../engine/classes';
+import { calculateTotalDR } from '../engine/dr';
 
 interface HeaderProps {
   character: CharacterState;
@@ -77,6 +78,8 @@ export const Header: React.FC<HeaderProps> = ({
   const shieldBonusMap: Record<string, number> = { none: 0, buckler: 1, light_wooden: 1, heavy_shield: 2, tower_shield: 4 };
   const totalAc = 10 + (armorBonusMap[eq.armor] || 0) + (eq.armorEnhancement || 0) + (shieldBonusMap[eq.shield] || 0) + (eq.shieldEnhancement || 0) + dexMod + (eq.deflection || 0) + (eq.natural || 0) + (eq.dodge || 0) + traitFlawAcMod;
 
+  const drSummary = calculateTotalDR(character, raceObj, undefined, [], classesData);
+
   const tabs = [
     { id: 'stats', label: 'Ability Scores', icon: 'fa-chart-simple' },
     { id: 'race-class', label: 'Race & Classes', icon: 'fa-shield-halved' },
@@ -129,6 +132,13 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="text-center">
             <span className="text-slate-400 block text-[10px] uppercase tracking-wider">AC</span>
             <span className="font-mono font-bold text-cyan-400 text-sm">{totalAc}</span>
+          </div>
+          <div className="h-6 w-px bg-slate-800"></div>
+          <div className="text-center">
+            <span className="text-slate-400 block text-[10px] uppercase tracking-wider">DR</span>
+            <span className="font-mono font-bold text-orange-400 text-sm" title={drSummary.fullDRString}>
+              {drSummary.bestDRString}
+            </span>
           </div>
           <div className="h-6 w-px bg-slate-800"></div>
           <div className="text-center">
