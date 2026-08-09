@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CharacterState, RaceData, ClassData, WeaponData, FeatData, TraitData, FlawData, SkillTrickData, TemplateData, DomainData, DeityData } from './types/character';
+import { CharacterState, RaceData, ClassData, WeaponData, FeatData, TraitData, FlawData, SkillTrickData, TemplateData, DomainData, DeityData, FamiliarData } from './types/character';
 import { Header } from './components/Header';
 import { StatsTab } from './components/StatsTab';
 import { RaceClassTab } from './components/RaceClassTab';
@@ -7,6 +7,7 @@ import { SkillsTab } from './components/SkillsTab';
 import { FeatsTab } from './components/FeatsTab';
 import { EquipmentTab } from './components/EquipmentTab';
 import { SpellsTab } from './components/SpellsTab';
+import { FamiliarTab } from './components/FamiliarTab';
 import { AurasTab } from './components/AurasTab';
 import { NotesTab } from './components/NotesTab';
 import { SheetViewTab } from './components/SheetViewTab';
@@ -142,6 +143,7 @@ export const App: React.FC = () => {
   const [templatesData, setTemplatesData] = useState<TemplateData[]>([]);
   const [domainsData, setDomainsData] = useState<DomainData[]>([]);
   const [deitiesData, setDeitiesData] = useState<DeityData[]>([]);
+  const [familiarsData, setFamiliarsData] = useState<FamiliarData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -155,8 +157,9 @@ export const App: React.FC = () => {
       fetch('./data/skill_tricks.json').then(res => res.json()),
       fetch('./data/templates.json').then(res => res.json()),
       fetch('./data/domains.json').then(res => res.json()),
-      fetch('./data/deities.json').then(res => res.json())
-    ]).then(([races, classes, weapons, feats, traits, flaws, tricks, templates, domains, deities]) => {
+      fetch('./data/deities.json').then(res => res.json()),
+      fetch('./data/familiars.json').then(res => res.json())
+    ]).then(([races, classes, weapons, feats, traits, flaws, tricks, templates, domains, deities, familiars]) => {
       setRacesData(races);
       setClassesData(classes);
       setWeaponsData(weapons);
@@ -167,6 +170,7 @@ export const App: React.FC = () => {
       setTemplatesData(templates);
       setDomainsData(domains);
       setDeitiesData(deities);
+      setFamiliarsData(familiars);
       setLoading(false);
     }).catch(err => {
       console.error('Failed to load HeroForge JSON data:', err);
@@ -346,6 +350,7 @@ export const App: React.FC = () => {
           {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} classesData={classesData} racesData={racesData} onChange={updateCharacter} />}
           {activeTab === 'equipment' && <EquipmentTab character={character} weaponsData={weaponsData} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
           {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} racesData={racesData} domainsData={domainsData} deitiesData={deitiesData} onChange={updateCharacter} />}
+          {activeTab === 'familiar' && <FamiliarTab character={character} classesData={classesData} familiarsData={familiarsData} onChange={updateCharacter} />}
           {activeTab === 'auras' && <AurasTab character={character} onChange={updateCharacter} />}
           {activeTab === 'sources' && <SourceBooksTab character={character} onChange={updateCharacter} />}
           {activeTab === 'notes' && <NotesTab character={character} onChange={updateCharacter} />}
