@@ -23,6 +23,12 @@ import {
   isClassSkillForCharacter,
   calculatePerceptionStats
 } from '../engine/skills';
+import { TacticalCombatWidget } from './TacticalCombatWidget';
+import {
+  getTacticalCombatState,
+  calculateTacticalCombatModifiers,
+  generateFullAttackSequence
+} from '../engine/combat';
 
 interface SheetViewTabProps {
   character: CharacterState;
@@ -34,6 +40,7 @@ interface SheetViewTabProps {
   flawsData?: FlawData[];
   domainsData?: DomainData[];
   deitiesData?: DeityData[];
+  onChange?: (updated: Partial<CharacterState>) => void;
 }
 
 export const SheetViewTab: React.FC<SheetViewTabProps> = ({
@@ -45,7 +52,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   traitsData = [],
   flawsData = [],
   domainsData = [],
-  deitiesData = []
+  deitiesData = [],
+  onChange
 }) => {
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
   const templateObj: Partial<TemplateData> | undefined = templatesData.find(t => t.name === character.selectedTemplate || t.id === character.selectedTemplate);
@@ -61,7 +69,6 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const traitFlawInitMod = calculateTraitFlawInitiativeMod(selectedTraits, selectedFlaws, traitsData, flawsData);
 
   const speedData = calculateTotalSpeed(character, raceObj, templateObj, traitsData, flawsData);
-  const finalSpeed = speedData.land;
 
   const totalLevel = character.levelProgression.filter(l => l.primaryClass).length || 1;
   const strScore = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
@@ -79,17 +86,28 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const chaMod = getAbilityMod(chaScore);
 
   const bab = calculateBAB(character.levelProgression, classesData);
-  const hp = calculateTotalHP(character.levelProgression, classesData, conMod, traitFlawHpMod);
+  const tcState = getTacticalCombatState(character, bab);
+  const generalTcMods = calculateTacticalCombatModifiers(tcState);
+
+  const effectiveStrScore = strScore + (generalTcMods.strBonus || 0);
+  const effectiveConScore = conScore + (generalTcMods.conBonus || 0);
+
+  const effectiveStrMod = getAbilityMod(effectiveStrScore);
+  const effectiveConMod = getAbilityMod(effectiveConScore);
+
+  const hp = calculateTotalHP(character.levelProgression, classesData, effectiveConMod, traitFlawHpMod);
 
   const baseFort = calculateBaseSave('fort', character.levelProgression, classesData);
   const baseRef = calculateBaseSave('ref', character.levelProgression, classesData);
   const baseWill = calculateBaseSave('will', character.levelProgression, classesData);
 
-  const totalFort = baseFort + conMod + traitFlawSaveMods.fort;
-  const totalRef = baseRef + dexMod + traitFlawSaveMods.ref;
-  const totalWill = baseWill + wisMod + traitFlawSaveMods.will;
+  const totalFort = baseFort + effectiveConMod + traitFlawSaveMods.fort + generalTcMods.fortSaveMod;
+  const totalRef = baseRef + dexMod + traitFlawSaveMods.ref + generalTcMods.refSaveMod;
+  const totalWill = baseWill + wisMod + traitFlawSaveMods.will + generalTcMods.willSaveMod;
 
   const totalInitiative = dexMod + traitFlawInitMod;
+
+  const finalSpeed = speedData.land + generalTcMods.speedMod;
 
   const eq: Equipment = character.equipment || {
     armor: 'chainshirt', armorEnhancement: 1, shield: 'heavy_shield', shieldEnhancement: 1,
@@ -99,7 +117,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const funds = character.funds || { cp: 0, sp: 0, gp: 0, pp: 0, otherValuables: 0 };
   const inventory = character.inventory || [];
 
-  const carryingCapacity = calculateCarryingCapacity(strScore, raceObj.size || 'Medium');
+  const carryingCapacity = calculateCarryingCapacity(strScore + generalTcMods.strBonus, raceObj.size || 'Medium');
   const totalCarriedWeight = calculateTotalCarriedWeight(character, weaponsData);
   const coinWeight = calculateCoinWeight(funds);
   const netWorthGP = calculateTotalNetWorthGP(funds);
@@ -116,7 +134,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const isClass = isClassSkillForCharacter(skill.name, character.levelProgression, classesData);
     const ranks = (character.skillRanks || {})[skill.name] || 0;
     const abilityScore = calculateTotalScore(skill.keyAbility, character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
-    const abMod = getAbilityMod(abilityScore);
+    const abMod = getAbilityMod(abilityScore) + (skill.keyAbility === 'str' ? Math.floor(generalTcMods.strBonus / 2) : (skill.keyAbility === 'con' ? Math.floor(generalTcMods.conBonus / 2) : 0));
     const tfSkillMod = traitFlawSkillMods[skill.name] || 0;
 
     let totalMod = Math.floor(ranks) + abMod + tfSkillMod;
@@ -144,39 +162,58 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const armorAc = armorObj.acBonus + (eq.armorEnhancement || 0);
   const shieldAc = shieldObj.acBonus + (eq.shieldEnhancement || 0);
 
-  const totalAc = 10 + armorAc + shieldAc + dexMod + (eq.deflection || 0) + (eq.natural || 0) + (eq.dodge || 0) + traitFlawAcMod;
-  const touchAc = 10 + dexMod + (eq.deflection || 0) + (eq.dodge || 0) + traitFlawAcMod;
-  const flatAc = 10 + armorAc + shieldAc + (eq.deflection || 0) + (eq.natural || 0) + traitFlawAcMod;
+  const totalAc = 10 + armorAc + shieldAc + dexMod + (eq.deflection || 0) + (eq.natural || 0) + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.acNetMod;
+  const touchAc = 10 + dexMod + (eq.deflection || 0) + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.touchAcMod;
+  const flatAc = 10 + armorAc + shieldAc + (eq.deflection || 0) + (eq.natural || 0) + traitFlawAcMod + generalTcMods.flatAcMod;
 
   // Weapon Resolutions & Feat Combat Bonuses
   const activeWeaponsList: Array<{
     label: string;
     weapon: WeaponData;
     attackBonus: number;
+    fullSeq: string;
     damageStr: string;
     critStr: string;
     type: string;
     featAtkBonus: number;
     featDmgBonus: number;
+    tacticalNote?: string;
   }> = [];
 
   // 1. Primary Weapon
   if (eq.primaryWeapon) {
     const primaryWpn = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
     const featBonuses = calculateFeatCombatBonuses(character, primaryWpn);
+    const wMods = calculateTacticalCombatModifiers(tcState, primaryWpn, false, false);
     const enh = eq.primaryWeaponEnhancement || 0;
-    const totalAtk = bab + strMod + enh + featBonuses.attackBonus;
-    const dmgVal = strMod + enh + featBonuses.damageBonus;
+    const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod;
+    const totalAtk = bab + netAtkBonus;
+    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy);
+    const dmgVal = effectiveStrMod + enh + featBonuses.damageBonus + wMods.damageMod;
+
+    const primaryNote = (() => {
+      const notes: string[] = [];
+      if (tcState.whirlingFrenzy) { notes.push('+2 Str', '-2 Flurry'); }
+      else if (tcState.rage) { notes.push('+2 Str'); }
+      if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('-2 Flurry'); }
+      if (tcState.haste) { notes.push('+1 Haste'); }
+      if (tcState.powerAttack > 0) { notes.push(`-${tcState.powerAttack} PA`); }
+      if (tcState.combatExpertise > 0) { notes.push(`-${tcState.combatExpertise} CE`); }
+      if (tcState.fightingDefensively) { notes.push('-4 Def'); }
+      return notes.length > 0 ? `(${notes.join(', ')})` : '';
+    })();
 
     activeWeaponsList.push({
       label: 'Primary',
       weapon: primaryWpn,
       attackBonus: totalAtk,
+      fullSeq,
       damageStr: `${primaryWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`,
       critStr: `${primaryWpn.threat < 20 ? `${primaryWpn.threat}-20` : '20'}/x${primaryWpn.critMultiplier || 2}`,
       type: primaryWpn.type || 'Slashing',
       featAtkBonus: featBonuses.attackBonus,
-      featDmgBonus: featBonuses.damageBonus
+      featDmgBonus: featBonuses.damageBonus,
+      tacticalNote: primaryNote
     });
   }
 
@@ -184,19 +221,36 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   if (eq.secondaryWeapon && eq.secondaryWeapon !== 'none') {
     const secWpn = resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData);
     const featBonuses = calculateFeatCombatBonuses(character, secWpn);
+    const wMods = calculateTacticalCombatModifiers(tcState, secWpn, true, false);
     const enh = eq.secondaryWeaponEnhancement || 0;
-    const totalAtk = bab + strMod + enh + featBonuses.attackBonus;
-    const dmgVal = Math.floor(strMod / 2) + enh + featBonuses.damageBonus;
+    const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod;
+    const totalAtk = bab + netAtkBonus;
+    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy);
+    const dmgVal = Math.floor(effectiveStrMod / 2) + enh + featBonuses.damageBonus + wMods.damageMod;
+
+    const secNote = (() => {
+      const notes: string[] = [];
+      if (tcState.whirlingFrenzy) { notes.push('+2 Str', '-2 Flurry'); }
+      else if (tcState.rage) { notes.push('+2 Str'); }
+      if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('-2 Flurry'); }
+      if (tcState.haste) { notes.push('+1 Haste'); }
+      if (tcState.powerAttack > 0) { notes.push(`-${tcState.powerAttack} PA`); }
+      if (tcState.combatExpertise > 0) { notes.push(`-${tcState.combatExpertise} CE`); }
+      if (tcState.fightingDefensively) { notes.push('-4 Def'); }
+      return notes.length > 0 ? `(${notes.join(', ')})` : '';
+    })();
 
     activeWeaponsList.push({
       label: 'Off-Hand',
       weapon: secWpn,
       attackBonus: totalAtk,
+      fullSeq,
       damageStr: `${secWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`,
       critStr: `${secWpn.threat < 20 ? `${secWpn.threat}-20` : '20'}/x${secWpn.critMultiplier || 2}`,
       type: secWpn.type || 'Slashing',
       featAtkBonus: featBonuses.attackBonus,
-      featDmgBonus: featBonuses.damageBonus
+      featDmgBonus: featBonuses.damageBonus,
+      tacticalNote: secNote
     });
   }
 
@@ -204,14 +258,29 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
     const rngWpn = resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData);
     const featBonuses = calculateFeatCombatBonuses(character, rngWpn);
+    const wMods = calculateTacticalCombatModifiers(tcState, rngWpn, false, true);
     const enh = eq.rangedWeaponEnhancement || 0;
-    const totalAtk = bab + dexMod + enh + featBonuses.attackBonus;
+    const netAtkBonus = dexMod + enh + featBonuses.attackBonus + wMods.attackMod;
+    const totalAtk = bab + netAtkBonus;
+    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy);
+    const dmgVal = enh + wMods.damageMod;
+
+    const rngNote = (() => {
+      const notes: string[] = [];
+      if (tcState.whirlingFrenzy) { notes.push('-2 Flurry'); }
+      if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('-2 Flurry'); }
+      if (tcState.haste) { notes.push('+1 Haste'); }
+      if (tcState.combatExpertise > 0) { notes.push(`-${tcState.combatExpertise} CE`); }
+      if (tcState.fightingDefensively) { notes.push('-4 Def'); }
+      return notes.length > 0 ? `(${notes.join(', ')})` : '';
+    })();
 
     activeWeaponsList.push({
       label: 'Ranged',
       weapon: rngWpn,
       attackBonus: totalAtk,
-      damageStr: `${rngWpn.damageM}${enh > 0 ? `+${enh}` : ''}`,
+      fullSeq,
+      damageStr: `${rngWpn.damageM}${dmgVal > 0 ? `+${dmgVal}` : (dmgVal < 0 ? `${dmgVal}` : '')}`,
       critStr: `${rngWpn.threat < 20 ? `${rngWpn.threat}-20` : '20'}/x${rngWpn.critMultiplier || 2}`,
       type: rngWpn.type || 'Piercing',
       featAtkBonus: featBonuses.attackBonus,
@@ -268,6 +337,12 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         </button>
       </div>
 
+      {onChange && (
+        <div className="print:hidden">
+          <TacticalCombatWidget character={character} bab={bab} onChange={onChange} />
+        </div>
+      )}
+
       <div id="printable-character-sheet" className="bg-white text-slate-900 p-8 rounded-xl shadow-2xl space-y-5 font-sans print:p-0 print:shadow-none print:rounded-none print:border-none print:space-y-2.5">
         {/* Page 1 Header */}
         {renderHeader()}
@@ -318,7 +393,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                     {item.weapon.name}
                   </td>
                   <td className="py-1 text-center font-bold text-slate-900">
-                    {item.attackBonus >= 0 ? '+' : ''}{item.attackBonus}
+                    <div>{item.fullSeq || (item.attackBonus >= 0 ? `+${item.attackBonus}` : `${item.attackBonus}`)}</div>
+                    {item.tacticalNote && (
+                      <div className="text-[9px] text-slate-500 font-sans font-normal">{item.tacticalNote}</div>
+                    )}
                   </td>
                   <td className="py-1 text-center text-slate-800">{item.damageStr}</td>
                   <td className="py-1 text-center text-slate-800">{item.critStr}</td>
@@ -378,9 +456,41 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 font-mono">
-                  <tr><td className="py-1 font-bold">STR</td><td className="py-1 text-center">{strScore}</td><td className="py-1 text-center font-bold">{strMod >= 0 ? '+' : ''}{strMod}</td></tr>
+                  <tr className={generalTcMods.strBonus > 0 ? 'bg-amber-100/80' : ''}>
+                    <td className="py-1 font-bold flex items-center gap-1">
+                      STR
+                      {generalTcMods.strBonus > 0 && (
+                        <span className="text-[9px] text-amber-800 bg-amber-200/80 px-1 rounded uppercase font-sans font-semibold">
+                          +{generalTcMods.strBonus}
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-1 text-center font-bold">
+                      {effectiveStrScore}
+                      {generalTcMods.strBonus > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">({strScore})</span>}
+                    </td>
+                    <td className="py-1 text-center font-bold">
+                      {effectiveStrMod >= 0 ? `+${effectiveStrMod}` : effectiveStrMod}
+                    </td>
+                  </tr>
                   <tr><td className="py-1 font-bold">DEX</td><td className="py-1 text-center">{dexScore}</td><td className="py-1 text-center font-bold">{dexMod >= 0 ? '+' : ''}{dexMod}</td></tr>
-                  <tr><td className="py-1 font-bold">CON</td><td className="py-1 text-center">{conScore}</td><td className="py-1 text-center font-bold">{conMod >= 0 ? '+' : ''}{conMod}</td></tr>
+                  <tr className={generalTcMods.conBonus > 0 ? 'bg-amber-100/80' : ''}>
+                    <td className="py-1 font-bold flex items-center gap-1">
+                      CON
+                      {generalTcMods.conBonus > 0 && (
+                        <span className="text-[9px] text-amber-800 bg-amber-200/80 px-1 rounded uppercase font-sans font-semibold">
+                          +{generalTcMods.conBonus}
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-1 text-center font-bold">
+                      {effectiveConScore}
+                      {generalTcMods.conBonus > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">({conScore})</span>}
+                    </td>
+                    <td className="py-1 text-center font-bold">
+                      {effectiveConMod >= 0 ? `+${effectiveConMod}` : effectiveConMod}
+                    </td>
+                  </tr>
                   <tr><td className="py-1 font-bold">INT</td><td className="py-1 text-center">{intScore}</td><td className="py-1 text-center font-bold">{intMod >= 0 ? '+' : ''}{intMod}</td></tr>
                   <tr><td className="py-1 font-bold">WIS</td><td className="py-1 text-center">{wisScore}</td><td className="py-1 text-center font-bold">{wisMod >= 0 ? '+' : ''}{wisMod}</td></tr>
                   <tr><td className="py-1 font-bold">CHA</td><td className="py-1 text-center">{chaScore}</td><td className="py-1 text-center font-bold">{chaMod >= 0 ? '+' : ''}{chaMod}</td></tr>
@@ -404,7 +514,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                     <td className="py-1 font-bold">FORTITUDE (Con)</td>
                     <td className="py-1 text-center font-bold text-xs">{totalFort >= 0 ? '+' : ''}{totalFort}</td>
                     <td className="py-1 text-center">{baseFort}</td>
-                    <td className="py-1 text-center">{conMod >= 0 ? '+' : ''}{conMod}</td>
+                    <td className="py-1 text-center">{effectiveConMod >= 0 ? '+' : ''}{effectiveConMod}</td>
                   </tr>
                   <tr>
                     <td className="py-1 font-bold">REFLEX (Dex)</td>

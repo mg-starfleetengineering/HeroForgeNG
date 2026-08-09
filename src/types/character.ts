@@ -122,6 +122,17 @@ export interface Aura {
   notes?: string;
 }
 
+export interface TacticalCombatState {
+  powerAttack: number;
+  combatExpertise: number;
+  fightingDefensively: boolean;
+  haste: boolean;
+  rage: boolean;
+  whirlingFrenzy: boolean;
+  flurryOfBlows: boolean;
+  isCollapsed?: boolean;
+}
+
 export interface CharacterState {
   name: string;
   player: string;
@@ -156,6 +167,7 @@ export interface CharacterState {
   selectedSkillTricks?: string[];
   selectedTemplate?: string;
   selectedDomains?: string[];
+  tacticalCombat?: TacticalCombatState;
 }
 
 export interface TemplateData {

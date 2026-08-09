@@ -10,6 +10,11 @@ import {
   calculateTotalCarriedWeight, getEncumbranceStatus, ARMOR_WEIGHT_MAP, SHIELD_WEIGHT_MAP,
   ensureEquippedItemInInventory, isItemInInventory, syncEquippedItemsToInventory
 } from '../engine/equipment';
+import {
+  getTacticalCombatState,
+  calculateTacticalCombatModifiers,
+  generateFullAttackSequence
+} from '../engine/combat';
 
 interface EquipmentTabProps {
   character: CharacterState;
@@ -207,26 +212,33 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     ];
   }, []);
 
+  // Tactical Combat Modifiers
+  const tcState = getTacticalCombatState(character, bab);
+
   // Resolve Weapons
   const primaryWpnObj = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
+  const primaryTacticalMods = calculateTacticalCombatModifiers(tcState, primaryWpnObj, false, false);
   const primaryFeatBonuses = calculateFeatCombatBonuses(character, primaryWpnObj);
   const primaryEnhancement = eq.primaryWeaponEnhancement || 0;
-  const primaryTotalAtk = bab + strMod + primaryEnhancement + primaryFeatBonuses.attackBonus;
-  const primaryDmgVal = strMod + primaryEnhancement + primaryFeatBonuses.damageBonus;
+  const primaryTotalAtk = bab + strMod + primaryEnhancement + primaryFeatBonuses.attackBonus + primaryTacticalMods.attackMod;
+  const primaryDmgVal = strMod + primaryEnhancement + primaryFeatBonuses.damageBonus + primaryTacticalMods.damageMod;
   const primaryDmgStr = primaryDmgVal >= 0 ? `+${primaryDmgVal}` : `${primaryDmgVal}`;
+  const primaryFullAttackSeq = generateFullAttackSequence(bab, strMod + primaryEnhancement + primaryFeatBonuses.attackBonus + primaryTacticalMods.attackMod, tcState.haste, tcState.flurryOfBlows);
 
   const hasSecondary = eq.secondaryWeapon && eq.secondaryWeapon !== 'none';
   const secondaryWpnObj = hasSecondary ? resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData) : null;
+  const secondaryTacticalMods = secondaryWpnObj ? calculateTacticalCombatModifiers(tcState, secondaryWpnObj, true, false) : null;
   const secondaryFeatBonuses = secondaryWpnObj ? calculateFeatCombatBonuses(character, secondaryWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const secondaryEnhancement = eq.secondaryWeaponEnhancement || 0;
-  const secondaryTotalAtk = secondaryWpnObj ? (bab + strMod + secondaryEnhancement + secondaryFeatBonuses.attackBonus) : 0;
-  const secondaryDmgVal = secondaryWpnObj ? (Math.floor(strMod / 2) + secondaryEnhancement + secondaryFeatBonuses.damageBonus) : 0;
+  const secondaryTotalAtk = secondaryWpnObj ? (bab + strMod + secondaryEnhancement + secondaryFeatBonuses.attackBonus + (secondaryTacticalMods?.attackMod || 0)) : 0;
+  const secondaryDmgVal = secondaryWpnObj ? (Math.floor(strMod / 2) + secondaryEnhancement + secondaryFeatBonuses.damageBonus + (secondaryTacticalMods?.damageMod || 0)) : 0;
 
   const hasRanged = eq.rangedWeapon && eq.rangedWeapon !== 'none';
   const rangedWpnObj = hasRanged ? resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData) : null;
+  const rangedTacticalMods = rangedWpnObj ? calculateTacticalCombatModifiers(tcState, rangedWpnObj, false, true) : null;
   const rangedFeatBonuses = rangedWpnObj ? calculateFeatCombatBonuses(character, rangedWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const rangedEnhancement = eq.rangedWeaponEnhancement || 0;
-  const rangedTotalAtk = rangedWpnObj ? (bab + dexMod + rangedEnhancement + rangedFeatBonuses.attackBonus) : 0;
+  const rangedTotalAtk = rangedWpnObj ? (bab + dexMod + rangedEnhancement + rangedFeatBonuses.attackBonus + (rangedTacticalMods?.attackMod || 0)) : 0;
 
   // Inventory Actions
   const handleAddInventoryItem = (e: React.FormEvent) => {
