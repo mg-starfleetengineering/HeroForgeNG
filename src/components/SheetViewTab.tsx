@@ -29,6 +29,7 @@ import {
   calculateTacticalCombatModifiers,
   generateFullAttackSequence
 } from '../engine/combat';
+import { calculateTotalDR } from '../engine/dr';
 
 interface SheetViewTabProps {
   character: CharacterState;
@@ -69,6 +70,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const traitFlawInitMod = calculateTraitFlawInitiativeMod(selectedTraits, selectedFlaws, traitsData, flawsData);
 
   const speedData = calculateTotalSpeed(character, raceObj, templateObj, traitsData, flawsData);
+  const drSummary = calculateTotalDR(character, raceObj, templateObj, [], classesData);
 
   const totalLevel = character.levelProgression.filter(l => l.primaryClass).length || 1;
   const strScore = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
@@ -348,27 +350,31 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         {renderHeader()}
 
         {/* Vitals Banner */}
-        <div className="grid grid-cols-5 gap-3 text-center font-mono py-2 bg-slate-100 rounded-lg border border-slate-300 print:break-inside-avoid">
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-2 text-center font-mono py-2 bg-slate-100 rounded-lg border border-slate-300 print:break-inside-avoid">
           <div>
             <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Hit Points</span>
-            <span className="text-2xl font-bold text-slate-900">{hp}</span>
+            <span className="text-xl font-bold text-slate-900">{hp}</span>
           </div>
           <div>
             <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Armor Class</span>
-            <span className="text-2xl font-bold text-slate-900">{totalAc}</span>
+            <span className="text-xl font-bold text-slate-900">{totalAc}</span>
             <span className="text-[9px] text-slate-500 block">Touch {touchAc} / FF {flatAc}</span>
           </div>
           <div>
-            <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Initiative</span>
-            <span className="text-2xl font-bold text-slate-900">{totalInitiative >= 0 ? '+' : ''}{totalInitiative}</span>
+            <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Damage Red.</span>
+            <span className="text-xl font-bold text-amber-700">{drSummary.bestDRString}</span>
           </div>
           <div>
-            <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Base Attack (BAB)</span>
-            <span className="text-2xl font-bold text-slate-900">+{bab}</span>
+            <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Initiative</span>
+            <span className="text-xl font-bold text-slate-900">{totalInitiative >= 0 ? '+' : ''}{totalInitiative}</span>
+          </div>
+          <div>
+            <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Base Attack</span>
+            <span className="text-xl font-bold text-slate-900">+{bab}</span>
           </div>
           <div>
             <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Speed</span>
-            <span className="text-2xl font-bold text-slate-900">{finalSpeed} ft</span>
+            <span className="text-xl font-bold text-slate-900">{finalSpeed} ft</span>
           </div>
         </div>
 
@@ -424,6 +430,48 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
               <p className="text-slate-600">Shield AC Bonus: +{shieldAc} | Check Penalty: {shieldObj.checkPenalty}</p>
             </div>
           </div>
+        </div>
+
+        {/* Damage Reduction (DR) Section */}
+        <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 space-y-1.5 print:break-inside-avoid">
+          <div className="flex items-center justify-between border-b border-slate-300 pb-1">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+              Damage Reduction (DR) Engine
+            </h3>
+            <span className="text-xs font-mono font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded border border-amber-300">
+              {drSummary.bestDRString}
+            </span>
+          </div>
+          {drSummary.hasDR ? (
+            <div className="space-y-2 text-xs font-mono">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="p-2 bg-white rounded border border-slate-200 space-y-1">
+                  <span className="text-[10px] font-sans font-bold text-slate-500 block uppercase">Active DR Rating Summary</span>
+                  <span className="text-sm font-bold text-slate-900 block">{drSummary.fullDRString}</span>
+                  {drSummary.baselineStackingDR > 0 && (
+                    <p className="text-[10px] text-emerald-700 font-sans font-semibold">
+                      Baseline Stacking DR: +{drSummary.baselineStackingDR}/- (applied to all DR ratings)
+                    </p>
+                  )}
+                </div>
+                <div className="p-2 bg-white rounded border border-slate-200 space-y-1">
+                  <span className="text-[10px] font-sans font-bold text-slate-500 block uppercase">Active DR Sources Breakdown</span>
+                  <ul className="text-[11px] space-y-0.5 font-sans">
+                    {drSummary.sources.map((src, i) => (
+                      <li key={i} className="flex justify-between items-center">
+                        <span className="text-slate-800 font-medium">&bull; {src.name}</span>
+                        <span className="font-mono text-[10px] px-1.5 py-0.2 bg-slate-100 border border-slate-200 rounded text-slate-700">
+                          {src.value}/{src.bypass} {src.stacks ? '(stacks)' : ''}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-slate-500 italic font-mono">No active Damage Reduction (DR) sources detected.</p>
+          )}
         </div>
 
         {/* Wondrous Items & Magic Gear Section */}
