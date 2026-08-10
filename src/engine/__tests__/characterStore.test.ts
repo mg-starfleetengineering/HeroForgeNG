@@ -73,6 +73,40 @@ describe('characterStore Storage Helper & Summary Tests', () => {
     expect(summary.updatedAt).toBe(1700000000000);
   });
 
+  it('should use raceOverride in createCharacterSummary when specified', () => {
+    const sheet: CharacterSheetData = {
+      id: 'test_override_456',
+      updatedAt: 1700000000000,
+      name: 'Ghislaine',
+      player: 'Shadow',
+      alignment: 'Chaotic Good',
+      deity: 'Solonor Thelandira',
+      pointBuyTarget: '32',
+      baseStats: { str: 14, dex: 16, con: 12, int: 10, wis: 12, cha: 10 },
+      enhancementMods: { str: 0, dex: 0, con: 0, int: 0, wis: 0, cha: 0 },
+      levelBumps: {},
+      selectedRace: 'Elf, Wild',
+      raceOverride: 'Catfolk',
+      isGestalt: false,
+      levelProgression: [{ level: 1, primaryClass: 'Ranger', hpRoll: 8 }],
+      skillRanks: {},
+      selectedFeats: ['Track'],
+      equipment: {
+        armor: 'leather',
+        armorEnhancement: 0,
+        shield: 'none',
+        shieldEnhancement: 0,
+        deflection: 0,
+        natural: 0,
+        dodge: 0,
+        primaryWeapon: 'Longbow'
+      }
+    };
+
+    const summary = createCharacterSummary(sheet);
+    expect(summary.race).toBe('Catfolk');
+  });
+
   it('should generate non-empty unique character IDs', () => {
     const id1 = generateCharacterId();
     const id2 = generateCharacterId();

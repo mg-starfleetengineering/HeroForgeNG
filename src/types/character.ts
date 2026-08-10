@@ -146,6 +146,7 @@ export interface CharacterState {
   enhancementMods: BaseStats;
   levelBumps: Record<number, StatType>;
   selectedRace: string;
+  raceOverride?: string;
   isGestalt: boolean;
   levelProgression: LevelProgression[];
   skillRanks: Record<string, number>;

@@ -87,7 +87,8 @@ export function generateRoll20JSON(
     // Header & Meta
     { name: 'character_name', current: character.name },
     { name: 'player_name', current: character.player || '' },
-    { name: 'race', current: character.selectedRace || '' },
+    { name: 'race', current: character.raceOverride?.trim() || character.selectedRace || '' },
+    { name: 'base_race', current: character.selectedRace || '' },
     { name: 'alignment', current: character.alignment || '' },
     { name: 'deity', current: character.deity || '' },
     { name: 'class', current: classSummary },

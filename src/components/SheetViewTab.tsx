@@ -316,7 +316,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         <div>
           <h1 className="text-2xl font-extrabold font-heading text-slate-900">{character.name || 'Unnamed Hero'}</h1>
           <p className="text-xs text-slate-600 font-semibold uppercase tracking-wider">
-            {character.selectedRace || 'Human'} &bull; {classSummary} &bull; Level {totalLevel}
+            {character.raceOverride?.trim() || character.selectedRace || 'Human'} &bull; {classSummary} &bull; Level {totalLevel}
           </p>
         </div>
       </div>
