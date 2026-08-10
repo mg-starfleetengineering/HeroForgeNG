@@ -363,10 +363,10 @@ export function ensureEquippedItemInInventory(
  * exist persistently in character.inventory.
  * Returns an updated CharacterState if missing items were added, or the original if unchanged.
  */
-export function syncEquippedItemsToInventory(
-  character: CharacterState,
+export function syncEquippedItemsToInventory<T extends CharacterState>(
+  character: T,
   weaponsData: WeaponData[] = []
-): CharacterState {
+): T {
   const eq = character.equipment;
   if (!eq) return character;
 

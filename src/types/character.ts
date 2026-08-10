@@ -134,6 +134,8 @@ export interface TacticalCombatState {
 }
 
 export interface CharacterState {
+  id?: string;
+  updatedAt?: number;
   name: string;
   player: string;
   alignment: string;
@@ -169,6 +171,7 @@ export interface CharacterState {
   selectedDomains?: string[];
   tacticalCombat?: TacticalCombatState;
   familiar?: FamiliarState;
+  animalCompanion?: AnimalCompanionState;
 }
 
 export interface TemplateData {
@@ -425,4 +428,99 @@ export interface FamiliarState {
   notes?: string;
 }
 
+export interface AnimalCompanionAttack {
+  name: string;
+  damage: string;
+  strMultiplier?: number;
+}
 
+export interface AnimalCompanionData {
+  id: string;
+  name: string;
+  minLevel: number;
+  size: string;
+  creatureType: string;
+  hd: number;
+  str: number;
+  dex: number;
+  con: number;
+  int: number;
+  wis: number;
+  cha: number;
+  naturalArmor: number;
+  speed: {
+    land: number;
+    fly?: number;
+    flyManeuverability?: string;
+    swim?: number;
+    climb?: number;
+    burrow?: number;
+  };
+  attacks: AnimalCompanionAttack[];
+  specialAbilities: string[];
+  feats: string[];
+  source?: string;
+  isQuadruped?: boolean;
+}
+
+export interface CustomAnimalCompanionData {
+  name: string;
+  minLevel: number;
+  size: string;
+  creatureType: string;
+  hd: number;
+  str: number;
+  dex: number;
+  con: number;
+  int: number;
+  wis: number;
+  cha: number;
+  naturalArmor: number;
+  speedLand: number;
+  speedFly?: number;
+  speedFlyManeuverability?: string;
+  speedSwim?: number;
+  speedClimb?: number;
+  speedBurrow?: number;
+  attack1Name: string;
+  attack1Damage: string;
+  attack2Name?: string;
+  attack2Damage?: string;
+  specialAbilities: string;
+  feats: string;
+  isQuadruped?: boolean;
+  notes?: string;
+}
+
+export interface AnimalCompanionState {
+  hasCompanion: boolean;
+  selectedCompanionId: string; // species slug or 'custom'
+  customCompanion?: CustomAnimalCompanionData;
+  overrideName?: string;
+  customHp?: number;
+  assignedFeats?: string[];
+  assignedSkillRanks?: Record<string, number>;
+  selectedTricks?: string[];
+  hasNaturalBondFeat?: boolean; // toggle/override for Natural Bond feat
+  notes?: string;
+}
+
+export interface CharacterSummary {
+  id: string; // crypto.randomUUID()
+  name: string;
+  race: string;
+  classes: string; // e.g. "Fighter 3 / Wizard 2"
+  level: number;
+  updatedAt: number; // Date.now() timestamp
+  portraitUrl?: string;
+}
+
+export interface CharacterSheetData extends CharacterState {
+  id: string;
+  updatedAt: number;
+}
+
+export interface MultiCharacterStore {
+  activeCharacterId: string | null;
+  characters: Record<string, CharacterSheetData>;
+}
