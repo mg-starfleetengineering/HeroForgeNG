@@ -28,6 +28,7 @@ interface HeaderProps {
   onExportAll?: () => void;
   onExportRoll20: () => void;
   onImport: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onOpenDocs?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -45,7 +46,8 @@ export const Header: React.FC<HeaderProps> = ({
   onExport,
   onExportAll,
   onExportRoll20,
-  onImport
+  onImport,
+  onOpenDocs
 }) => {
   const [showExportDropdown, setShowExportDropdown] = useState(false);
   const [showCharacterDropdown, setShowCharacterDropdown] = useState(false);
@@ -125,7 +127,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="app-header bg-slate-900/80 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2 sm:gap-4 flex-nowrap overflow-x-auto sm:overflow-visible">
         {/* Logo & Title */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-red-700 flex items-center justify-center shadow-lg shadow-amber-900/30 text-slate-950 font-extrabold text-xl">
@@ -144,7 +146,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={() => setShowCharacterDropdown(!showCharacterDropdown)}
-            className="hidden md:flex items-center gap-4 bg-slate-950/60 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-900/60 px-3.5 py-2 rounded-xl text-xs transition group cursor-pointer shadow-inner"
+            className="hidden lg:flex items-center gap-2.5 sm:gap-3 bg-slate-950/60 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-900/60 px-3 py-1.5 rounded-xl text-xs transition group cursor-pointer shadow-inner shrink-0"
             title="Click to switch active character or manage roster"
           >
             {/* Portrait Thumbnail */}
@@ -298,7 +300,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button onClick={onCreateNew} className="btn btn-secondary text-xs" title="New Character">
             <i className="fa-solid fa-file-circle-plus"></i> <span className="hidden sm:inline">New</span>
           </button>
@@ -366,6 +368,16 @@ export const Header: React.FC<HeaderProps> = ({
           <button onClick={() => { setActiveTab('sheet'); setTimeout(() => window.print(), 200); }} className="btn btn-primary text-xs">
             <i className="fa-solid fa-print"></i> <span className="hidden sm:inline">Print Sheet</span>
           </button>
+
+          {onOpenDocs && (
+            <button
+              onClick={onOpenDocs}
+              className="btn btn-secondary text-xs w-8 h-8 p-0 flex items-center justify-center text-amber-400 hover:text-amber-300 border-amber-500/30 hover:border-amber-400 shrink-0"
+              title="User Guide & Feature Documentation"
+            >
+              <i className="fa-solid fa-circle-question text-sm"></i>
+            </button>
+          )}
         </div>
       </div>
 
