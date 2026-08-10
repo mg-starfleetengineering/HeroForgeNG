@@ -14,6 +14,7 @@ import { NotesTab } from './components/NotesTab';
 import { SheetViewTab } from './components/SheetViewTab';
 import { PortraitModal } from './components/PortraitModal';
 import { CharacterRosterModal } from './components/CharacterRosterModal';
+import { DocumentationModal } from './components/DocumentationModal';
 import { SourceBooksTab } from './components/SourceBooksTab';
 import { CORE_SOURCES } from './utils/sourceFilter';
 import { generateRoll20JSON } from './engine/roll20Export';
@@ -140,6 +141,7 @@ export const App: React.FC = () => {
   const [character, setCharacter] = useState<CharacterSheetData | null>(null);
   const [summaries, setSummaries] = useState<CharacterSummary[]>([]);
   const [isRosterOpen, setIsRosterOpen] = useState(false);
+  const [showDocsModal, setShowDocsModal] = useState(false);
   const [activeTab, setActiveTab] = useState('stats');
   const [showPortraitModal, setShowPortraitModal] = useState(false);
   const [racesData, setRacesData] = useState<RaceData[]>([]);
@@ -375,6 +377,7 @@ export const App: React.FC = () => {
         onExportAll={handleExportAllRoster}
         onExportRoll20={handleExportRoll20}
         onImport={handleImport}
+        onOpenDocs={() => setShowDocsModal(true)}
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
@@ -500,6 +503,12 @@ export const App: React.FC = () => {
         onExportAllCharacters={handleExportAllRoster}
         onCreateNewCharacter={handleCreateNewCharacter}
         onImportCharacterJSON={handleImport}
+      />
+
+      {/* In-App Help & Documentation Modal */}
+      <DocumentationModal
+        isOpen={showDocsModal}
+        onClose={() => setShowDocsModal(false)}
       />
     </div>
   );
