@@ -62,7 +62,7 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
             {activeCharacter.name || 'Unnamed Character'}
           </div>
           <div className="text-[10px] text-slate-400 truncate">
-            Lvl {activeLevel} {activeCharacter.selectedRace} &bull; {activeClassStr}
+            Lvl {activeLevel} {activeCharacter.raceOverride?.trim() || activeCharacter.selectedRace} &bull; {activeClassStr}
           </div>
         </div>
 

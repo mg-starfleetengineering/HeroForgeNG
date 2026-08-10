@@ -32,10 +32,11 @@ export function formatClassesSummary(levelProgression: LevelProgression[]): stri
 export function createCharacterSummary(character: CharacterSheetData): CharacterSummary {
   const level = character.levelProgression?.filter(l => l.primaryClass)?.length || 1;
   const classes = formatClassesSummary(character.levelProgression || []);
+  const raceDisplay = character.raceOverride?.trim() || character.selectedRace || 'Human';
   return {
     id: character.id,
     name: character.name || 'Unnamed Character',
-    race: character.selectedRace || 'Human',
+    race: raceDisplay,
     classes: classes,
     level: level,
     updatedAt: character.updatedAt || Date.now(),

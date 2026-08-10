@@ -218,21 +218,51 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({
             </div>
 
             <div>
-              <label className="label-text">Racial Template (Optional)</label>
-              <SearchableSelect
-                value={character.selectedTemplate || ''}
-                options={templateOptions}
-                onChange={val => onChange({ selectedTemplate: val })}
-                placeholder="Search template (e.g. Half-Celestial, Vampire)..."
+              <label className="label-text flex items-center justify-between">
+                <span>Racial Override / Display Name (Optional)</span>
+                {character.raceOverride && (
+                  <button
+                    type="button"
+                    onClick={() => onChange({ raceOverride: '' })}
+                    className="text-[11px] text-rose-400 hover:text-rose-300 font-normal cursor-pointer"
+                    title="Clear racial override"
+                  >
+                    Clear Override
+                  </button>
+                )}
+              </label>
+              <input
+                type="text"
+                value={character.raceOverride || ''}
+                onChange={e => onChange({ raceOverride: e.target.value })}
+                placeholder={`e.g. Catfolk (reflavored from ${character.selectedRace})`}
+                className="input-field text-xs py-2 px-3 w-full"
               />
+              <p className="text-[11px] text-slate-400 mt-1 italic leading-tight">
+                Overrides display race on sheet, roster, headers & exports while keeping all stats and traits from <strong>{character.selectedRace}</strong>.
+              </p>
             </div>
           </div>
 
           {raceObj && (
             <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs space-y-2">
-              <div className="flex justify-between items-center text-amber-400 font-bold">
-                <span>{templateObj ? `${templateObj.name} ${raceObj.name}` : raceObj.name}</span>
-                <span className="text-slate-400 font-normal">
+              <div className="flex justify-between items-start text-amber-400 font-bold gap-2">
+                <div>
+                  {character.raceOverride?.trim() ? (
+                    <div>
+                      <span className="text-amber-300 text-sm font-bold flex items-center gap-1.5">
+                        <i className="fa-solid fa-masks-theater text-amber-400 text-xs"></i>
+                        {character.raceOverride.trim()}
+                      </span>
+                      <span className="text-slate-400 text-[11px] font-normal block font-sans mt-0.5">
+                        Base Race Mechanics: <strong className="text-amber-200/90">{templateObj ? `${templateObj.name} ${raceObj.name}` : raceObj.name}</strong>
+                      </span>
+                    </div>
+                  ) : (
+                    <span>{templateObj ? `${templateObj.name} ${raceObj.name}` : raceObj.name}</span>
+                  )}
+                </div>
+                <span className="text-slate-400 font-normal shrink-0">
                   {raceObj.size || 'Medium'} {effectiveTypeInfo.type}
                   {effectiveTypeInfo.subtype ? ` (${effectiveTypeInfo.subtype})` : ''}
                 </span>
