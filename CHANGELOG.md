@@ -12,6 +12,24 @@ Given a version number MAJOR.SOURCE.MINOR.BUGFIX, increment the:
 
 Prior to version 7.4.0.0, the difference between SOURCE and MINOR, and between MINOR and BUGFIX updates, was highly subjective.
 
+## [1.3.0] - 2026-08-10
+### Added
+- **Multi-Character Management System**: 100% local-first, client-side character management powered by IndexedDB with `localStorage` failover.
+- **Character Quick Switcher & Roster Dashboard**: Clickable character summary pill dropdown with search filtering, and a full dashboard modal with character cards grid.
+- **Export All & Import All (Roster Backup)**: Complete roster backup package export/import functionality alongside per-character JSON export/import.
+- **Legacy Migration & URL Query Sync**: Automatic boot migration for legacy single-character local state and live synchronization of active character context via `?characterId=<uuid>`.
+
+## [1.2.0] - 2026-08-09
+### Added
+- **Animal Companion Tab**: Built complete Animal Companion tab for Druids and Rangers with 106 extracted base companion species, Effective Druid Level (EDL) calculation engine (factoring Ranger levels, Beastmaster, prestige classes, and Natural Bond feat), companion HD/HP/AC/Save scaling, natural attacks, carrying capacity calculator (Light/Medium/Heavy loads, Lift & Drag), companion feat assignment, skill rank distribution, bonus tricks controls, and custom companion creation.
+- **Dynamic DR Calculator**: Advanced Damage Reduction engine with multi-source stacking and prioritization.
+- **Familiars Tab**: Arcane familiar stat scaling, master level calculation, and custom familiar support.
+- **Deity & Domain Selection**: Domain powers and spell progression integration.
+- **Auras & Emanations**: Aura radius, target tracking, and active toggles.
+
+### Changed
+- Navigation bar optimized to flex-wrap without requiring horizontal scrolling across responsive viewport widths.
+
 ## [8.0.0.0.alpha] - 2017-05-02
 ### N.B.: THIS IS AN ALPHA RELEASE. NOT ALL PLANNED V8.0 FEATURES HAVE BEEN IMPLEMENTED.
 ### Bugfix

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CharacterState, RaceData, ClassData, WeaponData, FeatData, TraitData, FlawData, SkillTrickData, TemplateData, DomainData, DeityData, FamiliarData } from './types/character';
+import { CharacterSheetData, CharacterSummary, CharacterState, RaceData, ClassData, WeaponData, FeatData, TraitData, FlawData, SkillTrickData, TemplateData, DomainData, DeityData, FamiliarData, AnimalCompanionData } from './types/character';
 import { Header } from './components/Header';
 import { StatsTab } from './components/StatsTab';
 import { RaceClassTab } from './components/RaceClassTab';
@@ -8,14 +8,29 @@ import { FeatsTab } from './components/FeatsTab';
 import { EquipmentTab } from './components/EquipmentTab';
 import { SpellsTab } from './components/SpellsTab';
 import { FamiliarTab } from './components/FamiliarTab';
+import { AnimalCompanionTab } from './components/AnimalCompanionTab';
 import { AurasTab } from './components/AurasTab';
 import { NotesTab } from './components/NotesTab';
 import { SheetViewTab } from './components/SheetViewTab';
 import { PortraitModal } from './components/PortraitModal';
+import { CharacterRosterModal } from './components/CharacterRosterModal';
 import { SourceBooksTab } from './components/SourceBooksTab';
 import { CORE_SOURCES } from './utils/sourceFilter';
 import { generateRoll20JSON } from './engine/roll20Export';
 import { syncEquippedItemsToInventory } from './engine/equipment';
+import {
+  getAllCharacterSummaries,
+  getCharacter,
+  saveCharacter,
+  deleteCharacter,
+  duplicateCharacter,
+  createNewCharacter,
+  setActiveCharacterId,
+  generateCharacterId,
+  exportAllRosterPackage,
+  importRosterPackage
+} from './storage/characterStore';
+import { runLegacyMigrationIfNeeded } from './storage/migration';
 
 const DEFAULT_CHARACTER: CharacterState = {
   name: 'Valerius the Brave',
@@ -122,15 +137,9 @@ const DEFAULT_CHARACTER: CharacterState = {
 };
 
 export const App: React.FC = () => {
-  const [character, setCharacter] = useState<CharacterState>(() => {
-    try {
-      const saved = localStorage.getItem('heroforge_active_character_v2');
-      return saved ? JSON.parse(saved) : DEFAULT_CHARACTER;
-    } catch {
-      return DEFAULT_CHARACTER;
-    }
-  });
-
+  const [character, setCharacter] = useState<CharacterSheetData | null>(null);
+  const [summaries, setSummaries] = useState<CharacterSummary[]>([]);
+  const [isRosterOpen, setIsRosterOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('stats');
   const [showPortraitModal, setShowPortraitModal] = useState(false);
   const [racesData, setRacesData] = useState<RaceData[]>([]);
@@ -144,7 +153,13 @@ export const App: React.FC = () => {
   const [domainsData, setDomainsData] = useState<DomainData[]>([]);
   const [deitiesData, setDeitiesData] = useState<DeityData[]>([]);
   const [familiarsData, setFamiliarsData] = useState<FamiliarData[]>([]);
+  const [animalCompanionsData, setAnimalCompanionsData] = useState<AnimalCompanionData[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const refreshSummaries = async () => {
+    const list = await getAllCharacterSummaries();
+    setSummaries(list);
+  };
 
   useEffect(() => {
     Promise.all([
@@ -158,8 +173,9 @@ export const App: React.FC = () => {
       fetch('./data/templates.json').then(res => res.json()),
       fetch('./data/domains.json').then(res => res.json()),
       fetch('./data/deities.json').then(res => res.json()),
-      fetch('./data/familiars.json').then(res => res.json())
-    ]).then(([races, classes, weapons, feats, traits, flaws, tricks, templates, domains, deities, familiars]) => {
+      fetch('./data/familiars.json').then(res => res.json()),
+      fetch('./data/animal_companions.json').then(res => res.json())
+    ]).then(([races, classes, weapons, feats, traits, flaws, tricks, templates, domains, deities, familiars, companions]) => {
       setRacesData(races);
       setClassesData(classes);
       setWeaponsData(weapons);
@@ -171,49 +187,119 @@ export const App: React.FC = () => {
       setDomainsData(domains);
       setDeitiesData(deities);
       setFamiliarsData(familiars);
-      setLoading(false);
+      setAnimalCompanionsData(companions);
+
+      runLegacyMigrationIfNeeded(DEFAULT_CHARACTER).then(({ activeCharacter }) => {
+        const synced = syncEquippedItemsToInventory(activeCharacter, weapons);
+        setCharacter(synced);
+        refreshSummaries();
+        setLoading(false);
+      });
     }).catch(err => {
       console.error('Failed to load HeroForge JSON data:', err);
       setLoading(false);
     });
   }, []);
 
-  useEffect(() => {
-    if (!loading) {
-      setCharacter(prev => syncEquippedItemsToInventory(prev, weaponsData));
-    }
-  }, [loading, weaponsData]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('heroforge_active_character_v2', JSON.stringify(character));
-    } catch (e) {
-      console.warn('LocalStorage save failed:', e);
-    }
-  }, [character]);
-
   const updateCharacter = (updated: Partial<CharacterState>) => {
-    setCharacter(prev => ({ ...prev, ...updated }));
+    if (!character) return;
+    const updatedChar: CharacterSheetData = {
+      ...character,
+      ...updated,
+      updatedAt: Date.now()
+    };
+    setCharacter(updatedChar);
+    saveCharacter(updatedChar).then(() => {
+      refreshSummaries();
+    });
   };
 
-  const handleReset = () => {
-    if (confirm('Create a new character? Current changes will be reset.')) {
-      setCharacter(DEFAULT_CHARACTER);
+  const handleSelectCharacter = async (id: string) => {
+    const char = await getCharacter(id);
+    if (char) {
+      const synced = syncEquippedItemsToInventory(char, weaponsData);
+      setCharacter(synced);
+      setActiveCharacterId(id);
+      await refreshSummaries();
     }
+  };
+
+  const handleDuplicateCharacter = async (id: string) => {
+    const cloned = await duplicateCharacter(id);
+    if (cloned) {
+      await refreshSummaries();
+      await handleSelectCharacter(cloned.id);
+    }
+  };
+
+  const handleDeleteCharacter = async (id: string) => {
+    const charToDelete = summaries.find(s => s.id === id);
+    const charName = charToDelete ? charToDelete.name : 'this character';
+
+    if (summaries.length <= 1) {
+      alert('Cannot delete the only character sheet. Create a new character first.');
+      return;
+    }
+
+    if (confirm(`Are you sure you want to delete "${charName}"? This action cannot be undone.`)) {
+      await deleteCharacter(id);
+      const remainingSummaries = await getAllCharacterSummaries();
+      setSummaries(remainingSummaries);
+
+      if (character?.id === id) {
+        const nextId = remainingSummaries[0]?.id;
+        if (nextId) {
+          await handleSelectCharacter(nextId);
+        } else {
+          await handleCreateNewCharacter();
+        }
+      }
+    }
+  };
+
+  const handleCreateNewCharacter = async () => {
+    const newChar = await createNewCharacter(DEFAULT_CHARACTER);
+    const synced = syncEquippedItemsToInventory(newChar, weaponsData);
+    setCharacter(synced);
+    setActiveCharacterId(synced.id);
+    await refreshSummaries();
+    setIsRosterOpen(false);
   };
 
   const handleExport = () => {
-    const jsonStr = JSON.stringify(character, null, 2);
+    if (!character) return;
+    handleExportCharacter(character.id);
+  };
+
+  const handleExportCharacter = async (id: string) => {
+    const charToExport = (id === character?.id) ? character : await getCharacter(id);
+    if (!charToExport) return;
+
+    const jsonStr = JSON.stringify(charToExport, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${character.name.replace(/\s+/g, '_')}_3.5_HeroForgeNG.json`;
+    a.download = `${(charToExport.name || 'Character').replace(/\s+/g, '_')}_3.5_HeroForgeNG.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportAllRoster = async () => {
+    const pkg = await exportAllRosterPackage();
+    const jsonStr = JSON.stringify(pkg, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const dateStr = new Date().toISOString().split('T')[0];
+    a.download = `HeroForgeNG_All_Characters_${dateStr}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   const handleExportRoll20 = () => {
+    if (!character) return;
     const roll20Data = generateRoll20JSON(character, racesData, classesData, weaponsData, featsData);
     const jsonStr = JSON.stringify(roll20Data, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -226,25 +312,43 @@ export const App: React.FC = () => {
   };
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = evt => {
-        try {
-          const parsed = JSON.parse(evt.target?.result as string);
-          if (parsed && typeof parsed === 'object') {
-            const synced = syncEquippedItemsToInventory(parsed, weaponsData);
-            setCharacter(synced);
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    let totalImported = 0;
+    let lastImportId: string | null = null;
+
+    const readPromises = Array.from(files).map(file => {
+      return new Promise<void>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = async (evt) => {
+          try {
+            const parsed = JSON.parse(evt.target?.result as string);
+            const { importedCount, lastImportedId } = await importRosterPackage(parsed);
+            totalImported += importedCount;
+            if (lastImportedId) lastImportId = lastImportedId;
+          } catch (err) {
+            console.error('Failed to parse JSON file:', file.name, err);
           }
-        } catch {
-          alert('Invalid HeroForgeNG JSON file.');
+          resolve();
+        };
+        reader.readAsText(file);
+      });
+    });
+
+    Promise.all(readPromises).then(async () => {
+      if (totalImported > 0) {
+        await refreshSummaries();
+        if (lastImportId) {
+          await handleSelectCharacter(lastImportId);
         }
-      };
-      reader.readAsText(file);
-    }
+      } else {
+        alert('No valid HeroForgeNG JSON files or roster backups could be imported.');
+      }
+    });
   };
 
-  if (loading) {
+  if (loading || !character) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center space-y-4 text-amber-400">
         <i className="fa-solid fa-dice-d20 fa-spin text-4xl"></i>
@@ -257,14 +361,18 @@ export const App: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Header
         character={character}
+        summaries={summaries}
         racesData={racesData}
         classesData={classesData}
         traitsData={traitsData}
         flawsData={flawsData}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onReset={handleReset}
+        onSelectCharacter={handleSelectCharacter}
+        onOpenRoster={() => setIsRosterOpen(true)}
+        onCreateNew={handleCreateNewCharacter}
         onExport={handleExport}
+        onExportAll={handleExportAllRoster}
         onExportRoll20={handleExportRoll20}
         onImport={handleImport}
       />
@@ -351,6 +459,7 @@ export const App: React.FC = () => {
           {activeTab === 'equipment' && <EquipmentTab character={character} weaponsData={weaponsData} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
           {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} racesData={racesData} domainsData={domainsData} deitiesData={deitiesData} onChange={updateCharacter} />}
           {activeTab === 'familiar' && <FamiliarTab character={character} classesData={classesData} familiarsData={familiarsData} onChange={updateCharacter} />}
+          {activeTab === 'companion' && <AnimalCompanionTab character={character} companionsData={animalCompanionsData} onChange={updateCharacter} />}
           {activeTab === 'auras' && <AurasTab character={character} onChange={updateCharacter} />}
           {activeTab === 'sources' && <SourceBooksTab character={character} onChange={updateCharacter} />}
           {activeTab === 'notes' && <NotesTab character={character} onChange={updateCharacter} />}
@@ -361,7 +470,7 @@ export const App: React.FC = () => {
       </main>
 
       <footer className="mt-auto border-t border-slate-800/80 bg-slate-900/40 text-slate-400 text-xs py-4 px-4 text-center space-y-1">
-        <p>HeroForgeNG 3.5 Web Edition v1.1.0 &copy; 2026. Built with React, Vite & TypeScript.</p>
+        <p>HeroForgeNG 3.5 Web Edition v1.3.0 &copy; 2026. Built with React, Vite & TypeScript.</p>
         <p className="text-[11px] text-slate-500">
           Based on the original <a href="https://github.com/Heliomance/HeroForge-Anew" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline font-medium">HeroForge Anew project by Heliomance</a>.
         </p>
@@ -373,6 +482,24 @@ export const App: React.FC = () => {
         isOpen={showPortraitModal}
         onClose={() => setShowPortraitModal(false)}
         onSelectPortrait={(url) => updateCharacter({ portraitUrl: url })}
+      />
+
+      {/* Global Multi-Character Roster Dashboard Modal */}
+      <CharacterRosterModal
+        isOpen={isRosterOpen}
+        onClose={() => setIsRosterOpen(false)}
+        activeCharacterId={character.id}
+        summaries={summaries}
+        onSelectCharacter={(id) => {
+          handleSelectCharacter(id);
+          setIsRosterOpen(false);
+        }}
+        onDuplicateCharacter={handleDuplicateCharacter}
+        onDeleteCharacter={handleDeleteCharacter}
+        onExportCharacter={handleExportCharacter}
+        onExportAllCharacters={handleExportAllRoster}
+        onCreateNewCharacter={handleCreateNewCharacter}
+        onImportCharacterJSON={handleImport}
       />
     </div>
   );

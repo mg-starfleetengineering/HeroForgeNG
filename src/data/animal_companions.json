@@ -1,0 +1,2935 @@
+[
+  {
+    "id": "baboon",
+    "name": "Baboon",
+    "minLevel": 1,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 15,
+    "dex": 14,
+    "con": 12,
+    "int": 2,
+    "wis": 12,
+    "cha": 4,
+    "naturalArmor": 1,
+    "speed": {
+      "land": 40,
+      "climb": 30
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "badger",
+    "name": "Badger",
+    "minLevel": 1,
+    "size": "Small",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 8,
+    "dex": 17,
+    "con": 15,
+    "int": 3,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 1,
+    "speed": {
+      "land": 30,
+      "burrow": 10
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+3+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+4+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "camel",
+    "name": "Camel",
+    "minLevel": 1,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "darkmantle",
+    "name": "Darkmantle",
+    "minLevel": 1,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dire_rat",
+    "name": "Dire Rat",
+    "minLevel": 1,
+    "size": "Small",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 17,
+    "con": 12,
+    "int": 1,
+    "wis": 12,
+    "cha": 4,
+    "naturalArmor": 1,
+    "speed": {
+      "land": 40,
+      "climb": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dog",
+    "name": "Dog",
+    "minLevel": 1,
+    "size": "Small",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 13,
+    "dex": 17,
+    "con": 15,
+    "int": 2,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 1,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dog_riding",
+    "name": "Dog, Riding",
+    "minLevel": 1,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 2,
+    "str": 15,
+    "dex": 15,
+    "con": 15,
+    "int": 2,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 4,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "eagle",
+    "name": "Eagle",
+    "minLevel": 1,
+    "size": "Small",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 15,
+    "con": 12,
+    "int": 2,
+    "wis": 14,
+    "cha": 6,
+    "naturalArmor": 1,
+    "speed": {
+      "land": 10,
+      "fly": 80,
+      "flyManeuverability": "average"
+    },
+    "attacks": [
+      {
+        "name": "Talons+5+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+5+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_air_small",
+    "name": "Elemental, Air(Small)",
+    "minLevel": 1,
+    "size": "Small",
+    "creatureType": "Elemental",
+    "hd": 2,
+    "str": 10,
+    "dex": 17,
+    "con": 10,
+    "int": 4,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 30,
+      "fly": 100,
+      "flyManeuverability": "perfect"
+    },
+    "attacks": [
+      {
+        "name": "Slam;",
+        "damage": "1d4"
+      }
+    ],
+    "specialAbilities": [
+      "Air mastery",
+      "Whirlwind",
+      "Elemental traits"
+    ],
+    "feats": [
+      "Improved Initiative",
+      "Weapon Finesse"
+    ],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_earth_small",
+    "name": "Elemental, Earth(Small)",
+    "minLevel": 1,
+    "size": "Small",
+    "creatureType": "Elemental",
+    "hd": 2,
+    "str": 17,
+    "dex": 8,
+    "con": 13,
+    "int": 4,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 7,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [
+      {
+        "name": "Slam;",
+        "damage": "1d6"
+      }
+    ],
+    "specialAbilities": [
+      "Earth mastery",
+      "Push",
+      "Elemental traits"
+    ],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_fire_small",
+    "name": "Elemental, Fire(Small)",
+    "minLevel": 1,
+    "size": "Small",
+    "creatureType": "Elemental",
+    "hd": 2,
+    "str": 10,
+    "dex": 13,
+    "con": 10,
+    "int": 4,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 50
+    },
+    "attacks": [
+      {
+        "name": "Slam;",
+        "damage": "1d4+1d4 fire"
+      }
+    ],
+    "specialAbilities": [
+      "Burn",
+      "Elemental traits"
+    ],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_water_small",
+    "name": "Elemental, Water(Small)",
+    "minLevel": 1,
+    "size": "Small",
+    "creatureType": "Elemental",
+    "hd": 2,
+    "str": 14,
+    "dex": 10,
+    "con": 13,
+    "int": 4,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 6,
+    "speed": {
+      "land": 20,
+      "swim": 90
+    },
+    "attacks": [
+      {
+        "name": "Slam;",
+        "damage": "1d6"
+      }
+    ],
+    "specialAbilities": [
+      "Water mastery",
+      "Drench",
+      "Vortex",
+      "Elemental traits"
+    ],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elven_hound",
+    "name": "Elven Hound",
+    "minLevel": 1,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 2,
+    "str": 17,
+    "dex": 17,
+    "con": 13,
+    "int": 2,
+    "wis": 12,
+    "cha": 8,
+    "naturalArmor": 4,
+    "speed": {
+      "land": 50
+    },
+    "attacks": [
+      {
+        "name": "Bite;",
+        "damage": "1d8"
+      }
+    ],
+    "specialAbilities": [
+      "Scent",
+      "Sprint"
+    ],
+    "feats": [
+      "Track",
+      "Improved Natural Attack (bite)"
+    ],
+    "source": "RotW"
+  },
+  {
+    "id": "hawk",
+    "name": "Hawk",
+    "minLevel": 1,
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 6,
+    "dex": 17,
+    "con": 10,
+    "int": 2,
+    "wis": 14,
+    "cha": 6,
+    "naturalArmor": 2,
+    "speed": {
+      "land": 10,
+      "fly": 60,
+      "flyManeuverability": "average"
+    },
+    "attacks": [
+      {
+        "name": "Talons+6+0+2",
+        "damage": "1d4"
+      }
+    ],
+    "specialAbilities": [
+      "Grants +3 bonus to spot in bright light"
+    ],
+    "feats": [
+      "Weapon Finesse"
+    ],
+    "source": "MM"
+  },
+  {
+    "id": "horse_heavy",
+    "name": "Horse, Heavy",
+    "minLevel": 1,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "horse_light",
+    "name": "Horse, Light",
+    "minLevel": 1,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "owl",
+    "name": "Owl",
+    "minLevel": 1,
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 4,
+    "dex": 17,
+    "con": 10,
+    "int": 2,
+    "wis": 14,
+    "cha": 4,
+    "naturalArmor": 2,
+    "speed": {
+      "land": 10,
+      "fly": 40,
+      "flyManeuverability": "average"
+    },
+    "attacks": [
+      {
+        "name": "Talons+6+0+2",
+        "damage": "1d4"
+      }
+    ],
+    "specialAbilities": [
+      "Grants +3 bonus to Spot in shadows",
+      "Gains +8 bonus to Spot in shadows"
+    ],
+    "feats": [
+      "Weapon Finesse"
+    ],
+    "source": "MM"
+  },
+  {
+    "id": "pony",
+    "name": "Pony",
+    "minLevel": 1,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 2,
+    "str": 13,
+    "dex": 13,
+    "con": 12,
+    "int": 2,
+    "wis": 11,
+    "cha": 4,
+    "naturalArmor": 2,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "2 Hooves+3+0+1",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "porpoise",
+    "name": "Porpoise",
+    "minLevel": 1,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 2,
+    "str": 11,
+    "dex": 17,
+    "con": 13,
+    "int": 3,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 2,
+    "speed": {
+      "land": 30,
+      "swim": 80
+    },
+    "attacks": [
+      {
+        "name": "Slam+9+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "ram",
+    "name": "Ram",
+    "minLevel": 1,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "PGtA"
+  },
+  {
+    "id": "shark_medium",
+    "name": "Shark, Medium",
+    "minLevel": 1,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 3,
+    "str": 13,
+    "dex": 15,
+    "con": 13,
+    "int": 1,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 30,
+      "swim": 60
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "snake_medium_viper",
+    "name": "Snake, Medium Viper",
+    "minLevel": 1,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 2,
+    "str": 8,
+    "dex": 17,
+    "con": 11,
+    "int": 1,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 20,
+      "swim": 20,
+      "climb": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite+4+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "snake_small_viper",
+    "name": "Snake, Small Viper",
+    "minLevel": 1,
+    "size": "Small",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 6,
+    "dex": 17,
+    "con": 11,
+    "int": 1,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 20,
+      "swim": 20,
+      "climb": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite+3+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "squid",
+    "name": "Squid",
+    "minLevel": 1,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "stirge",
+    "name": "Stirge",
+    "minLevel": 1,
+    "size": "Tiny",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 3,
+    "dex": 19,
+    "con": 10,
+    "int": 1,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 10,
+      "fly": 40,
+      "flyManeuverability": "avg"
+    },
+    "attacks": [
+      {
+        "name": "Touch;",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [
+      "Attach",
+      "Blood drain"
+    ],
+    "feats": [
+      "Alertness",
+      "Weapon Finesse"
+    ],
+    "source": "MM"
+  },
+  {
+    "id": "wolf",
+    "name": "Wolf",
+    "minLevel": 1,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 2,
+    "str": 13,
+    "dex": 15,
+    "con": 15,
+    "int": 2,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 2,
+    "speed": {
+      "land": 50
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "wolf_lizard",
+    "name": "Wolf Lizard",
+    "minLevel": 1,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "PGtA"
+  },
+  {
+    "id": "ape",
+    "name": "Ape",
+    "minLevel": 4,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 4,
+    "str": 21,
+    "dex": 15,
+    "con": 14,
+    "int": 2,
+    "wis": 12,
+    "cha": 7,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 30,
+      "climb": 30
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+4+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+4+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [
+      "Scent"
+    ],
+    "feats": [
+      "Alertness",
+      "Toughness"
+    ],
+    "source": "MM"
+  },
+  {
+    "id": "bear_black",
+    "name": "Bear, Black",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 3,
+    "str": 19,
+    "dex": 13,
+    "con": 15,
+    "int": 2,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 2,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+4+0+1",
+        "damage": "1d4"
+      },
+      {
+        "name": "Bite+5+0+0",
+        "damage": "1d6"
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "bison",
+    "name": "Bison",
+    "minLevel": 4,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "blink_dog",
+    "name": "Blink Dog",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 4,
+    "str": 10,
+    "dex": 17,
+    "con": 10,
+    "int": 10,
+    "wis": 13,
+    "cha": 11,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+2",
+        "damage": "1d6"
+      }
+    ],
+    "specialAbilities": [
+      "Blink",
+      "Dimension Door",
+      "Scent"
+    ],
+    "feats": [
+      "Iron Will",
+      "Run",
+      "Track"
+    ],
+    "source": "MM"
+  },
+  {
+    "id": "boar",
+    "name": "Boar",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 3,
+    "str": 15,
+    "dex": 10,
+    "con": 17,
+    "int": 2,
+    "wis": 13,
+    "cha": 4,
+    "naturalArmor": 2,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Gore+6+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "cheetah",
+    "name": "Cheetah",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 3,
+    "str": 16,
+    "dex": 19,
+    "con": 15,
+    "int": 2,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 1,
+    "speed": {
+      "land": 50
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+1",
+        "damage": ""
+      },
+      {
+        "name": "2 Claws+2+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "crocodile",
+    "name": "Crocodile",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 3,
+    "str": 19,
+    "dex": 12,
+    "con": 17,
+    "int": 1,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 4,
+    "speed": {
+      "land": 20,
+      "swim": 30
+    },
+    "attacks": [
+      {
+        "name": "Bite+6+0+2",
+        "damage": ""
+      },
+      {
+        "name": "Tail Slap+8+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dire_badger",
+    "name": "Dire Badger",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 3,
+    "str": 14,
+    "dex": 17,
+    "con": 19,
+    "int": 2,
+    "wis": 12,
+    "cha": 10,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 30,
+      "burrow": 10
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+4+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+5+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dire_bat",
+    "name": "Dire Bat",
+    "minLevel": 4,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 4,
+    "str": 17,
+    "dex": 22,
+    "con": 17,
+    "int": 2,
+    "wis": 14,
+    "cha": 6,
+    "naturalArmor": 5,
+    "speed": {
+      "land": 20,
+      "fly": 40,
+      "flyManeuverability": "good"
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dire_weasel",
+    "name": "Dire Weasel",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 3,
+    "str": 14,
+    "dex": 19,
+    "con": 10,
+    "int": 2,
+    "wis": 12,
+    "cha": 11,
+    "naturalArmor": 2,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dire_wolf_lizard",
+    "name": "Dire Wolf Lizard",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "PGtA"
+  },
+  {
+    "id": "elemental_air_medium",
+    "name": "Elemental, Air(Medium)",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Elemental",
+    "hd": 4,
+    "str": 12,
+    "dex": 21,
+    "con": 14,
+    "int": 4,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_earth_medium",
+    "name": "Elemental, Earth(Medium)",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Elemental",
+    "hd": 4,
+    "str": 21,
+    "dex": 8,
+    "con": 17,
+    "int": 4,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 9,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_fire_medium",
+    "name": "Elemental, Fire(Medium)",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Elemental",
+    "hd": 4,
+    "str": 12,
+    "dex": 17,
+    "con": 14,
+    "int": 4,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_water_medium",
+    "name": "Elemental, Water(Medium)",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Elemental",
+    "hd": 4,
+    "str": 16,
+    "dex": 12,
+    "con": 17,
+    "int": 4,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 8,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "hippogriff",
+    "name": "Hippogriff",
+    "minLevel": 4,
+    "size": "Large",
+    "creatureType": "Magical Beast",
+    "hd": 3,
+    "str": 18,
+    "dex": 15,
+    "con": 16,
+    "int": 2,
+    "wis": 13,
+    "cha": 8,
+    "naturalArmor": 4,
+    "speed": {
+      "land": 50,
+      "fly": 100,
+      "flyManeuverability": "avg"
+    },
+    "attacks": [
+      {
+        "name": "2 Claws;Bite;",
+        "damage": "1d4"
+      }
+    ],
+    "specialAbilities": [
+      "Scent"
+    ],
+    "feats": [
+      "Dodge",
+      "Wingover"
+    ],
+    "source": "MM"
+  },
+  {
+    "id": "leopard",
+    "name": "Leopard",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 3,
+    "str": 16,
+    "dex": 19,
+    "con": 15,
+    "int": 2,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 1,
+    "speed": {
+      "land": 40,
+      "climb": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+1",
+        "damage": ""
+      },
+      {
+        "name": "2 Claws+3+0+0",
+        "damage": ""
+      },
+      {
+        "name": "Rake+3+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "lizard_monitor",
+    "name": "Lizard, Monitor",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 3,
+    "str": 17,
+    "dex": 15,
+    "con": 17,
+    "int": 1,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 30,
+      "swim": 30
+    },
+    "attacks": [
+      {
+        "name": "Bite+6+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "shark_large",
+    "name": "Shark, Large",
+    "minLevel": 4,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 7,
+    "str": 17,
+    "dex": 15,
+    "con": 13,
+    "int": 1,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 4,
+    "speed": {
+      "land": 30,
+      "swim": 60
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "shocker_lizard",
+    "name": "Shocker Lizard",
+    "minLevel": 4,
+    "size": "Small",
+    "creatureType": "Magical Beast",
+    "hd": 2,
+    "str": 10,
+    "dex": 15,
+    "con": 13,
+    "int": 2,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 40,
+      "swim": 20,
+      "climb": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite;",
+        "damage": "1d4"
+      }
+    ],
+    "specialAbilities": [
+      "Stunning shock",
+      "Lethal shock",
+      "Electricity sense"
+    ],
+    "feats": [
+      "Improved Initiative"
+    ],
+    "source": "MM"
+  },
+  {
+    "id": "snake_constrictor",
+    "name": "Snake, Constrictor",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 3,
+    "str": 17,
+    "dex": 17,
+    "con": 13,
+    "int": 1,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 2,
+    "speed": {
+      "land": 20,
+      "swim": 20,
+      "climb": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite+3+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "snake_large_viper",
+    "name": "Snake, Large Viper",
+    "minLevel": 4,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 3,
+    "str": 10,
+    "dex": 17,
+    "con": 11,
+    "int": 1,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 20,
+      "swim": 20,
+      "climb": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite+3+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "wolverine",
+    "name": "Wolverine",
+    "minLevel": 4,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "ankheg",
+    "name": "Ankheg",
+    "minLevel": 7,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "asperi",
+    "name": "Asperi",
+    "minLevel": 7,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM2"
+  },
+  {
+    "id": "bear_brown",
+    "name": "Bear, Brown",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 6,
+    "str": 27,
+    "dex": 13,
+    "con": 19,
+    "int": 2,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 2,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+5+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+6-1+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "bull",
+    "name": "Bull",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "PGtA"
+  },
+  {
+    "id": "cockatrice",
+    "name": "Cockatrice",
+    "minLevel": 7,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "crocodile_giant",
+    "name": "Crocodile, Giant",
+    "minLevel": 7,
+    "size": "Huge",
+    "creatureType": "Animal",
+    "hd": 7,
+    "str": 27,
+    "dex": 12,
+    "con": 19,
+    "int": 1,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 7,
+    "speed": {
+      "land": 20,
+      "swim": 30
+    },
+    "attacks": [
+      {
+        "name": "Bite+14+0+2",
+        "damage": ""
+      },
+      {
+        "name": "Tail Slap+13+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "deinonychus",
+    "name": "Deinonychus",
+    "minLevel": 7,
+    "size": "Medium",
+    "creatureType": "Animal",
+    "hd": 4,
+    "str": 19,
+    "dex": 15,
+    "con": 19,
+    "int": 2,
+    "wis": 12,
+    "cha": 10,
+    "naturalArmor": 5,
+    "speed": {
+      "land": 60
+    },
+    "attacks": [
+      {
+        "name": "Talons+6+0+1",
+        "damage": ""
+      },
+      {
+        "name": "2 Foreclaws+3+0+0",
+        "damage": ""
+      },
+      {
+        "name": "Bite+9+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dire_ape",
+    "name": "Dire Ape",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 5,
+    "str": 22,
+    "dex": 15,
+    "con": 14,
+    "int": 2,
+    "wis": 12,
+    "cha": 7,
+    "naturalArmor": 4,
+    "speed": {
+      "land": 30,
+      "climb": 15
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+4+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+5+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dire_boar",
+    "name": "Dire Boar",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 7,
+    "str": 27,
+    "dex": 10,
+    "con": 17,
+    "int": 2,
+    "wis": 13,
+    "cha": 8,
+    "naturalArmor": 6,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Gore+5+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dire_ram",
+    "name": "Dire Ram",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "PGtA"
+  },
+  {
+    "id": "dire_wolf",
+    "name": "Dire Wolf",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 6,
+    "str": 25,
+    "dex": 15,
+    "con": 17,
+    "int": 2,
+    "wis": 12,
+    "cha": 10,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 50
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dire_wolverine",
+    "name": "Dire Wolverine",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 5,
+    "str": 22,
+    "dex": 17,
+    "con": 19,
+    "int": 2,
+    "wis": 12,
+    "cha": 10,
+    "naturalArmor": 4,
+    "speed": {
+      "land": 30,
+      "climb": 10
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+4+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+5+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "eagle_giant",
+    "name": "Eagle, Giant",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Magical Beast",
+    "hd": 4,
+    "str": 18,
+    "dex": 17,
+    "con": 12,
+    "int": 10,
+    "wis": 14,
+    "cha": 10,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 10,
+      "fly": 80,
+      "flyManeuverability": "average"
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+4+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+5+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elasmosaurus",
+    "name": "Elasmosaurus",
+    "minLevel": 7,
+    "size": "Huge",
+    "creatureType": "Animal",
+    "hd": 10,
+    "str": 26,
+    "dex": 14,
+    "con": 22,
+    "int": 2,
+    "wis": 13,
+    "cha": 9,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 10,
+      "swim": 50
+    },
+    "attacks": [
+      {
+        "name": "Bite+14+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "griffon",
+    "name": "Griffon",
+    "minLevel": 7,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "lion",
+    "name": "Lion",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 5,
+    "str": 21,
+    "dex": 17,
+    "con": 15,
+    "int": 2,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+3+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+5+0+0",
+        "damage": ""
+      },
+      {
+        "name": "Rake+3+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "owl_giant",
+    "name": "Owl, Giant",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Magical Beast",
+    "hd": 4,
+    "str": 18,
+    "dex": 17,
+    "con": 12,
+    "int": 10,
+    "wis": 14,
+    "cha": 10,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 10,
+      "fly": 70,
+      "flyManeuverability": "average"
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+4+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+5+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "owlbear",
+    "name": "Owlbear",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Magical Beast",
+    "hd": 5,
+    "str": 21,
+    "dex": 12,
+    "con": 21,
+    "int": 2,
+    "wis": 12,
+    "cha": 10,
+    "naturalArmor": 5,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+4+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+5+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "pegasus",
+    "name": "Pegasus",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Magical Beast",
+    "hd": 4,
+    "str": 18,
+    "dex": 15,
+    "con": 16,
+    "int": 10,
+    "wis": 13,
+    "cha": 13,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 60,
+      "fly": 120,
+      "flyManeuverability": "average"
+    },
+    "attacks": [
+      {
+        "name": "2 Hooves+4+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+2+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "rhinoceros",
+    "name": "Rhinoceros",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 8,
+    "str": 26,
+    "dex": 10,
+    "con": 21,
+    "int": 2,
+    "wis": 13,
+    "cha": 2,
+    "naturalArmor": 7,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [
+      {
+        "name": "Gore+6+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "sea_cat",
+    "name": "Sea Cat",
+    "minLevel": 7,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "snake_huge_viper",
+    "name": "Snake, Huge Viper",
+    "minLevel": 7,
+    "size": "Huge",
+    "creatureType": "Animal",
+    "hd": 6,
+    "str": 16,
+    "dex": 15,
+    "con": 13,
+    "int": 1,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 5,
+    "speed": {
+      "land": 20,
+      "swim": 20,
+      "climb": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite+3+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "tiger",
+    "name": "Tiger",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 6,
+    "str": 23,
+    "dex": 15,
+    "con": 17,
+    "int": 2,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 3,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+5+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+6+0+0",
+        "damage": ""
+      },
+      {
+        "name": "Rake+5+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "unicorn",
+    "name": "Unicorn",
+    "minLevel": 7,
+    "size": "Large",
+    "creatureType": "Magical Beast",
+    "hd": 4,
+    "str": 20,
+    "dex": 17,
+    "con": 21,
+    "int": 10,
+    "wis": 21,
+    "cha": 24,
+    "naturalArmor": 6,
+    "speed": {
+      "land": 60
+    },
+    "attacks": [
+      {
+        "name": "Horn+5+0+2",
+        "damage": "1d8"
+      },
+      {
+        "name": "2 Hooves+3+0+0",
+        "damage": "1d4"
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "basilisk",
+    "name": "Basilisk",
+    "minLevel": 10,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "bear_polar",
+    "name": "Bear, Polar",
+    "minLevel": 10,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 8,
+    "str": 27,
+    "dex": 13,
+    "con": 19,
+    "int": 2,
+    "wis": 12,
+    "cha": 6,
+    "naturalArmor": 5,
+    "speed": {
+      "land": 40,
+      "swim": 30
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+5+0+1",
+        "damage": "1d8"
+      },
+      {
+        "name": "Bite+7+0+0",
+        "damage": "2d8"
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "digester",
+    "name": "Digester",
+    "minLevel": 10,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dire_bull",
+    "name": "Dire Bull",
+    "minLevel": 10,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "PGtA"
+  },
+  {
+    "id": "dire_lion",
+    "name": "Dire Lion",
+    "minLevel": 10,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 8,
+    "str": 25,
+    "dex": 15,
+    "con": 17,
+    "int": 2,
+    "wis": 12,
+    "cha": 10,
+    "naturalArmor": 4,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+4+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+5+0+0",
+        "damage": ""
+      },
+      {
+        "name": "Rake+4+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_air_large",
+    "name": "Elemental, Air(Large)",
+    "minLevel": 10,
+    "size": "Large",
+    "creatureType": "Elemental",
+    "hd": 8,
+    "str": 14,
+    "dex": 25,
+    "con": 16,
+    "int": 6,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 4,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_earth_large",
+    "name": "Elemental, Earth(Large)",
+    "minLevel": 10,
+    "size": "Large",
+    "creatureType": "Elemental",
+    "hd": 8,
+    "str": 25,
+    "dex": 8,
+    "con": 19,
+    "int": 6,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 10,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_fire_large",
+    "name": "Elemental, Fire(Large)",
+    "minLevel": 10,
+    "size": "Large",
+    "creatureType": "Elemental",
+    "hd": 8,
+    "str": 14,
+    "dex": 21,
+    "con": 16,
+    "int": 6,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_water_large",
+    "name": "Elemental, Water(Large)",
+    "minLevel": 10,
+    "size": "Large",
+    "creatureType": "Elemental",
+    "hd": 8,
+    "str": 20,
+    "dex": 14,
+    "con": 19,
+    "int": 6,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 9,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "girallon",
+    "name": "Girallon",
+    "minLevel": 10,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "megaraptor",
+    "name": "Megaraptor",
+    "minLevel": 10,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 8,
+    "str": 21,
+    "dex": 15,
+    "con": 21,
+    "int": 2,
+    "wis": 15,
+    "cha": 10,
+    "naturalArmor": 6,
+    "speed": {
+      "land": 60
+    },
+    "attacks": [
+      {
+        "name": "Talons+6+0+1",
+        "damage": ""
+      },
+      {
+        "name": "2 Foreclaws+3+0+0",
+        "damage": ""
+      },
+      {
+        "name": "Bite+5+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "shark_huge",
+    "name": "Shark, Huge",
+    "minLevel": 10,
+    "size": "Huge",
+    "creatureType": "Animal",
+    "hd": 10,
+    "str": 21,
+    "dex": 15,
+    "con": 15,
+    "int": 1,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 5,
+    "speed": {
+      "land": 30,
+      "swim": 60
+    },
+    "attacks": [
+      {
+        "name": "Bite+5+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "snake_giant_constrictor",
+    "name": "Snake, Giant Constrictor",
+    "minLevel": 10,
+    "size": "Huge",
+    "creatureType": "Animal",
+    "hd": 11,
+    "str": 25,
+    "dex": 17,
+    "con": 13,
+    "int": 1,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 4,
+    "speed": {
+      "land": 20,
+      "swim": 20,
+      "climb": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite+4+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "spider_eater",
+    "name": "Spider Eater",
+    "minLevel": 10,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "whale_orca",
+    "name": "Whale, Orca",
+    "minLevel": 10,
+    "size": "Huge",
+    "creatureType": "Animal",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "bullete",
+    "name": "Bullete",
+    "minLevel": 13,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "chimera",
+    "name": "Chimera",
+    "minLevel": 13,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dire_bear",
+    "name": "Dire Bear",
+    "minLevel": 13,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 12,
+    "str": 31,
+    "dex": 13,
+    "con": 19,
+    "int": 2,
+    "wis": 12,
+    "cha": 10,
+    "naturalArmor": 7,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+15+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+7+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elephant",
+    "name": "Elephant",
+    "minLevel": 13,
+    "size": "Huge",
+    "creatureType": "Animal",
+    "hd": 11,
+    "str": 30,
+    "dex": 10,
+    "con": 21,
+    "int": 2,
+    "wis": 13,
+    "cha": 7,
+    "naturalArmor": 7,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Gore+14+0+2",
+        "damage": ""
+      },
+      {
+        "name": "Slam+5+0+1",
+        "damage": ""
+      },
+      {
+        "name": "2 Stamps+5+0+0",
+        "damage": ""
+      },
+      {
+        "name": "Trample+14+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "octopus_giant",
+    "name": "Octopus, Giant",
+    "minLevel": 13,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 8,
+    "str": 20,
+    "dex": 15,
+    "con": 13,
+    "int": 2,
+    "wis": 12,
+    "cha": 3,
+    "naturalArmor": 7,
+    "speed": {
+      "land": 20,
+      "swim": 30
+    },
+    "attacks": [
+      {
+        "name": "8 Tentacles+3+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+5+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "remorhaz",
+    "name": "Remorhaz",
+    "minLevel": 13,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dire_shark",
+    "name": "Dire Shark",
+    "minLevel": 16,
+    "size": "Huge",
+    "creatureType": "Animal",
+    "hd": 18,
+    "str": 23,
+    "dex": 15,
+    "con": 17,
+    "int": 1,
+    "wis": 12,
+    "cha": 10,
+    "naturalArmor": 7,
+    "speed": {
+      "land": 30,
+      "swim": 60
+    },
+    "attacks": [
+      {
+        "name": "Bite+14+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "dire_tiger",
+    "name": "Dire Tiger",
+    "minLevel": 16,
+    "size": "Large",
+    "creatureType": "Animal",
+    "hd": 16,
+    "str": 25,
+    "dex": 15,
+    "con": 17,
+    "int": 2,
+    "wis": 12,
+    "cha": 10,
+    "naturalArmor": 6,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "2 Claws+15+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+6+0+0",
+        "damage": ""
+      },
+      {
+        "name": "Rake+15+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_air_huge",
+    "name": "Elemental, Air(Huge)",
+    "minLevel": 16,
+    "size": "Huge",
+    "creatureType": "Elemental",
+    "hd": 16,
+    "str": 18,
+    "dex": 29,
+    "con": 18,
+    "int": 6,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 8,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_earth_huge",
+    "name": "Elemental, Earth(Huge)",
+    "minLevel": 16,
+    "size": "Huge",
+    "creatureType": "Elemental",
+    "hd": 16,
+    "str": 29,
+    "dex": 8,
+    "con": 21,
+    "int": 6,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 11,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_fire_huge",
+    "name": "Elemental, Fire(Huge)",
+    "minLevel": 16,
+    "size": "Huge",
+    "creatureType": "Elemental",
+    "hd": 16,
+    "str": 18,
+    "dex": 25,
+    "con": 18,
+    "int": 6,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "elemental_water_huge",
+    "name": "Elemental, Water(Huge)",
+    "minLevel": 16,
+    "size": "Huge",
+    "creatureType": "Elemental",
+    "hd": 16,
+    "str": 24,
+    "dex": 18,
+    "con": 21,
+    "int": 6,
+    "wis": 11,
+    "cha": 11,
+    "naturalArmor": 9,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "gorgon",
+    "name": "Gorgon",
+    "minLevel": 16,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "gray_render",
+    "name": "Gray Render",
+    "minLevel": 16,
+    "size": "Medium",
+    "creatureType": "Magical Beast",
+    "hd": 1,
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 2,
+    "wis": 10,
+    "cha": 10,
+    "naturalArmor": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "squid_giant",
+    "name": "Squid, Giant",
+    "minLevel": 16,
+    "size": "Huge",
+    "creatureType": "Animal",
+    "hd": 12,
+    "str": 26,
+    "dex": 17,
+    "con": 13,
+    "int": 1,
+    "wis": 12,
+    "cha": 2,
+    "naturalArmor": 6,
+    "speed": {
+      "land": 30,
+      "swim": 80
+    },
+    "attacks": [
+      {
+        "name": "10 Tentacles+3+0+1",
+        "damage": ""
+      },
+      {
+        "name": "Bite+14+0+0",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "triceratops",
+    "name": "Triceratops",
+    "minLevel": 16,
+    "size": "Huge",
+    "creatureType": "Animal",
+    "hd": 16,
+    "str": 30,
+    "dex": 9,
+    "con": 25,
+    "int": 1,
+    "wis": 12,
+    "cha": 7,
+    "naturalArmor": 11,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [
+      {
+        "name": "Gore+14+0+2",
+        "damage": ""
+      },
+      {
+        "name": "Trample+16+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  },
+  {
+    "id": "tyrannosaurus",
+    "name": "Tyrannosaurus",
+    "minLevel": 16,
+    "size": "Huge",
+    "creatureType": "Animal",
+    "hd": 18,
+    "str": 28,
+    "dex": 12,
+    "con": 21,
+    "int": 2,
+    "wis": 15,
+    "cha": 10,
+    "naturalArmor": 5,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Bite+6+0+2",
+        "damage": ""
+      }
+    ],
+    "specialAbilities": [],
+    "feats": [],
+    "source": "MM"
+  }
+]

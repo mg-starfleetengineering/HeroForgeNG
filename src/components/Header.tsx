@@ -1,5 +1,5 @@
-import React from 'react';
-import { CharacterState, RaceData, ClassData, Equipment, TraitData, FlawData } from '../types/character';
+import React, { useState, useRef, useEffect } from 'react';
+import { CharacterSheetData, CharacterSummary, RaceData, ClassData, Equipment, TraitData, FlawData } from '../types/character';
 import {
   calculateTotalScore,
   getAbilityMod,
@@ -13,33 +13,55 @@ import { calculateBAB, calculateBaseSave, calculateTotalHP } from '../engine/cla
 import { calculateTotalDR } from '../engine/dr';
 
 interface HeaderProps {
-  character: CharacterState;
+  character: CharacterSheetData;
+  summaries: CharacterSummary[];
   racesData: RaceData[];
   classesData: ClassData[];
   traitsData?: TraitData[];
   flawsData?: FlawData[];
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  onReset: () => void;
+  onSelectCharacter: (id: string) => void;
+  onOpenRoster: () => void;
+  onCreateNew: () => void;
   onExport: () => void;
+  onExportAll?: () => void;
   onExportRoll20: () => void;
   onImport: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   character,
+  summaries,
   racesData,
   classesData,
   traitsData = [],
   flawsData = [],
   activeTab,
   setActiveTab,
-  onReset,
+  onSelectCharacter,
+  onOpenRoster,
+  onCreateNew,
   onExport,
+  onExportAll,
   onExportRoll20,
   onImport
 }) => {
-  const [showExportDropdown, setShowExportDropdown] = React.useState(false);
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
+  const [showCharacterDropdown, setShowCharacterDropdown] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const characterDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (characterDropdownRef.current && !characterDropdownRef.current.contains(event.target as Node)) {
+        setShowCharacterDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
   const raceMods = parseRaceMods(raceObj);
 
@@ -80,18 +102,25 @@ export const Header: React.FC<HeaderProps> = ({
 
   const drSummary = calculateTotalDR(character, raceObj, undefined, [], classesData);
 
+  const filteredSummaries = summaries.filter(s =>
+    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.race.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.classes.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const tabs = [
-    { id: 'stats', label: 'Ability Scores', icon: 'fa-chart-simple' },
-    { id: 'race-class', label: 'Race & Classes', icon: 'fa-shield-halved' },
+    { id: 'stats', label: 'Stats', icon: 'fa-chart-simple' },
+    { id: 'race-class', label: 'Race & Class', icon: 'fa-shield-halved' },
     { id: 'skills', label: 'Skills', icon: 'fa-hand-sparkles' },
     { id: 'feats', label: 'Feats', icon: 'fa-award' },
     { id: 'equipment', label: 'Equipment', icon: 'fa-boxes-packing' },
-    { id: 'spells', label: 'Spells & Powers', icon: 'fa-hat-wizard' },
-    { id: 'familiar', label: 'Familiar', icon: 'fa-paw' },
-    { id: 'auras', label: 'Auras & Emanations', icon: 'fa-sun' },
-    { id: 'sources', label: 'Source Books', icon: 'fa-book-atlas' },
-    { id: 'notes', label: 'Notes & Journal', icon: 'fa-book-bookmark' },
-    { id: 'sheet', label: 'Character Sheet', icon: 'fa-scroll' }
+    { id: 'spells', label: 'Spells', icon: 'fa-hat-wizard' },
+    { id: 'familiar', label: 'Familiar', icon: 'fa-cat' },
+    { id: 'companion', label: 'Companion', icon: 'fa-paw' },
+    { id: 'auras', label: 'Auras', icon: 'fa-sun' },
+    { id: 'sources', label: 'Sources', icon: 'fa-book-atlas' },
+    { id: 'notes', label: 'Notes', icon: 'fa-book-bookmark' },
+    { id: 'sheet', label: 'Sheet View', icon: 'fa-scroll' }
   ];
 
   return (
@@ -104,58 +133,173 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
           <div>
             <h1 className="text-xl font-bold font-heading bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 bg-clip-text text-transparent tracking-wide">
-              HeroForgeNG <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">v1.1</span>
+              HeroForgeNG <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">v1.3</span>
             </h1>
             <p className="text-xs text-slate-400">D&D 3.5 Character Generator & Sheet Engine</p>
           </div>
         </div>
 
-        {/* Quick Summary Bar */}
-        <div className="hidden md:flex items-center gap-5 bg-slate-950/60 border border-slate-800 px-4 py-2 rounded-xl text-xs">
-          {character.portraitUrl && (
-            <>
-              <div className="w-8 h-8 rounded-lg border border-amber-500/40 overflow-hidden shrink-0 shadow-md">
+        {/* Quick Summary Bar with Integrated Character Switcher Dropdown */}
+        <div className="relative" ref={characterDropdownRef}>
+          <button
+            type="button"
+            onClick={() => setShowCharacterDropdown(!showCharacterDropdown)}
+            className="hidden md:flex items-center gap-4 bg-slate-950/60 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-900/60 px-3.5 py-2 rounded-xl text-xs transition group cursor-pointer shadow-inner"
+            title="Click to switch active character or manage roster"
+          >
+            {/* Portrait Thumbnail */}
+            <div className="relative w-8 h-8 rounded-lg border border-amber-500/40 bg-slate-900 overflow-hidden shrink-0 shadow-md group-hover:border-amber-400 transition flex items-center justify-center">
+              {character.portraitUrl ? (
                 <img src={character.portraitUrl} alt={character.name} className="w-full h-full object-cover" />
+              ) : (
+                <i className="fa-solid fa-user-shield text-amber-400 text-sm"></i>
+              )}
+              <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                <i className="fa-solid fa-arrows-rotate text-amber-300 text-[10px]"></i>
               </div>
-              <div className="h-6 w-px bg-slate-800"></div>
-            </>
+            </div>
+
+            <div className="h-6 w-px bg-slate-800"></div>
+
+            <div className="text-center">
+              <span className="text-slate-400 block text-[10px] uppercase tracking-wider">Level</span>
+              <span className="font-mono font-bold text-amber-400 text-sm">{totalLevel}</span>
+            </div>
+            <div className="h-6 w-px bg-slate-800"></div>
+            <div className="text-center">
+              <span className="text-slate-400 block text-[10px] uppercase tracking-wider">HP</span>
+              <span className="font-mono font-bold text-emerald-400 text-sm">{hp}</span>
+            </div>
+            <div className="h-6 w-px bg-slate-800"></div>
+            <div className="text-center">
+              <span className="text-slate-400 block text-[10px] uppercase tracking-wider">AC</span>
+              <span className="font-mono font-bold text-cyan-400 text-sm">{totalAc}</span>
+            </div>
+            <div className="h-6 w-px bg-slate-800"></div>
+            <div className="text-center">
+              <span className="text-slate-400 block text-[10px] uppercase tracking-wider">DR</span>
+              <span className="font-mono font-bold text-orange-400 text-sm" title={drSummary.fullDRString}>
+                {drSummary.bestDRString}
+              </span>
+            </div>
+            <div className="h-6 w-px bg-slate-800"></div>
+            <div className="text-center">
+              <span className="text-slate-400 block text-[10px] uppercase tracking-wider">BAB</span>
+              <span className="font-mono font-bold text-amber-300 text-sm">+{bab}</span>
+            </div>
+            <div className="h-6 w-px bg-slate-800"></div>
+            <div className="text-center">
+              <span className="text-slate-400 block text-[10px] uppercase tracking-wider">Saves (F/R/W)</span>
+              <span className="font-mono font-bold text-purple-300 text-sm">{totalFort >= 0 ? '+' : ''}{totalFort}/{totalRef >= 0 ? '+' : ''}{totalRef}/{totalWill >= 0 ? '+' : ''}{totalWill}</span>
+            </div>
+
+            <div className="h-6 w-px bg-slate-800"></div>
+            <i className={`fa-solid fa-chevron-down text-slate-400 group-hover:text-amber-400 text-xs transition-transform ${showCharacterDropdown ? 'rotate-180' : ''}`}></i>
+          </button>
+
+          {/* Roster Switcher Dropdown Menu */}
+          {showCharacterDropdown && (
+            <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-80 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl z-50 overflow-hidden backdrop-blur-xl animate-fadeIn">
+              <div className="p-3 border-b border-slate-800 bg-slate-950/60 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-300 uppercase tracking-wider font-heading">
+                    Switch Character ({summaries.length})
+                  </span>
+                  <button
+                    onClick={() => { setShowCharacterDropdown(false); onOpenRoster(); }}
+                    className="text-[11px] text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 font-semibold"
+                  >
+                    <i className="fa-solid fa-users-viewfinder text-xs"></i> Manage Roster
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <i className="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-xs text-slate-500"></i>
+                  <input
+                    type="text"
+                    placeholder="Search roster..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/60"
+                  />
+                </div>
+              </div>
+
+              <div className="max-h-64 overflow-y-auto p-1.5 space-y-1 divide-y divide-slate-800/40">
+                {filteredSummaries.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-slate-500">No matching characters found</div>
+                ) : (
+                  filteredSummaries.map(s => {
+                    const isActive = s.id === character.id;
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => {
+                          onSelectCharacter(s.id);
+                          setShowCharacterDropdown(false);
+                        }}
+                        className={`w-full text-left p-2 rounded-xl flex items-center justify-between gap-3 transition ${
+                          isActive
+                            ? 'bg-amber-500/15 border border-amber-500/40 text-amber-200'
+                            : 'hover:bg-slate-800/70 text-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 overflow-hidden">
+                          <div className="w-8 h-8 rounded-lg border border-slate-700 bg-slate-950 overflow-hidden shrink-0 flex items-center justify-center">
+                            {s.portraitUrl ? (
+                              <img src={s.portraitUrl} alt={s.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <i className="fa-solid fa-user-shield text-slate-400 text-xs"></i>
+                            )}
+                          </div>
+                          <div className="truncate leading-tight">
+                            <div className={`text-xs font-semibold truncate ${isActive ? 'text-amber-300 font-bold' : 'text-slate-200'}`}>
+                              {s.name}
+                            </div>
+                            <div className="text-[10px] text-slate-400 truncate">
+                              Lvl {s.level} {s.race} &bull; {s.classes}
+                            </div>
+                          </div>
+                        </div>
+
+                        {isActive && (
+                          <span className="shrink-0 text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded-md font-mono font-bold">
+                            Active
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+
+              <div className="p-2 border-t border-slate-800 bg-slate-950/60 flex items-center justify-between gap-2">
+                <button
+                  onClick={() => {
+                    setShowCharacterDropdown(false);
+                    onCreateNew();
+                  }}
+                  className="w-full btn btn-secondary text-xs py-1.5 flex items-center justify-center gap-1.5"
+                >
+                  <i className="fa-solid fa-plus text-amber-400"></i> New Character
+                </button>
+                <button
+                  onClick={() => {
+                    setShowCharacterDropdown(false);
+                    onOpenRoster();
+                  }}
+                  className="w-full btn btn-primary text-xs py-1.5 flex items-center justify-center gap-1.5"
+                >
+                  <i className="fa-solid fa-table-cells"></i> View All Cards
+                </button>
+              </div>
+            </div>
           )}
-          <div className="text-center">
-            <span className="text-slate-400 block text-[10px] uppercase tracking-wider">Level</span>
-            <span className="font-mono font-bold text-amber-400 text-sm">{totalLevel}</span>
-          </div>
-          <div className="h-6 w-px bg-slate-800"></div>
-          <div className="text-center">
-            <span className="text-slate-400 block text-[10px] uppercase tracking-wider">HP</span>
-            <span className="font-mono font-bold text-emerald-400 text-sm">{hp}</span>
-          </div>
-          <div className="h-6 w-px bg-slate-800"></div>
-          <div className="text-center">
-            <span className="text-slate-400 block text-[10px] uppercase tracking-wider">AC</span>
-            <span className="font-mono font-bold text-cyan-400 text-sm">{totalAc}</span>
-          </div>
-          <div className="h-6 w-px bg-slate-800"></div>
-          <div className="text-center">
-            <span className="text-slate-400 block text-[10px] uppercase tracking-wider">DR</span>
-            <span className="font-mono font-bold text-orange-400 text-sm" title={drSummary.fullDRString}>
-              {drSummary.bestDRString}
-            </span>
-          </div>
-          <div className="h-6 w-px bg-slate-800"></div>
-          <div className="text-center">
-            <span className="text-slate-400 block text-[10px] uppercase tracking-wider">BAB</span>
-            <span className="font-mono font-bold text-amber-300 text-sm">+{bab}</span>
-          </div>
-          <div className="h-6 w-px bg-slate-800"></div>
-          <div className="text-center">
-            <span className="text-slate-400 block text-[10px] uppercase tracking-wider">Saves (F/R/W)</span>
-            <span className="font-mono font-bold text-purple-300 text-sm">{totalFort >= 0 ? '+' : ''}{totalFort}/{totalRef >= 0 ? '+' : ''}{totalRef}/{totalWill >= 0 ? '+' : ''}{totalWill}</span>
-          </div>
         </div>
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
-          <button onClick={onReset} className="btn btn-secondary text-xs" title="New Character">
+          <button onClick={onCreateNew} className="btn btn-secondary text-xs" title="New Character">
             <i className="fa-solid fa-file-circle-plus"></i> <span className="hidden sm:inline">New</span>
           </button>
           
@@ -173,7 +317,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             {showExportDropdown && (
               <div
-                className="absolute right-0 mt-2 w-56 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 py-1.5 text-xs overflow-hidden"
+                className="absolute right-0 mt-2 w-60 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 py-1.5 text-xs overflow-hidden"
                 onMouseLeave={() => setShowExportDropdown(false)}
               >
                 <button
@@ -182,10 +326,23 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <i className="fa-solid fa-file-code text-amber-400 w-4"></i>
                   <div>
-                    <div className="font-medium">HeroForge Native JSON</div>
-                    <div className="text-[10px] text-slate-400">Save for re-importing into app</div>
+                    <div className="font-medium">Active Character JSON</div>
+                    <div className="text-[10px] text-slate-400">Save active character sheet</div>
                   </div>
                 </button>
+
+                {onExportAll && (
+                  <button
+                    onClick={() => { onExportAll(); setShowExportDropdown(false); }}
+                    className="w-full px-4 py-2 text-left text-slate-200 hover:bg-slate-800 hover:text-amber-300 flex items-center gap-2 transition border-t border-slate-800"
+                  >
+                    <i className="fa-solid fa-file-zipper text-amber-400 w-4"></i>
+                    <div>
+                      <div className="font-medium">Export All Roster Backup</div>
+                      <div className="text-[10px] text-slate-400">Backup all saved characters</div>
+                    </div>
+                  </button>
+                )}
                 
                 <button
                   onClick={() => { onExportRoll20(); setShowExportDropdown(false); }}
@@ -205,6 +362,7 @@ export const Header: React.FC<HeaderProps> = ({
             <i className="fa-solid fa-upload"></i> <span className="hidden sm:inline">Import</span>
             <input type="file" className="hidden" accept=".json" onChange={onImport} />
           </label>
+
           <button onClick={() => { setActiveTab('sheet'); setTimeout(() => window.print(), 200); }} className="btn btn-primary text-xs">
             <i className="fa-solid fa-print"></i> <span className="hidden sm:inline">Print Sheet</span>
           </button>
@@ -213,7 +371,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Navigation Tabs */}
       <nav className="border-t border-slate-800/80 bg-slate-900/50">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 flex items-center justify-start xl:justify-center gap-0.5 sm:gap-1 overflow-x-auto nav-tab-container py-1">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 py-1.5">
           {tabs.map(tab => (
             <button
               key={tab.id}

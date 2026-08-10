@@ -218,3 +218,4 @@ node_modules/
 dist/
 .~lock.*
 samples/
+scratch/
