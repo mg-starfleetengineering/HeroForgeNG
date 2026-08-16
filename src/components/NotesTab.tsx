@@ -21,18 +21,20 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [showPortraitModal, setShowPortraitModal] = useState(false);
   const [showLightbox, setShowLightbox] = useState(false);
+  const [showZenMode, setShowZenMode] = useState(false);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setShowLightbox(false);
+        setShowZenMode(false);
       }
     };
-    if (showLightbox) {
+    if (showLightbox || showZenMode) {
       window.addEventListener('keydown', handleKeyDown);
     }
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showLightbox]);
+  }, [showLightbox, showZenMode]);
 
   // Edit / Form States
   const [editingQuestId, setEditingQuestId] = useState<string | null>(null);
@@ -402,125 +404,143 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
         </div>
       </div>
 
-      {/* --- SUB-TAB 1: Profile & Backstory --- */}
+      {/* --- SUB-TAB 1: Profile & Backstory (Unified Identity Card + Full Backstory) --- */}
       {activeSubTab === 'backstory' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column: Visual Identity & Physical Lore */}
-          <div className="space-y-6">
-            {/* Hero Artwork Showcase Card (Option 1) */}
-            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-5 rounded-2xl space-y-4 shadow-xl">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                <h3 className="text-base font-bold font-heading text-slate-100 flex items-center gap-2">
-                  <i className="fa-solid fa-image text-amber-500"></i> Character Artwork Showcase
-                </h3>
-                <button
-                  onClick={() => setShowPortraitModal(true)}
-                  className="btn btn-primary text-xs px-2.5 py-1 flex items-center gap-1.5"
-                >
-                  <i className="fa-solid fa-camera"></i> Change Portrait
-                </button>
+        <div className="space-y-6">
+          {/* Top Block: Single Unified Visual Identity & Lore Card */}
+          <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-5 sm:p-6 rounded-2xl shadow-xl space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+              {/* Left Column: Character Showcase + Change Portrait button (~5 cols on desktop) */}
+              <div className="lg:col-span-5 flex flex-col space-y-2.5 h-full">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <h3 className="text-sm font-bold font-heading text-slate-100 flex items-center gap-2">
+                    <i className="fa-solid fa-image text-amber-500"></i> Character Showcase
+                  </h3>
+                  <button
+                    onClick={() => setShowPortraitModal(true)}
+                    className="btn btn-primary text-xs px-2.5 py-1 flex items-center gap-1.5"
+                  >
+                    <i className="fa-solid fa-camera"></i> Change Portrait
+                  </button>
+                </div>
+
+                {character.portraitUrl ? (
+                  <div
+                    onClick={() => setShowLightbox(true)}
+                    className="relative group rounded-xl overflow-hidden border border-slate-700/80 bg-slate-950 shadow-xl flex-1 w-full min-h-[380px] max-h-[410px] flex items-center justify-center cursor-pointer"
+                    title="Click to view full resolution"
+                  >
+                    <img
+                      src={character.portraitUrl}
+                      alt={character.name || 'Character Showcase'}
+                      className="w-full h-full object-cover object-top group-hover:scale-[1.02] transition duration-300"
+                    />
+                    {/* Bottom gradient banner with hero details */}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent p-3.5 pt-10 flex items-end justify-between pointer-events-none">
+                      <div>
+                        <h4 className="text-base font-bold font-heading text-slate-100 leading-tight drop-shadow-md">
+                          {character.name || 'Unnamed Hero'}
+                        </h4>
+                        <p className="text-[11px] text-amber-400 font-semibold uppercase tracking-wider drop-shadow-sm mt-0.5">
+                          {character.raceOverride?.trim() || character.selectedRace || 'Human'} &bull; Level {character.levelProgression?.length || 1}
+                        </p>
+                      </div>
+                      <span className="text-[10px] text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900/90 px-2 py-0.5 rounded-md border border-slate-700/80 font-mono shadow">
+                        <i className="fa-solid fa-magnifying-glass-plus mr-1"></i> Expand
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => setShowPortraitModal(true)}
+                    className="border-2 border-dashed border-slate-700/80 hover:border-amber-500/60 rounded-xl p-6 text-center cursor-pointer transition bg-slate-950/40 space-y-2.5 flex-1 w-full min-h-[380px] max-h-[410px] flex flex-col items-center justify-center group"
+                  >
+                    <div className="w-16 h-16 mx-auto rounded-full bg-slate-900 flex items-center justify-center border border-slate-800 group-hover:border-amber-500/40 group-hover:bg-amber-500/10 transition">
+                      <i className="fa-solid fa-cloud-arrow-up text-2xl text-slate-500 group-hover:text-amber-400 transition"></i>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-200 group-hover:text-amber-300 transition">Upload Character Artwork</p>
+                      <p className="text-[10px] text-slate-500 mt-0.5">Click to select portrait</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {character.portraitUrl ? (
-                <div
-                  onClick={() => setShowLightbox(true)}
-                  className="relative group rounded-xl overflow-hidden border border-slate-700/80 bg-slate-950 shadow-xl max-h-[460px] flex items-center justify-center cursor-pointer"
-                  title="Click to view full resolution"
-                >
-                  <img
-                    src={character.portraitUrl}
-                    alt={character.name || 'Character Artwork'}
-                    className="w-full h-full max-h-[460px] object-cover object-top group-hover:scale-[1.02] transition duration-300"
+              {/* Right Column: Physical Appearance + Personality + Allies (~7 cols on desktop) */}
+              <div className="lg:col-span-7 flex flex-col justify-between space-y-3 h-full">
+                {/* 1. Physical Appearance & Mannerisms */}
+                <div className="space-y-1.5 flex-[4] flex flex-col min-h-0">
+                  <label className="text-xs font-bold font-heading text-slate-200 flex items-center gap-1.5">
+                    <i className="fa-solid fa-person-rays text-amber-400"></i> Physical Appearance & Mannerisms
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={notes.appearance || ''}
+                    onChange={e => handleNotesChange('appearance', e.target.value)}
+                    placeholder="Height, weight, build, eye/hair color, scars, tattoos, attire, posture, voice, distinguishable marks..."
+                    className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-2.5 rounded-xl resize-y flex-1 min-h-[85px]"
                   />
-                  {/* Bottom gradient banner with hero details */}
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent p-4 pt-12 flex items-end justify-between pointer-events-none">
-                    <div>
-                      <h4 className="text-lg font-bold font-heading text-slate-100 leading-tight drop-shadow-md">
-                        {character.name || 'Unnamed Hero'}
-                      </h4>
-                      <p className="text-xs text-amber-400 font-semibold uppercase tracking-wider drop-shadow-sm mt-0.5">
-                        {character.raceOverride?.trim() || character.selectedRace || 'Human'} &bull; Level {character.levelProgression?.length || 1}
-                      </p>
-                    </div>
-                    <span className="text-[10px] text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900/90 px-2.5 py-1 rounded-md border border-slate-700/80 font-mono shadow">
-                      <i className="fa-solid fa-magnifying-glass-plus mr-1"></i> Expand
-                    </span>
-                  </div>
                 </div>
-              ) : (
-                <div
-                  onClick={() => setShowPortraitModal(true)}
-                  className="border-2 border-dashed border-slate-700/80 hover:border-amber-500/60 rounded-xl p-8 text-center cursor-pointer transition bg-slate-950/40 space-y-3 group"
-                >
-                  <div className="w-16 h-16 mx-auto rounded-full bg-slate-900 flex items-center justify-center border border-slate-800 group-hover:border-amber-500/40 group-hover:bg-amber-500/10 transition">
-                    <i className="fa-solid fa-cloud-arrow-up text-2xl text-slate-500 group-hover:text-amber-400 transition"></i>
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-slate-200 group-hover:text-amber-300 transition">Upload Character Artwork</p>
-                    <p className="text-xs text-slate-500 mt-0.5">Click to upload custom artwork, paste an image link, or select fantasy presets.</p>
-                  </div>
-                </div>
-              )}
-            </div>
 
-            {/* Appearance & Mannerisms */}
-            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg">
-              <h3 className="text-base font-bold font-heading text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-2">
-                <i className="fa-solid fa-person-rays text-amber-400"></i> Physical Appearance & Mannerisms
-              </h3>
-              <textarea
-                rows={5}
-                value={notes.appearance || ''}
-                onChange={e => handleNotesChange('appearance', e.target.value)}
-                placeholder="Height, weight, eye color, hair, scars, attire, posture, distinguishable marks..."
-                className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-3 rounded-xl resize-y"
-              />
+                {/* 2. Personality Traits, Ideals & Flaws */}
+                <div className="space-y-1.5 flex-[4] flex flex-col min-h-0">
+                  <label className="text-xs font-bold font-heading text-slate-200 flex items-center gap-1.5">
+                    <i className="fa-solid fa-masks-theater text-amber-400"></i> Personality Traits, Ideals & Flaws
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={notes.personality || ''}
+                    onChange={e => handleNotesChange('personality', e.target.value)}
+                    placeholder="Core values, personal code, quirks, phobias, speech patterns, behavioral habits, flaws..."
+                    className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-2.5 rounded-xl resize-y flex-1 min-h-[85px]"
+                  />
+                </div>
+
+                {/* 3. Allies & Guild Affiliations */}
+                <div className="space-y-1.5 flex-[3] flex flex-col min-h-0">
+                  <label className="text-xs font-bold font-heading text-slate-200 flex items-center gap-1.5">
+                    <i className="fa-solid fa-shield-halved text-cyan-400"></i> Allies & Guild Affiliations
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={notes.alliesAndOrganizations || ''}
+                    onChange={e => handleNotesChange('alliesAndOrganizations', e.target.value)}
+                    placeholder="Guild memberships, holy orders, mentor relationships, noble houses, factions, sworn rivals..."
+                    className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-2.5 rounded-xl resize-y flex-1 min-h-[65px]"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Right Column: Lore, Personality & Affiliations */}
-          <div className="space-y-6">
-            {/* Character Backstory & Origin */}
-            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg">
-              <h3 className="text-base font-bold font-heading text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-2">
-                <i className="fa-solid fa-feather-pointed text-amber-500"></i> Character Backstory & Origin
-              </h3>
-              <textarea
-                rows={9}
-                value={notes.backstory || ''}
-                onChange={e => handleNotesChange('backstory', e.target.value)}
-                placeholder="Write your character's backstory, homeland, family ties, past adventures, or major motivations here..."
-                className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-3 rounded-xl resize-y"
-              />
+          {/* Bottom Block: Full-Width Story Canvas + Zen Mode */}
+          <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 sm:p-7 rounded-2xl space-y-4 shadow-2xl">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-3">
+                <h3 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2.5">
+                  <i className="fa-solid fa-feather-pointed text-amber-500"></i> Character Backstory & Origin
+                </h3>
+                <span className="text-xs text-slate-400 font-mono hidden sm:inline-block">
+                  ({(notes.backstory || '').trim().split(/\s+/).filter(Boolean).length} words &bull; {(notes.backstory || '').length} chars)
+                </span>
+              </div>
+              <button
+                onClick={() => setShowZenMode(true)}
+                className="btn btn-secondary text-xs px-3 py-1.5 flex items-center gap-2 shadow hover:bg-slate-800 transition"
+                title="Open distraction-free fullscreen Zen writing mode"
+              >
+                <i className="fa-solid fa-maximize text-amber-400"></i>
+                <span>Zen Writing Mode</span>
+              </button>
             </div>
 
-            {/* Personality Traits, Ideals & Flaws */}
-            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg">
-              <h3 className="text-base font-bold font-heading text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-2">
-                <i className="fa-solid fa-masks-theater text-amber-400"></i> Personality Traits, Ideals & Flaws
-              </h3>
-              <textarea
-                rows={5}
-                value={notes.personality || ''}
-                onChange={e => handleNotesChange('personality', e.target.value)}
-                placeholder="Core values, quirks, phobias, speech patterns, alignment drivers, personal flaws..."
-                className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-3 rounded-xl resize-y"
-              />
-            </div>
-
-            {/* Allies & Guild Affiliations */}
-            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg">
-              <h3 className="text-base font-bold font-heading text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-2">
-                <i className="fa-solid fa-shield-halved text-cyan-400"></i> Allies & Guild Affiliations
-              </h3>
-              <textarea
-                rows={4}
-                value={notes.alliesAndOrganizations || ''}
-                onChange={e => handleNotesChange('alliesAndOrganizations', e.target.value)}
-                placeholder="Guild memberships, holy orders, mentor relationships, noble houses, factions..."
-                className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-3 rounded-xl resize-y"
-              />
-            </div>
+            <textarea
+              rows={16}
+              value={notes.backstory || ''}
+              onChange={e => handleNotesChange('backstory', e.target.value)}
+              placeholder="Write your hero's complete origin story, homeland, family lineage, turning-point experiences, major mentors, triumphs, defeats, and overarching campaign ambitions here..."
+              className="input-field w-full text-sm font-mono leading-relaxed bg-slate-950/90 p-5 rounded-2xl resize-y min-h-[350px] text-slate-200 focus:ring-2 focus:ring-amber-500/40"
+            />
           </div>
         </div>
       )}
@@ -1249,6 +1269,62 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
           <p className="text-[11px] text-slate-500 mt-2 font-mono">
             Click outside or press Escape to close
           </p>
+        </div>
+      )}
+
+      {/* Zen / Fullscreen Writing Modal (Option C) */}
+      {showZenMode && (
+        <div
+          className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col p-4 sm:p-8 animate-in fade-in duration-200"
+          onClick={() => setShowZenMode(false)}
+        >
+          <div
+            className="w-full max-w-5xl mx-auto h-full flex flex-col space-y-4"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Top Navigation & Status Bar */}
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3 text-slate-300">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                  <i className="fa-solid fa-feather-pointed"></i>
+                </div>
+                <div>
+                  <h2 className="text-base font-bold font-heading text-slate-100 leading-tight">
+                    {character.name || 'Hero'} — Backstory & Origin (Zen Mode)
+                  </h2>
+                  <p className="text-xs text-slate-400 font-mono">
+                    {(notes.backstory || '').trim().split(/\s+/).filter(Boolean).length} words &bull; {(notes.backstory || '').length} characters
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowZenMode(false)}
+                  className="btn btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5"
+                  title="Return to sheet (Esc)"
+                >
+                  <i className="fa-solid fa-xmark"></i> Close Zen Mode
+                </button>
+              </div>
+            </div>
+
+            {/* Zen Editor Canvas */}
+            <div className="flex-1 flex flex-col bg-slate-900/60 rounded-2xl border border-slate-800 p-4 sm:p-6 shadow-2xl">
+              <textarea
+                value={notes.backstory || ''}
+                onChange={e => handleNotesChange('backstory', e.target.value)}
+                placeholder="Write without distractions. Your text saves automatically..."
+                autoFocus
+                className="w-full h-full flex-1 bg-transparent text-sm sm:text-base font-mono leading-relaxed text-slate-100 resize-none focus:outline-none placeholder:text-slate-600 p-2"
+              />
+            </div>
+
+            {/* Bottom Status Hint */}
+            <div className="flex items-center justify-between text-xs text-slate-500 font-mono px-1">
+              <span>Auto-saved live to character profile</span>
+              <span>Press Escape or click Close to return</span>
+            </div>
+          </div>
         </div>
       )}
     </div>

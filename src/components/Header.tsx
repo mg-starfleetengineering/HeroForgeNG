@@ -146,23 +146,9 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={() => setShowCharacterDropdown(!showCharacterDropdown)}
-            className="hidden lg:flex items-center gap-2.5 sm:gap-3 bg-slate-950/60 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-900/60 px-3 py-1.5 rounded-xl text-xs transition group cursor-pointer shadow-inner shrink-0"
+            className="hidden lg:flex items-center gap-2.5 sm:gap-3 bg-slate-950/60 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-900/60 px-3.5 py-1.5 rounded-xl text-xs transition group cursor-pointer shadow-inner shrink-0"
             title="Click to switch active character or manage roster"
           >
-            {/* Portrait Thumbnail */}
-            <div className="relative w-8 h-8 rounded-lg border border-amber-500/40 bg-slate-900 overflow-hidden shrink-0 shadow-md group-hover:border-amber-400 transition flex items-center justify-center">
-              {character.portraitUrl ? (
-                <img src={character.portraitUrl} alt={character.name} className="w-full h-full object-cover" />
-              ) : (
-                <i className="fa-solid fa-user-shield text-amber-400 text-sm"></i>
-              )}
-              <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                <i className="fa-solid fa-arrows-rotate text-amber-300 text-[10px]"></i>
-              </div>
-            </div>
-
-            <div className="h-6 w-px bg-slate-800"></div>
-
             <div className="text-center">
               <span className="text-slate-400 block text-[10px] uppercase tracking-wider">Level</span>
               <span className="font-mono font-bold text-amber-400 text-sm">{totalLevel}</span>
