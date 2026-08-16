@@ -29,7 +29,9 @@ import {
   calculateTacticalCombatModifiers,
   generateFullAttackSequence,
   calculateGrappleModifier,
-  getGrappleAttackEntry
+  getGrappleAttackEntry,
+  getActiveCombatModifiers,
+  isTwoHandedWeapon
 } from '../engine/combat';
 import { calculateTotalDR } from '../engine/dr';
 import { calculateTotalSR } from '../engine/sr';
@@ -94,6 +96,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const bab = calculateBAB(character.levelProgression, classesData);
   const tcState = getTacticalCombatState(character, bab);
   const generalTcMods = calculateTacticalCombatModifiers(tcState);
+  const activeCombatMods = getActiveCombatModifiers(tcState, totalLevel);
 
   const effectiveStrScore = strScore + (generalTcMods.strBonus || 0);
   const effectiveConScore = conScore + (generalTcMods.conBonus || 0);
@@ -199,14 +202,17 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
     const primaryNote = (() => {
       const notes: string[] = [];
-      if (tcState.whirlingFrenzy) { notes.push('+2 Str', '-2 Flurry'); }
-      else if (tcState.rage) { notes.push('+2 Str'); }
-      if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('-2 Flurry'); }
-      if (tcState.haste) { notes.push('+1 Haste'); }
-      if (tcState.powerAttack > 0) { notes.push(`-${tcState.powerAttack} PA`); }
-      if (tcState.combatExpertise > 0) { notes.push(`-${tcState.combatExpertise} CE`); }
-      if (tcState.fightingDefensively) { notes.push('-4 Def'); }
-      return notes.length > 0 ? `(${notes.join(', ')})` : '';
+      if (tcState.whirlingFrenzy) { notes.push('Whirling Frenzy: +2 Str, -2 Flurry, +1 Extra Atk'); }
+      else if (tcState.rage) { notes.push('Barbarian Rage: +2 Str'); }
+      if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('Flurry: -2 Atk, +1 Extra Atk'); }
+      if (tcState.haste) { notes.push('Haste: +1 Atk, +1 Extra Atk'); }
+      if (tcState.powerAttack > 0) {
+        const is2H = isTwoHandedWeapon(primaryWpn);
+        notes.push(`Power Attack (-${tcState.powerAttack}): +${is2H ? tcState.powerAttack * 2 : tcState.powerAttack} Dmg`);
+      }
+      if (tcState.combatExpertise > 0) { notes.push(`Combat Exp: -${tcState.combatExpertise} Atk`); }
+      if (tcState.fightingDefensively) { notes.push('Fight Defensively: -4 Atk'); }
+      return notes.length > 0 ? `(${notes.join(' • ')})` : '';
     })();
 
     activeWeaponsList.push({
@@ -236,14 +242,14 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
     const secNote = (() => {
       const notes: string[] = [];
-      if (tcState.whirlingFrenzy) { notes.push('+2 Str', '-2 Flurry'); }
-      else if (tcState.rage) { notes.push('+2 Str'); }
-      if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('-2 Flurry'); }
-      if (tcState.haste) { notes.push('+1 Haste'); }
-      if (tcState.powerAttack > 0) { notes.push(`-${tcState.powerAttack} PA`); }
-      if (tcState.combatExpertise > 0) { notes.push(`-${tcState.combatExpertise} CE`); }
-      if (tcState.fightingDefensively) { notes.push('-4 Def'); }
-      return notes.length > 0 ? `(${notes.join(', ')})` : '';
+      if (tcState.whirlingFrenzy) { notes.push('Whirling Frenzy: +2 Str, -2 Flurry, +1 Extra Atk'); }
+      else if (tcState.rage) { notes.push('Barbarian Rage: +2 Str'); }
+      if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('Flurry: -2 Atk, +1 Extra Atk'); }
+      if (tcState.haste) { notes.push('Haste: +1 Atk, +1 Extra Atk'); }
+      if (tcState.powerAttack > 0) { notes.push(`Power Attack: -${tcState.powerAttack} Atk`); }
+      if (tcState.combatExpertise > 0) { notes.push(`Combat Exp: -${tcState.combatExpertise} Atk`); }
+      if (tcState.fightingDefensively) { notes.push('Fight Defensively: -4 Atk'); }
+      return notes.length > 0 ? `(${notes.join(' • ')})` : '';
     })();
 
     activeWeaponsList.push({
@@ -273,12 +279,12 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
     const rngNote = (() => {
       const notes: string[] = [];
-      if (tcState.whirlingFrenzy) { notes.push('-2 Flurry'); }
-      if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('-2 Flurry'); }
-      if (tcState.haste) { notes.push('+1 Haste'); }
-      if (tcState.combatExpertise > 0) { notes.push(`-${tcState.combatExpertise} CE`); }
-      if (tcState.fightingDefensively) { notes.push('-4 Def'); }
-      return notes.length > 0 ? `(${notes.join(', ')})` : '';
+      if (tcState.whirlingFrenzy) { notes.push('Whirling Frenzy: -2 Flurry, +1 Extra Atk'); }
+      if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('Flurry: -2 Atk, +1 Extra Atk'); }
+      if (tcState.haste) { notes.push('Haste: +1 Atk, +1 Extra Atk'); }
+      if (tcState.combatExpertise > 0) { notes.push(`Combat Exp: -${tcState.combatExpertise} Atk`); }
+      if (tcState.fightingDefensively) { notes.push('Fight Defensively: -4 Atk'); }
+      return notes.length > 0 ? `(${notes.join(' • ')})` : '';
     })();
 
     activeWeaponsList.push({
@@ -290,7 +296,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       critStr: `${rngWpn.threat < 20 ? `${rngWpn.threat}-20` : '20'}/x${rngWpn.critMultiplier || 2}`,
       type: rngWpn.type || 'Piercing',
       featAtkBonus: featBonuses.attackBonus,
-      featDmgBonus: featBonuses.damageBonus
+      featDmgBonus: featBonuses.damageBonus,
+      tacticalNote: rngNote
     });
   }
 
@@ -363,11 +370,27 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
           <div>
             <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Hit Points</span>
             <span className="text-xl print:text-lg font-bold text-slate-900">{hp}</span>
+            {generalTcMods.hpBonusPerLevel > 0 && (
+              <span className="text-[9px] print:text-[8px] text-rose-700 block font-sans font-semibold leading-tight">
+                +{generalTcMods.hpBonusPerLevel * totalLevel} HP (Rage)
+              </span>
+            )}
           </div>
           <div>
             <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Armor Class</span>
             <span className="text-xl print:text-lg font-bold text-slate-900">{totalAc}</span>
             <span className="text-[10px] print:text-[8.5px] text-slate-500 block leading-tight">Touch {touchAc} / FF {flatAc}</span>
+            {generalTcMods.acNetMod !== 0 && (
+              <span className={`text-[9px] print:text-[8px] block font-sans font-semibold leading-tight ${generalTcMods.acNetMod > 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                {generalTcMods.acNetMod > 0 ? `+${generalTcMods.acNetMod}` : generalTcMods.acNetMod} AC ({[
+                  tcState.whirlingFrenzy ? '+2 Frenzy' : '',
+                  tcState.haste ? '+1 Haste' : '',
+                  tcState.combatExpertise > 0 ? `+${tcState.combatExpertise} CE` : '',
+                  tcState.fightingDefensively ? '+2 Def' : '',
+                  tcState.rage ? '-2 Rage' : ''
+                ].filter(Boolean).join(', ')})
+              </span>
+            )}
           </div>
           <div>
             <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Damage Red.</span>
@@ -381,13 +404,69 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
           <div>
             <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Base Attack</span>
             <span className="text-xl print:text-lg font-bold text-slate-900">+{bab}</span>
-            <span className="text-[10px] print:text-[8.5px] text-slate-500 block leading-tight">Grapple {grappleCalc.total >= 0 ? `+${grappleCalc.total}` : grappleCalc.total}</span>
+            <span className="text-[10px] print:text-[8.5px] text-slate-500 block leading-tight">
+              Grapple {grappleCalc.total >= 0 ? `+${grappleCalc.total}` : grappleCalc.total}
+              {generalTcMods.strBonus > 0 && <span className="text-rose-700 text-[8.5px] ml-0.5">(+{Math.floor(generalTcMods.strBonus / 2)} Str)</span>}
+            </span>
           </div>
           <div>
             <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Speed</span>
             <span className="text-xl print:text-lg font-bold text-slate-900">{finalSpeed} ft</span>
+            {generalTcMods.speedMod > 0 && (
+              <span className="text-[9px] print:text-[8px] text-cyan-700 block font-sans font-semibold leading-tight">
+                +{generalTcMods.speedMod} ft (Haste)
+              </span>
+            )}
           </div>
         </div>
+
+        {/* Active Combat Stances & Tactical Modifiers Section */}
+        {activeCombatMods.length > 0 && (
+          <div className="border-2 border-amber-500/40 rounded-lg p-2.5 print:p-2 bg-amber-50/70 print:bg-slate-50 space-y-1.5 print:space-y-1 print:break-inside-avoid shadow-xs">
+            <div className="flex items-center justify-between border-b border-amber-300/80 print:border-slate-300 pb-1 print:pb-0.5">
+              <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1.5 font-heading">
+                <i className="fa-solid fa-crosshairs text-amber-600"></i> Active Combat Modifiers & Tactical Stances
+              </h3>
+              <span className="text-[10px] print:text-[9px] font-mono font-bold bg-amber-200/90 text-amber-950 border border-amber-400/60 px-1.5 py-0.2 rounded">
+                {activeCombatMods.length} Active Modifier{activeCombatMods.length > 1 ? 's' : ''} Applied
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 print:grid-cols-2 print:gap-1.5">
+              {activeCombatMods.map(mod => (
+                <div key={mod.id} className="p-2 print:p-1.5 bg-white rounded border border-amber-200 print:border-slate-200 shadow-xs space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-900 text-xs print:text-[10px] flex items-center gap-1.5">
+                      <i className={`${mod.icon} text-amber-600 print:text-slate-700`}></i> {mod.name}
+                    </span>
+                    {onChange && (
+                      <button
+                        onClick={() => {
+                          if (mod.id === 'whirlingFrenzy') onChange({ tacticalCombat: { ...tcState, whirlingFrenzy: false } });
+                          else if (mod.id === 'rage') onChange({ tacticalCombat: { ...tcState, rage: false } });
+                          else if (mod.id === 'haste') onChange({ tacticalCombat: { ...tcState, haste: false } });
+                          else if (mod.id === 'powerAttack') onChange({ tacticalCombat: { ...tcState, powerAttack: 0 } });
+                          else if (mod.id === 'combatExpertise') onChange({ tacticalCombat: { ...tcState, combatExpertise: 0 } });
+                          else if (mod.id === 'fightingDefensively') onChange({ tacticalCombat: { ...tcState, fightingDefensively: false } });
+                          else if (mod.id === 'flurryOfBlows') onChange({ tacticalCombat: { ...tcState, flurryOfBlows: false } });
+                        }}
+                        className="print:hidden text-[10px] text-slate-400 hover:text-rose-600 transition px-1"
+                        title={`Turn off ${mod.name}`}
+                      >
+                        <i className="fa-solid fa-xmark"></i>
+                      </button>
+                    )}
+                  </div>
+                  <ul className="text-[10px] print:text-[9px] text-slate-700 font-mono space-y-0.5 list-disc list-inside">
+                    {mod.effects.map((eff, i) => (
+                      <li key={i} className="leading-tight">{eff}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Primary Attacks & Weapons Section */}
         <div className="border border-slate-300 rounded-lg p-2.5 print:p-2 bg-slate-50 space-y-1 print:space-y-0.5 print:break-inside-avoid">
@@ -533,14 +612,14 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                     <td className="py-0.5 font-bold flex items-center gap-1">
                       STR
                       {generalTcMods.strBonus > 0 && (
-                        <span className="text-[9px] text-amber-800 bg-amber-200/80 px-1 rounded uppercase font-sans font-semibold">
-                          +{generalTcMods.strBonus}
+                        <span className="text-[8.5px] text-amber-900 bg-amber-200/90 px-1 rounded uppercase font-sans font-bold" title={tcState.whirlingFrenzy ? 'Whirling Frenzy' : 'Barbarian Rage'}>
+                          +{generalTcMods.strBonus} ({tcState.whirlingFrenzy ? 'Frenzy' : 'Rage'})
                         </span>
                       )}
                     </td>
                     <td className="py-0.5 text-center font-bold">
                       {effectiveStrScore}
-                      {generalTcMods.strBonus > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">({strScore})</span>}
+                      {generalTcMods.strBonus > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">(Base {strScore})</span>}
                     </td>
                     <td className="py-0.5 text-center font-bold">
                       {effectiveStrMod >= 0 ? `+${effectiveStrMod}` : effectiveStrMod}
@@ -551,14 +630,14 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                     <td className="py-0.5 font-bold flex items-center gap-1">
                       CON
                       {generalTcMods.conBonus > 0 && (
-                        <span className="text-[9px] text-amber-800 bg-amber-200/80 px-1 rounded uppercase font-sans font-semibold">
-                          +{generalTcMods.conBonus}
+                        <span className="text-[8.5px] text-amber-900 bg-amber-200/90 px-1 rounded uppercase font-sans font-bold" title="Barbarian Rage">
+                          +{generalTcMods.conBonus} (Rage)
                         </span>
                       )}
                     </td>
                     <td className="py-0.5 text-center font-bold">
                       {effectiveConScore}
-                      {generalTcMods.conBonus > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">({conScore})</span>}
+                      {generalTcMods.conBonus > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">(Base {conScore})</span>}
                     </td>
                     <td className="py-0.5 text-center font-bold">
                       {effectiveConMod >= 0 ? `+${effectiveConMod}` : effectiveConMod}
@@ -580,6 +659,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                     <th className="py-0.5 text-center">Total</th>
                     <th className="py-0.5 text-center">Base</th>
                     <th className="py-0.5 text-center">Ability</th>
+                    <th className="py-0.5 text-center">Tactical / Misc</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 font-mono text-[11px] print:text-[10px]">
@@ -588,18 +668,45 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                     <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px]">{totalFort >= 0 ? '+' : ''}{totalFort}</td>
                     <td className="py-0.5 text-center">{baseFort}</td>
                     <td className="py-0.5 text-center">{effectiveConMod >= 0 ? '+' : ''}{effectiveConMod}</td>
+                    <td className="py-0.5 text-center text-[10px] print:text-[9px] text-slate-600">
+                      {traitFlawSaveMods.fort !== 0 || generalTcMods.fortSaveMod !== 0 ? (
+                        <span>
+                          {generalTcMods.fortSaveMod > 0 ? `+${generalTcMods.fortSaveMod} (Rage)` : ''}
+                          {traitFlawSaveMods.fort !== 0 ? ` ${traitFlawSaveMods.fort > 0 ? `+${traitFlawSaveMods.fort}` : traitFlawSaveMods.fort} (Trait/Flaw)` : ''}
+                        </span>
+                      ) : '-'}
+                    </td>
                   </tr>
                   <tr>
                     <td className="py-0.5 font-bold">REFLEX (Dex)</td>
                     <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px]">{totalRef >= 0 ? '+' : ''}{totalRef}</td>
                     <td className="py-0.5 text-center">{baseRef}</td>
                     <td className="py-0.5 text-center">{dexMod >= 0 ? '+' : ''}{dexMod}</td>
+                    <td className="py-0.5 text-center text-[10px] print:text-[9px] text-slate-600">
+                      {traitFlawSaveMods.ref !== 0 || generalTcMods.refSaveMod !== 0 ? (
+                        <span>
+                          {generalTcMods.refSaveMod > 0 ? (
+                            tcState.whirlingFrenzy && tcState.haste ? '+3 (+2 Frenzy, +1 Haste)' :
+                            tcState.whirlingFrenzy ? '+2 (Frenzy)' : '+1 (Haste)'
+                          ) : ''}
+                          {traitFlawSaveMods.ref !== 0 ? ` ${traitFlawSaveMods.ref > 0 ? `+${traitFlawSaveMods.ref}` : traitFlawSaveMods.ref} (Trait/Flaw)` : ''}
+                        </span>
+                      ) : '-'}
+                    </td>
                   </tr>
                   <tr>
                     <td className="py-0.5 font-bold">WILL (Wis)</td>
                     <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px]">{totalWill >= 0 ? '+' : ''}{totalWill}</td>
                     <td className="py-0.5 text-center">{baseWill}</td>
                     <td className="py-0.5 text-center">{wisMod >= 0 ? '+' : ''}{wisMod}</td>
+                    <td className="py-0.5 text-center text-[10px] print:text-[9px] text-slate-600">
+                      {traitFlawSaveMods.will !== 0 || generalTcMods.willSaveMod !== 0 ? (
+                        <span>
+                          {generalTcMods.willSaveMod > 0 ? `+${generalTcMods.willSaveMod} (Rage)` : ''}
+                          {traitFlawSaveMods.will !== 0 ? ` ${traitFlawSaveMods.will > 0 ? `+${traitFlawSaveMods.will}` : traitFlawSaveMods.will} (Trait/Flaw)` : ''}
+                        </span>
+                      ) : '-'}
+                    </td>
                   </tr>
                 </tbody>
               </table>

@@ -9,7 +9,8 @@ import {
   getSizeGrappleModifier,
   calculateGrappleModifier,
   getGrappleDamageDice,
-  getGrappleAttackEntry
+  getGrappleAttackEntry,
+  getActiveCombatModifiers
 } from '../combat';
 import { CharacterState, WeaponData, RaceData } from '../../types/character';
 
@@ -155,6 +156,55 @@ describe('Tactical Combat Engine', () => {
     // With +4 Str (+2 mod) and -2 flurry penalty, net attack bonus is 0 over base
     const seqFrenzy = generateFullAttackSequence(11, 0, false, false, true);
     expect(seqFrenzy).toBe('+11/+11/+6/+1');
+  });
+
+  describe('Active Combat Modifiers Descriptor List', () => {
+    it('returns empty array when no tactical modifiers are active', () => {
+      const active = getActiveCombatModifiers(DEFAULT_TACTICAL_COMBAT, 5);
+      expect(active).toEqual([]);
+    });
+
+    it('returns Whirling Frenzy descriptors with full stat breakdown', () => {
+      const tcState = {
+        ...DEFAULT_TACTICAL_COMBAT,
+        whirlingFrenzy: true
+      };
+      const active = getActiveCombatModifiers(tcState, 5);
+      expect(active).toHaveLength(1);
+      expect(active[0].id).toBe('whirlingFrenzy');
+      expect(active[0].name).toBe('Whirling Frenzy');
+      expect(active[0].affectedStats.str).toBe(4);
+      expect(active[0].affectedStats.ac).toBe(2);
+      expect(active[0].affectedStats.ref).toBe(2);
+      expect(active[0].affectedStats.attack).toBe(-2);
+      expect(active[0].affectedStats.extraAttacks).toBe(1);
+    });
+
+    it('returns Barbarian Rage descriptors with HP scaling by level', () => {
+      const tcState = {
+        ...DEFAULT_TACTICAL_COMBAT,
+        rage: true
+      };
+      const active = getActiveCombatModifiers(tcState, 6);
+      expect(active).toHaveLength(1);
+      expect(active[0].id).toBe('rage');
+      expect(active[0].summary).toContain('+12 HP');
+      expect(active[0].affectedStats.con).toBe(4);
+      expect(active[0].affectedStats.fort).toBe(2);
+      expect(active[0].affectedStats.will).toBe(2);
+      expect(active[0].affectedStats.ac).toBe(-2);
+    });
+
+    it('returns multiple active modifiers in correct sequence', () => {
+      const tcState = {
+        ...DEFAULT_TACTICAL_COMBAT,
+        haste: true,
+        powerAttack: 4,
+        combatExpertise: 2
+      };
+      const active = getActiveCombatModifiers(tcState, 5);
+      expect(active.map(a => a.id)).toEqual(['haste', 'powerAttack', 'combatExpertise']);
+    });
   });
 
   describe('Grapple Calculations', () => {
