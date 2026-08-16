@@ -427,7 +427,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                 {character.portraitUrl ? (
                   <div
                     onClick={() => setShowLightbox(true)}
-                    className="relative group rounded-xl overflow-hidden border border-slate-700/80 bg-slate-950 shadow-xl flex-1 w-full min-h-[380px] max-h-[410px] flex items-center justify-center cursor-pointer"
+                    className="relative group rounded-xl overflow-hidden border border-slate-700/80 bg-slate-950 shadow-xl flex-1 w-full min-h-[380px] max-h-[480px] flex items-center justify-center cursor-pointer"
                     title="Click to view full resolution"
                   >
                     <img
@@ -453,7 +453,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                 ) : (
                   <div
                     onClick={() => setShowPortraitModal(true)}
-                    className="border-2 border-dashed border-slate-700/80 hover:border-amber-500/60 rounded-xl p-6 text-center cursor-pointer transition bg-slate-950/40 space-y-2.5 flex-1 w-full min-h-[380px] max-h-[410px] flex flex-col items-center justify-center group"
+                    className="border-2 border-dashed border-slate-700/80 hover:border-amber-500/60 rounded-xl p-6 text-center cursor-pointer transition bg-slate-950/40 space-y-2.5 flex-1 w-full min-h-[380px] max-h-[480px] flex flex-col items-center justify-center group"
                   >
                     <div className="w-16 h-16 mx-auto rounded-full bg-slate-900 flex items-center justify-center border border-slate-800 group-hover:border-amber-500/40 group-hover:bg-amber-500/10 transition">
                       <i className="fa-solid fa-cloud-arrow-up text-2xl text-slate-500 group-hover:text-amber-400 transition"></i>
