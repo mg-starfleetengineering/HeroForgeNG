@@ -12,6 +12,15 @@ Given a version number MAJOR.SOURCE.MINOR.BUGFIX, increment the:
 
 Prior to version 7.4.0.0, the difference between SOURCE and MINOR, and between MINOR and BUGFIX updates, was highly subjective.
 
+## [1.4.0] - 2026-08-16
+### Added
+- **Active Combat Modifiers & Tactical Stances Display**: Comprehensive active combat modifiers engine tracking and banner across character sheet and equipment views. Displays active stances (Whirling Frenzy, Barbarian Rage, Haste, Power Attack, Combat Expertise, Fighting Defensively, Flurry of Blows) with icons, bonus/penalty breakdowns, and inline dismissal buttons.
+- **Stat Cause Breakdowns**: Explicit source annotations next to modified Ability Scores (e.g. `+4 (Frenzy)`, `+4 (Rage)` alongside base score), Saving Throws (dedicated Tactical/Misc column for Fortitude, Reflex, and Will), Vitals (HP, AC, Speed, Grapple), and Attacks arsenal.
+- **Zen Writing Mode Font Size Controls**: Compact text sizing default with Small (12px), Default (14px), and Large (16px) controls in fullscreen Zen writing mode.
+
+### Changed
+- **Character Sheet Possessions Table**: Removed fixed max-height and scrollbar constraints from the Possessions & Adventuring Gear section so inventory expands naturally to fit all rows in both on-screen and print views.
+
 ## [1.3.0] - 2026-08-10
 ### Added
 - **Multi-Character Management System**: 100% local-first, client-side character management powered by IndexedDB with `localStorage` failover.

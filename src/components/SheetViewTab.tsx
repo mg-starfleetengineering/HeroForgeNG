@@ -885,7 +885,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
               {inventory.length === 0 ? (
                 <p className="text-xs text-slate-500 italic">No general inventory recorded.</p>
               ) : (
-                <div className="max-h-[220px] overflow-y-auto pr-1 print:max-h-none print:overflow-visible print:pr-0">
+                <div className="w-full">
                   <table className="w-full text-[11px] text-left border-collapse font-mono">
                     <thead>
                       <tr className="border-b border-slate-300 text-slate-500 uppercase font-sans font-bold">
