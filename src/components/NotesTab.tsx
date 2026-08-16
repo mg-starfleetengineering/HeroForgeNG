@@ -20,6 +20,19 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
   const [showNpcModal, setShowNpcModal] = useState(false);
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [showPortraitModal, setShowPortraitModal] = useState(false);
+  const [showLightbox, setShowLightbox] = useState(false);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowLightbox(false);
+      }
+    };
+    if (showLightbox) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showLightbox]);
 
   // Edit / Form States
   const [editingQuestId, setEditingQuestId] = useState<string | null>(null);
@@ -63,6 +76,64 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
         [field]: value
       }
     });
+  };
+
+  // --- Image Helpers for Lightbox ---
+  const handleOpenRawImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!character.portraitUrl) return;
+
+    if (character.portraitUrl.startsWith('data:')) {
+      try {
+        const parts = character.portraitUrl.split(';base64,');
+        const contentType = parts[0].split(':')[1] || 'image/png';
+        const raw = window.atob(parts[1]);
+        const rawLength = raw.length;
+        const uInt8Array = new Uint8Array(rawLength);
+        for (let i = 0; i < rawLength; ++i) {
+          uInt8Array[i] = raw.charCodeAt(i);
+        }
+        const blob = new Blob([uInt8Array], { type: contentType });
+        const blobUrl = URL.createObjectURL(blob);
+        const newWindow = window.open(blobUrl, '_blank');
+        if (!newWindow) {
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = `${(character.name || 'hero').toLowerCase().replace(/\s+/g, '_')}_portrait.${contentType.split('/')[1] || 'png'}`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+      } catch (err) {
+        console.error('Failed to open raw image blob:', err);
+      }
+    } else {
+      window.open(character.portraitUrl, '_blank');
+    }
+  };
+
+  const handleDownloadImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!character.portraitUrl) return;
+
+    const baseName = (character.name || 'hero').toLowerCase().replace(/\s+/g, '_');
+    if (character.portraitUrl.startsWith('data:')) {
+      const ext = character.portraitUrl.split(';')[0].split('/')[1] || 'png';
+      const a = document.createElement('a');
+      a.href = character.portraitUrl;
+      a.download = `${baseName}_portrait.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      const a = document.createElement('a');
+      a.href = character.portraitUrl;
+      a.download = `${baseName}_portrait`;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
   };
 
   // --- Quest Actions ---
@@ -334,85 +405,111 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
       {/* --- SUB-TAB 1: Profile & Backstory --- */}
       {activeSubTab === 'backstory' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Backstory */}
-          <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-3">
-            <h3 className="text-base font-bold font-heading text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-2">
-              <i className="fa-solid fa-feather-pointed text-amber-500"></i> Character Backstory & Origin
-            </h3>
-            <textarea
-              rows={12}
-              value={notes.backstory || ''}
-              onChange={e => handleNotesChange('backstory', e.target.value)}
-              placeholder="Write your character's backstory, homeland, family ties, past adventures, or major motivations here..."
-              className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-3 rounded-xl resize-y"
-            />
-          </div>
-
-          {/* Details & Allies Column */}
+          {/* Left Column: Visual Identity & Physical Lore */}
           <div className="space-y-6">
-            {/* Character Portrait Card */}
-            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-4">
+            {/* Hero Artwork Showcase Card (Option 1) */}
+            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-5 rounded-2xl space-y-4 shadow-xl">
               <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                 <h3 className="text-base font-bold font-heading text-slate-100 flex items-center gap-2">
-                  <i className="fa-solid fa-image text-amber-500"></i> Character Portrait
+                  <i className="fa-solid fa-image text-amber-500"></i> Character Artwork Showcase
                 </h3>
                 <button
                   onClick={() => setShowPortraitModal(true)}
-                  className="btn btn-secondary text-xs"
+                  className="btn btn-primary text-xs px-2.5 py-1 flex items-center gap-1.5"
                 >
-                  <i className="fa-solid fa-camera font-normal"></i> Change Portrait
+                  <i className="fa-solid fa-camera"></i> Change Portrait
                 </button>
               </div>
 
-              <div className="flex items-center gap-4 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+              {character.portraitUrl ? (
+                <div
+                  onClick={() => setShowLightbox(true)}
+                  className="relative group rounded-xl overflow-hidden border border-slate-700/80 bg-slate-950 shadow-xl max-h-[460px] flex items-center justify-center cursor-pointer"
+                  title="Click to view full resolution"
+                >
+                  <img
+                    src={character.portraitUrl}
+                    alt={character.name || 'Character Artwork'}
+                    className="w-full h-full max-h-[460px] object-cover object-top group-hover:scale-[1.02] transition duration-300"
+                  />
+                  {/* Bottom gradient banner with hero details */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent p-4 pt-12 flex items-end justify-between pointer-events-none">
+                    <div>
+                      <h4 className="text-lg font-bold font-heading text-slate-100 leading-tight drop-shadow-md">
+                        {character.name || 'Unnamed Hero'}
+                      </h4>
+                      <p className="text-xs text-amber-400 font-semibold uppercase tracking-wider drop-shadow-sm mt-0.5">
+                        {character.raceOverride?.trim() || character.selectedRace || 'Human'} &bull; Level {character.levelProgression?.length || 1}
+                      </p>
+                    </div>
+                    <span className="text-[10px] text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900/90 px-2.5 py-1 rounded-md border border-slate-700/80 font-mono shadow">
+                      <i className="fa-solid fa-magnifying-glass-plus mr-1"></i> Expand
+                    </span>
+                  </div>
+                </div>
+              ) : (
                 <div
                   onClick={() => setShowPortraitModal(true)}
-                  className="w-20 h-20 rounded-xl border-2 border-amber-500/40 bg-slate-900 overflow-hidden flex items-center justify-center shrink-0 shadow-lg cursor-pointer hover:border-amber-400 group transition"
+                  className="border-2 border-dashed border-slate-700/80 hover:border-amber-500/60 rounded-xl p-8 text-center cursor-pointer transition bg-slate-950/40 space-y-3 group"
                 >
-                  {character.portraitUrl ? (
-                    <img src={character.portraitUrl} alt={character.name} className="w-full h-full object-cover group-hover:scale-105 transition" />
-                  ) : (
-                    <i className="fa-solid fa-user-shield text-4xl text-slate-600 group-hover:text-amber-400 transition"></i>
-                  )}
+                  <div className="w-16 h-16 mx-auto rounded-full bg-slate-900 flex items-center justify-center border border-slate-800 group-hover:border-amber-500/40 group-hover:bg-amber-500/10 transition">
+                    <i className="fa-solid fa-cloud-arrow-up text-2xl text-slate-500 group-hover:text-amber-400 transition"></i>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-200 group-hover:text-amber-300 transition">Upload Character Artwork</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Click to upload custom artwork, paste an image link, or select fantasy presets.</p>
+                  </div>
                 </div>
-                <div className="flex-1 text-xs space-y-1">
-                  <p className="font-bold text-slate-200">{character.name || 'Unnamed Hero'}</p>
-                  <p className="text-slate-400 text-[11px]">
-                    {character.portraitUrl ? 'Custom portrait active. Click image to upload a new file, paste a link, or select a preset.' : 'No portrait uploaded yet. Click to upload custom artwork or pick a fantasy preset.'}
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* Personality & Description */}
-            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-4">
+            {/* Appearance & Mannerisms */}
+            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg">
               <h3 className="text-base font-bold font-heading text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-2">
-                <i className="fa-solid fa-masks-theater text-amber-400"></i> Appearance & Personality
+                <i className="fa-solid fa-person-rays text-amber-400"></i> Physical Appearance & Mannerisms
               </h3>
-              <div>
-                <label className="label-text">Physical Appearance & Mannerisms</label>
-                <textarea
-                  rows={4}
-                  value={notes.appearance || ''}
-                  onChange={e => handleNotesChange('appearance', e.target.value)}
-                  placeholder="Height, weight, eye color, hair, scars, attire, posture..."
-                  className="input-field w-full text-xs font-mono bg-slate-950/80 p-2.5 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="label-text">Personality Traits, Ideals & Flaws</label>
-                <textarea
-                  rows={4}
-                  value={notes.personality || ''}
-                  onChange={e => handleNotesChange('personality', e.target.value)}
-                  placeholder="Core values, quirks, phobias, speech patterns, alignment drivers..."
-                  className="input-field w-full text-xs font-mono bg-slate-950/80 p-2.5 rounded-xl"
-                />
-              </div>
+              <textarea
+                rows={5}
+                value={notes.appearance || ''}
+                onChange={e => handleNotesChange('appearance', e.target.value)}
+                placeholder="Height, weight, eye color, hair, scars, attire, posture, distinguishable marks..."
+                className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-3 rounded-xl resize-y"
+              />
+            </div>
+          </div>
+
+          {/* Right Column: Lore, Personality & Affiliations */}
+          <div className="space-y-6">
+            {/* Character Backstory & Origin */}
+            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg">
+              <h3 className="text-base font-bold font-heading text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-2">
+                <i className="fa-solid fa-feather-pointed text-amber-500"></i> Character Backstory & Origin
+              </h3>
+              <textarea
+                rows={9}
+                value={notes.backstory || ''}
+                onChange={e => handleNotesChange('backstory', e.target.value)}
+                placeholder="Write your character's backstory, homeland, family ties, past adventures, or major motivations here..."
+                className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-3 rounded-xl resize-y"
+              />
             </div>
 
-            {/* Allies & Factions */}
-            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-3">
+            {/* Personality Traits, Ideals & Flaws */}
+            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg">
+              <h3 className="text-base font-bold font-heading text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-2">
+                <i className="fa-solid fa-masks-theater text-amber-400"></i> Personality Traits, Ideals & Flaws
+              </h3>
+              <textarea
+                rows={5}
+                value={notes.personality || ''}
+                onChange={e => handleNotesChange('personality', e.target.value)}
+                placeholder="Core values, quirks, phobias, speech patterns, alignment drivers, personal flaws..."
+                className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-3 rounded-xl resize-y"
+              />
+            </div>
+
+            {/* Allies & Guild Affiliations */}
+            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg">
               <h3 className="text-base font-bold font-heading text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-2">
                 <i className="fa-solid fa-shield-halved text-cyan-400"></i> Allies & Guild Affiliations
               </h3>
@@ -420,8 +517,8 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                 rows={4}
                 value={notes.alliesAndOrganizations || ''}
                 onChange={e => handleNotesChange('alliesAndOrganizations', e.target.value)}
-                placeholder="Guild memberships, holy orders, mentor relationships, noble houses..."
-                className="input-field w-full text-xs font-mono bg-slate-950/80 p-2.5 rounded-xl"
+                placeholder="Guild memberships, holy orders, mentor relationships, noble houses, factions..."
+                className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-3 rounded-xl resize-y"
               />
             </div>
           </div>
@@ -1093,6 +1190,67 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
         onClose={() => setShowPortraitModal(false)}
         onSelectPortrait={(url) => onChange({ portraitUrl: url })}
       />
+
+      {/* High-Resolution Artwork Lightbox Modal */}
+      {showLightbox && character.portraitUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setShowLightbox(false)}
+        >
+          {/* Top Bar Controls */}
+          <div
+            className="w-full max-w-4xl flex items-center justify-between pb-3 px-2 text-slate-300"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2.5 font-heading font-bold text-slate-100 text-sm">
+              <i className="fa-solid fa-image text-amber-500"></i>
+              <span>{character.name || 'Character Artwork'}</span>
+              <span className="text-xs text-slate-400 font-sans font-normal">
+                ({character.raceOverride?.trim() || character.selectedRace || 'Human'} &bull; Level {character.levelProgression?.length || 1})
+              </span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={handleOpenRawImage}
+                className="btn btn-secondary text-xs px-3 py-1 flex items-center gap-1.5"
+                title="Open high-resolution image in new browser tab"
+              >
+                <i className="fa-solid fa-arrow-up-right-from-square"></i> Open in Tab
+              </button>
+              <button
+                onClick={handleDownloadImage}
+                className="btn btn-secondary text-xs px-3 py-1 flex items-center gap-1.5"
+                title="Download high-resolution image to device"
+              >
+                <i className="fa-solid fa-download"></i> Download
+              </button>
+              <button
+                onClick={() => setShowLightbox(false)}
+                className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition text-sm ml-1"
+                title="Close (Esc)"
+              >
+                <i className="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+
+          {/* Centered High-Res Image Frame */}
+          <div
+            className="relative max-w-5xl max-h-[82vh] flex items-center justify-center"
+            onClick={e => e.stopPropagation()}
+          >
+            <img
+              src={character.portraitUrl}
+              alt={character.name || 'Character Artwork'}
+              className="max-w-full max-h-[82vh] object-contain rounded-2xl shadow-2xl border border-slate-700/80"
+            />
+          </div>
+
+          <p className="text-[11px] text-slate-500 mt-2 font-mono">
+            Click outside or press Escape to close
+          </p>
+        </div>
+      )}
     </div>
   );
 };
