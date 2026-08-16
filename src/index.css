@@ -174,7 +174,7 @@ body {
 @media print {
   @page {
     size: portrait;
-    margin: 0.4in;
+    margin: 0.35in;
   }
 
   html, body {

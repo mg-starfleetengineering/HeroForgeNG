@@ -5,9 +5,13 @@ import {
   isTwoHandedWeapon,
   isLightWeapon,
   calculateTacticalCombatModifiers,
-  generateFullAttackSequence
+  generateFullAttackSequence,
+  getSizeGrappleModifier,
+  calculateGrappleModifier,
+  getGrappleDamageDice,
+  getGrappleAttackEntry
 } from '../combat';
-import { CharacterState, WeaponData } from '../../types/character';
+import { CharacterState, WeaponData, RaceData } from '../../types/character';
 
 describe('Tactical Combat Engine', () => {
   const dummyGreatsword: WeaponData = {
@@ -151,5 +155,81 @@ describe('Tactical Combat Engine', () => {
     // With +4 Str (+2 mod) and -2 flurry penalty, net attack bonus is 0 over base
     const seqFrenzy = generateFullAttackSequence(11, 0, false, false, true);
     expect(seqFrenzy).toBe('+11/+11/+6/+1');
+  });
+
+  describe('Grapple Calculations', () => {
+    it('verifies size modifier progression (±4 steps)', () => {
+      expect(getSizeGrappleModifier('Fine')).toBe(-16);
+      expect(getSizeGrappleModifier('Diminutive')).toBe(-12);
+      expect(getSizeGrappleModifier('Tiny')).toBe(-8);
+      expect(getSizeGrappleModifier('Small')).toBe(-4);
+      expect(getSizeGrappleModifier('Medium')).toBe(0);
+      expect(getSizeGrappleModifier('Large')).toBe(4);
+      expect(getSizeGrappleModifier('Huge')).toBe(8);
+      expect(getSizeGrappleModifier('Gargantuan')).toBe(12);
+      expect(getSizeGrappleModifier('Colossal')).toBe(16);
+    });
+
+    it('calculates basic grapple modifier (BAB + StrMod + SizeMod)', () => {
+      const char: Partial<CharacterState> = {
+        selectedRace: 'Human',
+        selectedFeats: []
+      };
+      const race: Partial<RaceData> = { name: 'Human', size: 'Medium' };
+      const grapple = calculateGrappleModifier(char as CharacterState, 1, 3, race);
+      expect(grapple.total).toBe(4); // BAB 1 + Str 3 + Size 0
+      expect(grapple.sizeMod).toBe(0);
+      expect(grapple.featBonus).toBe(0);
+    });
+
+    it('adds +4 bonus for Improved Grapple feat', () => {
+      const char: Partial<CharacterState> = {
+        selectedRace: 'Elf',
+        selectedFeats: ['Improved Grapple']
+      };
+      const race: Partial<RaceData> = { name: 'Elf', size: 'Medium' };
+      const grapple = calculateGrappleModifier(char as CharacterState, 1, 3, race);
+      expect(grapple.total).toBe(8); // BAB 1 + Str 3 + Size 0 + Feat 4
+      expect(grapple.featBonus).toBe(4);
+    });
+
+    it('applies Powerful Build size bonus (+4)', () => {
+      const char: Partial<CharacterState> = {
+        selectedRace: 'Goliath',
+        selectedFeats: []
+      };
+      const race: Partial<RaceData> = { name: 'Goliath', size: 'Medium', specialAbilities: 'Powerful Build' };
+      const grapple = calculateGrappleModifier(char as CharacterState, 2, 4, race);
+      expect(grapple.total).toBe(10); // BAB 2 + Str 4 + Size 4 (Treated as Large)
+      expect(grapple.sizeMod).toBe(4);
+    });
+
+    it('scales grapple unarmed damage dice based on Monk levels', () => {
+      expect(getGrappleDamageDice('Medium', 0)).toBe('1d3');
+      expect(getGrappleDamageDice('Small', 0)).toBe('1d2');
+      expect(getGrappleDamageDice('Large', 0)).toBe('1d4');
+
+      expect(getGrappleDamageDice('Medium', 1)).toBe('1d6');
+      expect(getGrappleDamageDice('Medium', 4)).toBe('1d8');
+      expect(getGrappleDamageDice('Medium', 8)).toBe('1d10');
+      expect(getGrappleDamageDice('Medium', 12)).toBe('2d6');
+      expect(getGrappleDamageDice('Medium', 16)).toBe('2d8');
+      expect(getGrappleDamageDice('Medium', 20)).toBe('2d10');
+    });
+
+    it('generates a full weapon-row entry for Grapple Check', () => {
+      const char: Partial<CharacterState> = {
+        selectedRace: 'Elf',
+        selectedFeats: ['Improved Grapple'],
+        levelProgression: [{ level: 1, primaryClass: 'Barbarian', hpRoll: 12 }]
+      };
+      const race: Partial<RaceData> = { name: 'Elf', size: 'Medium' };
+      const entry = getGrappleAttackEntry(char as CharacterState, 1, 3, DEFAULT_TACTICAL_COMBAT, race);
+      expect(entry.label).toBe('Special');
+      expect(entry.weapon.name).toBe('Grapple Check');
+      expect(entry.attackBonus).toBe(8); // BAB 1 + Str 3 + Feat 4
+      expect(entry.damageStr).toBe('1d3+3 nonlethal');
+      expect(entry.type).toBe('Bludgeoning');
+    });
   });
 });
