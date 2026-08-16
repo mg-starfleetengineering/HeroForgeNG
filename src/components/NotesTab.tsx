@@ -22,6 +22,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
   const [showPortraitModal, setShowPortraitModal] = useState(false);
   const [showLightbox, setShowLightbox] = useState(false);
   const [showZenMode, setShowZenMode] = useState(false);
+  const [zenFontSize, setZenFontSize] = useState<'xs' | 'sm' | 'base'>('sm');
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -1297,7 +1298,32 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
+                {/* Font Size Selector */}
+                <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5 text-xs font-mono">
+                  <button
+                    onClick={() => setZenFontSize('xs')}
+                    className={`px-2 py-1 rounded transition ${zenFontSize === 'xs' ? 'bg-amber-500/20 text-amber-300 font-bold' : 'text-slate-400 hover:text-slate-200'}`}
+                    title="Small text size (12px)"
+                  >
+                    Small
+                  </button>
+                  <button
+                    onClick={() => setZenFontSize('sm')}
+                    className={`px-2 py-1 rounded transition ${zenFontSize === 'sm' ? 'bg-amber-500/20 text-amber-300 font-bold' : 'text-slate-400 hover:text-slate-200'}`}
+                    title="Default text size (14px - matches main page)"
+                  >
+                    Default
+                  </button>
+                  <button
+                    onClick={() => setZenFontSize('base')}
+                    className={`px-2 py-1 rounded transition ${zenFontSize === 'base' ? 'bg-amber-500/20 text-amber-300 font-bold' : 'text-slate-400 hover:text-slate-200'}`}
+                    title="Large text size (16px)"
+                  >
+                    Large
+                  </button>
+                </div>
+
                 <button
                   onClick={() => setShowZenMode(false)}
                   className="btn btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5"
@@ -1315,7 +1341,9 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                 onChange={e => handleNotesChange('backstory', e.target.value)}
                 placeholder="Write without distractions. Your text saves automatically..."
                 autoFocus
-                className="w-full h-full flex-1 bg-transparent text-sm sm:text-base font-mono leading-relaxed text-slate-100 resize-none focus:outline-none placeholder:text-slate-600 p-2"
+                className={`w-full h-full flex-1 bg-transparent font-mono leading-relaxed text-slate-100 resize-none focus:outline-none placeholder:text-slate-600 p-2 ${
+                  zenFontSize === 'xs' ? 'text-xs' : (zenFontSize === 'sm' ? 'text-sm' : 'text-base')
+                }`}
               />
             </div>
 
