@@ -78,6 +78,230 @@ export function isLightWeapon(weapon?: WeaponData): boolean {
   );
 }
 
+export interface ActiveCombatModifier {
+  id: string;
+  name: string;
+  icon: string;
+  colorClass: {
+    bg: string;
+    text: string;
+    border: string;
+    badge: string;
+  };
+  summary: string;
+  effects: string[];
+  affectedStats: {
+    str?: number;
+    con?: number;
+    hpPerLevel?: number;
+    ac?: number;
+    touchAc?: number;
+    flatAc?: number;
+    speed?: number;
+    fort?: number;
+    ref?: number;
+    will?: number;
+    attack?: number;
+    damage?: string;
+    extraAttacks?: number;
+  };
+}
+
+/**
+ * Returns a list of all currently active tactical combat modifiers and stances
+ * with detailed descriptions of what each applies to stats, AC, saves, and attacks.
+ */
+export function getActiveCombatModifiers(tcState: TacticalCombatState, totalLevel: number = 1): ActiveCombatModifier[] {
+  const active: ActiveCombatModifier[] = [];
+
+  if (tcState.whirlingFrenzy) {
+    active.push({
+      id: 'whirlingFrenzy',
+      name: 'Whirling Frenzy',
+      icon: 'fa-solid fa-tornado',
+      colorClass: {
+        bg: 'bg-teal-500/10',
+        text: 'text-teal-300',
+        border: 'border-teal-500/30',
+        badge: 'bg-teal-500/20 text-teal-300 border-teal-500/30'
+      },
+      summary: '+4 Str, +2 Dodge AC, +2 Ref, -2 Flurry, +1 Extra Atk',
+      effects: [
+        '+4 Strength (+2 bonus to melee attack, damage & Grapple)',
+        '+2 Dodge bonus to Armor Class and Reflex saves',
+        '-2 penalty on all attack rolls (Flurry)',
+        '+1 extra attack at highest BAB during full attack'
+      ],
+      affectedStats: {
+        str: 4,
+        ac: 2,
+        touchAc: 2,
+        ref: 2,
+        attack: -2,
+        damage: '+2 (+3 for 2H)',
+        extraAttacks: 1
+      }
+    });
+  }
+
+  if (tcState.rage) {
+    active.push({
+      id: 'rage',
+      name: 'Barbarian Rage',
+      icon: 'fa-solid fa-fire-flame-curved',
+      colorClass: {
+        bg: 'bg-rose-500/10',
+        text: 'text-rose-300',
+        border: 'border-rose-500/30',
+        badge: 'bg-rose-500/20 text-rose-300 border-rose-500/30'
+      },
+      summary: `+4 Str, +4 Con, +2 Will, -2 AC, +${2 * Math.max(1, totalLevel)} HP`,
+      effects: [
+        '+4 Strength (+2 bonus to melee attack, damage & Grapple)',
+        `+4 Constitution (+2 Fortitude saves, +2 HP/level = +${2 * Math.max(1, totalLevel)} total HP)`,
+        '+2 Morale bonus on Will saving throws',
+        '-2 penalty to Armor Class'
+      ],
+      affectedStats: {
+        str: 4,
+        con: 4,
+        hpPerLevel: 2,
+        ac: -2,
+        touchAc: -2,
+        flatAc: -2,
+        fort: 2,
+        will: 2,
+        damage: '+2 (+3 for 2H)'
+      }
+    });
+  }
+
+  if (tcState.haste) {
+    active.push({
+      id: 'haste',
+      name: 'Haste',
+      icon: 'fa-solid fa-bolt-lightning',
+      colorClass: {
+        bg: 'bg-cyan-500/10',
+        text: 'text-cyan-300',
+        border: 'border-cyan-500/30',
+        badge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
+      },
+      summary: '+1 Atk, +1 AC, +1 Ref, +30ft Speed, +1 Extra Atk',
+      effects: [
+        '+1 bonus on all attack rolls',
+        '+1 Dodge bonus to Armor Class and Reflex saves',
+        '+30 ft enhancement bonus to base speed',
+        '+1 extra attack at highest BAB during full attack'
+      ],
+      affectedStats: {
+        attack: 1,
+        ac: 1,
+        touchAc: 1,
+        ref: 1,
+        speed: 30,
+        extraAttacks: 1
+      }
+    });
+  }
+
+  if (tcState.powerAttack > 0) {
+    active.push({
+      id: 'powerAttack',
+      name: `Power Attack (-${tcState.powerAttack})`,
+      icon: 'fa-solid fa-gavel',
+      colorClass: {
+        bg: 'bg-amber-500/10',
+        text: 'text-amber-300',
+        border: 'border-amber-500/30',
+        badge: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+      },
+      summary: `-${tcState.powerAttack} Atk / +${tcState.powerAttack} Dmg (+${tcState.powerAttack * 2} 2H)`,
+      effects: [
+        `-${tcState.powerAttack} penalty on melee attack rolls`,
+        `+${tcState.powerAttack} bonus to 1-handed melee damage (+${tcState.powerAttack * 2} for 2-handed weapons)`
+      ],
+      affectedStats: {
+        attack: -tcState.powerAttack,
+        damage: `+${tcState.powerAttack} (+${tcState.powerAttack * 2} 2H)`
+      }
+    });
+  }
+
+  if (tcState.combatExpertise > 0) {
+    active.push({
+      id: 'combatExpertise',
+      name: `Combat Expertise (-${tcState.combatExpertise})`,
+      icon: 'fa-solid fa-user-shield',
+      colorClass: {
+        bg: 'bg-emerald-500/10',
+        text: 'text-emerald-300',
+        border: 'border-emerald-500/30',
+        badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+      },
+      summary: `-${tcState.combatExpertise} Atk / +${tcState.combatExpertise} Dodge AC`,
+      effects: [
+        `-${tcState.combatExpertise} penalty on attack rolls`,
+        `+${tcState.combatExpertise} Dodge bonus to Armor Class`
+      ],
+      affectedStats: {
+        attack: -tcState.combatExpertise,
+        ac: tcState.combatExpertise,
+        touchAc: tcState.combatExpertise
+      }
+    });
+  }
+
+  if (tcState.fightingDefensively) {
+    active.push({
+      id: 'fightingDefensively',
+      name: 'Fighting Defensively',
+      icon: 'fa-solid fa-shield-halved',
+      colorClass: {
+        bg: 'bg-sky-500/10',
+        text: 'text-sky-300',
+        border: 'border-sky-500/30',
+        badge: 'bg-sky-500/20 text-sky-300 border-sky-500/30'
+      },
+      summary: '-4 Atk / +2 Dodge AC',
+      effects: [
+        '-4 penalty on all attack rolls',
+        '+2 Dodge bonus to Armor Class'
+      ],
+      affectedStats: {
+        attack: -4,
+        ac: 2,
+        touchAc: 2
+      }
+    });
+  }
+
+  if (tcState.flurryOfBlows) {
+    active.push({
+      id: 'flurryOfBlows',
+      name: 'Flurry of Blows',
+      icon: 'fa-solid fa-hand-fist',
+      colorClass: {
+        bg: 'bg-indigo-500/10',
+        text: 'text-indigo-300',
+        border: 'border-indigo-500/30',
+        badge: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+      },
+      summary: '-2 All Atks / +1 Extra Atk',
+      effects: [
+        '-2 penalty on all attack rolls',
+        '+1 extra attack at highest BAB during full attack'
+      ],
+      affectedStats: {
+        attack: -2,
+        extraAttacks: 1
+      }
+    });
+  }
+
+  return active;
+}
+
 export interface TacticalCombatModifiers {
   attackMod: number;
   damageMod: number;

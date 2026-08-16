@@ -13,7 +13,8 @@ import {
 import {
   getTacticalCombatState,
   calculateTacticalCombatModifiers,
-  generateFullAttackSequence
+  generateFullAttackSequence,
+  getActiveCombatModifiers
 } from '../engine/combat';
 
 interface EquipmentTabProps {
@@ -214,24 +215,28 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
 
   // Tactical Combat Modifiers
   const tcState = getTacticalCombatState(character, bab);
+  const generalTcMods = calculateTacticalCombatModifiers(tcState);
+  const activeCombatMods = getActiveCombatModifiers(tcState, totalLevel);
+  const effectiveStrScore = strScore + (generalTcMods.strBonus || 0);
+  const effectiveStrMod = getAbilityMod(effectiveStrScore);
 
   // Resolve Weapons
   const primaryWpnObj = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
   const primaryTacticalMods = calculateTacticalCombatModifiers(tcState, primaryWpnObj, false, false);
   const primaryFeatBonuses = calculateFeatCombatBonuses(character, primaryWpnObj);
   const primaryEnhancement = eq.primaryWeaponEnhancement || 0;
-  const primaryTotalAtk = bab + strMod + primaryEnhancement + primaryFeatBonuses.attackBonus + primaryTacticalMods.attackMod;
-  const primaryDmgVal = strMod + primaryEnhancement + primaryFeatBonuses.damageBonus + primaryTacticalMods.damageMod;
+  const primaryTotalAtk = bab + effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + primaryTacticalMods.attackMod;
+  const primaryDmgVal = effectiveStrMod + primaryEnhancement + primaryFeatBonuses.damageBonus + primaryTacticalMods.damageMod;
   const primaryDmgStr = primaryDmgVal >= 0 ? `+${primaryDmgVal}` : `${primaryDmgVal}`;
-  const primaryFullAttackSeq = generateFullAttackSequence(bab, strMod + primaryEnhancement + primaryFeatBonuses.attackBonus + primaryTacticalMods.attackMod, tcState.haste, tcState.flurryOfBlows);
+  const primaryFullAttackSeq = generateFullAttackSequence(bab, effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + primaryTacticalMods.attackMod, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy);
 
   const hasSecondary = eq.secondaryWeapon && eq.secondaryWeapon !== 'none';
   const secondaryWpnObj = hasSecondary ? resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData) : null;
   const secondaryTacticalMods = secondaryWpnObj ? calculateTacticalCombatModifiers(tcState, secondaryWpnObj, true, false) : null;
   const secondaryFeatBonuses = secondaryWpnObj ? calculateFeatCombatBonuses(character, secondaryWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const secondaryEnhancement = eq.secondaryWeaponEnhancement || 0;
-  const secondaryTotalAtk = secondaryWpnObj ? (bab + strMod + secondaryEnhancement + secondaryFeatBonuses.attackBonus + (secondaryTacticalMods?.attackMod || 0)) : 0;
-  const secondaryDmgVal = secondaryWpnObj ? (Math.floor(strMod / 2) + secondaryEnhancement + secondaryFeatBonuses.damageBonus + (secondaryTacticalMods?.damageMod || 0)) : 0;
+  const secondaryTotalAtk = secondaryWpnObj ? (bab + effectiveStrMod + secondaryEnhancement + secondaryFeatBonuses.attackBonus + (secondaryTacticalMods?.attackMod || 0)) : 0;
+  const secondaryDmgVal = secondaryWpnObj ? (Math.floor(effectiveStrMod / 2) + secondaryEnhancement + secondaryFeatBonuses.damageBonus + (secondaryTacticalMods?.damageMod || 0)) : 0;
 
   const hasRanged = eq.rangedWeapon && eq.rangedWeapon !== 'none';
   const rangedWpnObj = hasRanged ? resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData) : null;
@@ -850,11 +855,18 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 <div className="flex justify-between items-center">
                   <div>
                     <span className="font-bold text-amber-400 text-sm block">{primaryWpnObj.name}</span>
-                    {primaryFeatBonuses.attackBonus > 0 || primaryFeatBonuses.damageBonus > 0 ? (
-                      <span className="text-[10px] text-emerald-400">
-                        Includes Feat Bonus (+{primaryFeatBonuses.attackBonus} Atk / +{primaryFeatBonuses.damageBonus} Dmg)
-                      </span>
-                    ) : null}
+                    <div className="flex flex-wrap gap-1 mt-0.5">
+                      {primaryFeatBonuses.attackBonus > 0 || primaryFeatBonuses.damageBonus > 0 ? (
+                        <span className="text-[10px] text-emerald-400">
+                          Includes Feat Bonus (+{primaryFeatBonuses.attackBonus} Atk / +{primaryFeatBonuses.damageBonus} Dmg)
+                        </span>
+                      ) : null}
+                      {activeCombatMods.length > 0 && (
+                        <span className="text-[10px] text-amber-300 font-mono">
+                          • Tactical ({activeCombatMods.map(m => m.name).join(', ')})
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <span className="font-mono text-emerald-400 font-bold text-sm">
                     {primaryTotalAtk >= 0 ? '+' : ''}{primaryTotalAtk} Melee
