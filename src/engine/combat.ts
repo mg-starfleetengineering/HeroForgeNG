@@ -1,4 +1,4 @@
-import { CharacterState, TacticalCombatState, WeaponData } from '../types/character';
+import { CharacterState, TacticalCombatState, WeaponData, RaceData, TemplateData } from '../types/character';
 
 export const DEFAULT_TACTICAL_COMBAT: TacticalCombatState = {
   powerAttack: 0,
@@ -52,7 +52,6 @@ export function isTwoHandedWeapon(weapon?: WeaponData): boolean {
     name.includes('guisarme') ||
     name.includes('ranseur') ||
     name.includes('heavy flail') ||
-    name.includes('scythe') ||
     cat.includes('two-handed') ||
     spec.includes('two-handed') ||
     spec.includes('2-handed')
@@ -225,4 +224,235 @@ export function generateFullAttackSequence(
       return val >= 0 ? `+${val}` : `${val}`;
     })
     .join('/');
+}
+
+/**
+ * D&D 3.5e Size Modifiers for Grapple Checks.
+ * Progression: Colossal +16, Gargantuan +12, Huge +8, Large +4, Medium 0, Small -4, Tiny -8, Diminutive -12, Fine -16
+ */
+export const SIZE_GRAPPLE_MODIFIERS: Record<string, number> = {
+  Fine: -16,
+  Diminutive: -12,
+  Tiny: -8,
+  Small: -4,
+  Medium: 0,
+  Large: 4,
+  Huge: 8,
+  Gargantuan: 12,
+  Colossal: 16
+};
+
+export function getSizeGrappleModifier(sizeStr?: string): number {
+  if (!sizeStr) return 0;
+  const s = sizeStr.trim().toLowerCase();
+  if (s.startsWith('fine') || s === 'f') return -16;
+  if (s.startsWith('dim') || s === 'd') return -12;
+  if (s.startsWith('tiny') || s === 't') return -8;
+  if (s.startsWith('small') || s === 's') return -4;
+  if (s.startsWith('med') || s === 'm') return 0;
+  if (s.startsWith('large') || s === 'l') return 4;
+  if (s.startsWith('huge') || s === 'h') return 8;
+  if (s.startsWith('garg') || s === 'g') return 12;
+  if (s.startsWith('col') || s === 'c') return 16;
+  return 0;
+}
+
+export interface GrappleCalculation {
+  total: number;
+  bab: number;
+  strMod: number;
+  sizeMod: number;
+  featBonus: number;
+  notes: string[];
+}
+
+/**
+ * Calculates D&D 3.5e Grapple Check Modifier:
+ * Grapple = BAB + STR Modifier + Size Modifier + Feat/Misc Bonuses
+ */
+export function calculateGrappleModifier(
+  character: CharacterState,
+  bab: number,
+  effectiveStrMod: number,
+  raceObj?: Partial<RaceData>,
+  templateObj?: Partial<TemplateData>
+): GrappleCalculation {
+  const notes: string[] = [];
+
+  // Determine base size
+  const baseSize = templateObj?.size || raceObj?.size || 'Medium';
+  let sizeMod = getSizeGrappleModifier(baseSize);
+
+  // Check for Powerful Build (Goliath, Half-Giant, or trait/ability) -> treat as 1 size category larger
+  const raceName = (raceObj?.name || '').toLowerCase();
+  const raceAbils = (raceObj?.specialAbilities || '').toLowerCase();
+  const traits = (character.selectedTraits || []).map(t => t.toLowerCase());
+
+  const hasPowerfulBuild =
+    raceName.includes('goliath') ||
+    raceName.includes('half-giant') ||
+    raceAbils.includes('powerful build') ||
+    traits.some(t => t.includes('powerful build'));
+
+  if (hasPowerfulBuild && sizeMod === 0) {
+    sizeMod = 4; // Treated as Large (+4)
+    notes.push('Powerful Build (+4)');
+  }
+
+  // Feat bonuses
+  let featBonus = 0;
+  const selectedFeats = character.selectedFeats || [];
+
+  for (const fName of selectedFeats) {
+    const fLower = fName.toLowerCase();
+    if (fLower === 'improved grapple' || fLower === '--improved grapple--') {
+      featBonus += 4;
+      notes.push('Improved Grapple (+4)');
+    } else if (fLower.includes('illithid grapple')) {
+      featBonus += 2;
+      notes.push('Illithid Grapple (+2)');
+    } else if (fLower.includes('jotunbrud') && sizeMod === 0) {
+      sizeMod = 4;
+      notes.push('Jotunbrud (+4)');
+    }
+  }
+
+  const total = bab + effectiveStrMod + sizeMod + featBonus;
+
+  return {
+    total,
+    bab,
+    strMod: effectiveStrMod,
+    sizeMod,
+    featBonus,
+    notes
+  };
+}
+
+/**
+ * Resolves standard Grapple damage dice based on creature size and Monk levels.
+ */
+export function getGrappleDamageDice(sizeStr?: string, monkLevels: number = 0): string {
+  const s = (sizeStr || 'Medium').trim().toLowerCase();
+  const isSmall = s.startsWith('small') || s === 's';
+  const isLarge = s.startsWith('large') || s === 'l';
+  const isHuge = s.startsWith('huge') || s === 'h';
+  const isTiny = s.startsWith('tiny') || s === 't';
+
+  if (monkLevels >= 20) {
+    if (isSmall) return '2d8';
+    if (isLarge || isHuge) return '4d8';
+    return '2d10';
+  }
+  if (monkLevels >= 16) {
+    if (isSmall) return '2d6';
+    if (isLarge || isHuge) return '3d8';
+    return '2d8';
+  }
+  if (monkLevels >= 12) {
+    if (isSmall) return '1d10';
+    if (isLarge || isHuge) return '3d6';
+    return '2d6';
+  }
+  if (monkLevels >= 8) {
+    if (isSmall) return '1d8';
+    if (isLarge || isHuge) return '2d8';
+    return '1d10';
+  }
+  if (monkLevels >= 4) {
+    if (isSmall) return '1d6';
+    if (isLarge || isHuge) return '2d6';
+    return '1d8';
+  }
+  if (monkLevels >= 1) {
+    if (isSmall) return '1d4';
+    if (isLarge || isHuge) return '1d8';
+    return '1d6';
+  }
+
+  // Non-Monk standard unarmed strike damage
+  if (isTiny) return '1d1';
+  if (isSmall) return '1d2';
+  if (isLarge || isHuge) return '1d4';
+  return '1d3';
+}
+
+/**
+ * Creates weapon-row compatible entry for Grapple maneuver.
+ */
+export function getGrappleAttackEntry(
+  character: CharacterState,
+  bab: number,
+  effectiveStrMod: number,
+  tcState: TacticalCombatState,
+  raceObj?: Partial<RaceData>,
+  templateObj?: Partial<TemplateData>
+): {
+  label: string;
+  weapon: WeaponData;
+  attackBonus: number;
+  fullSeq: string;
+  damageStr: string;
+  critStr: string;
+  type: string;
+  featAtkBonus: number;
+  featDmgBonus: number;
+  tacticalNote?: string;
+} {
+  const grappleCalc = calculateGrappleModifier(character, bab, effectiveStrMod, raceObj, templateObj);
+  const monkLevels = (character.levelProgression || []).filter(l => (l.primaryClass || '').toLowerCase() === 'monk').length;
+  const baseSize = templateObj?.size || raceObj?.size || 'Medium';
+  const dmgDice = getGrappleDamageDice(baseSize, monkLevels);
+
+  const dmgVal = effectiveStrMod;
+  const dmgStr = `${dmgDice}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal} nonlethal`;
+
+  // Iterative attacks sequence for grapple checks (in 3.5e grapple checks can be made multiple times during full attack)
+  const fullSeq = generateFullAttackSequence(
+    bab,
+    grappleCalc.total - bab,
+    tcState.haste,
+    tcState.flurryOfBlows,
+    tcState.whirlingFrenzy
+  );
+
+  const notes = [...grappleCalc.notes];
+  if (tcState.whirlingFrenzy) notes.push('+2 Str', '-2 Flurry');
+  else if (tcState.rage) notes.push('+2 Str');
+  if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) notes.push('-2 Flurry');
+  if (tcState.haste) notes.push('+1 Haste');
+
+  const tacticalNote = notes.length > 0 ? `(${notes.join(', ')})` : undefined;
+
+  const pseudoWeapon: WeaponData = {
+    id: 'grapple_maneuver',
+    name: 'Grapple Check',
+    category: 'Special Combat Action',
+    size: baseSize || 'Medium',
+    damageM: dmgDice,
+    threat: 20,
+    critMultiplier: 2,
+    type: 'Bludgeoning',
+    weight: 0,
+    source: 'PHB'
+  };
+
+  return {
+    label: 'Special',
+    weapon: pseudoWeapon,
+    attackBonus: grappleCalc.total,
+    fullSeq,
+    damageStr: dmgStr,
+    critStr: '20/x2',
+    type: 'Bludgeoning',
+    featAtkBonus: grappleCalc.featBonus,
+    featDmgBonus: 0,
+    tacticalNote
+  };
+}
+
+function isSmallSize(sizeStr?: string): boolean {
+  if (!sizeStr) return false;
+  const s = sizeStr.trim().toLowerCase();
+  return s.startsWith('small') || s === 's' || s.startsWith('tiny') || s.startsWith('dim') || s.startsWith('fine');
 }

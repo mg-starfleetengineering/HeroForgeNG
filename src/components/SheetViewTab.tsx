@@ -27,9 +27,12 @@ import { TacticalCombatWidget } from './TacticalCombatWidget';
 import {
   getTacticalCombatState,
   calculateTacticalCombatModifiers,
-  generateFullAttackSequence
+  generateFullAttackSequence,
+  calculateGrappleModifier,
+  getGrappleAttackEntry
 } from '../engine/combat';
 import { calculateTotalDR } from '../engine/dr';
+import { calculateTotalSR } from '../engine/sr';
 
 interface SheetViewTabProps {
   character: CharacterState;
@@ -71,6 +74,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
   const speedData = calculateTotalSpeed(character, raceObj, templateObj, traitsData, flawsData);
   const drSummary = calculateTotalDR(character, raceObj, templateObj, [], classesData);
+  const srSummary = calculateTotalSR(character, raceObj, templateObj, [], classesData);
 
   const totalLevel = character.levelProgression.filter(l => l.primaryClass).length || 1;
   const strScore = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
@@ -290,6 +294,11 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     });
   }
 
+  // 4. Special Maneuver: Grapple
+  const grappleCalc = calculateGrappleModifier(character, bab, effectiveStrMod, raceObj, templateObj);
+  const grappleEntry = getGrappleAttackEntry(character, bab, effectiveStrMod, tcState, raceObj, templateObj);
+  activeWeaponsList.push(grappleEntry);
+
   const classMap: Record<string, number> = {};
   character.levelProgression.forEach(l => {
     if (l.primaryClass) classMap[l.primaryClass] = (classMap[l.primaryClass] || 0) + 1;
@@ -297,30 +306,30 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const classSummary = Object.entries(classMap).map(([c, count]) => `${c} ${count}`).join(' / ') || 'None 1';
 
   const renderHeader = () => (
-    <div className="border-b-2 border-slate-900 pb-3 flex items-center justify-between gap-4">
-      <div className="flex items-center gap-4">
+    <div className="border-b-2 border-slate-900 pb-3 print:pb-1.5 flex items-center justify-between gap-4">
+      <div className="flex items-center gap-3.5 print:gap-2.5">
         {character.portraitUrl ? (
-          <div className="w-14 h-14 rounded-xl border-2 border-slate-900 overflow-hidden shrink-0 shadow">
+          <div className="w-14 h-14 min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] print:w-11 print:h-11 print:min-w-[2.75rem] print:min-h-[2.75rem] print:max-w-[2.75rem] print:max-h-[2.75rem] rounded-xl border-2 border-slate-900 overflow-hidden shrink-0 shadow bg-slate-100">
             <img
               src={character.portraitUrl}
               alt={character.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-top"
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
           </div>
         ) : (
-          <div className="w-14 h-14 rounded-xl border-2 border-slate-300 bg-slate-100 flex items-center justify-center shrink-0 text-slate-400">
-            <i className="fa-solid fa-user-shield text-2xl"></i>
+          <div className="w-14 h-14 min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] print:w-11 print:h-11 print:min-w-[2.75rem] print:min-h-[2.75rem] print:max-w-[2.75rem] print:max-h-[2.75rem] rounded-xl border-2 border-slate-300 bg-slate-100 flex items-center justify-center shrink-0 text-slate-400">
+            <i className="fa-solid fa-user-shield text-2xl print:text-lg"></i>
           </div>
         )}
         <div>
-          <h1 className="text-2xl font-extrabold font-heading text-slate-900">{character.name || 'Unnamed Hero'}</h1>
-          <p className="text-xs text-slate-600 font-semibold uppercase tracking-wider">
+          <h1 className="text-2xl print:text-xl font-extrabold font-heading text-slate-900 leading-tight">{character.name || 'Unnamed Hero'}</h1>
+          <p className="text-xs print:text-[10px] text-slate-600 font-semibold uppercase tracking-wider">
             {character.raceOverride?.trim() || character.selectedRace || 'Human'} &bull; {classSummary} &bull; Level {totalLevel}
           </p>
         </div>
       </div>
-      <div className="text-right text-xs text-slate-600 shrink-0">
+      <div className="text-right text-xs print:text-[10.5px] text-slate-600 shrink-0 leading-tight">
         <p><span className="font-bold">Player:</span> {character.player || 'Shadow'}</p>
         <p><span className="font-bold">Alignment:</span> {character.alignment || 'True Neutral'}</p>
         <p><span className="font-bold">Deity:</span> {character.deity || 'Pelor'}</p>
@@ -345,144 +354,160 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         </div>
       )}
 
-      <div id="printable-character-sheet" className="bg-white text-slate-900 p-8 rounded-xl shadow-2xl space-y-5 font-sans print:p-0 print:shadow-none print:rounded-none print:border-none print:space-y-2.5">
+      <div id="printable-character-sheet" className="bg-white text-slate-900 p-8 rounded-xl shadow-2xl space-y-4 font-sans print:p-0 print:shadow-none print:rounded-none print:border-none print:space-y-2.5">
         {/* Page 1 Header */}
         {renderHeader()}
 
-        {/* Vitals Banner */}
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-2 text-center font-mono py-2 bg-slate-100 rounded-lg border border-slate-300 print:break-inside-avoid">
+        {/* Vitals Banner - strictly 1 row of 6 columns */}
+        <div className="grid grid-cols-6 gap-2 print:gap-1.5 text-center font-mono py-2.5 print:py-1.5 bg-slate-100 rounded-lg border border-slate-300 print:break-inside-avoid">
           <div>
-            <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Hit Points</span>
-            <span className="text-xl font-bold text-slate-900">{hp}</span>
+            <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Hit Points</span>
+            <span className="text-xl print:text-lg font-bold text-slate-900">{hp}</span>
           </div>
           <div>
-            <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Armor Class</span>
-            <span className="text-xl font-bold text-slate-900">{totalAc}</span>
-            <span className="text-[9px] text-slate-500 block">Touch {touchAc} / FF {flatAc}</span>
+            <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Armor Class</span>
+            <span className="text-xl print:text-lg font-bold text-slate-900">{totalAc}</span>
+            <span className="text-[10px] print:text-[8.5px] text-slate-500 block leading-tight">Touch {touchAc} / FF {flatAc}</span>
           </div>
           <div>
-            <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Damage Red.</span>
-            <span className="text-xl font-bold text-amber-700">{drSummary.bestDRString}</span>
+            <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Damage Red.</span>
+            <span className="text-xl print:text-lg font-bold text-amber-700">{drSummary.bestDRString}</span>
+            <span className="text-[10px] print:text-[8.5px] text-slate-500 block leading-tight">{srSummary.hasSR ? srSummary.bestSRString : 'SR None'}</span>
           </div>
           <div>
-            <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Initiative</span>
-            <span className="text-xl font-bold text-slate-900">{totalInitiative >= 0 ? '+' : ''}{totalInitiative}</span>
+            <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Initiative</span>
+            <span className="text-xl print:text-lg font-bold text-slate-900">{totalInitiative >= 0 ? '+' : ''}{totalInitiative}</span>
           </div>
           <div>
-            <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Base Attack</span>
-            <span className="text-xl font-bold text-slate-900">+{bab}</span>
+            <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Base Attack</span>
+            <span className="text-xl print:text-lg font-bold text-slate-900">+{bab}</span>
+            <span className="text-[10px] print:text-[8.5px] text-slate-500 block leading-tight">Grapple {grappleCalc.total >= 0 ? `+${grappleCalc.total}` : grappleCalc.total}</span>
           </div>
           <div>
-            <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Speed</span>
-            <span className="text-xl font-bold text-slate-900">{finalSpeed} ft</span>
+            <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Speed</span>
+            <span className="text-xl print:text-lg font-bold text-slate-900">{finalSpeed} ft</span>
           </div>
         </div>
 
         {/* Primary Attacks & Weapons Section */}
-        <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 space-y-1.5 print:break-inside-avoid">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Attacks & Weapon Arsenal</h3>
+        <div className="border border-slate-300 rounded-lg p-2.5 print:p-2 bg-slate-50 space-y-1 print:space-y-0.5 print:break-inside-avoid">
+          <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 print:pb-0.5">Attacks & Weapon Arsenal</h3>
           <table className="w-full text-xs text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-300 text-slate-600 uppercase font-mono">
-                <th className="py-1">Slot / Weapon</th>
-                <th className="py-1 text-center">Attack Bonus</th>
-                <th className="py-1 text-center">Damage</th>
-                <th className="py-1 text-center">Critical</th>
-                <th className="py-1 text-center">Type</th>
+              <tr className="border-b border-slate-300 text-slate-600 uppercase font-mono text-[10px] print:text-[9.5px]">
+                <th className="py-0.5">Slot / Weapon</th>
+                <th className="py-0.5 text-center">Attack Bonus</th>
+                <th className="py-0.5 text-center">Damage</th>
+                <th className="py-0.5 text-center">Critical</th>
+                <th className="py-0.5 text-center">Type</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 font-mono">
+            <tbody className="divide-y divide-slate-200 font-mono text-[11px] print:text-[10px]">
               {activeWeaponsList.map((item, idx) => (
                 <tr key={idx}>
-                  <td className="py-1 font-bold text-slate-900">
-                    <span className="text-[10px] font-sans font-semibold text-slate-500 uppercase mr-1">[{item.label}]</span>
+                  <td className="py-0.5 font-bold text-slate-900">
+                    <span className="text-[9.5px] font-sans font-semibold text-slate-500 uppercase mr-1">[{item.label}]</span>
                     {item.weapon.name}
                   </td>
-                  <td className="py-1 text-center font-bold text-slate-900">
+                  <td className="py-0.5 text-center font-bold text-slate-900">
                     <div>{item.fullSeq || (item.attackBonus >= 0 ? `+${item.attackBonus}` : `${item.attackBonus}`)}</div>
                     {item.tacticalNote && (
-                      <div className="text-[9px] text-slate-500 font-sans font-normal">{item.tacticalNote}</div>
+                      <div className="text-[8.5px] text-slate-500 font-sans font-normal leading-none">{item.tacticalNote}</div>
                     )}
                   </td>
-                  <td className="py-1 text-center text-slate-800">{item.damageStr}</td>
-                  <td className="py-1 text-center text-slate-800">{item.critStr}</td>
-                  <td className="py-1 text-center text-slate-800">{item.type}</td>
+                  <td className="py-0.5 text-center text-slate-800">{item.damageStr}</td>
+                  <td className="py-0.5 text-center text-slate-800">{item.critStr}</td>
+                  <td className="py-0.5 text-center text-slate-800">{item.type}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        {/* Armor & Protective Gear Section */}
-        <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 space-y-1.5 print:break-inside-avoid">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Armor & Protective Gear</h3>
-          <div className="grid grid-cols-2 gap-3 text-xs font-mono">
-            <div className="p-2 bg-white rounded border border-slate-200 space-y-0.5">
-              <span className="font-bold block text-slate-900">
-                Armor: {armorObj.name} {eq.armorEnhancement ? `+${eq.armorEnhancement}` : ''}
-              </span>
-              <p className="text-slate-600">Armor AC Bonus: +{armorAc} | Max Dex: +{armorObj.maxDex} | Check Penalty: {armorObj.checkPenalty}</p>
-            </div>
-            <div className="p-2 bg-white rounded border border-slate-200 space-y-0.5">
-              <span className="font-bold block text-slate-900">
-                Shield: {shieldObj.name} {eq.shieldEnhancement ? `+${eq.shieldEnhancement}` : ''}
-              </span>
-              <p className="text-slate-600">Shield AC Bonus: +{shieldAc} | Check Penalty: {shieldObj.checkPenalty}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Damage Reduction (DR) Section */}
-        <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 space-y-1.5 print:break-inside-avoid">
-          <div className="flex items-center justify-between border-b border-slate-300 pb-1">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-              Damage Reduction (DR) Engine
-            </h3>
-            <span className="text-xs font-mono font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded border border-amber-300">
-              {drSummary.bestDRString}
-            </span>
-          </div>
-          {drSummary.hasDR ? (
-            <div className="space-y-2 text-xs font-mono">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="p-2 bg-white rounded border border-slate-200 space-y-1">
-                  <span className="text-[10px] font-sans font-bold text-slate-500 block uppercase">Active DR Rating Summary</span>
-                  <span className="text-sm font-bold text-slate-900 block">{drSummary.fullDRString}</span>
-                  {drSummary.baselineStackingDR > 0 && (
-                    <p className="text-[10px] text-emerald-700 font-sans font-semibold">
-                      Baseline Stacking DR: +{drSummary.baselineStackingDR}/- (applied to all DR ratings)
-                    </p>
-                  )}
-                </div>
-                <div className="p-2 bg-white rounded border border-slate-200 space-y-1">
-                  <span className="text-[10px] font-sans font-bold text-slate-500 block uppercase">Active DR Sources Breakdown</span>
-                  <ul className="text-[11px] space-y-0.5 font-sans">
-                    {drSummary.sources.map((src, i) => (
-                      <li key={i} className="flex justify-between items-center">
-                        <span className="text-slate-800 font-medium">&bull; {src.name}</span>
-                        <span className="font-mono text-[10px] px-1.5 py-0.2 bg-slate-100 border border-slate-200 rounded text-slate-700">
-                          {src.value}/{src.bypass} {src.stacks ? '(stacks)' : ''}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+        {/* Armor & Defenses Row (2 Columns) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 print:grid-cols-2 print:gap-2 print:break-inside-avoid">
+          {/* Armor & Protective Gear */}
+          <div className="border border-slate-300 rounded-lg p-2.5 print:p-2 bg-slate-50 space-y-1.5 print:space-y-1">
+            <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 print:pb-0.5">Armor & Protective Gear</h3>
+            <div className="space-y-1 text-xs font-mono print:text-[10px]">
+              <div className="p-1.5 bg-white rounded border border-slate-200 space-y-0.5">
+                <span className="font-bold block text-slate-900">
+                  Armor: {armorObj.name} {eq.armorEnhancement ? `+${eq.armorEnhancement}` : ''}
+                </span>
+                <p className="text-slate-600 text-[11px] print:text-[9.5px]">AC: +{armorAc} | Max Dex: +{armorObj.maxDex} | Check: {armorObj.checkPenalty}</p>
+              </div>
+              <div className="p-1.5 bg-white rounded border border-slate-200 space-y-0.5">
+                <span className="font-bold block text-slate-900">
+                  Shield: {shieldObj.name} {eq.shieldEnhancement ? `+${eq.shieldEnhancement}` : ''}
+                </span>
+                <p className="text-slate-600 text-[11px] print:text-[9.5px]">AC: +{shieldAc} | Check: {shieldObj.checkPenalty}</p>
               </div>
             </div>
-          ) : (
-            <p className="text-xs text-slate-500 italic font-mono">No active Damage Reduction (DR) sources detected.</p>
-          )}
+          </div>
+
+          {/* Defenses & Resistances (DR / SR) */}
+          <div className="border border-slate-300 rounded-lg p-2.5 print:p-2 bg-slate-50 space-y-1.5 print:space-y-1">
+            <div className="flex items-center justify-between border-b border-slate-300 pb-1 print:pb-0.5">
+              <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-slate-800">
+                Defenses & Resistances (DR / SR)
+              </h3>
+              <div className="flex items-center gap-1 font-mono text-[11px] print:text-[9.5px]">
+                <span className={`font-bold px-1.5 py-0.2 rounded border ${drSummary.hasDR ? 'text-amber-900 bg-amber-100 border-amber-300' : 'text-slate-600 bg-slate-200 border-slate-300'}`}>
+                  {drSummary.hasDR ? drSummary.bestDRString : 'DR: None'}
+                </span>
+                <span className={`font-bold px-1.5 py-0.2 rounded border ${srSummary.hasSR ? 'text-indigo-800 bg-indigo-100 border-indigo-300' : 'text-slate-600 bg-slate-200 border-slate-300'}`}>
+                  {srSummary.hasSR ? srSummary.bestSRString : 'SR: None'}
+                </span>
+              </div>
+            </div>
+            {drSummary.hasDR || srSummary.hasSR ? (
+              <div className="space-y-1 text-xs font-mono print:text-[10px]">
+                {drSummary.hasDR && (
+                  <div className="p-1.5 bg-white rounded border border-slate-200">
+                    <span className="text-[9.5px] font-sans font-bold text-amber-800 block uppercase">Damage Reduction</span>
+                    <span className="font-bold text-slate-900">{drSummary.fullDRString}</span>
+                    {drSummary.baselineStackingDR > 0 && (
+                      <p className="text-[9px] text-emerald-700 font-sans font-semibold">
+                        Baseline Stacking DR: +{drSummary.baselineStackingDR}/-
+                      </p>
+                    )}
+                  </div>
+                )}
+                {srSummary.hasSR && (
+                  <div className="p-1.5 bg-white rounded border border-slate-200">
+                    <span className="text-[9.5px] font-sans font-bold text-indigo-800 block uppercase">Spell Resistance</span>
+                    <span className="font-bold text-slate-900">{srSummary.bestSRString}</span>
+                    {srSummary.bonusSR > 0 && (
+                      <p className="text-[9px] text-emerald-700 font-sans font-semibold">
+                        +{srSummary.bonusSR} feat bonus applied
+                      </p>
+                    )}
+                  </div>
+                )}
+                <div className="text-[10px] print:text-[9px] text-slate-600 font-sans leading-tight">
+                  <span className="font-bold text-slate-700">Sources: </span>
+                  {[...drSummary.sources.map(s => `${s.name} (${s.value}/${s.bypass})`), ...srSummary.sources.map(s => `${s.name} (SR ${s.value})`)].join(', ')}
+                </div>
+              </div>
+            ) : (
+              <div className="p-3 print:p-2 bg-white rounded border border-slate-200 flex items-center justify-center min-h-[64px] print:min-h-[56px] text-center">
+                <p className="text-[11px] print:text-[9.5px] text-slate-500 italic font-mono">
+                  No active Damage Reduction (DR) or Spell Resistance (SR) sources detected.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Wondrous Items & Magic Gear Section */}
         {(eq.wondrousItems || []).length > 0 && (
-          <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 space-y-1.5 print:break-inside-avoid">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1">Wondrous Items & Magic Gear</h3>
-            <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+          <div className="border border-slate-300 rounded-lg p-2.5 print:p-2 bg-slate-50 space-y-1 print:space-y-0.5 print:break-inside-avoid">
+            <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 print:pb-0.5">Wondrous Items & Magic Gear</h3>
+            <div className="grid grid-cols-2 gap-2 print:gap-1 text-xs font-mono print:text-[10px]">
               {eq.wondrousItems!.map(w => (
-                <div key={w.id} className="p-2 bg-white rounded border border-slate-200">
-                  <span className="font-bold text-slate-900 block">{w.name} <span className="text-[10px] text-purple-700 uppercase font-sans">({w.slot})</span></span>
-                  {w.effect && <p className="text-slate-600 text-[11px]">{w.effect}</p>}
+                <div key={w.id} className="p-1.5 bg-white rounded border border-slate-200">
+                  <span className="font-bold text-slate-900 block">{w.name} <span className="text-[9px] text-purple-700 uppercase font-sans">({w.slot})</span></span>
+                  {w.effect && <p className="text-slate-600 text-[10px] print:text-[9px] leading-tight">{w.effect}</p>}
                 </div>
               ))}
             </div>
@@ -490,12 +515,12 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         )}
 
         {/* Page 1 Lower Split Grid: Left (Stats & Saves) | Right (Feats & Auras) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-3 print:break-inside-avoid">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 print:grid-cols-2 print:gap-2 print:break-inside-avoid">
           {/* Left Column Card: Ability Scores & Saving Throws */}
-          <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 space-y-3">
+          <div className="border border-slate-300 rounded-lg p-2.5 print:p-2 bg-slate-50 space-y-2 print:space-y-1.5">
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 mb-1.5">Ability Scores</h3>
-              <table className="w-full text-xs text-left border-collapse">
+              <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-0.5 mb-1">Ability Scores</h3>
+              <table className="w-full text-xs print:text-[10.5px] text-left border-collapse">
                 <thead>
                   <tr className="border-b border-slate-300 text-slate-500 uppercase">
                     <th className="py-0.5">Stat</th>
@@ -505,7 +530,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                 </thead>
                 <tbody className="divide-y divide-slate-200 font-mono">
                   <tr className={generalTcMods.strBonus > 0 ? 'bg-amber-100/80' : ''}>
-                    <td className="py-1 font-bold flex items-center gap-1">
+                    <td className="py-0.5 font-bold flex items-center gap-1">
                       STR
                       {generalTcMods.strBonus > 0 && (
                         <span className="text-[9px] text-amber-800 bg-amber-200/80 px-1 rounded uppercase font-sans font-semibold">
@@ -513,17 +538,17 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                         </span>
                       )}
                     </td>
-                    <td className="py-1 text-center font-bold">
+                    <td className="py-0.5 text-center font-bold">
                       {effectiveStrScore}
                       {generalTcMods.strBonus > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">({strScore})</span>}
                     </td>
-                    <td className="py-1 text-center font-bold">
+                    <td className="py-0.5 text-center font-bold">
                       {effectiveStrMod >= 0 ? `+${effectiveStrMod}` : effectiveStrMod}
                     </td>
                   </tr>
-                  <tr><td className="py-1 font-bold">DEX</td><td className="py-1 text-center">{dexScore}</td><td className="py-1 text-center font-bold">{dexMod >= 0 ? '+' : ''}{dexMod}</td></tr>
+                  <tr><td className="py-0.5 font-bold">DEX</td><td className="py-0.5 text-center">{dexScore}</td><td className="py-0.5 text-center font-bold">{dexMod >= 0 ? '+' : ''}{dexMod}</td></tr>
                   <tr className={generalTcMods.conBonus > 0 ? 'bg-amber-100/80' : ''}>
-                    <td className="py-1 font-bold flex items-center gap-1">
+                    <td className="py-0.5 font-bold flex items-center gap-1">
                       CON
                       {generalTcMods.conBonus > 0 && (
                         <span className="text-[9px] text-amber-800 bg-amber-200/80 px-1 rounded uppercase font-sans font-semibold">
@@ -531,50 +556,50 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                         </span>
                       )}
                     </td>
-                    <td className="py-1 text-center font-bold">
+                    <td className="py-0.5 text-center font-bold">
                       {effectiveConScore}
                       {generalTcMods.conBonus > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">({conScore})</span>}
                     </td>
-                    <td className="py-1 text-center font-bold">
+                    <td className="py-0.5 text-center font-bold">
                       {effectiveConMod >= 0 ? `+${effectiveConMod}` : effectiveConMod}
                     </td>
                   </tr>
-                  <tr><td className="py-1 font-bold">INT</td><td className="py-1 text-center">{intScore}</td><td className="py-1 text-center font-bold">{intMod >= 0 ? '+' : ''}{intMod}</td></tr>
-                  <tr><td className="py-1 font-bold">WIS</td><td className="py-1 text-center">{wisScore}</td><td className="py-1 text-center font-bold">{wisMod >= 0 ? '+' : ''}{wisMod}</td></tr>
-                  <tr><td className="py-1 font-bold">CHA</td><td className="py-1 text-center">{chaScore}</td><td className="py-1 text-center font-bold">{chaMod >= 0 ? '+' : ''}{chaMod}</td></tr>
+                  <tr><td className="py-0.5 font-bold">INT</td><td className="py-0.5 text-center">{intScore}</td><td className="py-0.5 text-center font-bold">{intMod >= 0 ? '+' : ''}{intMod}</td></tr>
+                  <tr><td className="py-0.5 font-bold">WIS</td><td className="py-0.5 text-center">{wisScore}</td><td className="py-0.5 text-center font-bold">{wisMod >= 0 ? '+' : ''}{wisMod}</td></tr>
+                  <tr><td className="py-0.5 font-bold">CHA</td><td className="py-0.5 text-center">{chaScore}</td><td className="py-0.5 text-center font-bold">{chaMod >= 0 ? '+' : ''}{chaMod}</td></tr>
                 </tbody>
               </table>
             </div>
 
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 mb-1.5">Saving Throws</h3>
-              <table className="w-full text-xs text-left border-collapse">
+              <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-0.5 mb-1">Saving Throws</h3>
+              <table className="w-full text-xs print:text-[10.5px] text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-300 text-slate-500 uppercase">
+                  <tr className="border-b border-slate-300 text-slate-500 uppercase text-[10px] print:text-[9.5px]">
                     <th className="py-0.5">Save</th>
                     <th className="py-0.5 text-center">Total</th>
                     <th className="py-0.5 text-center">Base</th>
                     <th className="py-0.5 text-center">Ability</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 font-mono">
+                <tbody className="divide-y divide-slate-200 font-mono text-[11px] print:text-[10px]">
                   <tr>
-                    <td className="py-1 font-bold">FORTITUDE (Con)</td>
-                    <td className="py-1 text-center font-bold text-xs">{totalFort >= 0 ? '+' : ''}{totalFort}</td>
-                    <td className="py-1 text-center">{baseFort}</td>
-                    <td className="py-1 text-center">{effectiveConMod >= 0 ? '+' : ''}{effectiveConMod}</td>
+                    <td className="py-0.5 font-bold">FORTITUDE (Con)</td>
+                    <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px]">{totalFort >= 0 ? '+' : ''}{totalFort}</td>
+                    <td className="py-0.5 text-center">{baseFort}</td>
+                    <td className="py-0.5 text-center">{effectiveConMod >= 0 ? '+' : ''}{effectiveConMod}</td>
                   </tr>
                   <tr>
-                    <td className="py-1 font-bold">REFLEX (Dex)</td>
-                    <td className="py-1 text-center font-bold text-xs">{totalRef >= 0 ? '+' : ''}{totalRef}</td>
-                    <td className="py-1 text-center">{baseRef}</td>
-                    <td className="py-1 text-center">{dexMod >= 0 ? '+' : ''}{dexMod}</td>
+                    <td className="py-0.5 font-bold">REFLEX (Dex)</td>
+                    <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px]">{totalRef >= 0 ? '+' : ''}{totalRef}</td>
+                    <td className="py-0.5 text-center">{baseRef}</td>
+                    <td className="py-0.5 text-center">{dexMod >= 0 ? '+' : ''}{dexMod}</td>
                   </tr>
                   <tr>
-                    <td className="py-1 font-bold">WILL (Wis)</td>
-                    <td className="py-1 text-center font-bold text-xs">{totalWill >= 0 ? '+' : ''}{totalWill}</td>
-                    <td className="py-1 text-center">{baseWill}</td>
-                    <td className="py-1 text-center">{wisMod >= 0 ? '+' : ''}{wisMod}</td>
+                    <td className="py-0.5 font-bold">WILL (Wis)</td>
+                    <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px]">{totalWill >= 0 ? '+' : ''}{totalWill}</td>
+                    <td className="py-0.5 text-center">{baseWill}</td>
+                    <td className="py-0.5 text-center">{wisMod >= 0 ? '+' : ''}{wisMod}</td>
                   </tr>
                 </tbody>
               </table>
@@ -582,10 +607,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
           </div>
 
           {/* Right Column Card: Feats & Special Abilities + Active Auras */}
-          <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 space-y-3">
+          <div className="border border-slate-300 rounded-lg p-2.5 print:p-2 bg-slate-50 space-y-2 print:space-y-1.5">
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 mb-1.5">Feats & Special Abilities</h3>
-              <div className="space-y-0.5 text-[11px] text-slate-800 font-medium leading-tight font-mono">
+              <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-0.5 mb-1">Feats & Special Abilities</h3>
+              <div className="space-y-0.5 text-[11px] print:text-[10px] text-slate-800 font-medium leading-tight font-mono">
                 {raceObj.spellLikeAbilities && (
                   <p><span className="font-bold text-slate-900 font-sans">Spell-Likes:</span> {raceObj.spellLikeAbilities}</p>
                 )}
@@ -611,7 +636,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                       const domObj = domainsData.find(d => d.name.toLowerCase() === domName.toLowerCase() || d.id === domName.toLowerCase());
                       if (!domObj) return null;
                       return (
-                        <div key={domObj.id} className="text-[10px] bg-slate-100 p-1.5 rounded border border-slate-200">
+                        <div key={domObj.id} className="text-[10px] print:text-[9px] bg-slate-100 p-1 rounded border border-slate-200">
                           <span className="font-bold text-slate-900">{domObj.name} Domain Power:</span>{' '}
                           <span className="text-slate-700">{domObj.power}</span>
                         </div>
@@ -625,19 +650,19 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
             {(character.auras || []).filter(a => a.active).length > 0 && (
               <div className="space-y-1">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 mb-1.5">
+                <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-0.5 mb-1">
                   Active Projected Auras
                 </h3>
-                <div className="space-y-1.5 text-xs">
+                <div className="space-y-1 text-xs print:text-[10px]">
                   {character.auras!.filter(a => a.active).map(aura => (
                     <div key={aura.id} className="p-1.5 bg-white rounded border border-slate-200 font-sans space-y-0.5">
-                      <div className="flex items-center justify-between font-bold text-slate-900 text-[10px]">
+                      <div className="flex items-center justify-between font-bold text-slate-900 text-[10px] print:text-[9.5px]">
                         <span>{aura.name}</span>
                         <span className="text-[9px] px-1 py-0.2 bg-slate-100 border border-slate-300 text-slate-700 rounded font-mono">
                           {aura.radius} ft &bull; {aura.target}
                         </span>
                       </div>
-                      <p className="text-slate-700 text-[10px] font-mono leading-tight">{aura.effect}</p>
+                      <p className="text-slate-700 text-[10px] print:text-[9px] font-mono leading-tight">{aura.effect}</p>
                     </div>
                   ))}
                 </div>
