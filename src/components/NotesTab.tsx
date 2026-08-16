@@ -414,7 +414,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
               {/* Left Column: Character Showcase + Change Portrait button (~5 cols on desktop) */}
               <div className="lg:col-span-5 flex flex-col space-y-2.5 h-full">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                  <h3 className="text-sm font-bold font-heading text-slate-100 flex items-center gap-2">
+                  <h3 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2.5">
                     <i className="fa-solid fa-image text-amber-500"></i> Character Showcase
                   </h3>
                   <button
@@ -479,7 +479,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                     value={notes.appearance || ''}
                     onChange={e => handleNotesChange('appearance', e.target.value)}
                     placeholder="Height, weight, build, eye/hair color, scars, tattoos, attire, posture, voice, distinguishable marks..."
-                    className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-2.5 rounded-xl resize-y flex-1 min-h-[85px]"
+                    className="input-field w-full text-xs leading-relaxed bg-slate-950/80 p-2.5 rounded-xl resize-y flex-1 min-h-[85px]"
                   />
                 </div>
 
@@ -493,7 +493,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                     value={notes.personality || ''}
                     onChange={e => handleNotesChange('personality', e.target.value)}
                     placeholder="Core values, personal code, quirks, phobias, speech patterns, behavioral habits, flaws..."
-                    className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-2.5 rounded-xl resize-y flex-1 min-h-[85px]"
+                    className="input-field w-full text-xs leading-relaxed bg-slate-950/80 p-2.5 rounded-xl resize-y flex-1 min-h-[85px]"
                   />
                 </div>
 
@@ -507,7 +507,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                     value={notes.alliesAndOrganizations || ''}
                     onChange={e => handleNotesChange('alliesAndOrganizations', e.target.value)}
                     placeholder="Guild memberships, holy orders, mentor relationships, noble houses, factions, sworn rivals..."
-                    className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-2.5 rounded-xl resize-y flex-1 min-h-[65px]"
+                    className="input-field w-full text-xs leading-relaxed bg-slate-950/80 p-2.5 rounded-xl resize-y flex-1 min-h-[65px]"
                   />
                 </div>
               </div>
@@ -540,7 +540,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
               value={notes.backstory || ''}
               onChange={e => handleNotesChange('backstory', e.target.value)}
               placeholder="Write your hero's complete origin story, homeland, family lineage, turning-point experiences, major mentors, triumphs, defeats, and overarching campaign ambitions here..."
-              className="input-field w-full text-sm font-mono leading-relaxed bg-slate-950/90 p-5 rounded-2xl resize-y min-h-[350px] text-slate-200 focus:ring-2 focus:ring-amber-500/40"
+              className="input-field w-full text-sm leading-relaxed bg-slate-950/90 p-5 rounded-2xl resize-y min-h-[350px] text-slate-200 focus:ring-2 focus:ring-amber-500/40"
             />
           </div>
         </div>
@@ -634,7 +634,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                     {q.objectives && (
                       <div className="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 text-xs">
                         <span className="text-[10px] text-slate-400 block font-bold uppercase tracking-wider">Objectives:</span>
-                        <p className="text-slate-300 font-mono whitespace-pre-wrap">{q.objectives}</p>
+                        <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{q.objectives}</p>
                       </div>
                     )}
 
@@ -761,7 +761,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                     </div>
 
                     {npc.notes && (
-                      <p className="text-xs text-slate-300 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 font-mono whitespace-pre-wrap">
+                      <p className="text-xs text-slate-300 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 whitespace-pre-wrap leading-relaxed">
                         {npc.notes}
                       </p>
                     )}
@@ -849,7 +849,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed bg-slate-950/60 p-4 rounded-xl border border-slate-800">
+                  <p className="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed bg-slate-950/60 p-4 rounded-xl border border-slate-800">
                     {s.summary}
                   </p>
 
@@ -904,7 +904,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
             value={notes.scratchpad || ''}
             onChange={e => handleNotesChange('scratchpad', e.target.value)}
             placeholder="Type quick session notes here..."
-            className="input-field w-full text-xs font-mono leading-relaxed bg-slate-950/80 p-4 rounded-xl resize-y"
+            className="input-field w-full text-xs leading-relaxed bg-slate-950/80 p-4 rounded-xl resize-y"
           />
 
           <div className="flex justify-between items-center text-[11px] text-slate-400 font-mono">
@@ -974,7 +974,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                   value={questObjectives}
                   onChange={e => setQuestObjectives(e.target.value)}
                   placeholder="Defeat the warlock, locate the altar key..."
-                  className="input-field text-xs w-full font-mono"
+                  className="input-field text-xs w-full"
                 />
               </div>
 
@@ -985,7 +985,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                   value={questRewards}
                   onChange={e => setQuestRewards(e.target.value)}
                   placeholder="e.g. 1,000 GP, Pelor's Amulet, +500 XP"
-                  className="input-field text-xs w-full font-mono"
+                  className="input-field text-xs w-full"
                 />
               </div>
 
@@ -996,7 +996,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                   value={questNotes}
                   onChange={e => setQuestNotes(e.target.value)}
                   placeholder="Given by Archmage Vane in Waterdeep..."
-                  className="input-field text-xs w-full font-mono"
+                  className="input-field text-xs w-full"
                 />
               </div>
 
@@ -1090,7 +1090,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                   value={npcNotes}
                   onChange={e => setNpcNotes(e.target.value)}
                   placeholder="Key information, secrets learned, trade options..."
-                  className="input-field text-xs w-full font-mono"
+                  className="input-field text-xs w-full"
                 />
               </div>
 
@@ -1169,7 +1169,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                   value={sessionSummary}
                   onChange={e => setSessionSummary(e.target.value)}
                   placeholder="Key story events, battles fought, decisions made..."
-                  className="input-field text-xs w-full font-mono"
+                  className="input-field text-xs w-full"
                 />
               </div>
 
@@ -1180,7 +1180,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                   value={sessionLootXP}
                   onChange={e => setSessionLootXP(e.target.value)}
                   placeholder="e.g. +1,200 XP, Ring of Protection +1, 350 GP"
-                  className="input-field text-xs w-full font-mono"
+                  className="input-field text-xs w-full"
                 />
               </div>
 
@@ -1341,7 +1341,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ character, onChange }) => {
                 onChange={e => handleNotesChange('backstory', e.target.value)}
                 placeholder="Write without distractions. Your text saves automatically..."
                 autoFocus
-                className={`w-full h-full flex-1 bg-transparent font-mono leading-relaxed text-slate-100 resize-none focus:outline-none placeholder:text-slate-600 p-2 ${
+                className={`w-full h-full flex-1 bg-transparent leading-relaxed text-slate-100 resize-none focus:outline-none placeholder:text-slate-600 p-2 ${
                   zenFontSize === 'xs' ? 'text-xs' : (zenFontSize === 'sm' ? 'text-sm' : 'text-base')
                 }`}
               />

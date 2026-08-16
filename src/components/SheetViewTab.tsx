@@ -961,13 +961,13 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
               {character.notes.backstory && (
                 <div className="text-xs space-y-1">
                   <span className="font-bold text-slate-900 block">Backstory:</span>
-                  <p className="text-slate-700 font-mono text-[11px] print:text-[10.5px] leading-relaxed print:leading-normal whitespace-pre-wrap">{character.notes.backstory}</p>
+                  <p className="text-slate-700 font-sans text-[11px] print:text-[10.5px] leading-relaxed print:leading-normal whitespace-pre-wrap">{character.notes.backstory}</p>
                 </div>
               )}
               {(character.notes.quests || []).filter(q => q.status === 'active').length > 0 && (
                 <div className="text-xs space-y-1 border-t border-slate-200 pt-2">
                   <span className="font-bold text-slate-900 block">Active Quests:</span>
-                  <ul className="list-disc list-inside text-slate-700 font-mono text-[11px] print:text-[10.5px] space-y-0.5">
+                  <ul className="list-disc list-inside text-slate-700 font-sans text-[11px] print:text-[10.5px] space-y-0.5">
                     {character.notes.quests!.filter(q => q.status === 'active').map(q => (
                       <li key={q.id}>
                         <span className="font-bold">{q.title}</span> {q.location ? `(${q.location})` : ''} - {q.objectives || 'No objectives listed.'}
