@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CharacterSheetData, CharacterSummary, CharacterState, RaceData, ClassData, WeaponData, FeatData, TraitData, FlawData, SkillTrickData, TemplateData, DomainData, DeityData, FamiliarData, AnimalCompanionData } from './types/character';
+import { CharacterSheetData, CharacterSummary, CharacterState, RaceData, ClassData, WeaponData, FeatData, TraitData, FlawData, SkillTrickData, TemplateData, DomainData, DeityData, FamiliarData, AnimalCompanionData, WildShapeFormData } from './types/character';
 import { Header } from './components/Header';
 import { StatsTab } from './components/StatsTab';
 import { RaceClassTab } from './components/RaceClassTab';
@@ -156,6 +156,7 @@ export const App: React.FC = () => {
   const [deitiesData, setDeitiesData] = useState<DeityData[]>([]);
   const [familiarsData, setFamiliarsData] = useState<FamiliarData[]>([]);
   const [animalCompanionsData, setAnimalCompanionsData] = useState<AnimalCompanionData[]>([]);
+  const [wildShapeFormsData, setWildShapeFormsData] = useState<WildShapeFormData[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refreshSummaries = async () => {
@@ -176,8 +177,9 @@ export const App: React.FC = () => {
       fetch('./data/domains.json').then(res => res.json()),
       fetch('./data/deities.json').then(res => res.json()),
       fetch('./data/familiars.json').then(res => res.json()),
-      fetch('./data/animal_companions.json').then(res => res.json())
-    ]).then(([races, classes, weapons, feats, traits, flaws, tricks, templates, domains, deities, familiars, companions]) => {
+      fetch('./data/animal_companions.json').then(res => res.json()),
+      fetch('./data/wildshape_forms.json').then(res => res.json())
+    ]).then(([races, classes, weapons, feats, traits, flaws, tricks, templates, domains, deities, familiars, companions, wildshapeForms]) => {
       setRacesData(races);
       setClassesData(classes);
       setWeaponsData(weapons);
@@ -190,6 +192,7 @@ export const App: React.FC = () => {
       setDeitiesData(deities);
       setFamiliarsData(familiars);
       setAnimalCompanionsData(companions);
+      setWildShapeFormsData(wildshapeForms);
 
       runLegacyMigrationIfNeeded(DEFAULT_CHARACTER).then(({ activeCharacter }) => {
         const synced = syncEquippedItemsToInventory(activeCharacter, weapons);
@@ -456,7 +459,7 @@ export const App: React.FC = () => {
         {/* Tab Views */}
         <div className="print:hidden">
           {activeTab === 'stats' && <StatsTab character={character} racesData={racesData} onChange={updateCharacter} />}
-          {activeTab === 'race-class' && <RaceClassTab character={character} racesData={racesData} classesData={classesData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} deitiesData={deitiesData} domainsData={domainsData} onChange={updateCharacter} />}
+          {activeTab === 'race-class' && <RaceClassTab character={character} racesData={racesData} classesData={classesData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} deitiesData={deitiesData} domainsData={domainsData} wildShapeFormsData={wildShapeFormsData} onChange={updateCharacter} />}
           {activeTab === 'skills' && <SkillsTab character={character} racesData={racesData} classesData={classesData} traitsData={traitsData} flawsData={flawsData} skillTricksData={skillTricksData} onChange={updateCharacter} />}
           {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} classesData={classesData} racesData={racesData} onChange={updateCharacter} />}
           {activeTab === 'equipment' && <EquipmentTab character={character} weaponsData={weaponsData} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
@@ -468,7 +471,7 @@ export const App: React.FC = () => {
           {activeTab === 'notes' && <NotesTab character={character} onChange={updateCharacter} />}
         </div>
         <div className={activeTab === 'sheet' ? 'block' : 'hidden print:block'}>
-          <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} domainsData={domainsData} deitiesData={deitiesData} onChange={updateCharacter} />
+          <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} domainsData={domainsData} deitiesData={deitiesData} wildShapeFormsData={wildShapeFormsData} onChange={updateCharacter} />
         </div>
       </main>
 

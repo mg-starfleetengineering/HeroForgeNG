@@ -1,5 +1,5 @@
 import React from 'react';
-import { CharacterState, RaceData, ClassData, WeaponData, Equipment, TraitData, FlawData, TemplateData, DomainData, DeityData } from '../types/character';
+import { CharacterState, RaceData, ClassData, WeaponData, Equipment, TraitData, FlawData, TemplateData, DomainData, DeityData, WildShapeFormData } from '../types/character';
 import {
   calculateTotalScore,
   getAbilityMod,
@@ -35,6 +35,7 @@ import {
 } from '../engine/combat';
 import { calculateTotalDR } from '../engine/dr';
 import { calculateTotalSR } from '../engine/sr';
+import { resolveActiveWildShape, calculateWildShapeAttacks, getSizeAcModifier } from '../engine/wildshape';
 
 interface SheetViewTabProps {
   character: CharacterState;
@@ -46,6 +47,7 @@ interface SheetViewTabProps {
   flawsData?: FlawData[];
   domainsData?: DomainData[];
   deitiesData?: DeityData[];
+  wildShapeFormsData?: WildShapeFormData[];
   onChange?: (updated: Partial<CharacterState>) => void;
 }
 
@@ -59,6 +61,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   flawsData = [],
   domainsData = [],
   deitiesData = [],
+  wildShapeFormsData = [],
   onChange
 }) => {
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
@@ -77,14 +80,20 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const speedData = calculateTotalSpeed(character, raceObj, templateObj, traitsData, flawsData);
   const drSummary = calculateTotalDR(character, raceObj, templateObj, [], classesData);
   const srSummary = calculateTotalSR(character, raceObj, templateObj, [], classesData);
+  const activeWildShape = resolveActiveWildShape(character, wildShapeFormsData);
 
   const totalLevel = character.levelProgression.filter(l => l.primaryClass).length || 1;
-  const strScore = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
-  const dexScore = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
-  const conScore = calculateTotalScore('con', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+  const baseStrScore = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+  const baseDexScore = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+  const baseConScore = calculateTotalScore('con', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
   const intScore = calculateTotalScore('int', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
   const wisScore = calculateTotalScore('wis', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
   const chaScore = calculateTotalScore('cha', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+
+  // Substitute physical ability scores with form's base stats when Wild Shape is active
+  const strScore = activeWildShape ? activeWildShape.str : baseStrScore;
+  const dexScore = activeWildShape ? activeWildShape.dex : baseDexScore;
+  const conScore = activeWildShape ? activeWildShape.con : baseConScore;
 
   const strMod = getAbilityMod(strScore);
   const dexMod = getAbilityMod(dexScore);
@@ -104,7 +113,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const effectiveStrMod = getAbilityMod(effectiveStrScore);
   const effectiveConMod = getAbilityMod(effectiveConScore);
 
-  const hp = calculateTotalHP(character.levelProgression, classesData, effectiveConMod, traitFlawHpMod);
+  // HP retains character's base Constitution modifier
+  const baseConMod = getAbilityMod(baseConScore);
+  const hp = calculateTotalHP(character.levelProgression, classesData, baseConMod, traitFlawHpMod);
 
   const baseFort = calculateBaseSave('fort', character.levelProgression, classesData);
   const baseRef = calculateBaseSave('ref', character.levelProgression, classesData);
@@ -116,7 +127,11 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
   const totalInitiative = dexMod + traitFlawInitMod;
 
-  const finalSpeed = speedData.land + generalTcMods.speedMod;
+  const activeSize = activeWildShape ? activeWildShape.size : (templateObj?.size || raceObj.size || 'Medium');
+  const sizeAcMod = getSizeAcModifier(activeSize);
+  const wildShapeNatArmor = activeWildShape ? activeWildShape.naturalArmor : 0;
+
+  const finalSpeed = (activeWildShape ? activeWildShape.speed.land : speedData.land) + generalTcMods.speedMod;
 
   const eq: Equipment = character.equipment || {
     armor: 'chainshirt', armorEnhancement: 1, shield: 'heavy_shield', shieldEnhancement: 1,
@@ -171,9 +186,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const armorAc = armorObj.acBonus + (eq.armorEnhancement || 0);
   const shieldAc = shieldObj.acBonus + (eq.shieldEnhancement || 0);
 
-  const totalAc = 10 + armorAc + shieldAc + dexMod + (eq.deflection || 0) + (eq.natural || 0) + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.acNetMod;
-  const touchAc = 10 + dexMod + (eq.deflection || 0) + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.touchAcMod;
-  const flatAc = 10 + armorAc + shieldAc + (eq.deflection || 0) + (eq.natural || 0) + traitFlawAcMod + generalTcMods.flatAcMod;
+  const totalAc = 10 + armorAc + shieldAc + dexMod + (eq.deflection || 0) + (eq.natural || 0) + wildShapeNatArmor + sizeAcMod + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.acNetMod;
+  const touchAc = 10 + dexMod + (eq.deflection || 0) + sizeAcMod + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.touchAcMod;
+  const flatAc = 10 + armorAc + shieldAc + (eq.deflection || 0) + (eq.natural || 0) + wildShapeNatArmor + sizeAcMod + traitFlawAcMod + generalTcMods.flatAcMod;
 
   // Weapon Resolutions & Feat Combat Bonuses
   const activeWeaponsList: Array<{
@@ -188,6 +203,12 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     featDmgBonus: number;
     tacticalNote?: string;
   }> = [];
+
+  // 0. Active Wild Shape Natural Attacks (rendered first in weapon table)
+  if (activeWildShape) {
+    const wsAttacks = calculateWildShapeAttacks(character, activeWildShape, bab, effectiveStrMod, dexMod, tcState);
+    activeWeaponsList.push(...wsAttacks);
+  }
 
   // 1. Primary Weapon
   if (eq.primaryWeapon) {
@@ -302,8 +323,21 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   }
 
   // 4. Special Maneuver: Grapple
-  const grappleCalc = calculateGrappleModifier(character, bab, effectiveStrMod, raceObj, templateObj);
-  const grappleEntry = getGrappleAttackEntry(character, bab, effectiveStrMod, tcState, raceObj, templateObj);
+  const grappleCalc = calculateGrappleModifier(
+    character,
+    bab,
+    effectiveStrMod,
+    activeWildShape ? { size: activeWildShape.size, name: activeWildShape.name } : raceObj,
+    activeWildShape ? undefined : templateObj
+  );
+  const grappleEntry = getGrappleAttackEntry(
+    character,
+    bab,
+    effectiveStrMod,
+    tcState,
+    activeWildShape ? { size: activeWildShape.size, name: activeWildShape.name } : raceObj,
+    activeWildShape ? undefined : templateObj
+  );
   activeWeaponsList.push(grappleEntry);
 
   const classMap: Record<string, number> = {};
@@ -364,6 +398,49 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       <div id="printable-character-sheet" className="bg-white text-slate-900 p-8 rounded-xl shadow-2xl space-y-4 font-sans print:p-0 print:shadow-none print:rounded-none print:border-none print:space-y-2.5">
         {/* Page 1 Header */}
         {renderHeader()}
+
+        {/* Active Wild Shape Banner */}
+        {activeWildShape && (
+          <div className="border-2 border-emerald-600/60 rounded-lg p-2.5 print:p-2 bg-emerald-50 print:bg-slate-50 space-y-1.5 print:space-y-1 print:break-inside-avoid shadow-xs">
+            <div className="flex items-center justify-between border-b border-emerald-300/80 print:border-slate-300 pb-1">
+              <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-emerald-950 flex items-center gap-1.5 font-heading">
+                <i className="fa-solid fa-paw text-emerald-700"></i> Active Wild Shape: {activeWildShape.name} ({activeWildShape.size} {activeWildShape.creatureType})
+              </h3>
+              {onChange && (
+                <button
+                  onClick={() => onChange({ wildShape: { ...(character.wildShape || { isActive: false }), isActive: false } })}
+                  className="print:hidden text-[11px] font-semibold text-rose-700 hover:text-rose-900 flex items-center gap-1 cursor-pointer"
+                  title="Revert to humanoid form"
+                >
+                  <i className="fa-solid fa-arrow-rotate-left"></i> Revert to Humanoid
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-2 text-[11px] print:text-[9.5px] font-mono text-emerald-950">
+              <span><strong>Str {strScore}</strong> ({strMod >= 0 ? `+${strMod}` : strMod})</span>
+              <span>&bull;</span>
+              <span><strong>Dex {dexScore}</strong> ({dexMod >= 0 ? `+${dexMod}` : dexMod})</span>
+              <span>&bull;</span>
+              <span><strong>Con {conScore}</strong> ({conMod >= 0 ? `+${conMod}` : conMod})</span>
+              <span>&bull;</span>
+              <span><strong>Nat Armor:</strong> +{activeWildShape.naturalArmor}</span>
+              <span>&bull;</span>
+              <span>
+                <strong>Speed:</strong> {activeWildShape.speed.land} ft
+                {activeWildShape.speed.fly ? ` (Fly ${activeWildShape.speed.fly} ft ${activeWildShape.speed.flyManeuverability || ''})` : ''}
+                {activeWildShape.speed.swim ? ` (Swim ${activeWildShape.speed.swim} ft)` : ''}
+                {activeWildShape.speed.burrow ? ` (Burrow ${activeWildShape.speed.burrow} ft)` : ''}
+                {activeWildShape.speed.climb ? ` (Climb ${activeWildShape.speed.climb} ft)` : ''}
+              </span>
+              {activeWildShape.specialQualities && activeWildShape.specialQualities.length > 0 && (
+                <>
+                  <span>&bull;</span>
+                  <span><strong>Traits:</strong> {activeWildShape.specialQualities.join(', ')}</span>
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Vitals Banner - strictly 1 row of 6 columns */}
         <div className="grid grid-cols-6 gap-2 print:gap-1.5 text-center font-mono py-2.5 print:py-1.5 bg-slate-100 rounded-lg border border-slate-300 print:break-inside-avoid">
@@ -608,9 +685,14 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 font-mono">
-                  <tr className={generalTcMods.strBonus > 0 ? 'bg-amber-100/80' : ''}>
+                  <tr className={activeWildShape ? 'bg-emerald-50' : (generalTcMods.strBonus > 0 ? 'bg-amber-100/80' : '')}>
                     <td className="py-0.5 font-bold flex items-center gap-1">
                       STR
+                      {activeWildShape && (
+                        <span className="text-[8px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-1 rounded uppercase font-sans font-bold">
+                          {activeWildShape.name}
+                        </span>
+                      )}
                       {generalTcMods.strBonus > 0 && (
                         <span className="text-[8.5px] text-amber-900 bg-amber-200/90 px-1 rounded uppercase font-sans font-bold" title={tcState.whirlingFrenzy ? 'Whirling Frenzy' : 'Barbarian Rage'}>
                           +{generalTcMods.strBonus} ({tcState.whirlingFrenzy ? 'Frenzy' : 'Rage'})
@@ -625,10 +707,26 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                       {effectiveStrMod >= 0 ? `+${effectiveStrMod}` : effectiveStrMod}
                     </td>
                   </tr>
-                  <tr><td className="py-0.5 font-bold">DEX</td><td className="py-0.5 text-center">{dexScore}</td><td className="py-0.5 text-center font-bold">{dexMod >= 0 ? '+' : ''}{dexMod}</td></tr>
-                  <tr className={generalTcMods.conBonus > 0 ? 'bg-amber-100/80' : ''}>
+                  <tr className={activeWildShape ? 'bg-emerald-50' : ''}>
+                    <td className="py-0.5 font-bold flex items-center gap-1">
+                      DEX
+                      {activeWildShape && (
+                        <span className="text-[8px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-1 rounded uppercase font-sans font-bold">
+                          {activeWildShape.name}
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-0.5 text-center font-bold">{dexScore}</td>
+                    <td className="py-0.5 text-center font-bold">{dexMod >= 0 ? '+' : ''}{dexMod}</td>
+                  </tr>
+                  <tr className={activeWildShape ? 'bg-emerald-50' : (generalTcMods.conBonus > 0 ? 'bg-amber-100/80' : '')}>
                     <td className="py-0.5 font-bold flex items-center gap-1">
                       CON
+                      {activeWildShape && (
+                        <span className="text-[8px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-1 rounded uppercase font-sans font-bold">
+                          {activeWildShape.name}
+                        </span>
+                      )}
                       {generalTcMods.conBonus > 0 && (
                         <span className="text-[8.5px] text-amber-900 bg-amber-200/90 px-1 rounded uppercase font-sans font-bold" title="Barbarian Rage">
                           +{generalTcMods.conBonus} (Rage)

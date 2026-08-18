@@ -173,6 +173,7 @@ export interface CharacterState {
   tacticalCombat?: TacticalCombatState;
   familiar?: FamiliarState;
   animalCompanion?: AnimalCompanionState;
+  wildShape?: WildShapeState;
 }
 
 export interface TemplateData {
@@ -503,6 +504,83 @@ export interface AnimalCompanionState {
   assignedSkillRanks?: Record<string, number>;
   selectedTricks?: string[];
   hasNaturalBondFeat?: boolean; // toggle/override for Natural Bond feat
+  notes?: string;
+}
+
+export interface WildShapeAttack {
+  name: string;
+  damage: string;
+  strMultiplier?: number;
+  isPrimary?: boolean;
+  attackCount?: number;
+  special?: string;
+}
+
+export interface WildShapeFormData {
+  id: string;
+  name: string;
+  category: 'animal' | 'dinosaur' | 'plant' | 'elemental' | 'custom' | string;
+  size: string;
+  creatureType: string;
+  minDruidLevel: number;
+  str: number;
+  dex: number;
+  con: number;
+  naturalArmor: number;
+  space?: number;
+  reach?: number;
+  speed: {
+    land: number;
+    fly?: number;
+    flyManeuverability?: string;
+    swim?: number;
+    climb?: number;
+    burrow?: number;
+  };
+  attacks: WildShapeAttack[];
+  specialQualities?: string[];
+  source?: string;
+  description?: string;
+}
+
+export interface CustomWildShapeData {
+  name: string;
+  category: string;
+  size: string;
+  creatureType: string;
+  minDruidLevel: number;
+  str: number;
+  dex: number;
+  con: number;
+  naturalArmor: number;
+  space?: number;
+  reach?: number;
+  speedLand: number;
+  speedFly?: number;
+  speedFlyManeuverability?: string;
+  speedSwim?: number;
+  speedClimb?: number;
+  speedBurrow?: number;
+  attack1Name: string;
+  attack1Damage: string;
+  attack1Count?: number;
+  attack1IsPrimary?: boolean;
+  attack1Special?: string;
+  attack2Name?: string;
+  attack2Damage?: string;
+  attack2Count?: number;
+  attack2IsPrimary?: boolean;
+  attack2Special?: string;
+  specialQualities?: string;
+  notes?: string;
+}
+
+export interface WildShapeState {
+  isActive: boolean;
+  selectedFormId?: string; // form ID or 'custom'
+  customForm?: CustomWildShapeData;
+  overrideName?: string;
+  hasNaturalSpell?: boolean;
   notes?: string;
 }
 

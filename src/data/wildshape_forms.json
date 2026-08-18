@@ -1,0 +1,1740 @@
+[
+  {
+    "id": "wolf",
+    "name": "Wolf",
+    "category": "animal",
+    "size": "Medium",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 13,
+    "dex": 15,
+    "con": 15,
+    "naturalArmor": 2,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 50
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "damage": "1d6",
+        "strMultiplier": 1.5,
+        "isPrimary": true,
+        "special": "Trip"
+      }
+    ],
+    "specialQualities": ["Trip (+1 check)", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A swift canine predator known for its deadly tripping bite and scent tracking."
+  },
+  {
+    "id": "black_bear",
+    "name": "Black Bear",
+    "category": "animal",
+    "size": "Medium",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 19,
+    "dex": 13,
+    "con": 15,
+    "naturalArmor": 2,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "damage": "1d4",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      },
+      {
+        "name": "Bite",
+        "damage": "1d6",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A powerful Medium predator featuring a multiattack routine with two sharp claws and a bite."
+  },
+  {
+    "id": "leopard",
+    "name": "Leopard",
+    "category": "animal",
+    "size": "Medium",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 16,
+    "dex": 19,
+    "con": 15,
+    "naturalArmor": 1,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 40,
+      "climb": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "damage": "1d6",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "special": "Improved Grab"
+      },
+      {
+        "name": "Claw",
+        "damage": "1d3",
+        "strMultiplier": 0.5,
+        "isPrimary": false,
+        "attackCount": 2
+      }
+    ],
+    "specialQualities": ["Pounce", "Improved Grab", "Rake (2x 1d3)", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "An agile hunter capable of pouncing on a charge to make a full attack with rake claws."
+  },
+  {
+    "id": "cheetah",
+    "name": "Cheetah",
+    "category": "animal",
+    "size": "Medium",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 16,
+    "dex": 19,
+    "con": 15,
+    "naturalArmor": 1,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 50
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "damage": "1d6",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "special": "Trip"
+      },
+      {
+        "name": "Claw",
+        "damage": "1d2",
+        "strMultiplier": 0.5,
+        "isPrimary": false,
+        "attackCount": 2
+      }
+    ],
+    "specialQualities": ["Sprint (500 ft 1/hr)", "Trip", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "The fastest land animal, capable of incredible burst sprints and tripping prey with its bite."
+  },
+  {
+    "id": "deinonychus",
+    "name": "Deinonychus",
+    "category": "dinosaur",
+    "size": "Medium",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 19,
+    "dex": 15,
+    "con": 19,
+    "naturalArmor": 5,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 60
+    },
+    "attacks": [
+      {
+        "name": "Talons",
+        "damage": "2d6",
+        "strMultiplier": 1.0,
+        "isPrimary": true
+      },
+      {
+        "name": "Foreclaws",
+        "damage": "1d3",
+        "strMultiplier": 0.5,
+        "isPrimary": false,
+        "attackCount": 2
+      },
+      {
+        "name": "Bite",
+        "damage": "1d6",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Pounce", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A savage raptor dinosaur with a devastating 2d6 talon attack and pounce on a charge."
+  },
+  {
+    "id": "fleshraker",
+    "name": "Fleshraker",
+    "category": "dinosaur",
+    "size": "Medium",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 17,
+    "dex": 19,
+    "con": 15,
+    "naturalArmor": 3,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 50
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "damage": "1d6",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      },
+      {
+        "name": "Bite",
+        "damage": "1d6",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      },
+      {
+        "name": "Tail Slap",
+        "damage": "1d6",
+        "strMultiplier": 0.5,
+        "isPrimary": false,
+        "special": "Poison (1d6 Dex / 1d6 Dex, DC 14)"
+      }
+    ],
+    "specialQualities": ["Leaping Pounce", "Poison (DC 14)", "Rake (2x 1d6)", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual III",
+    "description": "An elite combat dinosaur with 4 natural attacks, venomous tail stinger, and leaping pounce."
+  },
+  {
+    "id": "boar",
+    "name": "Boar",
+    "category": "animal",
+    "size": "Medium",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 15,
+    "dex": 10,
+    "con": 17,
+    "naturalArmor": 6,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Gore",
+        "damage": "1d8",
+        "strMultiplier": 1.5,
+        "isPrimary": true
+      }
+    ],
+    "specialQualities": ["Ferocity (fight to -9 HP)", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A rugged wild pig that gains tough natural armor (+6) and continues fighting even below 0 HP."
+  },
+  {
+    "id": "crocodile",
+    "name": "Crocodile",
+    "category": "animal",
+    "size": "Medium",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 19,
+    "dex": 12,
+    "con": 17,
+    "naturalArmor": 4,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 20,
+      "swim": 30
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "damage": "1d8",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "special": "Improved Grab"
+      },
+      {
+        "name": "Tail Slap",
+        "damage": "1d12",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Improved Grab", "Hold Breath", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "An amphibious hunter with high Strength (19), strong swimming speed, and powerful grab bite."
+  },
+  {
+    "id": "riding_dog",
+    "name": "Riding Dog",
+    "category": "animal",
+    "size": "Medium",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 15,
+    "dex": 15,
+    "con": 15,
+    "naturalArmor": 4,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "damage": "1d6",
+        "strMultiplier": 1.5,
+        "isPrimary": true,
+        "special": "Trip"
+      }
+    ],
+    "specialQualities": ["Trip (+3 check)", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A trained domestic war hound with +4 natural armor and tripping bite."
+  },
+  {
+    "id": "eagle",
+    "name": "Eagle",
+    "category": "animal",
+    "size": "Small",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 10,
+    "dex": 15,
+    "con": 12,
+    "naturalArmor": 1,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 10,
+      "fly": 80,
+      "flyManeuverability": "average"
+    },
+    "attacks": [
+      {
+        "name": "Talons",
+        "damage": "1d4",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      },
+      {
+        "name": "Bite",
+        "damage": "1d4",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Flight 80 ft", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A swift avian form providing early 80 ft flight speed and aerial scouting."
+  },
+  {
+    "id": "badger",
+    "name": "Badger",
+    "category": "animal",
+    "size": "Small",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 8,
+    "dex": 17,
+    "con": 15,
+    "naturalArmor": 1,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 30,
+      "burrow": 10
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "damage": "1d2",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      },
+      {
+        "name": "Bite",
+        "damage": "1d3",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Rage (+4 Str, +4 Con, -2 AC)", "Burrow 10 ft", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A fierce burrowing creature that can tunnel underground and fly into a rage when damaged."
+  },
+  {
+    "id": "dire_rat",
+    "name": "Dire Rat",
+    "category": "animal",
+    "size": "Small",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 10,
+    "dex": 17,
+    "con": 12,
+    "naturalArmor": 1,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 40,
+      "climb": 20,
+      "swim": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "damage": "1d4",
+        "strMultiplier": 1.5,
+        "isPrimary": true,
+        "special": "Filth Fever (DC 11)"
+      }
+    ],
+    "specialQualities": ["Filth Fever", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A versatile infiltrator possessing land, climbing, and swimming speeds."
+  },
+  {
+    "id": "constrictor_snake",
+    "name": "Constrictor Snake",
+    "category": "animal",
+    "size": "Medium",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 17,
+    "dex": 17,
+    "con": 13,
+    "naturalArmor": 3,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 20,
+      "climb": 20,
+      "swim": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "damage": "1d4",
+        "strMultiplier": 1.5,
+        "isPrimary": true,
+        "special": "Improved Grab"
+      }
+    ],
+    "specialQualities": ["Improved Grab", "Constrict (1d4+Str)", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A crushing serpent capable of grappling foes and suffocating them with Constrict damage."
+  },
+  {
+    "id": "wolverine",
+    "name": "Wolverine",
+    "category": "animal",
+    "size": "Medium",
+    "creatureType": "Animal",
+    "minDruidLevel": 5,
+    "str": 14,
+    "dex": 15,
+    "con": 19,
+    "naturalArmor": 2,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 30,
+      "burrow": 10,
+      "climb": 10
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "damage": "1d4",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      },
+      {
+        "name": "Bite",
+        "damage": "1d6",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Rage (+4 Str, +4 Con, -2 AC)", "Burrow 10 ft", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A tenacious carnivore that burrows through earth and erupts into a furious rage."
+  },
+  {
+    "id": "brown_bear",
+    "name": "Brown Bear",
+    "category": "animal",
+    "size": "Large",
+    "creatureType": "Animal",
+    "minDruidLevel": 8,
+    "str": 27,
+    "dex": 13,
+    "con": 19,
+    "naturalArmor": 5,
+    "space": 10,
+    "reach": 5,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "damage": "1d8",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2,
+        "special": "Improved Grab"
+      },
+      {
+        "name": "Bite",
+        "damage": "2d6",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Improved Grab", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "The quintessential Large wild shape form with enormous Strength (27), +5 Natural Armor, and Improved Grab."
+  },
+  {
+    "id": "polar_bear",
+    "name": "Polar Bear",
+    "category": "animal",
+    "size": "Large",
+    "creatureType": "Animal",
+    "minDruidLevel": 8,
+    "str": 27,
+    "dex": 13,
+    "con": 19,
+    "naturalArmor": 5,
+    "space": 10,
+    "reach": 5,
+    "speed": {
+      "land": 40,
+      "swim": 30
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "damage": "1d8",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2,
+        "special": "Improved Grab"
+      },
+      {
+        "name": "Bite",
+        "damage": "2d6",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Improved Grab", "Cold Resistance", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "An arctic apex predator identical in power to the brown bear, plus a 30 ft swim speed."
+  },
+  {
+    "id": "dire_ape",
+    "name": "Dire Ape",
+    "category": "animal",
+    "size": "Large",
+    "creatureType": "Animal",
+    "minDruidLevel": 8,
+    "str": 22,
+    "dex": 15,
+    "con": 14,
+    "naturalArmor": 4,
+    "space": 10,
+    "reach": 10,
+    "speed": {
+      "land": 30,
+      "climb": 15
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "damage": "1d6",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      },
+      {
+        "name": "Bite",
+        "damage": "1d8",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Rend (2d6+Str)", "10 ft Reach", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A Large bipedal ape featuring full 10 ft reach, climbing agility, and brutal Rend damage."
+  },
+  {
+    "id": "dire_boar",
+    "name": "Dire Boar",
+    "category": "animal",
+    "size": "Large",
+    "creatureType": "Animal",
+    "minDruidLevel": 8,
+    "str": 27,
+    "dex": 10,
+    "con": 17,
+    "naturalArmor": 6,
+    "space": 10,
+    "reach": 5,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Gore",
+        "damage": "1d8",
+        "strMultiplier": 1.5,
+        "isPrimary": true
+      }
+    ],
+    "specialQualities": ["Ferocity (fight to -9 HP)", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A massive armored boar with 27 Strength, +6 Natural Armor, and relentless Ferocity."
+  },
+  {
+    "id": "dire_wolf",
+    "name": "Dire Wolf",
+    "category": "animal",
+    "size": "Large",
+    "creatureType": "Animal",
+    "minDruidLevel": 8,
+    "str": 25,
+    "dex": 15,
+    "con": 17,
+    "naturalArmor": 3,
+    "space": 10,
+    "reach": 5,
+    "speed": {
+      "land": 50
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "damage": "1d8",
+        "strMultiplier": 1.5,
+        "isPrimary": true,
+        "special": "Trip"
+      }
+    ],
+    "specialQualities": ["Trip (+11 check)", "Speed 50 ft", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A gigantic wolf boasting 25 Strength, 50 ft land speed, and high tripping modifiers."
+  },
+  {
+    "id": "dire_bat",
+    "name": "Dire Bat",
+    "category": "animal",
+    "size": "Large",
+    "creatureType": "Animal",
+    "minDruidLevel": 8,
+    "str": 17,
+    "dex": 22,
+    "con": 17,
+    "naturalArmor": 5,
+    "space": 10,
+    "reach": 5,
+    "speed": {
+      "land": 20,
+      "fly": 40,
+      "flyManeuverability": "good"
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "damage": "1d8",
+        "strMultiplier": 1.5,
+        "isPrimary": true
+      }
+    ],
+    "specialQualities": ["Blindsense 40 ft", "Fly 40 ft (good)", "High Dexterity (22)"],
+    "source": "Monster Manual",
+    "description": "A Large aerial form with Blindsense 40 ft, 22 Dexterity, and +5 natural armor."
+  },
+  {
+    "id": "lion",
+    "name": "Lion",
+    "category": "animal",
+    "size": "Large",
+    "creatureType": "Animal",
+    "minDruidLevel": 8,
+    "str": 21,
+    "dex": 15,
+    "con": 15,
+    "naturalArmor": 3,
+    "space": 10,
+    "reach": 5,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "damage": "1d4",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2,
+        "special": "Improved Grab"
+      },
+      {
+        "name": "Bite",
+        "damage": "1d8",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Pounce", "Improved Grab", "Rake (2x 1d4)", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A Large feline predator with Pounce, Improved Grab, and devastating rake attacks."
+  },
+  {
+    "id": "tiger",
+    "name": "Tiger",
+    "category": "animal",
+    "size": "Large",
+    "creatureType": "Animal",
+    "minDruidLevel": 8,
+    "str": 23,
+    "dex": 15,
+    "con": 17,
+    "naturalArmor": 3,
+    "space": 10,
+    "reach": 5,
+    "speed": {
+      "land": 40,
+      "swim": 30
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "damage": "1d8",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2,
+        "special": "Improved Grab"
+      },
+      {
+        "name": "Bite",
+        "damage": "2d6",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Pounce", "Improved Grab", "Rake (2x 1d8)", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A lethal Large carnivore combining 23 Strength, Pounce, and 1d8 rake claws."
+  },
+  {
+    "id": "megaraptor",
+    "name": "Megaraptor",
+    "category": "dinosaur",
+    "size": "Large",
+    "creatureType": "Animal",
+    "minDruidLevel": 8,
+    "str": 21,
+    "dex": 15,
+    "con": 21,
+    "naturalArmor": 6,
+    "space": 10,
+    "reach": 5,
+    "speed": {
+      "land": 60
+    },
+    "attacks": [
+      {
+        "name": "Talons",
+        "damage": "2d8",
+        "strMultiplier": 1.0,
+        "isPrimary": true
+      },
+      {
+        "name": "Foreclaws",
+        "damage": "1d4",
+        "strMultiplier": 0.5,
+        "isPrimary": false,
+        "attackCount": 2
+      },
+      {
+        "name": "Bite",
+        "damage": "1d8",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Pounce", "Speed 60 ft", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A Large apex dinosaur capable of charging at 60 ft speed with a 2d8 talons attack."
+  },
+  {
+    "id": "giant_constrictor_snake",
+    "name": "Giant Constrictor Snake",
+    "category": "animal",
+    "size": "Huge",
+    "creatureType": "Animal",
+    "minDruidLevel": 15,
+    "str": 25,
+    "dex": 17,
+    "con": 13,
+    "naturalArmor": 4,
+    "space": 15,
+    "reach": 10,
+    "speed": {
+      "land": 20,
+      "climb": 20,
+      "swim": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "damage": "1d8",
+        "strMultiplier": 1.5,
+        "isPrimary": true,
+        "special": "Improved Grab"
+      }
+    ],
+    "specialQualities": ["Improved Grab", "Constrict (1d8+Str)", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A colossal constrictor serpent capable of grappling Huge opponents and suffocating them."
+  },
+  {
+    "id": "rhinoceros",
+    "name": "Rhinoceros",
+    "category": "animal",
+    "size": "Large",
+    "creatureType": "Animal",
+    "minDruidLevel": 8,
+    "str": 26,
+    "dex": 10,
+    "con": 21,
+    "naturalArmor": 7,
+    "space": 10,
+    "reach": 5,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [
+      {
+        "name": "Gore",
+        "damage": "2d6",
+        "strMultiplier": 1.5,
+        "isPrimary": true
+      }
+    ],
+    "specialQualities": ["Powerful Charge (4d6+Str)", "Natural Armor +7", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A heavily plated beast with +7 Natural Armor and a devastating 4d6 Powerful Charge."
+  },
+  {
+    "id": "smilodon",
+    "name": "Smilodon (Saber-Toothed Tiger)",
+    "category": "animal",
+    "size": "Large",
+    "creatureType": "Animal",
+    "minDruidLevel": 8,
+    "str": 26,
+    "dex": 14,
+    "con": 16,
+    "naturalArmor": 4,
+    "space": 10,
+    "reach": 5,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "damage": "1d6",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2,
+        "special": "Improved Grab"
+      },
+      {
+        "name": "Bite",
+        "damage": "2d6",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Pounce", "Improved Grab", "Rake (2x 1d6)", "Scent", "Low-Light Vision"],
+    "source": "Frostburn",
+    "description": "A prehistoric saber-toothed cat packing 26 Strength and brutal pouncing rake claws."
+  },
+  {
+    "id": "bat",
+    "name": "Bat",
+    "category": "animal",
+    "size": "Diminutive",
+    "creatureType": "Animal",
+    "minDruidLevel": 11,
+    "str": 1,
+    "dex": 15,
+    "con": 10,
+    "naturalArmor": 0,
+    "space": 1,
+    "reach": 0,
+    "speed": {
+      "land": 5,
+      "fly": 40,
+      "flyManeuverability": "good"
+    },
+    "attacks": [],
+    "specialQualities": ["Blindsense 20 ft", "Fly 40 ft (good)", "Tiny Infiltration"],
+    "source": "Monster Manual",
+    "description": "A tiny nocturnal flyer ideal for stealth, covert scouting, and sonar detection."
+  },
+  {
+    "id": "cat",
+    "name": "Cat",
+    "category": "animal",
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "minDruidLevel": 11,
+    "str": 3,
+    "dex": 15,
+    "con": 10,
+    "naturalArmor": 0,
+    "space": 2.5,
+    "reach": 0,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "damage": "1d2",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      },
+      {
+        "name": "Bite",
+        "damage": "1d3",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Stealth Infiltration", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "An inconspicuous urban scout capable of blending in anywhere in civilized settlements."
+  },
+  {
+    "id": "hawk",
+    "name": "Hawk",
+    "category": "animal",
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "minDruidLevel": 11,
+    "str": 6,
+    "dex": 17,
+    "con": 10,
+    "naturalArmor": 1,
+    "space": 2.5,
+    "reach": 0,
+    "speed": {
+      "land": 10,
+      "fly": 60,
+      "flyManeuverability": "average"
+    },
+    "attacks": [
+      {
+        "name": "Talons",
+        "damage": "1d4",
+        "strMultiplier": 1.0,
+        "isPrimary": true
+      }
+    ],
+    "specialQualities": ["Fly 60 ft", "Spot +8", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A nimble raptor bird granting high Dex (17) and long-range aerial recon."
+  },
+  {
+    "id": "tiny_viper",
+    "name": "Tiny Viper",
+    "category": "animal",
+    "size": "Tiny",
+    "creatureType": "Animal",
+    "minDruidLevel": 11,
+    "str": 6,
+    "dex": 17,
+    "con": 11,
+    "naturalArmor": 0,
+    "space": 2.5,
+    "reach": 0,
+    "speed": {
+      "land": 15,
+      "climb": 15,
+      "swim": 15
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "damage": "1d2",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "special": "Poison (1d6 Con / 1d6 Con, DC 10)"
+      }
+    ],
+    "specialQualities": ["Poison (1d6 Con)", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A miniature serpent with Constitution-damaging venom for stealth assassinations."
+  },
+  {
+    "id": "dire_bear",
+    "name": "Dire Bear",
+    "category": "animal",
+    "size": "Huge",
+    "creatureType": "Animal",
+    "minDruidLevel": 15,
+    "str": 31,
+    "dex": 13,
+    "con": 19,
+    "naturalArmor": 7,
+    "space": 15,
+    "reach": 10,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "damage": "2d4",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2,
+        "special": "Improved Grab"
+      },
+      {
+        "name": "Bite",
+        "damage": "2d8",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Improved Grab", "10 ft Reach", "Natural Armor +7", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A colossal beast with 31 Strength (+10 mod), Huge size bonuses to Grapple (+8), and +7 natural armor."
+  },
+  {
+    "id": "dire_tiger",
+    "name": "Dire Tiger",
+    "category": "animal",
+    "size": "Huge",
+    "creatureType": "Animal",
+    "minDruidLevel": 15,
+    "str": 27,
+    "dex": 15,
+    "con": 17,
+    "naturalArmor": 6,
+    "space": 15,
+    "reach": 10,
+    "speed": {
+      "land": 40,
+      "swim": 20
+    },
+    "attacks": [
+      {
+        "name": "Claw",
+        "damage": "2d4",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2,
+        "special": "Improved Grab"
+      },
+      {
+        "name": "Bite",
+        "damage": "2d6",
+        "strMultiplier": 0.5,
+        "isPrimary": false
+      }
+    ],
+    "specialQualities": ["Pounce", "Improved Grab", "Rake (2x 2d4)", "10 ft Reach", "Scent"],
+    "source": "Monster Manual",
+    "description": "A Huge charging cat that pounces with 2d4 claws, bite, and two 2d4 rake attacks."
+  },
+  {
+    "id": "elephant",
+    "name": "Elephant",
+    "category": "animal",
+    "size": "Huge",
+    "creatureType": "Animal",
+    "minDruidLevel": 15,
+    "str": 30,
+    "dex": 10,
+    "con": 21,
+    "naturalArmor": 7,
+    "space": 15,
+    "reach": 10,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "2d6",
+        "strMultiplier": 1.5,
+        "isPrimary": true
+      },
+      {
+        "name": "Stamp",
+        "damage": "2d6",
+        "strMultiplier": 0.5,
+        "isPrimary": false,
+        "attackCount": 2
+      }
+    ],
+    "specialQualities": ["Trample (2d8+Str, DC 25)", "10 ft Reach", "Natural Armor +7", "Scent"],
+    "source": "Monster Manual",
+    "description": "A massive 30 Strength quadruped capable of trampling enemy lines underfoot."
+  },
+  {
+    "id": "triceratops",
+    "name": "Triceratops",
+    "category": "dinosaur",
+    "size": "Huge",
+    "creatureType": "Animal",
+    "minDruidLevel": 15,
+    "str": 30,
+    "dex": 9,
+    "con": 25,
+    "naturalArmor": 11,
+    "space": 15,
+    "reach": 10,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [
+      {
+        "name": "Gore",
+        "damage": "2d8",
+        "strMultiplier": 1.5,
+        "isPrimary": true
+      }
+    ],
+    "specialQualities": ["Powerful Charge (4d8+Str)", "Trample (2d12+Str)", "Natural Armor +11", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A fortified ceratopsian dinosaur with an unmatched +11 Natural Armor and 4d8 Powerful Charge."
+  },
+  {
+    "id": "tyrannosaurus",
+    "name": "Tyrannosaurus",
+    "category": "dinosaur",
+    "size": "Huge",
+    "creatureType": "Animal",
+    "minDruidLevel": 15,
+    "str": 28,
+    "dex": 12,
+    "con": 21,
+    "naturalArmor": 5,
+    "space": 15,
+    "reach": 10,
+    "speed": {
+      "land": 40
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "damage": "3d6",
+        "strMultiplier": 1.5,
+        "isPrimary": true,
+        "special": "Improved Grab"
+      }
+    ],
+    "specialQualities": ["Improved Grab", "Swallow Whole", "10 ft Reach", "Scent", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "The king of dinosaurs, delivering a single colossal 3d6 bite that can grab and swallow foes whole."
+  },
+  {
+    "id": "treant",
+    "name": "Treant",
+    "category": "plant",
+    "size": "Huge",
+    "creatureType": "Plant",
+    "minDruidLevel": 12,
+    "str": 29,
+    "dex": 8,
+    "con": 21,
+    "naturalArmor": 13,
+    "space": 15,
+    "reach": 15,
+    "speed": {
+      "land": 30
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "2d6",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      }
+    ],
+    "specialQualities": ["Plant Traits (Immune to crit/poison/sleep)", "Natural Armor +13", "15 ft Reach", "Trample (2d6+Str)", "Double Damage vs Objects"],
+    "source": "Monster Manual",
+    "description": "A towering sentient tree providing +13 Natural Armor, 15 ft Reach, and total plant immunities."
+  },
+  {
+    "id": "shambling_mound",
+    "name": "Shambling Mound",
+    "category": "plant",
+    "size": "Large",
+    "creatureType": "Plant",
+    "minDruidLevel": 12,
+    "str": 21,
+    "dex": 10,
+    "con": 17,
+    "naturalArmor": 11,
+    "space": 10,
+    "reach": 10,
+    "speed": {
+      "land": 20,
+      "swim": 20
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "2d6",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2,
+        "special": "Improved Grab"
+      }
+    ],
+    "specialQualities": ["Immunity to Electricity", "Fire Resistance 10", "Improved Grab", "Constrict (2d6+Str)", "Plant Traits"],
+    "source": "Monster Manual",
+    "description": "A dense mass of vegetation with +11 Natural Armor, Constrict, and immunity to electrical damage."
+  },
+  {
+    "id": "phantom_fungus",
+    "name": "Phantom Fungus",
+    "category": "plant",
+    "size": "Medium",
+    "creatureType": "Plant",
+    "minDruidLevel": 12,
+    "str": 14,
+    "dex": 10,
+    "con": 16,
+    "naturalArmor": 5,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 20
+    },
+    "attacks": [
+      {
+        "name": "Bite",
+        "damage": "1d6",
+        "strMultiplier": 1.5,
+        "isPrimary": true
+      }
+    ],
+    "specialQualities": ["Greater Invisibility (Su)", "Plant Traits", "Low-Light Vision"],
+    "source": "Monster Manual",
+    "description": "A carnivorous fungal creature permanently cloaked in supernatural Greater Invisibility."
+  },
+  {
+    "id": "air_elemental_small",
+    "name": "Small Air Elemental",
+    "category": "elemental",
+    "size": "Small",
+    "creatureType": "Elemental",
+    "minDruidLevel": 16,
+    "str": 12,
+    "dex": 17,
+    "con": 10,
+    "naturalArmor": 3,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 0,
+      "fly": 100,
+      "flyManeuverability": "perfect"
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "1d4",
+        "strMultiplier": 1.5,
+        "isPrimary": true
+      }
+    ],
+    "specialQualities": ["Elemental Traits (Immune to crit/flanking/poison)", "Fly 100 ft (perfect)", "Air Mastery", "Whirlwind"],
+    "source": "Monster Manual",
+    "description": "A vortex of living air with 100 ft perfect flight and whirlwind transformation."
+  },
+  {
+    "id": "air_elemental_medium",
+    "name": "Medium Air Elemental",
+    "category": "elemental",
+    "size": "Medium",
+    "creatureType": "Elemental",
+    "minDruidLevel": 16,
+    "str": 14,
+    "dex": 21,
+    "con": 14,
+    "naturalArmor": 3,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 0,
+      "fly": 100,
+      "flyManeuverability": "perfect"
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "1d6",
+        "strMultiplier": 1.5,
+        "isPrimary": true
+      }
+    ],
+    "specialQualities": ["Elemental Traits", "Fly 100 ft (perfect)", "Dexterity 21", "Whirlwind"],
+    "source": "Monster Manual",
+    "description": "A swirling gale with 21 Dexterity and perfect aerial maneuverability."
+  },
+  {
+    "id": "air_elemental_large",
+    "name": "Large Air Elemental",
+    "category": "elemental",
+    "size": "Large",
+    "creatureType": "Elemental",
+    "minDruidLevel": 16,
+    "str": 18,
+    "dex": 25,
+    "con": 16,
+    "naturalArmor": 4,
+    "space": 10,
+    "reach": 10,
+    "speed": {
+      "land": 0,
+      "fly": 100,
+      "flyManeuverability": "perfect"
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "2d6",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      }
+    ],
+    "specialQualities": ["Elemental Traits", "Fly 100 ft (perfect)", "Dexterity 25", "2 Slams", "Whirlwind"],
+    "source": "Monster Manual",
+    "description": "A Large vortex boasting 25 Dexterity, 2 powerful Slams, and 10 ft reach."
+  },
+  {
+    "id": "air_elemental_huge",
+    "name": "Huge Air Elemental",
+    "category": "elemental",
+    "size": "Huge",
+    "creatureType": "Elemental",
+    "minDruidLevel": 20,
+    "str": 22,
+    "dex": 29,
+    "con": 18,
+    "naturalArmor": 6,
+    "space": 15,
+    "reach": 15,
+    "speed": {
+      "land": 0,
+      "fly": 100,
+      "flyManeuverability": "perfect"
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "2d8",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      }
+    ],
+    "specialQualities": ["Elemental Traits", "Fly 100 ft (perfect)", "Dexterity 29", "15 ft Reach", "Whirlwind"],
+    "source": "Monster Manual",
+    "description": "An enormous cyclone of air featuring 29 Dexterity, 15 ft reach, and devastating slam strikes."
+  },
+  {
+    "id": "earth_elemental_small",
+    "name": "Small Earth Elemental",
+    "category": "elemental",
+    "size": "Small",
+    "creatureType": "Elemental",
+    "minDruidLevel": 16,
+    "str": 17,
+    "dex": 8,
+    "con": 13,
+    "naturalArmor": 7,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 20,
+      "burrow": 20
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "1d6",
+        "strMultiplier": 1.5,
+        "isPrimary": true
+      }
+    ],
+    "specialQualities": ["Earth Glide (glide through unworked stone)", "Natural Armor +7", "Earth Mastery (+1 Atk/Dmg on ground)", "Elemental Traits"],
+    "source": "Monster Manual",
+    "description": "Living rock capable of gliding effortlessly through solid stone and earth."
+  },
+  {
+    "id": "earth_elemental_medium",
+    "name": "Medium Earth Elemental",
+    "category": "elemental",
+    "size": "Medium",
+    "creatureType": "Elemental",
+    "minDruidLevel": 16,
+    "str": 21,
+    "dex": 8,
+    "con": 17,
+    "naturalArmor": 9,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 20,
+      "burrow": 20
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "1d8",
+        "strMultiplier": 1.5,
+        "isPrimary": true
+      }
+    ],
+    "specialQualities": ["Earth Glide", "Natural Armor +9", "Strength 21", "Earth Mastery", "Elemental Traits"],
+    "source": "Monster Manual",
+    "description": "A dense humanoid figure of stone with 21 Strength and +9 Natural Armor."
+  },
+  {
+    "id": "earth_elemental_large",
+    "name": "Large Earth Elemental",
+    "category": "elemental",
+    "size": "Large",
+    "creatureType": "Elemental",
+    "minDruidLevel": 16,
+    "str": 25,
+    "dex": 8,
+    "con": 19,
+    "naturalArmor": 10,
+    "space": 10,
+    "reach": 10,
+    "speed": {
+      "land": 20,
+      "burrow": 20
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "2d8",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      }
+    ],
+    "specialQualities": ["Earth Glide", "Natural Armor +10", "Strength 25", "10 ft Reach", "Earth Mastery"],
+    "source": "Monster Manual",
+    "description": "A Large stone monolith with 25 Strength, +10 Natural Armor, and 2 crushing Slams."
+  },
+  {
+    "id": "earth_elemental_huge",
+    "name": "Huge Earth Elemental",
+    "category": "elemental",
+    "size": "Huge",
+    "creatureType": "Elemental",
+    "minDruidLevel": 20,
+    "str": 29,
+    "dex": 8,
+    "con": 21,
+    "naturalArmor": 11,
+    "space": 15,
+    "reach": 15,
+    "speed": {
+      "land": 30,
+      "burrow": 30
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "2d10",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      }
+    ],
+    "specialQualities": ["Earth Glide", "Natural Armor +11", "Strength 29", "15 ft Reach", "Earth Mastery"],
+    "source": "Monster Manual",
+    "description": "A towering colossus of living mountain with 29 Strength and 2d10 slam damage."
+  },
+  {
+    "id": "fire_elemental_small",
+    "name": "Small Fire Elemental",
+    "category": "elemental",
+    "size": "Small",
+    "creatureType": "Elemental",
+    "minDruidLevel": 16,
+    "str": 10,
+    "dex": 13,
+    "con": 10,
+    "naturalArmor": 3,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 50
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "1d4",
+        "strMultiplier": 1.5,
+        "isPrimary": true,
+        "special": "Burn (1d4 Fire, DC 11)"
+      }
+    ],
+    "specialQualities": ["Fire Immunity", "Vulnerability to Cold", "Burn (1d4 Fire)", "Speed 50 ft", "Elemental Traits"],
+    "source": "Monster Manual",
+    "description": "A swift pillar of flame that ignites enemies with its fiery slam."
+  },
+  {
+    "id": "fire_elemental_medium",
+    "name": "Medium Fire Elemental",
+    "category": "elemental",
+    "size": "Medium",
+    "creatureType": "Elemental",
+    "minDruidLevel": 16,
+    "str": 12,
+    "dex": 17,
+    "con": 14,
+    "naturalArmor": 4,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 50
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "1d6",
+        "strMultiplier": 1.5,
+        "isPrimary": true,
+        "special": "Burn (1d6 Fire, DC 14)"
+      }
+    ],
+    "specialQualities": ["Fire Immunity", "Vulnerability to Cold", "Burn (1d6 Fire)", "Speed 50 ft", "Elemental Traits"],
+    "source": "Monster Manual",
+    "description": "A roaring blaze with 50 ft speed, Dexterity 17, and scorching Burn damage."
+  },
+  {
+    "id": "fire_elemental_large",
+    "name": "Large Fire Elemental",
+    "category": "elemental",
+    "size": "Large",
+    "creatureType": "Elemental",
+    "minDruidLevel": 16,
+    "str": 14,
+    "dex": 21,
+    "con": 16,
+    "naturalArmor": 4,
+    "space": 10,
+    "reach": 10,
+    "speed": {
+      "land": 50
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "2d6",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2,
+        "special": "Burn (2d6 Fire, DC 18)"
+      }
+    ],
+    "specialQualities": ["Fire Immunity", "Burn (2d6 Fire)", "Dexterity 21", "2 Slams", "10 ft Reach"],
+    "source": "Monster Manual",
+    "description": "A Large conflagration delivering 2 Slams with 2d6 Burn and 10 ft reach."
+  },
+  {
+    "id": "fire_elemental_huge",
+    "name": "Huge Fire Elemental",
+    "category": "elemental",
+    "size": "Huge",
+    "creatureType": "Elemental",
+    "minDruidLevel": 20,
+    "str": 18,
+    "dex": 25,
+    "con": 18,
+    "naturalArmor": 5,
+    "space": 15,
+    "reach": 15,
+    "speed": {
+      "land": 60
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "2d8",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2,
+        "special": "Burn (2d8 Fire, DC 22)"
+      }
+    ],
+    "specialQualities": ["Fire Immunity", "Burn (2d8 Fire)", "Dexterity 25", "Speed 60 ft", "15 ft Reach"],
+    "source": "Monster Manual",
+    "description": "An enormous inferno with 60 ft speed, 25 Dexterity, and 2d8 burn."
+  },
+  {
+    "id": "water_elemental_small",
+    "name": "Small Water Elemental",
+    "category": "elemental",
+    "size": "Small",
+    "creatureType": "Elemental",
+    "minDruidLevel": 16,
+    "str": 14,
+    "dex": 10,
+    "con": 13,
+    "naturalArmor": 6,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 20,
+      "swim": 90
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "1d6",
+        "strMultiplier": 1.5,
+        "isPrimary": true
+      }
+    ],
+    "specialQualities": ["Water Mastery (+1 Atk/Dmg in water)", "Swim 90 ft", "Vortex", "Elemental Traits"],
+    "source": "Monster Manual",
+    "description": "A cresting wave of aquatic force with 90 ft swim speed and vortex creation."
+  },
+  {
+    "id": "water_elemental_medium",
+    "name": "Medium Water Elemental",
+    "category": "elemental",
+    "size": "Medium",
+    "creatureType": "Elemental",
+    "minDruidLevel": 16,
+    "str": 16,
+    "dex": 12,
+    "con": 15,
+    "naturalArmor": 6,
+    "space": 5,
+    "reach": 5,
+    "speed": {
+      "land": 20,
+      "swim": 90
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "1d8",
+        "strMultiplier": 1.5,
+        "isPrimary": true
+      }
+    ],
+    "specialQualities": ["Water Mastery", "Swim 90 ft", "Natural Armor +6", "Vortex"],
+    "source": "Monster Manual",
+    "description": "A surging torrent of living water with +6 Natural Armor and Vortex control."
+  },
+  {
+    "id": "water_elemental_large",
+    "name": "Large Water Elemental",
+    "category": "elemental",
+    "size": "Large",
+    "creatureType": "Elemental",
+    "minDruidLevel": 16,
+    "str": 20,
+    "dex": 14,
+    "con": 19,
+    "naturalArmor": 8,
+    "space": 10,
+    "reach": 10,
+    "speed": {
+      "land": 20,
+      "swim": 90
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "2d8",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      }
+    ],
+    "specialQualities": ["Water Mastery", "Swim 90 ft", "Natural Armor +8", "10 ft Reach", "Vortex"],
+    "source": "Monster Manual",
+    "description": "A Large tidal wave of water delivering 2 Slams with 10 ft reach and 90 ft swim speed."
+  },
+  {
+    "id": "water_elemental_huge",
+    "name": "Huge Water Elemental",
+    "category": "elemental",
+    "size": "Huge",
+    "creatureType": "Elemental",
+    "minDruidLevel": 20,
+    "str": 24,
+    "dex": 16,
+    "con": 21,
+    "naturalArmor": 9,
+    "space": 15,
+    "reach": 15,
+    "speed": {
+      "land": 30,
+      "swim": 120
+    },
+    "attacks": [
+      {
+        "name": "Slam",
+        "damage": "2d10",
+        "strMultiplier": 1.0,
+        "isPrimary": true,
+        "attackCount": 2
+      }
+    ],
+    "specialQualities": ["Water Mastery", "Swim 120 ft", "Natural Armor +9", "15 ft Reach", "Vortex"],
+    "source": "Monster Manual",
+    "description": "A tsunami of living sea with 120 ft swim speed, 24 Strength, and 2d10 slams."
+  }
+]
