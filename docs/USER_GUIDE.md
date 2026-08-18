@@ -1,4 +1,4 @@
-# HeroForgeNG User Guide
+# HeroForgeNG User Guide (v1.4.0)
 
 Welcome to the **HeroForgeNG User Guide**. HeroForgeNG is a modern, high-performance web application designed for creating, customizing, and managing D&D 3.5e character sheets.
 
@@ -7,14 +7,15 @@ Welcome to the **HeroForgeNG User Guide**. HeroForgeNG is a modern, high-perform
 ## Table of Contents
 1. [Getting Started & Character Roster](#1-getting-started--character-roster)
 2. [Race, Class & Level Progression](#2-race-class--level-progression)
-3. [Ability Scores & Point Buy Math](#3-ability-scores--point-buy-math)
+3. [Ability Scores, SR & Derived Vitals](#3-ability-scores-sr--derived-vitals)
 4. [Feats, Skill Tricks & Traits/Flaws](#4-feats-skill-tricks--traitsflaws)
 5. [Skills & Synergy Bonuses](#5-skills--synergy-bonuses)
 6. [Equipment, Magic Items & Encumbrance](#6-equipment-magic-items--encumbrance)
-7. [Tactical Combat Widget & Damage Reduction](#7-tactical-combat-widget--damage-reduction)
+7. [Tactical Combat Banner & Cause Breakdowns](#7-tactical-combat-banner--cause-breakdowns)
 8. [Animal Companions & Familiars](#8-animal-companions--familiars)
 9. [Spells & Active/Passive Auras](#9-spells--activepassive-auras)
-10. [Character Sheet View, Printing & Roll20 Export](#10-character-sheet-view-printing--roll20-export)
+10. [Artwork Showcase, Backstory & Zen Writing Mode](#10-artwork-showcase-backstory--zen-writing-mode)
+11. [Character Sheet View, Printing & Roll20 Export](#11-character-sheet-view-printing--roll20-export)
 
 ---
 
@@ -23,7 +24,7 @@ Welcome to the **HeroForgeNG User Guide**. HeroForgeNG is a modern, high-perform
 HeroForgeNG stores all character sheets **100% locally** inside your web browser using IndexedDB with fallback to `localStorage`. No server registration or cloud login is required.
 
 ### Navigating the Interface
-- **Header Bar**: Displays your active character's summary badge: Level, Hit Points (HP), Armor Class (AC), Damage Reduction (DR), Base Attack Bonus (BAB), and Saving Throws (Fortitude, Reflex, Will).
+- **Header Bar**: Displays your active character's summary badge: Level, Hit Points (HP), Armor Class (AC), Damage Reduction (DR), Spell Resistance (SR), Base Attack Bonus (BAB), and Saving Throws (Fortitude, Reflex, Will).
 - **Roster Switcher Dropdown**: Click the header summary badge to open the quick-switcher dropdown. Type in the search box to immediately find and switch between saved characters.
 - **Roster Dashboard Modal**: Click **Manage Roster** or **View All Cards** to open the full roster dashboard:
   - **New Character**: Initialize a default level 1 character sheet.
@@ -47,7 +48,7 @@ Navigate to the **Race & Class** tab to configure your character's race, stacked
 
 ### Applying Templates & Level Adjustment (LA)
 - Apply official templates such as **Half-Dragon**, **Vampire**, **Celestial**, **Fiendish**, or **Draconic**.
-- Template stat bonuses, natural armor additions, alignment changes, and **Level Adjustment (LA)** automatically apply to your totals.
+- Template stat bonuses, natural armor additions, alignment changes, Spell Resistance, and **Level Adjustment (LA)** automatically apply to your totals.
 
 ### Class & Level Progression (Up to 4 Classes)
 - Distribute up to 20 character levels across up to 4 primary or prestige classes.
@@ -56,23 +57,26 @@ Navigate to the **Race & Class** tab to configure your character's race, stacked
   - **Base Saving Throws** (Fortitude, Reflex, Will).
   - **Hit Points (HP)** per level with Constitution modifier scaling.
 
-### Deities, Domains & Pathfinder Skill Toggles
-- **Deity & Domain Selection**: Choose your deity and select domain pairs (e.g. *War*, *Sun*, *Good*, *Strength*, *Trickery*) to grant domain powers and domain spell slots.
-- **Pathfinder Perception Toggle**: Check the *Use Pathfinder Perception* option to merge Spot, Listen, and Search into a single consolidated Perception skill.
-
 ---
 
-## 3. Ability Scores & Point Buy Math
+## 3. Ability Scores, SR & Derived Vitals
 
 Navigate to the **Stats** tab to manage your character's ability scores (STR, DEX, CON, INT, WIS, CHA).
 
 ### Final Ability Score Formula
-$$\text{Total Score} = \text{Base} + \text{Racial Mod} + \text{Level Increases} + \text{Enhancement Mod} + \text{Trait/Flaw Mod}$$
+$$\text{Total Score} = \text{Base} + \text{Racial Mod} + \text{Level Increases} + \text{Enhancement Mod} + \text{Stance Mod} + \text{Trait/Flaw Mod}$$
 
-### Point Buy & Direct Input Modes
-- **Point Buy System**: Choose from 15, 25, 28, 32 (Standard), or 36 point buy budgets. Point costs scale according to standard 3.5 rules (8=0pt, 14=6pt, 18=16pt).
-- **4th Level Stat Increments**: Assign point increases awarded at levels 4, 8, 12, 16, and 20 directly in the level bump selectors.
-- **Enhancement Bonuses**: Enter enhancement modifiers from items (e.g. *Belt of Giant Strength*, *Headband of Intellect*) to automatically update derived HP, AC, Saves, and Skill modifiers.
+### Spell Resistance (SR) Engine
+- HeroForgeNG evaluates all passive and active sources of Spell Resistance:
+  - **Racial SR**: Drow (11 + Level), Svirfneblin (11 + Level), Elan, Spellscale.
+  - **Class Features**: Monk *Diamond Soul* (11 + Monk Level).
+  - **Templates**: Celestial / Fiendish SR (Level + 5 up to cap).
+  - **Feats & Items**: *Indomitable Soul*, Mantle of Spell Resistance.
+- Displays maximum active SR in the header pill badge and sheet vitals block.
+
+### Grapple Modifier Calculation
+$$\text{Grapple Mod} = \text{BAB} + \text{STR Mod} + \text{Size Grapple Mod} + \text{Misc Mods (Improved Grapple +4)}$$
+- **Size Grapple Modifiers**: Fine (-16), Diminutive (-12), Tiny (-8), Small (-4), Medium (+0), Large (+4), Huge (+8), Gargantuan (+12), Colossal (+16).
 
 ---
 
@@ -120,29 +124,31 @@ Navigate to the **Equipment** tab to equip armor, shields, weapons, and manage i
 ### Equipment & Inventory Synchronization
 - When an item is unequipped, it transitions to **Carried** status in your inventory list rather than being deleted.
 - Add custom magic items, potions, scrolls, containers, and coin balances (CP, SP, GP, PP, Gems).
-
-### Encumbrance & Load Limits
-- Calculates total carried item weight against STR-based **Light**, **Medium**, and **Heavy** carrying thresholds:
-  - **Medium Load**: -2 ACP, Max DEX +3, Speed reduced.
-  - **Heavy Load**: -6 ACP, Max DEX +1, Speed reduced.
+- The inventory table auto-expands naturally without fixed height scrollbars.
 
 ---
 
-## 7. Tactical Combat Widget & Damage Reduction
+## 7. Tactical Combat Banner & Cause Breakdowns
 
-The **Tactical Combat Widget** provides interactive real-time combat toggles during play.
+The **Active Combat Modifiers Banner** provides interactive real-time combat toggles across Sheet View and Equipment tabs.
 
-### Real-Time Combat Toggles
+### Real-Time Combat Stances
 - **Power Attack Slider**: Set your Power Attack penalty (-1 to -BAB). When wielding a two-handed primary weapon, Power Attack awards **+2 damage per -1 attack penalty**.
 - **Fighting Defensively**: Grants +2 Dodge AC (-4 attack penalty), increasing to +3 Dodge AC if you possess 5+ ranks in Tumble.
 - **Combat Expertise**: Trade up to -5 attack penalty for +5 Dodge AC.
-- **Haste Toggle**: Grants +1 attack bonus, +1 Dodge AC, +1 Reflex save, and +1 extra attack on full attack.
-- **Flanking Toggle**: Adds +2 bonus to melee attack rolls.
-- **Charge Toggle**: Adds +2 bonus to attack rolls and -2 penalty to AC.
+- **Haste**: Grants +1 attack bonus, +1 Dodge AC, +1 Reflex save, and +1 extra attack on full attack.
+- **Flanking**: Adds +2 bonus to melee attack rolls.
+- **Charge**: Adds +2 bonus to attack rolls and -2 penalty to AC.
+- **Barbarian Rage**: Grants +4 STR, +4 CON (+2 HP/level), +2 Will saves, and -2 AC.
+- **Whirling Frenzy**: Grants +4 STR, +2 Dodge AC, +2 Reflex saves, and 1 extra attack.
+- **Flurry of Blows**: Grants extra monk attack iteration with flurry penalty math.
 
-### Dynamic Damage Reduction (DR) Engine
-- HeroForgeNG aggregates DR from all active sources (Racial traits, Barbarian class features, Armor enchantments, Feats, and Spells).
-- Identical bypass conditions prioritize the highest value. Distinct bypasses (e.g. `DR 5/Magic`, `DR 3/Adamantine`, `DR 5/Evil`) are displayed in the header pill and combat widget.
+### 1-Click Stance Dismissal & Inline Stat Cause Breakdowns
+- **Inline Dismissal (`x`)**: Active stances display color-coded badges in the Active Combat Modifiers banner with an `x` button to turn off any stance instantly.
+- **Stat Cause Breakdowns**: Displays explicit cause annotations inline across the character sheet:
+  - **Ability Scores**: Shows active stance modifiers next to base score (e.g. `18 (+4 Frenzy)`).
+  - **Saving Throws**: Dedicated *Tactical/Misc* column breaks down Fortitude, Reflex, and Will stance adjustments.
+  - **Vitals & Attacks**: Attack penalties, damage multipliers, AC dodge bonuses, and speed changes update dynamically.
 
 ---
 
@@ -155,12 +161,10 @@ HeroForgeNG includes dedicated tabs for Druid/Ranger Animal Companions and Wizar
 - **106 Base Species**: Select from wolves, bears, big cats, eagles, dire animals, and exotic companion options.
 - **Automatic Scaling**: HD increases, hit points, natural armor, bonus tricks, feat assignment, and skill rank spending.
 - **Carrying Capacity**: Calculates Light, Medium, Heavy, Lift, and Drag load limits adjusted for quadruped size multipliers.
-- **Custom Companions**: Build custom companion stats directly in the tab.
 
 ### Familiars Tab
 - **Master Level Scaling**: Familiar natural armor, Intelligence, and Hit Points (half master's total HP) scale with caster level.
 - **Master Bonuses**: Automatically grants bonuses to master (e.g. Bat +3 Listen, Cat +3 Stealth, Toad +3 HP).
-- **Special Abilities**: Deliver Touch Spells, Speak with Master, and Spell Resistance tracking.
 
 ---
 
@@ -172,16 +176,28 @@ HeroForgeNG includes dedicated tabs for Druid/Ranger Animal Companions and Wizar
 
 ### Active & Passive Auras Tab
 - Manage emanations (Paladin *Aura of Courage*, Marshal Auras, Bardic Music, Draconic Auras, Devotion feats).
-- Set aura radius (10 ft, 30 ft, 60 ft) and target types (Self, Allies, Enemies) with active toggles.
 
 ---
 
-## 10. Character Sheet View, Printing & Roll20 Export
+## 10. Artwork Showcase, Backstory & Zen Writing Mode
 
-### Printable Character Sheet View
+Navigate to the **Notes** tab to manage backstory, artwork, and session logs.
+
+### Character Artwork Showcase & Lightbox Modal
+- Displays character portrait artwork in a high-resolution presentation frame.
+- Click the portrait thumbnail to launch the **Lightbox View Modal** for full-screen artwork inspection.
+
+### Full-Width Backstory Canvas & Zen Mode Text Size Controls
+- Click the Zen Mode button on the Backstory canvas for a distraction-free writing environment.
+- Toggle text size controls (**Small 12px**, **Default 14px**, **Large 16px**) for comfortable editing.
+
+---
+
+## 11. Character Sheet View, Printing & Roll20 Export
+
+### Printable Character Sheet View & Auto-Expanding Inventory
 - Click **Sheet View** or **Print Sheet** in the top header bar.
-- Renders a complete high-contrast D&D 3.5e character sheet optimized for physical printing or PDF generation.
+- Possessions & Adventuring Gear section auto-expands naturally to fit all inventory rows without scrollbar truncation in both on-screen view and printed PDF output.
 
 ### Roll20 VTT JSON Export
 - Open the **Export** dropdown in the header and select **Roll20 3.5e Sheet JSON**.
-- Generates a formatted JSON file compatible with Roll20 Virtual Tabletop character sheet importers.

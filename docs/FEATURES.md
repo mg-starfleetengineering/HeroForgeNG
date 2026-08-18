@@ -1,4 +1,4 @@
-# HeroForgeNG Feature & Engine Specification
+# HeroForgeNG Feature & Engine Specification (v1.4.0)
 
 This document provides a technical overview of the core calculation engines, state storage models, and architecture of **HeroForgeNG**.
 
@@ -39,9 +39,22 @@ The DR Engine calculates total effective Damage Reduction from character traits,
 
 ---
 
-## 4. Tactical Combat Engine (`src/engine/combat.ts`)
+## 4. Spell Resistance Engine (`src/engine/sr.ts`)
 
-The Tactical Combat Engine computes real-time attack roll bonuses, damage modifiers, AC adjustments, and extra attack iterations.
+The SR Engine calculates Spell Resistance across racial traits, class features, templates, feats, and active items.
+
+### Key Calculation Logic (`calculateSpellResistance`)
+- **Racial SR**: Drow (11 + Total Level), Svirfneblin (11 + Total Level), Elan (9 + Level).
+- **Class Features**: Monk *Diamond Soul* (11 + Monk Level).
+- **Templates**: Celestial / Fiendish SR (Level + 5 up to template cap).
+- **Feats & Items**: *Indomitable Soul*, Mantle of Spell Resistance.
+- **Prioritization**: Returns the maximum non-stacking SR value along with source breakdown strings for UI display.
+
+---
+
+## 5. Tactical Combat & Grapple Engine (`src/engine/combat.ts`)
+
+The Tactical Combat Engine computes real-time attack roll bonuses, damage modifiers, AC adjustments, Grapple math, and active stance banner breakdowns.
 
 ### Tactical Modifiers
 - **Power Attack**:
@@ -53,10 +66,17 @@ The Tactical Combat Engine computes real-time attack roll bonuses, damage modifi
 - **Haste**: +1 attack bonus, +1 Dodge AC, +1 Reflex save, +1 extra attack at highest BAB on full attack.
 - **Flanking**: +2 melee attack bonus.
 - **Charge**: +2 attack bonus, -2 AC penalty.
+- **Barbarian Rage**: +4 STR, +4 CON (+2 HP/level), +2 Will saves, -2 AC.
+- **Whirling Frenzy**: +4 STR, +2 Dodge AC, +2 Reflex saves, +1 extra attack.
+- **Flurry of Blows**: Monk extra attack iteration with flurry penalty scaling.
+
+### Grapple Modifier Calculation (`calculateGrappleMod`)
+$$\text{Grapple Mod} = \text{BAB} + \text{STR Mod} + \text{Size Grapple Mod} + \text{Misc Mods}$$
+- **Size Grapple Modifiers**: Fine (-16), Diminutive (-12), Tiny (-8), Small (-4), Medium (+0), Large (+4), Huge (+8), Gargantuan (+12), Colossal (+16).
 
 ---
 
-## 5. Animal Companion Engine (`src/engine/animal_companion.ts`)
+## 6. Animal Companion Engine (`src/engine/animal_companion.ts`)
 
 Computes Druid and Ranger Animal Companion statistics, Effective Druid Level (EDL), hit dice scaling, natural armor, bonus tricks, and carrying capacities.
 
@@ -64,17 +84,9 @@ Computes Druid and Ranger Animal Companion statistics, Effective Druid Level (ED
 $$\text{EDL} = \text{Druid Level} + \lfloor \frac{\text{Ranger Level}}{2} \rfloor + \text{Beastmaster Level} + \text{Natural Bond Feat Mod}$$
 - Hard capped at character total level.
 
-### Carrying Capacity Math
-- Uses standard D&D 3.5 STR-to-carrying capacity table.
-- Multiplies capacity based on size category and posture:
-  - **Medium Biped**: 1.0x, **Medium Quadruped**: 1.5x
-  - **Large Biped**: 2.0x, **Large Quadruped**: 3.0x
-  - **Huge Biped**: 4.0x, **Huge Quadruped**: 6.0x
-  - **Gargantuan Biped**: 8.0x, **Gargantuan Quadruped**: 12.0x
-
 ---
 
-## 6. Arcane Familiar Engine (`src/engine/familiars.ts`)
+## 7. Arcane Familiar Engine (`src/engine/familiars.ts`)
 
 Computes familiar stat scaling for Wizards and Sorcerers.
 
@@ -85,12 +97,6 @@ Computes familiar stat scaling for Wizards and Sorcerers.
 
 ---
 
-## 7. Roll20 Export Engine (`src/engine/roll20Export.ts`)
+## 8. Roll20 Export Engine (`src/engine/roll20Export.ts`)
 
 Serializes HeroForgeNG character sheet data into Roll20 D&D 3.5e character sheet JSON format.
-
-### Mapped Attributes
-- Ability scores, base saves, hit points, speed, armor class components.
-- Skill ranks and total skill modifiers.
-- Weapon attack sequences, damage formulas, and critical ranges.
-- Spell slots per level and class features.

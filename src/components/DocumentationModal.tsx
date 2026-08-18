@@ -25,7 +25,7 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
       icon: 'fa-rocket',
       content: (
         <div className="space-y-4">
-          <h3 className="text-lg font-bold text-amber-300 font-heading">Getting Started with HeroForgeNG</h3>
+          <h3 className="text-lg font-bold text-amber-300 font-heading">Getting Started with HeroForgeNG v1.4.0</h3>
           <p className="text-slate-300 text-sm leading-relaxed">
             HeroForgeNG is a high-performance web application designed for creating, customizing, and managing D&D 3.5e character sheets. All character data is saved <strong>100% locally in your browser</strong> using IndexedDB with automatic local storage fallback.
           </p>
@@ -37,7 +37,7 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
                 <span>Roster Pill & Quick Switcher</span>
               </div>
               <p className="text-slate-400 text-xs leading-relaxed">
-                Click the summary badge in the header (showing Level, HP, AC, DR, BAB, and Saves) to immediately switch between saved characters or search your roster.
+                Click the summary badge in the header (showing Level, HP, AC, DR, SR, BAB, and Saves) to immediately switch between saved characters or search your roster.
               </p>
             </div>
 
@@ -103,7 +103,7 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
               </h4>
               <ul className="text-slate-300 text-xs space-y-1 list-disc list-inside">
                 <li>Apply templates such as <strong>Half-Dragon</strong>, <strong>Vampire</strong>, <strong>Celestial</strong>, <strong>Fiendish</strong>, or <strong>Draconic</strong>.</li>
-                <li>Template stat adjustments, speed modifications, natural armor bonuses, and <strong>Level Adjustment (LA)</strong> stack dynamically onto your character sheet.</li>
+                <li>Template stat adjustments, speed modifications, natural armor bonuses, Spell Resistance, and <strong>Level Adjustment (LA)</strong> stack dynamically onto your character sheet.</li>
               </ul>
             </div>
 
@@ -126,33 +126,44 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
       icon: 'fa-chart-simple',
       content: (
         <div className="space-y-4">
-          <h3 className="text-lg font-bold text-amber-300 font-heading">Ability Score Calculator</h3>
+          <h3 className="text-lg font-bold text-amber-300 font-heading">Ability Score & Derived Vitals Calculator</h3>
           <p className="text-slate-300 text-sm leading-relaxed">
-            HeroForgeNG calculates your character&apos;s final ability scores (STR, DEX, CON, INT, WIS, CHA) by aggregating base scores, point buy costs, level increments, racial adjustments, equipment enhancement bonuses, and trait/flaw modifiers.
+            HeroForgeNG calculates your character&apos;s final ability scores (STR, DEX, CON, INT, WIS, CHA), Spell Resistance (SR), and Grapple modifier by aggregating base scores, point buy costs, level increments, racial adjustments, stance modifiers, equipment enhancement bonuses, and trait/flaw modifiers.
           </p>
 
           <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
             <h4 className="text-amber-400 font-semibold text-sm">Calculation Breakdown</h4>
             <div className="bg-slate-950 p-2.5 rounded-lg font-mono text-xs text-amber-200 border border-slate-800">
-              Total Score = Base Score + Racial Mod + Level Increase + Enhancement Mod + Trait/Flaw Mod
+              Total Score = Base Score + Racial Mod + Level Increase + Enhancement Mod + Stance Mod + Trait/Flaw Mod
             </div>
             <p className="text-slate-400 text-xs leading-relaxed">
               Ability modifiers equal <code>Math.floor((Total Score - 10) / 2)</code>.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="bg-slate-900/80 border border-slate-800 p-3 rounded-xl">
-              <span className="text-amber-400 font-bold text-xs block mb-1">Point Buy Engine</span>
-              <p className="text-slate-400 text-xs">Select from 15, 25, 28, 32 (Standard), or 36 point buy pools with real-time remaining point validation.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-1.5">
+              <span className="text-amber-400 font-bold text-xs flex items-center gap-1.5">
+                <i className="fa-solid fa-[#000] fa-hand text-xs"></i> Grapple Modifier Math
+              </span>
+              <div className="bg-slate-950 p-2 rounded font-mono text-[11px] text-cyan-300 border border-slate-800">
+                Grapple = BAB + STR Mod + Size Grapple Mod + Misc (Improved Grapple +4)
+              </div>
+              <p className="text-slate-400 text-xs">
+                Size Grapple Modifiers: Fine (-16), Diminutive (-12), Tiny (-8), Small (-4), Medium (+0), Large (+4), Huge (+8), Gargantuan (+12), Colossal (+16).
+              </p>
             </div>
-            <div className="bg-slate-900/80 border border-slate-800 p-3 rounded-xl">
-              <span className="text-amber-400 font-bold text-xs block mb-1">4th Level Stat Increments</span>
-              <p className="text-slate-400 text-xs">Assign point bumps granted at levels 4, 8, 12, 16, and 20 directly in the stat breakdown table.</p>
-            </div>
-            <div className="bg-slate-900/80 border border-slate-800 p-3 rounded-xl">
-              <span className="text-amber-400 font-bold text-xs block mb-1">Enhancement & Items</span>
-              <p className="text-slate-400 text-xs">Input enhancement bonuses from belts, headbands, or manual overrides that immediately cascade into Saves, HP, and AC.</p>
+
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-1.5">
+              <span className="text-amber-400 font-bold text-xs flex items-center gap-1.5">
+                <i className="fa-solid fa-wand-magic-sparkles text-xs"></i> Spell Resistance (SR) Engine
+              </span>
+              <div className="bg-slate-950 p-2 rounded font-mono text-[11px] text-purple-300 border border-slate-800">
+                SR = Max(Racial SR, Template SR, Monk Diamond Soul 11+Lvl, Feats/Items)
+              </div>
+              <p className="text-slate-400 text-xs">
+                Evaluates Drow SR (11 + Level), Svirfneblin (11 + Level), Celestial/Fiendish templates, Elan, and active spell/item bonuses.
+              </p>
             </div>
           </div>
         </div>
@@ -240,7 +251,7 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
           <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
             <h4 className="text-amber-400 font-semibold text-sm">Custom Inventory & Currency Tracker</h4>
             <p className="text-slate-300 text-xs leading-relaxed">
-              Add custom adventuring gear, potions, scrolls, containers (Backpack, Belt Pouch, Saddlebags), item quantities, individual weights, and coin balances (CP, SP, GP, PP, gems).
+              Add custom adventuring gear, potions, scrolls, containers (Backpack, Belt Pouch, Saddlebags), item quantities, individual weights, and coin balances (CP, SP, GP, PP, gems). The inventory table auto-expands naturally without fixed height scrollbar truncation.
             </p>
           </div>
         </div>
@@ -248,18 +259,18 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
     },
     {
       id: 'combat-dr',
-      title: 'Tactical Combat & DR',
+      title: 'Tactical Combat & Stances',
       icon: 'fa-swords',
       content: (
         <div className="space-y-4">
-          <h3 className="text-lg font-bold text-amber-300 font-heading">Tactical Combat Widget & Dynamic DR Engine</h3>
+          <h3 className="text-lg font-bold text-amber-300 font-heading">Tactical Combat Stances, Active Banner & Cause Breakdowns</h3>
 
           <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
             <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
-              <i className="fa-solid fa-sliders text-xs"></i> Interactive Tactical Combat Widget
+              <i className="fa-solid fa-sliders text-xs"></i> Interactive Tactical Combat Banner
             </h4>
             <p className="text-slate-300 text-xs leading-relaxed">
-              Located on the left sidebar of the sheet (or collapsible widget top), toggle combat conditions in real time during tabletop play:
+              Located at the top of Sheet View and Equipment tabs, toggle combat conditions in real time during tabletop play:
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1 font-mono text-xs">
               <div className="bg-slate-950 p-2 rounded border border-slate-800 text-amber-300">Power Attack Slider</div>
@@ -268,10 +279,27 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
               <div className="bg-slate-950 p-2 rounded border border-slate-800 text-yellow-300">Haste (+1 Attack/AC)</div>
               <div className="bg-slate-950 p-2 rounded border border-slate-800 text-red-300">Flanking (+2 Attack)</div>
               <div className="bg-slate-950 p-2 rounded border border-slate-800 text-orange-300">Charge (+2 Atk/-2 AC)</div>
+              <div className="bg-slate-950 p-2 rounded border border-slate-800 text-purple-300">Barbarian Rage</div>
+              <div className="bg-slate-950 p-2 rounded border border-slate-800 text-pink-300">Whirling Frenzy</div>
+              <div className="bg-slate-950 p-2 rounded border border-slate-800 text-blue-300">Flurry of Blows</div>
             </div>
-            <p className="text-slate-400 text-xs leading-relaxed pt-1">
-              <strong>Power Attack 2-Handed Rule</strong>: When wielding a 2-handed primary weapon, Power Attack penalty grants <strong>+2 damage per -1 attack</strong> automatically!
+            <p className="text-slate-300 text-xs leading-relaxed pt-1">
+              <strong>1-Click Stance Dismissal</strong>: Active combat stances display color-coded badges in the Active Combat Modifiers banner with an <code>x</code> button to instantly turn off any stance.
             </p>
+          </div>
+
+          <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+            <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+              <i className="fa-solid fa-tag text-xs"></i> Stat Cause Breakdowns Across Character Sheet
+            </h4>
+            <p className="text-slate-300 text-xs leading-relaxed">
+              When stances or active buffs modify character statistics, explicit cause annotations display inline across the sheet:
+            </p>
+            <ul className="text-slate-400 text-xs list-disc list-inside space-y-1">
+              <li><strong>Ability Scores</strong>: Displays active modifier source next to score (e.g. <code>18 (+4 Frenzy)</code>, <code>18 (+4 Rage)</code>).</li>
+              <li><strong>Saving Throws</strong>: Dedicated <em>Tactical/Misc</em> column breaks down Fortitude, Reflex, and Will stance adjustments.</li>
+              <li><strong>Vitals & Attacks</strong>: Inline attack penalties, damage multipliers, AC dodge modifiers, and movement speed adjustments update dynamically.</li>
+            </ul>
           </div>
 
           <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
@@ -285,6 +313,36 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
               <li>Per standard 3.5e rules, DR values with identical bypass conditions do not stack (the highest value applies).</li>
               <li>Distinct bypass conditions (e.g. <code>DR 5/Magic</code> vs <code>DR 3/Adamantine</code> vs <code>DR 5/Evil</code>) are prioritized and summarized clearly in your header pill and combat summary block.</li>
             </ul>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'artwork-notes',
+      title: 'Artwork, Backstory & Zen Mode',
+      icon: 'fa-book-bookmark',
+      content: (
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-amber-300 font-heading">Character Artwork Showcase, Backstory & Zen Writing Mode</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-image text-xs"></i> Character Artwork Showcase & Lightbox
+              </h4>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                The Notes tab features a high-resolution <strong>Character Artwork Showcase</strong> panel. Click any portrait thumbnail to open the high-res <strong>Lightbox View Modal</strong> for fullscreen artwork inspection.
+              </p>
+            </div>
+
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-expand text-xs"></i> Fullscreen Zen Writing Mode Controls
+              </h4>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                Click the Zen Mode icon on the Backstory canvas for a distraction-free writing environment. Toggle text font size between <strong>Small (12px)</strong>, <strong>Default (14px)</strong>, and <strong>Large (16px)</strong> for comfortable writing.
+              </p>
+            </div>
           </div>
         </div>
       )
@@ -374,7 +432,7 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
       icon: 'fa-scroll',
       content: (
         <div className="space-y-4">
-          <h3 className="text-lg font-bold text-amber-300 font-heading">Character Sheet View, Printing & VTT Export</h3>
+          <h3 className="text-lg font-bold text-amber-300 font-heading">Character Sheet View, Printing & Roll20 Export</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
@@ -382,7 +440,7 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
                 <i className="fa-solid fa-print text-xs"></i> Printable Character Sheet View
               </h4>
               <p className="text-slate-300 text-xs leading-relaxed">
-                Click <strong>Sheet View</strong> or the <strong>Print Sheet</strong> button in the header. The layout renders a clean, high-contrast D&D 3.5e character sheet styled specifically for physical printing or PDF export via browser print dialog.
+                Click <strong>Sheet View</strong> or the <strong>Print Sheet</strong> button in the header. The layout renders a clean, high-contrast D&D 3.5e character sheet styled specifically for physical printing or PDF export via browser print dialog. The possessions table auto-expands naturally without max-height clipping.
               </p>
             </div>
 
@@ -422,7 +480,7 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
             </div>
             <div>
               <h2 className="text-lg font-bold font-heading text-amber-300">HeroForgeNG Documentation & User Guide</h2>
-              <p className="text-xs text-slate-400">Complete manual for features, capabilities, and character management</p>
+              <p className="text-xs text-slate-400">Complete manual for features, capabilities, and character management (v1.4.0)</p>
             </div>
           </div>
 
