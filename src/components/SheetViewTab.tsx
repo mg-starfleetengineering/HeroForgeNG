@@ -24,6 +24,7 @@ import {
   calculatePerceptionStats
 } from '../engine/skills';
 import { TacticalCombatWidget } from './TacticalCombatWidget';
+import { VitalsCombatTracker } from './VitalsCombatTracker';
 import {
   getTacticalCombatState,
   calculateTacticalCombatModifiers,
@@ -33,6 +34,7 @@ import {
   getActiveCombatModifiers,
   isTwoHandedWeapon
 } from '../engine/combat';
+import { calculateConditionPenalties, CONDITION_MAP } from '../engine/conditions';
 import { calculateTotalDR } from '../engine/dr';
 import { calculateTotalSR } from '../engine/sr';
 import { resolveActiveWildShape, calculateWildShapeAttacks, getSizeAcModifier } from '../engine/wildshape';
@@ -77,6 +79,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const traitFlawAcMod = calculateTraitFlawAcMod(selectedTraits, selectedFlaws, traitsData, flawsData);
   const traitFlawInitMod = calculateTraitFlawInitiativeMod(selectedTraits, selectedFlaws, traitsData, flawsData);
 
+  const activeConditions = character.activeConditions || [];
+  const conditionPenalties = calculateConditionPenalties(activeConditions);
+
   const speedData = calculateTotalSpeed(character, raceObj, templateObj, traitsData, flawsData);
   const drSummary = calculateTotalDR(character, raceObj, templateObj, [], classesData);
   const srSummary = calculateTotalSR(character, raceObj, templateObj, [], classesData);
@@ -107,31 +112,42 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const generalTcMods = calculateTacticalCombatModifiers(tcState);
   const activeCombatMods = getActiveCombatModifiers(tcState, totalLevel);
 
-  const effectiveStrScore = strScore + (generalTcMods.strBonus || 0);
+  // Apply Tactical Modifiers & Condition Penalties to Effective Stats
+  const rawEffectiveStr = strScore + (generalTcMods.strBonus || 0) + conditionPenalties.strPenalty;
+  const effectiveStrScore = conditionPenalties.strPenalty === -99 ? 0 : Math.max(0, rawEffectiveStr);
+
+  const rawEffectiveDex = dexScore + conditionPenalties.dexPenalty;
+  const effectiveDexScore = conditionPenalties.dexPenalty === -99 ? 0 : Math.max(0, rawEffectiveDex);
+
   const effectiveConScore = conScore + (generalTcMods.conBonus || 0);
 
   const effectiveStrMod = getAbilityMod(effectiveStrScore);
+  const effectiveDexMod = getAbilityMod(effectiveDexScore);
   const effectiveConMod = getAbilityMod(effectiveConScore);
 
-  // HP retains character's base Constitution modifier
+  // HP retains character's base Constitution modifier + Rage bonus
   const baseConMod = getAbilityMod(baseConScore);
-  const hp = calculateTotalHP(character.levelProgression, classesData, baseConMod, traitFlawHpMod);
+  const maxHp = calculateTotalHP(character.levelProgression, classesData, baseConMod, traitFlawHpMod) + (generalTcMods.hpBonusPerLevel * totalLevel);
+  const currentHp = character.currentHp !== undefined ? character.currentHp : maxHp;
+  const tempHp = character.tempHp || 0;
+  const nonlethalDamage = character.nonlethalDamage || 0;
 
   const baseFort = calculateBaseSave('fort', character.levelProgression, classesData);
   const baseRef = calculateBaseSave('ref', character.levelProgression, classesData);
   const baseWill = calculateBaseSave('will', character.levelProgression, classesData);
 
-  const totalFort = baseFort + effectiveConMod + traitFlawSaveMods.fort + generalTcMods.fortSaveMod;
-  const totalRef = baseRef + dexMod + traitFlawSaveMods.ref + generalTcMods.refSaveMod;
-  const totalWill = baseWill + wisMod + traitFlawSaveMods.will + generalTcMods.willSaveMod;
+  const totalFort = baseFort + effectiveConMod + traitFlawSaveMods.fort + generalTcMods.fortSaveMod + conditionPenalties.fortPenalty;
+  const totalRef = baseRef + effectiveDexMod + traitFlawSaveMods.ref + generalTcMods.refSaveMod + conditionPenalties.refPenalty;
+  const totalWill = baseWill + wisMod + traitFlawSaveMods.will + generalTcMods.willSaveMod + conditionPenalties.willPenalty;
 
-  const totalInitiative = dexMod + traitFlawInitMod;
+  const totalInitiative = effectiveDexMod + traitFlawInitMod + conditionPenalties.initiativePenalty;
 
   const activeSize = activeWildShape ? activeWildShape.size : (templateObj?.size || raceObj.size || 'Medium');
   const sizeAcMod = getSizeAcModifier(activeSize);
   const wildShapeNatArmor = activeWildShape ? activeWildShape.naturalArmor : 0;
 
-  const finalSpeed = (activeWildShape ? activeWildShape.speed.land : speedData.land) + generalTcMods.speedMod;
+  const baseSpeed = (activeWildShape ? activeWildShape.speed.land : speedData.land) + generalTcMods.speedMod;
+  const finalSpeed = Math.max(5, Math.floor(baseSpeed * conditionPenalties.speedMultiplier));
 
   const eq: Equipment = character.equipment || {
     armor: 'chainshirt', armorEnhancement: 1, shield: 'heavy_shield', shieldEnhancement: 1,
@@ -158,13 +174,19 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const isClass = isClassSkillForCharacter(skill.name, character.levelProgression, classesData);
     const ranks = (character.skillRanks || {})[skill.name] || 0;
     const abilityScore = calculateTotalScore(skill.keyAbility, character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
-    const abMod = getAbilityMod(abilityScore) + (skill.keyAbility === 'str' ? Math.floor(generalTcMods.strBonus / 2) : (skill.keyAbility === 'con' ? Math.floor(generalTcMods.conBonus / 2) : 0));
+    const condStatPen = skill.keyAbility === 'str' ? conditionPenalties.strPenalty : (skill.keyAbility === 'dex' ? conditionPenalties.dexPenalty : 0);
+    const abMod = getAbilityMod(Math.max(0, abilityScore + condStatPen)) + (skill.keyAbility === 'str' ? Math.floor(generalTcMods.strBonus / 2) : (skill.keyAbility === 'con' ? Math.floor(generalTcMods.conBonus / 2) : 0));
     const tfSkillMod = traitFlawSkillMods[skill.name] || 0;
 
-    let totalMod = Math.floor(ranks) + abMod + tfSkillMod;
+    let skillSpecificPenalty = conditionPenalties.skillCheckPenalty;
+    if (skill.name === 'Search') skillSpecificPenalty += conditionPenalties.searchPenalty;
+    if (skill.name === 'Spot') skillSpecificPenalty += conditionPenalties.spotPenalty;
+    if (skill.name === 'Listen') skillSpecificPenalty += conditionPenalties.listenPenalty;
+
+    let totalMod = Math.floor(ranks) + abMod + tfSkillMod + skillSpecificPenalty;
     if (skill.name === 'Perception') {
       const percStats = calculatePerceptionStats(character, classesData, abMod);
-      totalMod = percStats.totalBonus + tfSkillMod;
+      totalMod = percStats.totalBonus + tfSkillMod + skillSpecificPenalty;
     }
 
     return {
@@ -186,9 +208,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const armorAc = armorObj.acBonus + (eq.armorEnhancement || 0);
   const shieldAc = shieldObj.acBonus + (eq.shieldEnhancement || 0);
 
-  const totalAc = 10 + armorAc + shieldAc + dexMod + (eq.deflection || 0) + (eq.natural || 0) + wildShapeNatArmor + sizeAcMod + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.acNetMod;
-  const touchAc = 10 + dexMod + (eq.deflection || 0) + sizeAcMod + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.touchAcMod;
-  const flatAc = 10 + armorAc + shieldAc + (eq.deflection || 0) + (eq.natural || 0) + wildShapeNatArmor + sizeAcMod + traitFlawAcMod + generalTcMods.flatAcMod;
+  const finalDexToAc = conditionPenalties.loseDexToAc ? Math.min(0, effectiveDexMod) : effectiveDexMod;
+  const totalAc = 10 + armorAc + shieldAc + finalDexToAc + (eq.deflection || 0) + (eq.natural || 0) + wildShapeNatArmor + sizeAcMod + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.acNetMod + conditionPenalties.acPenalty;
+  const touchAc = 10 + finalDexToAc + (eq.deflection || 0) + sizeAcMod + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.touchAcMod + conditionPenalties.acPenalty;
+  const flatAc = 10 + armorAc + shieldAc + Math.min(0, effectiveDexMod) + (eq.deflection || 0) + (eq.natural || 0) + wildShapeNatArmor + sizeAcMod + traitFlawAcMod + generalTcMods.flatAcMod + conditionPenalties.acPenalty;
 
   // Weapon Resolutions & Feat Combat Bonuses
   const activeWeaponsList: Array<{
@@ -206,7 +229,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
   // 0. Active Wild Shape Natural Attacks (rendered first in weapon table)
   if (activeWildShape) {
-    const wsAttacks = calculateWildShapeAttacks(character, activeWildShape, bab, effectiveStrMod, dexMod, tcState);
+    const wsAttacks = calculateWildShapeAttacks(character, activeWildShape, bab, effectiveStrMod, effectiveDexMod, tcState);
     activeWeaponsList.push(...wsAttacks);
   }
 
@@ -216,10 +239,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const featBonuses = calculateFeatCombatBonuses(character, primaryWpn);
     const wMods = calculateTacticalCombatModifiers(tcState, primaryWpn, false, false);
     const enh = eq.primaryWeaponEnhancement || 0;
-    const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod;
+    const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
     const totalAtk = bab + netAtkBonus;
     const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy);
-    const dmgVal = effectiveStrMod + enh + featBonuses.damageBonus + wMods.damageMod;
+    const dmgVal = effectiveStrMod + enh + featBonuses.damageBonus + wMods.damageMod + conditionPenalties.damagePenalty;
 
     const primaryNote = (() => {
       const notes: string[] = [];
@@ -233,6 +256,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       }
       if (tcState.combatExpertise > 0) { notes.push(`Combat Exp: -${tcState.combatExpertise} Atk`); }
       if (tcState.fightingDefensively) { notes.push('Fight Defensively: -4 Atk'); }
+      if (conditionPenalties.attackPenalty !== 0) { notes.push(`Condition: ${conditionPenalties.attackPenalty} Atk`); }
+      if (conditionPenalties.meleeAttackPenalty !== 0) { notes.push(`Prone: ${conditionPenalties.meleeAttackPenalty} Melee Atk`); }
       return notes.length > 0 ? `(${notes.join(' • ')})` : '';
     })();
 
@@ -256,10 +281,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const featBonuses = calculateFeatCombatBonuses(character, secWpn);
     const wMods = calculateTacticalCombatModifiers(tcState, secWpn, true, false);
     const enh = eq.secondaryWeaponEnhancement || 0;
-    const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod;
+    const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
     const totalAtk = bab + netAtkBonus;
     const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy);
-    const dmgVal = Math.floor(effectiveStrMod / 2) + enh + featBonuses.damageBonus + wMods.damageMod;
+    const dmgVal = Math.floor(effectiveStrMod / 2) + enh + featBonuses.damageBonus + wMods.damageMod + conditionPenalties.damagePenalty;
 
     const secNote = (() => {
       const notes: string[] = [];
@@ -270,6 +295,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       if (tcState.powerAttack > 0) { notes.push(`Power Attack: -${tcState.powerAttack} Atk`); }
       if (tcState.combatExpertise > 0) { notes.push(`Combat Exp: -${tcState.combatExpertise} Atk`); }
       if (tcState.fightingDefensively) { notes.push('Fight Defensively: -4 Atk'); }
+      if (conditionPenalties.attackPenalty !== 0) { notes.push(`Condition: ${conditionPenalties.attackPenalty} Atk`); }
+      if (conditionPenalties.meleeAttackPenalty !== 0) { notes.push(`Prone: ${conditionPenalties.meleeAttackPenalty} Melee Atk`); }
       return notes.length > 0 ? `(${notes.join(' • ')})` : '';
     })();
 
@@ -293,10 +320,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const featBonuses = calculateFeatCombatBonuses(character, rngWpn);
     const wMods = calculateTacticalCombatModifiers(tcState, rngWpn, false, true);
     const enh = eq.rangedWeaponEnhancement || 0;
-    const netAtkBonus = dexMod + enh + featBonuses.attackBonus + wMods.attackMod;
+    const netAtkBonus = effectiveDexMod + enh + featBonuses.attackBonus + wMods.attackMod + conditionPenalties.attackPenalty + conditionPenalties.rangedAttackPenalty;
     const totalAtk = bab + netAtkBonus;
     const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy);
-    const dmgVal = enh + wMods.damageMod;
+    const dmgVal = enh + wMods.damageMod + conditionPenalties.damagePenalty;
 
     const rngNote = (() => {
       const notes: string[] = [];
@@ -305,6 +332,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       if (tcState.haste) { notes.push('Haste: +1 Atk, +1 Extra Atk'); }
       if (tcState.combatExpertise > 0) { notes.push(`Combat Exp: -${tcState.combatExpertise} Atk`); }
       if (tcState.fightingDefensively) { notes.push('Fight Defensively: -4 Atk'); }
+      if (conditionPenalties.attackPenalty !== 0) { notes.push(`Condition: ${conditionPenalties.attackPenalty} Atk`); }
       return notes.length > 0 ? `(${notes.join(' • ')})` : '';
     })();
 
@@ -390,7 +418,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       </div>
 
       {onChange && (
-        <div className="print:hidden">
+        <div className="print:hidden space-y-4">
+          <VitalsCombatTracker character={character} maxHp={maxHp} onChange={onChange} />
           <TacticalCombatWidget character={character} bab={bab} onChange={onChange} />
         </div>
       )}
@@ -446,7 +475,19 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         <div className="grid grid-cols-6 gap-2 print:gap-1.5 text-center font-mono py-2.5 print:py-1.5 bg-slate-100 rounded-lg border border-slate-300 print:break-inside-avoid">
           <div>
             <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Hit Points</span>
-            <span className="text-xl print:text-lg font-bold text-slate-900">{hp}</span>
+            <span className={`text-xl print:text-lg font-bold ${currentHp <= 0 ? 'text-rose-700' : 'text-slate-900'}`}>
+              {currentHp}
+            </span>
+            {tempHp > 0 && (
+              <span className="text-[9px] print:text-[8px] text-cyan-700 block font-sans font-semibold leading-tight">
+                +{tempHp} Temp HP
+              </span>
+            )}
+            {nonlethalDamage > 0 && (
+              <span className="text-[9px] print:text-[8px] text-amber-700 block font-sans font-semibold leading-tight">
+                {nonlethalDamage} Nonlethal
+              </span>
+            )}
             {generalTcMods.hpBonusPerLevel > 0 && (
               <span className="text-[9px] print:text-[8px] text-rose-700 block font-sans font-semibold leading-tight">
                 +{generalTcMods.hpBonusPerLevel * totalLevel} HP (Rage)
@@ -466,6 +507,16 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                   tcState.fightingDefensively ? '+2 Def' : '',
                   tcState.rage ? '-2 Rage' : ''
                 ].filter(Boolean).join(', ')})
+              </span>
+            )}
+            {conditionPenalties.acPenalty !== 0 && (
+              <span className="text-[9px] print:text-[8px] text-rose-700 block font-sans font-semibold leading-tight">
+                {conditionPenalties.acPenalty} AC (Condition)
+              </span>
+            )}
+            {conditionPenalties.loseDexToAc && (
+              <span className="text-[9px] print:text-[8px] text-purple-700 block font-sans font-semibold leading-tight">
+                No Dex to AC
               </span>
             )}
           </div>
@@ -541,6 +592,53 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                   </ul>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Active Conditions & Penalties Banner */}
+        {activeConditions.length > 0 && (
+          <div className="border-2 border-rose-500/40 rounded-lg p-2.5 print:p-2 bg-rose-50/70 print:bg-slate-50 space-y-1.5 print:space-y-1 print:break-inside-avoid shadow-xs">
+            <div className="flex items-center justify-between border-b border-rose-300/80 print:border-slate-300 pb-1 print:pb-0.5">
+              <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-rose-950 flex items-center gap-1.5 font-heading">
+                <i className="fa-solid fa-masks-theater text-rose-600"></i> Active Conditions & Penalties
+              </h3>
+              <span className="text-[10px] print:text-[9px] font-mono font-bold bg-rose-200/90 text-rose-950 border border-rose-400/60 px-1.5 py-0.2 rounded">
+                {activeConditions.length} Condition{activeConditions.length > 1 ? 's' : ''} Active
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 print:grid-cols-2 print:gap-1.5">
+              {activeConditions.map(condId => {
+                const def = CONDITION_MAP[condId];
+                return (
+                  <div key={condId} className="p-2 print:p-1.5 bg-white rounded border border-rose-200 print:border-slate-200 shadow-xs space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-900 text-xs print:text-[10px] flex items-center gap-1.5">
+                        <i className={`${def?.icon || 'fa-solid fa-circle-exclamation'} text-rose-600 print:text-slate-700`}></i> {def?.name || condId}
+                      </span>
+                      {onChange && (
+                        <button
+                          onClick={() => onChange({ activeConditions: activeConditions.filter(c => c !== condId) })}
+                          className="print:hidden text-[10px] text-slate-400 hover:text-rose-600 transition px-1 cursor-pointer"
+                          title={`Remove ${def?.name || condId}`}
+                        >
+                          <i className="fa-solid fa-xmark"></i>
+                        </button>
+                      )}
+                    </div>
+                    <ul className="text-[10px] print:text-[9px] text-slate-700 font-mono space-y-0.5 list-disc list-inside">
+                      {def ? (
+                        def.effects.map((eff, i) => (
+                          <li key={i} className="leading-tight">{eff}</li>
+                        ))
+                      ) : (
+                        <li className="leading-tight">{condId}</li>
+                      )}
+                    </ul>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

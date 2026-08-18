@@ -91,7 +91,9 @@ export default defineConfig({
     port: 5173,
     host: true,
     watch: {
-      usePolling: true
+      usePolling: true,
+      interval: 100,
+      binaryInterval: 300
     }
   }
 })
