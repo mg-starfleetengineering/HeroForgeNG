@@ -93,6 +93,11 @@ export const TacticalCombatWidget: React.FC<TacticalCombatWidgetProps> = ({
             {tc.haste && <span className="badge bg-cyan-500/20 text-cyan-300 border-cyan-500/30">Haste</span>}
             {tc.rage && <span className="badge bg-rose-500/20 text-rose-300 border-rose-500/30">Rage</span>}
             {tc.whirlingFrenzy && <span className="badge bg-teal-500/20 text-teal-300 border-teal-500/30">Frenzy</span>}
+            {character.wildShape?.isActive && (
+              <span className="badge bg-emerald-500/20 text-emerald-300 border-emerald-500/30">
+                🌿 Wild Shape
+              </span>
+            )}
           </div>
         )}
 

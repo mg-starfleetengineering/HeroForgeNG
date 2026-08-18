@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
-import { CharacterState, RaceData, ClassData, LevelProgression, TraitData, FlawData, TemplateData, DeityData, DomainData } from '../types/character';
+import { CharacterState, RaceData, ClassData, LevelProgression, TraitData, FlawData, TemplateData, DeityData, DomainData, WildShapeFormData } from '../types/character';
 import { getSourceBadgeInfo, isSourceAllowed, sortDropdownItems } from '../utils/sourceFilter';
 import { SearchableSelect, SearchableOption } from './SearchableSelect';
 import { TraitsFlawsSection } from './TraitsFlawsSection';
+import { WildShapeManager } from './WildShapeManager';
 import { getEffectiveRaceMods, getEffectiveLevelAdj, getEffectiveRaceType, getEffectiveSpeed } from '../engine/stats';
 
 interface RaceClassTabProps {
@@ -14,6 +15,7 @@ interface RaceClassTabProps {
   flawsData: FlawData[];
   deitiesData?: DeityData[];
   domainsData?: DomainData[];
+  wildShapeFormsData?: WildShapeFormData[];
   onChange: (updated: Partial<CharacterState>) => void;
 }
 
@@ -26,6 +28,7 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({
   flawsData,
   deitiesData = [],
   domainsData = [],
+  wildShapeFormsData = [],
   onChange
 }) => {
   const sortedRaces = useMemo(
@@ -624,6 +627,13 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({
         character={character}
         traitsData={traitsData}
         flawsData={flawsData}
+        onChange={onChange}
+      />
+
+      {/* Wild Shape Form Manager Section */}
+      <WildShapeManager
+        character={character}
+        formsData={wildShapeFormsData}
         onChange={onChange}
       />
     </div>
