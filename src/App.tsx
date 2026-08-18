@@ -97,6 +97,10 @@ const DEFAULT_CHARACTER: CharacterState = {
     flurryOfBlows: false,
     isCollapsed: false
   },
+  currentHp: 38,
+  tempHp: 0,
+  nonlethalDamage: 0,
+  activeConditions: [],
   auras: [
     {
       id: 'aura_def_1',

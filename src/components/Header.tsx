@@ -11,6 +11,7 @@ import {
 } from '../engine/stats';
 import { calculateBAB, calculateBaseSave, calculateTotalHP } from '../engine/classes';
 import { calculateTotalDR } from '../engine/dr';
+import { calculateConditionPenalties } from '../engine/conditions';
 
 interface HeaderProps {
   character: CharacterSheetData;
@@ -75,24 +76,34 @@ export const Header: React.FC<HeaderProps> = ({
   const traitFlawHpMod = calculateTraitFlawHpPerLevel(selectedTraits, selectedFlaws, traitsData, flawsData);
   const traitFlawAcMod = calculateTraitFlawAcMod(selectedTraits, selectedFlaws, traitsData, flawsData);
 
+  const activeConditions = character.activeConditions || [];
+  const conditionPenalties = calculateConditionPenalties(activeConditions);
+
   const totalLevel = character.levelProgression.filter(l => l.primaryClass).length || 1;
-  const conScore = calculateTotalScore('con', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
-  const dexScore = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+  const rawCon = calculateTotalScore('con', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+  const rawDex = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
   const wisScore = calculateTotalScore('wis', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
 
-  const conMod = getAbilityMod(conScore);
-  const dexMod = getAbilityMod(dexScore);
+  const effectiveCon = Math.max(0, rawCon);
+  const effectiveDex = conditionPenalties.dexPenalty === -99 ? 0 : Math.max(0, rawDex + conditionPenalties.dexPenalty);
+
+  const conMod = getAbilityMod(effectiveCon);
+  const dexMod = getAbilityMod(effectiveDex);
   const wisMod = getAbilityMod(wisScore);
-  const hp = calculateTotalHP(character.levelProgression, classesData, conMod, traitFlawHpMod);
+
+  const maxHp = calculateTotalHP(character.levelProgression, classesData, conMod, traitFlawHpMod);
+  const currentHp = character.currentHp !== undefined ? character.currentHp : maxHp;
+  const tempHp = character.tempHp || 0;
+
   const bab = calculateBAB(character.levelProgression, classesData);
 
   const baseFort = calculateBaseSave('fort', character.levelProgression, classesData);
   const baseRef = calculateBaseSave('ref', character.levelProgression, classesData);
   const baseWill = calculateBaseSave('will', character.levelProgression, classesData);
 
-  const totalFort = baseFort + conMod + traitFlawSaveMods.fort;
-  const totalRef = baseRef + dexMod + traitFlawSaveMods.ref;
-  const totalWill = baseWill + wisMod + traitFlawSaveMods.will;
+  const totalFort = baseFort + conMod + traitFlawSaveMods.fort + conditionPenalties.fortPenalty;
+  const totalRef = baseRef + dexMod + traitFlawSaveMods.ref + conditionPenalties.refPenalty;
+  const totalWill = baseWill + wisMod + traitFlawSaveMods.will + conditionPenalties.willPenalty;
 
   const eq: Equipment = character.equipment || {
     armor: 'chainshirt', armorEnhancement: 1, shield: 'heavy_shield', shieldEnhancement: 1,
@@ -100,7 +111,8 @@ export const Header: React.FC<HeaderProps> = ({
   };
   const armorBonusMap: Record<string, number> = { none: 0, padded: 1, leather: 2, studded: 3, chainshirt: 4, breastplate: 5, fullplate: 8 };
   const shieldBonusMap: Record<string, number> = { none: 0, buckler: 1, light_wooden: 1, heavy_shield: 2, tower_shield: 4 };
-  const totalAc = 10 + (armorBonusMap[eq.armor] || 0) + (eq.armorEnhancement || 0) + (shieldBonusMap[eq.shield] || 0) + (eq.shieldEnhancement || 0) + dexMod + (eq.deflection || 0) + (eq.natural || 0) + (eq.dodge || 0) + traitFlawAcMod;
+  const finalDexToAc = conditionPenalties.loseDexToAc ? Math.min(0, dexMod) : dexMod;
+  const totalAc = 10 + (armorBonusMap[eq.armor] || 0) + (eq.armorEnhancement || 0) + (shieldBonusMap[eq.shield] || 0) + (eq.shieldEnhancement || 0) + finalDexToAc + (eq.deflection || 0) + (eq.natural || 0) + (eq.dodge || 0) + traitFlawAcMod + conditionPenalties.acPenalty;
 
   const drSummary = calculateTotalDR(character, raceObj, undefined, [], classesData);
 
@@ -156,7 +168,10 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="h-6 w-px bg-slate-800"></div>
             <div className="text-center">
               <span className="text-slate-400 block text-[10px] uppercase tracking-wider">HP</span>
-              <span className="font-mono font-bold text-emerald-400 text-sm">{hp}</span>
+              <span className={`font-mono font-bold text-sm ${currentHp <= 0 ? 'text-rose-400 font-extrabold' : currentHp < maxHp / 2 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                {currentHp}/{maxHp}
+                {tempHp > 0 && <span className="text-cyan-300 text-[10px] ml-0.5">+{tempHp}</span>}
+              </span>
             </div>
             <div className="h-6 w-px bg-slate-800"></div>
             <div className="text-center">

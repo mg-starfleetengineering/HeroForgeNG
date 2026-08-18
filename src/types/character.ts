@@ -133,6 +133,80 @@ export interface TacticalCombatState {
   isCollapsed?: boolean;
 }
 
+export type ConditionCategory = 'mental' | 'physical' | 'sensory' | 'positional' | 'incapacitated';
+
+export type ConditionType =
+  | 'blinded'
+  | 'cowering'
+  | 'dazed'
+  | 'dazzled'
+  | 'deafened'
+  | 'disabled'
+  | 'dying'
+  | 'entangled'
+  | 'exhausted'
+  | 'fascinated'
+  | 'fatigued'
+  | 'flat_footed'
+  | 'frightened'
+  | 'grappled'
+  | 'helpless'
+  | 'nauseated'
+  | 'panicked'
+  | 'paralyzed'
+  | 'pinned'
+  | 'prone'
+  | 'shaken'
+  | 'sickened'
+  | 'staggered'
+  | 'stunned'
+  | 'unconscious';
+
+export interface ConditionDefinition {
+  id: ConditionType;
+  name: string;
+  category: ConditionCategory;
+  description: string;
+  summary: string;
+  effects: string[];
+  icon: string;
+  badgeColor: string;
+}
+
+export interface ConditionPenalties {
+  strPenalty: number;
+  dexPenalty: number;
+  attackPenalty: number;
+  meleeAttackPenalty: number;
+  rangedAttackPenalty: number;
+  damagePenalty: number;
+  fortPenalty: number;
+  refPenalty: number;
+  willPenalty: number;
+  allSavesPenalty: number;
+  acPenalty: number;
+  meleeAcPenalty: number;
+  rangedAcPenalty: number;
+  loseDexToAc: boolean;
+  speedMultiplier: number;
+  initiativePenalty: number;
+  skillCheckPenalty: number;
+  searchPenalty: number;
+  spotPenalty: number;
+  listenPenalty: number;
+  specialNotes: string[];
+}
+
+export type VitalsHealthStatus =
+  | 'healthy'
+  | 'injured'
+  | 'bloodied'
+  | 'disabled'
+  | 'dying'
+  | 'dead'
+  | 'staggered'
+  | 'unconscious';
+
 export interface CharacterState {
   id?: string;
   updatedAt?: number;
@@ -174,6 +248,10 @@ export interface CharacterState {
   familiar?: FamiliarState;
   animalCompanion?: AnimalCompanionState;
   wildShape?: WildShapeState;
+  currentHp?: number;
+  tempHp?: number;
+  nonlethalDamage?: number;
+  activeConditions?: string[];
 }
 
 export interface TemplateData {
