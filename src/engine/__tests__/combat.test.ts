@@ -281,5 +281,21 @@ describe('Tactical Combat Engine', () => {
       expect(entry.damageStr).toBe('1d3+3 nonlethal');
       expect(entry.type).toBe('Bludgeoning');
     });
+
+    it('handles Smite Evil and Stunning Fist in Tactical Combat State', () => {
+      const tcState = {
+        ...DEFAULT_TACTICAL_COMBAT,
+        smiteEvil: true,
+        stunningFist: true
+      };
+
+      const activeMods = getActiveCombatModifiers(tcState);
+      expect(activeMods.some(m => m.id === 'smiteEvil')).toBe(true);
+      expect(activeMods.some(m => m.id === 'stunningFist')).toBe(true);
+
+      const parsed = getTacticalCombatState({ tacticalCombat: tcState } as CharacterState);
+      expect(parsed.smiteEvil).toBe(true);
+      expect(parsed.stunningFist).toBe(true);
+    });
   });
 });

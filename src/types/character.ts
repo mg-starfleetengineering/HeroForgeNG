@@ -130,6 +130,8 @@ export interface TacticalCombatState {
   rage: boolean;
   whirlingFrenzy: boolean;
   flurryOfBlows: boolean;
+  smiteEvil?: boolean;
+  stunningFist?: boolean;
   isCollapsed?: boolean;
 }
 
@@ -252,6 +254,33 @@ export interface CharacterState {
   tempHp?: number;
   nonlethalDamage?: number;
   activeConditions?: string[];
+  resourceUsages?: Record<string, number>;
+  customResources?: CustomResourceDefinition[];
+  barbarianVariant?: 'rage' | 'whirling_frenzy';
+}
+
+export interface DailyResourceTrack {
+  id: string;
+  name: string;
+  category: 'class' | 'feat' | 'pool' | 'custom';
+  maxUses: number;
+  usedUses: number;
+  isPool?: boolean;
+  unit?: string;
+  source: string;
+  description?: string;
+  icon?: string;
+  badgeColor?: string;
+}
+
+export interface CustomResourceDefinition {
+  id: string;
+  name: string;
+  maxUses: number;
+  unit?: string;
+  isPool?: boolean;
+  description?: string;
+  icon?: string;
 }
 
 export interface TemplateData {

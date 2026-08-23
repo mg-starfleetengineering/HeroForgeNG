@@ -233,16 +233,27 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     activeWeaponsList.push(...wsAttacks);
   }
 
+  const paladinLevel = (character.levelProgression || []).filter(l => {
+    const c1 = (l.primaryClass || '').toLowerCase().trim();
+    const c2 = (l.secondaryClass || '').toLowerCase().trim();
+    return c1 === 'paladin' || c2 === 'paladin';
+  }).length;
+  const smiteAtkBonus = tcState.smiteEvil ? Math.max(0, chaMod) : 0;
+  const smiteDmgBonus = tcState.smiteEvil ? Math.max(1, paladinLevel) : 0;
+
   // 1. Primary Weapon
   if (eq.primaryWeapon) {
     const primaryWpn = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
     const featBonuses = calculateFeatCombatBonuses(character, primaryWpn);
     const wMods = calculateTacticalCombatModifiers(tcState, primaryWpn, false, false);
     const enh = eq.primaryWeaponEnhancement || 0;
-    const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
+    const isMelee = !primaryWpn.category?.toLowerCase().includes('ranged');
+    const netSmiteAtk = isMelee ? smiteAtkBonus : 0;
+    const netSmiteDmg = isMelee ? smiteDmgBonus : 0;
+    const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
     const totalAtk = bab + netAtkBonus;
     const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy);
-    const dmgVal = effectiveStrMod + enh + featBonuses.damageBonus + wMods.damageMod + conditionPenalties.damagePenalty;
+    const dmgVal = effectiveStrMod + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty;
 
     const primaryNote = (() => {
       const notes: string[] = [];
@@ -250,6 +261,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       else if (tcState.rage) { notes.push('Barbarian Rage: +2 Str'); }
       if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('Flurry: -2 Atk, +1 Extra Atk'); }
       if (tcState.haste) { notes.push('Haste: +1 Atk, +1 Extra Atk'); }
+      if (tcState.smiteEvil && isMelee) { notes.push(`Smite Evil: +${smiteAtkBonus} Atk, +${smiteDmgBonus} Dmg vs Evil`); }
+      if (tcState.stunningFist) { notes.push(`Stunning Fist: Fort DC ${10 + Math.floor(totalLevel / 2) + wisMod}`); }
       if (tcState.powerAttack > 0) {
         const is2H = isTwoHandedWeapon(primaryWpn);
         notes.push(`Power Attack (-${tcState.powerAttack}): +${is2H ? tcState.powerAttack * 2 : tcState.powerAttack} Dmg`);
@@ -281,10 +294,13 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const featBonuses = calculateFeatCombatBonuses(character, secWpn);
     const wMods = calculateTacticalCombatModifiers(tcState, secWpn, true, false);
     const enh = eq.secondaryWeaponEnhancement || 0;
-    const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
+    const isMelee = !secWpn.category?.toLowerCase().includes('ranged');
+    const netSmiteAtk = isMelee ? smiteAtkBonus : 0;
+    const netSmiteDmg = isMelee ? smiteDmgBonus : 0;
+    const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
     const totalAtk = bab + netAtkBonus;
     const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy);
-    const dmgVal = Math.floor(effectiveStrMod / 2) + enh + featBonuses.damageBonus + wMods.damageMod + conditionPenalties.damagePenalty;
+    const dmgVal = Math.floor(effectiveStrMod / 2) + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty;
 
     const secNote = (() => {
       const notes: string[] = [];
@@ -292,6 +308,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       else if (tcState.rage) { notes.push('Barbarian Rage: +2 Str'); }
       if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('Flurry: -2 Atk, +1 Extra Atk'); }
       if (tcState.haste) { notes.push('Haste: +1 Atk, +1 Extra Atk'); }
+      if (tcState.smiteEvil && isMelee) { notes.push(`Smite Evil: +${smiteAtkBonus} Atk, +${smiteDmgBonus} Dmg vs Evil`); }
+      if (tcState.stunningFist) { notes.push(`Stunning Fist: Fort DC ${10 + Math.floor(totalLevel / 2) + wisMod}`); }
       if (tcState.powerAttack > 0) { notes.push(`Power Attack: -${tcState.powerAttack} Atk`); }
       if (tcState.combatExpertise > 0) { notes.push(`Combat Exp: -${tcState.combatExpertise} Atk`); }
       if (tcState.fightingDefensively) { notes.push('Fight Defensively: -4 Atk'); }
@@ -419,7 +437,15 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
       {onChange && (
         <div className="print:hidden space-y-4">
-          <VitalsCombatTracker character={character} maxHp={maxHp} onChange={onChange} />
+          <VitalsCombatTracker
+            character={character}
+            maxHp={maxHp}
+            racesData={racesData}
+            templatesData={templatesData}
+            traitsData={traitsData}
+            flawsData={flawsData}
+            onChange={onChange}
+          />
           <TacticalCombatWidget character={character} bab={bab} onChange={onChange} />
         </div>
       )}

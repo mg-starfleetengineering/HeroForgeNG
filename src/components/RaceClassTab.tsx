@@ -193,6 +193,13 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({
     onChange({ levelProgression: prog });
   };
 
+  // Check if character has barbarian levels
+  const barbLevel = (character.levelProgression || []).filter(l => {
+    const c1 = (l.primaryClass || '').toLowerCase().trim();
+    const c2 = (l.secondaryClass || '').toLowerCase().trim();
+    return c1 === 'barbarian' || c2 === 'barbarian';
+  }).length;
+
   // Check if character has cleric or divine levels
   const isClericOrDivine = (character.levelProgression || []).some(l => {
     const c1 = l.primaryClass.toLowerCase();
@@ -439,6 +446,92 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({
               </tbody>
             </table>
           </div>
+
+          {/* Barbarian Alternative Class Feature Variant (Whirling Frenzy vs Standard Rage) */}
+          {barbLevel >= 1 && (
+            <div className="mt-4 p-4 rounded-xl bg-slate-950/80 border border-rose-500/30 space-y-3 animate-fadeIn">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                    <i className={character.barbarianVariant === 'whirling_frenzy' ? 'fa-solid fa-tornado' : 'fa-solid fa-fire'}></i>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold font-heading text-slate-100 flex items-center gap-2">
+                      Barbarian Class Variant (Level {barbLevel})
+                      <span className="badge bg-rose-500/20 text-rose-300 border-rose-500/30 text-[9px] uppercase font-mono px-1.5 py-0.2 rounded">
+                        Alternative Class Feature
+                      </span>
+                    </h3>
+                    <p className="text-[11px] text-slate-400">
+                      Choose whether this character uses standard PHB Barbarian Rage or the Unearthed Arcana Whirling Frenzy variant.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-0.5">
+                {/* Option 1: Standard Rage */}
+                <button
+                  type="button"
+                  onClick={() => onChange({ barbarianVariant: 'rage' })}
+                  className={`p-3 rounded-xl border text-left flex flex-col justify-between transition cursor-pointer ${
+                    character.barbarianVariant !== 'whirling_frenzy'
+                      ? 'bg-rose-950/50 border-rose-500/70 text-rose-100 shadow-md ring-1 ring-rose-500/50'
+                      : 'bg-slate-900/50 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-xs flex items-center gap-1.5">
+                      <i className="fa-solid fa-fire text-rose-400"></i> Standard Barbarian Rage
+                    </span>
+                    <span
+                      className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                        character.barbarianVariant !== 'whirling_frenzy' ? 'bg-rose-500 text-slate-950' : 'bg-slate-800 text-slate-500'
+                      }`}
+                    >
+                      {character.barbarianVariant !== 'whirling_frenzy' ? 'SELECTED' : 'SELECT'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-300">
+                    <strong className="text-rose-300">+4 Str, +4 Con, +2 Morale Will saves, -2 AC</strong>
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-1 leading-tight">
+                    Standard PHB rage. Grants +2 HP/level, melee attack/damage bonus, and Will saves against spells. Cannot cast spells.
+                  </p>
+                </button>
+
+                {/* Option 2: Whirling Frenzy */}
+                <button
+                  type="button"
+                  onClick={() => onChange({ barbarianVariant: 'whirling_frenzy' })}
+                  className={`p-3 rounded-xl border text-left flex flex-col justify-between transition cursor-pointer ${
+                    character.barbarianVariant === 'whirling_frenzy'
+                      ? 'bg-teal-950/50 border-teal-500/70 text-teal-100 shadow-md ring-1 ring-teal-500/50'
+                      : 'bg-slate-900/50 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-xs flex items-center gap-1.5">
+                      <i className="fa-solid fa-tornado text-teal-400"></i> Whirling Frenzy (UA)
+                    </span>
+                    <span
+                      className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                        character.barbarianVariant === 'whirling_frenzy' ? 'bg-teal-400 text-slate-950' : 'bg-slate-800 text-slate-500'
+                      }`}
+                    >
+                      {character.barbarianVariant === 'whirling_frenzy' ? 'SELECTED' : 'SELECT'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-300">
+                    <strong className="text-teal-300">+4 Str (+2 Atk/Dmg), +2 Dodge AC, +2 Ref, -2 Flurry (+1 Extra Attack)</strong>
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-1 leading-tight">
+                    Unearthed Arcana alternative. Grants an extra attack at highest BAB during a full attack and defensive Dodge bonus instead of Con/HP bonus.
+                  </p>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

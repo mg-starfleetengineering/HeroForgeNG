@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { CharacterState, ConditionCategory } from '../types/character';
+import {
+  CharacterState,
+  ConditionCategory,
+  DailyResourceTrack,
+  CustomResourceDefinition,
+  RaceData,
+  TemplateData,
+  TraitData,
+  FlawData
+} from '../types/character';
 import {
   DND_CONDITIONS,
   CONDITION_MAP,
@@ -9,6 +18,13 @@ import {
   applyHeal,
   toggleCondition
 } from '../engine/conditions';
+import {
+  calculateDailyResources,
+  performLongRest,
+  useResource,
+  setResourceUsed,
+  resetResource
+} from '../engine/resources';
 
 interface VitalsCombatTrackerProps {
   character: CharacterState;
@@ -16,6 +32,10 @@ interface VitalsCombatTrackerProps {
   onChange: (updated: Partial<CharacterState>) => void;
   className?: string;
   isCompact?: boolean;
+  racesData?: RaceData[];
+  templatesData?: TemplateData[];
+  traitsData?: TraitData[];
+  flawsData?: FlawData[];
 }
 
 export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
@@ -23,22 +43,48 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
   maxHp,
   onChange,
   className = '',
-  isCompact = false
+  isCompact = false,
+  racesData = [],
+  templatesData = [],
+  traitsData = [],
+  flawsData = []
 }) => {
   // Resolve effective current HP (default to maxHp if not set)
   const currentHp = character.currentHp !== undefined ? character.currentHp : maxHp;
   const tempHp = character.tempHp || 0;
   const nonlethalDamage = character.nonlethalDamage || 0;
   const activeConditions = character.activeConditions || [];
+  const resourceUsages = character.resourceUsages || {};
+  const customResources = character.customResources || [];
 
   const [customAmount, setCustomAmount] = useState<string>('');
   const [isNonlethalInput, setIsNonlethalInput] = useState<boolean>(false);
   const [conditionCategoryFilter, setConditionCategoryFilter] = useState<ConditionCategory | 'all'>('all');
   const [conditionSearch, setConditionSearch] = useState<string>('');
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  const [restToast, setRestToast] = useState<string | null>(null);
+
+  // Custom resource modal / form state
+  const [showAddCustomResource, setShowAddCustomResource] = useState<boolean>(false);
+  const [customName, setCustomName] = useState<string>('');
+  const [customMaxUses, setCustomMaxUses] = useState<string>('3');
+  const [customUnit, setCustomUnit] = useState<string>('uses');
+  const [customIsPool, setCustomIsPool] = useState<boolean>(false);
+  const [customDescription, setCustomDescription] = useState<string>('');
+
+  // Lay on Hands pool quick input state
+  const [lohAdjustAmount, setLohAdjustAmount] = useState<string>('');
 
   const healthStatus = getHealthStatus(currentHp, maxHp, tempHp, nonlethalDamage);
   const penalties = calculateConditionPenalties(activeConditions);
+  const dailyResources = calculateDailyResources(
+    character,
+    undefined,
+    racesData,
+    templatesData,
+    traitsData,
+    flawsData
+  );
 
   // Quick State Updaters
   const handleApplyDamage = (amount: number, nonlethal: boolean = false) => {
@@ -62,13 +108,13 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
     setCustomAmount('');
   };
 
-  const handleFullRest = () => {
-    onChange({
-      currentHp: maxHp,
-      tempHp: 0,
-      nonlethalDamage: 0,
-      activeConditions: activeConditions.filter(c => c !== 'fatigued' && c !== 'exhausted')
-    });
+  const handleLongRest = () => {
+    const updated = performLongRest(character, maxHp);
+    onChange(updated);
+    setRestToast('8-Hour Long Rest completed! HP restored, daily resources refilled, and temporary fatigue/shaken conditions cleared.');
+    setTimeout(() => {
+      setRestToast(null);
+    }, 4500);
   };
 
   const handleConditionToggle = (conditionId: string) => {
@@ -88,6 +134,74 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
   const handleNonlethalChange = (delta: number) => {
     const next = Math.max(0, nonlethalDamage + delta);
     onChange({ nonlethalDamage: next });
+  };
+
+  // Resource Usages Management
+  const handleUseResource = (resourceId: string, delta: number, maxUses: number) => {
+    const updated = useResource(resourceUsages, resourceId, delta, maxUses);
+    onChange({ resourceUsages: updated });
+  };
+
+  const handleBubbleClick = (resourceId: string, bubbleIndex: number, maxUses: number, remaining: number) => {
+    // bubbleIndex is 1-based (1..maxUses)
+    // If clicking on an available bubble (bubbleIndex <= remaining): expend uses so this bubble and prior are used, or spend 1
+    // If clicking on an expended bubble (bubbleIndex > remaining): restore uses up to that bubble!
+    if (bubbleIndex <= remaining) {
+      // Spend down to bubbleIndex - 1 available (i.e. used = maxUses - bubbleIndex + 1)
+      const newUsed = maxUses - bubbleIndex + 1;
+      const updated = setResourceUsed(resourceUsages, resourceId, newUsed, maxUses);
+      onChange({ resourceUsages: updated });
+    } else {
+      // Restore up to bubbleIndex available (i.e. used = maxUses - bubbleIndex)
+      const newUsed = maxUses - bubbleIndex;
+      const updated = setResourceUsed(resourceUsages, resourceId, newUsed, maxUses);
+      onChange({ resourceUsages: updated });
+    }
+  };
+
+  const handleResetResource = (resourceId: string) => {
+    const updated = resetResource(resourceUsages, resourceId);
+    onChange({ resourceUsages: updated });
+  };
+
+  const handleResetAllResources = () => {
+    onChange({ resourceUsages: {} });
+  };
+
+  // Custom Resource Management
+  const handleAddCustomResource = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customName.trim()) return;
+
+    const newRes: CustomResourceDefinition = {
+      id: `custom_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      name: customName.trim(),
+      maxUses: Math.max(1, parseInt(customMaxUses) || 1),
+      unit: customUnit.trim() || 'uses',
+      isPool: customIsPool,
+      description: customDescription.trim() || undefined
+    };
+
+    onChange({
+      customResources: [...customResources, newRes]
+    });
+
+    setCustomName('');
+    setCustomMaxUses('3');
+    setCustomUnit('uses');
+    setCustomIsPool(false);
+    setCustomDescription('');
+    setShowAddCustomResource(false);
+  };
+
+  const handleDeleteCustomResource = (id: string) => {
+    const nextCustom = customResources.filter(r => r.id !== id);
+    const nextUsages = { ...resourceUsages };
+    delete nextUsages[id];
+    onChange({
+      customResources: nextCustom,
+      resourceUsages: nextUsages
+    });
   };
 
   const filteredConditions = DND_CONDITIONS.filter(c => {
@@ -113,6 +227,22 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
     <div
       className={`card bg-slate-900/80 backdrop-blur border border-rose-500/25 p-4 rounded-2xl shadow-xl transition-all ${className}`}
     >
+      {/* Toast feedback for Long Rest */}
+      {restToast && (
+        <div className="mb-3 p-2.5 rounded-xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 text-xs flex items-center justify-between animate-fadeIn shadow-lg">
+          <div className="flex items-center gap-2">
+            <i className="fa-solid fa-moon text-emerald-400 text-sm"></i>
+            <span className="font-semibold">{restToast}</span>
+          </div>
+          <button
+            onClick={() => setRestToast(null)}
+            className="text-emerald-400 hover:text-emerald-200 text-xs font-bold px-1.5 py-0.5 rounded cursor-pointer"
+          >
+            <i className="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      )}
+
       {/* Widget Header */}
       <div
         className={`flex flex-wrap items-center justify-between gap-2 text-xs select-none ${
@@ -122,7 +252,7 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
         <div
           className="flex items-center gap-2.5 cursor-pointer flex-1 min-w-[240px]"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          title={isCollapsed ? 'Click to expand Vitals & Conditions HUD' : 'Click to collapse Vitals & Conditions HUD'}
+          title={isCollapsed ? 'Click to expand Vitals & Daily Resources HUD' : 'Click to collapse HUD'}
         >
           <div className="w-8 h-8 rounded-lg bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0">
             <i className="fa-solid fa-heart-pulse text-sm"></i>
@@ -130,7 +260,7 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-bold font-heading text-slate-100 flex items-center gap-2">
-                Live Vitals & Condition Tracker
+                Live Vitals, Conditions & Daily Resources
               </h3>
               <span
                 className={`badge text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${healthStatus.badgeClass}`}
@@ -142,11 +272,16 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
                   {activeConditions.length} Condition{activeConditions.length > 1 ? 's' : ''}
                 </span>
               )}
+              {dailyResources.length > 0 && (
+                <span className="badge bg-indigo-500/20 text-indigo-300 border-indigo-500/30 text-[10px] font-mono px-1.5 py-0.5">
+                  {dailyResources.length} Tracked Resource{dailyResources.length > 1 ? 's' : ''}
+                </span>
+              )}
             </div>
             <p className="text-[11px] text-slate-400">
               {isCollapsed
-                ? 'Click to expand live HP adjustments, temp HP, nonlethal damage, and condition toggles'
-                : 'Manage real-time Hit Points, quick damage/healing, temporary HP, and 1-click combat conditions.'}
+                ? 'Click to expand live HP adjustments, daily resource bubbles, conditions, and 8-hour long rest.'
+                : 'Real-time Hit Points, interactive daily class resource bubbles, combat conditions, and 1-click Long Rest.'}
             </p>
           </div>
         </div>
@@ -167,6 +302,23 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
                 {nonlethalDamage} NL
               </span>
             )}
+            {dailyResources.map(res => {
+              const remaining = Math.max(0, res.maxUses - res.usedUses);
+              return (
+                <span
+                  key={res.id}
+                  className={`badge text-[10px] ${
+                    remaining === 0
+                      ? 'bg-slate-800 text-slate-500 border-slate-700'
+                      : res.badgeColor || 'bg-slate-800 text-slate-300 border-slate-700'
+                  }`}
+                  title={`${res.name}: ${remaining}/${res.maxUses} ${res.unit || 'uses'}`}
+                >
+                  <i className={`${res.icon || 'fa-solid fa-bolt'} mr-1 text-[9px]`}></i>
+                  {res.name.replace('Barbarian ', '').replace('Paladin ', '')}: {remaining}/{res.maxUses}
+                </span>
+              );
+            })}
             {activeConditions.map(condId => {
               const def = CONDITION_MAP[condId];
               return (
@@ -182,18 +334,19 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
         )}
 
         <div className="flex items-center gap-2">
-          {(currentHp < maxHp || tempHp > 0 || nonlethalDamage > 0) && (
-            <button
-              onClick={handleFullRest}
-              className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-mono transition bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/30 cursor-pointer"
-              title="Restore full HP, clear temp HP and nonlethal damage"
-            >
-              <i className="fa-solid fa-bed"></i> Full Rest
-            </button>
-          )}
+          {/* 1-Click 8-Hour Long Rest Button */}
+          <button
+            onClick={handleLongRest}
+            className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 font-bold font-mono transition bg-emerald-500/15 hover:bg-emerald-500/25 px-3 py-1.5 rounded-lg border border-emerald-500/40 shadow-xs cursor-pointer active:scale-95"
+            title="8-Hour Long Rest: Fully restore HP, reset daily class resource bubbles, clear nonlethal & temp HP, and remove fatigue/shaken conditions."
+          >
+            <i className="fa-solid fa-moon text-amber-300"></i>
+            <span>Long Rest</span>
+          </button>
+
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1.5 font-semibold transition bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1 rounded-lg border border-rose-500/30 cursor-pointer"
+            className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1.5 font-semibold transition bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1.5 rounded-lg border border-rose-500/30 cursor-pointer"
           >
             <i className={`fa-solid ${isCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'}`}></i>
             <span>{isCollapsed ? 'Expand' : 'Collapse'}</span>
@@ -361,14 +514,14 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
                     <button
                       onClick={() => handleTempHpChange(-1)}
                       disabled={tempHp <= 0}
-                      className="text-slate-400 hover:text-cyan-300 disabled:opacity-30 px-1"
+                      className="text-slate-400 hover:text-cyan-300 disabled:opacity-30 px-1 cursor-pointer"
                     >
                       -
                     </button>
                     <span className="font-bold text-cyan-300 min-w-[16px] text-center">{tempHp}</span>
                     <button
                       onClick={() => handleTempHpChange(1)}
-                      className="text-slate-400 hover:text-cyan-300 px-1"
+                      className="text-slate-400 hover:text-cyan-300 px-1 cursor-pointer"
                     >
                       +
                     </button>
@@ -384,14 +537,14 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
                     <button
                       onClick={() => handleNonlethalChange(-1)}
                       disabled={nonlethalDamage <= 0}
-                      className="text-slate-400 hover:text-amber-300 disabled:opacity-30 px-1"
+                      className="text-slate-400 hover:text-amber-300 disabled:opacity-30 px-1 cursor-pointer"
                     >
                       -
                     </button>
                     <span className="font-bold text-amber-300 min-w-[16px] text-center">{nonlethalDamage}</span>
                     <button
                       onClick={() => handleNonlethalChange(1)}
-                      className="text-slate-400 hover:text-amber-300 px-1"
+                      className="text-slate-400 hover:text-amber-300 px-1 cursor-pointer"
                     >
                       +
                     </button>
@@ -423,7 +576,321 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
             </div>
           )}
 
-          {/* Conditions Engine Section */}
+          {/* ═══════════════════════════════════════════════════════════════════════ */}
+          {/* DAILY CLASS RESOURCES & BUBBLE TRACKER SECTION                         */}
+          {/* ═══════════════════════════════════════════════════════════════════════ */}
+          <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-3.5 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-900 pb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                  <i className="fa-solid fa-battery-half text-amber-400"></i> Daily Class Resources & Usage Tracking
+                </span>
+                <span className="badge bg-slate-800 text-slate-400 border-slate-700 text-[10px] font-mono px-2 py-0.5">
+                  {dailyResources.length} Track{dailyResources.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {dailyResources.length > 0 && (
+                  <button
+                    onClick={handleResetAllResources}
+                    className="text-[10px] text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 px-2 py-1 rounded border border-emerald-500/20 transition cursor-pointer flex items-center gap-1 font-mono"
+                    title="Refill all daily class resources to full capacity"
+                  >
+                    <i className="fa-solid fa-rotate-left"></i> Refill All
+                  </button>
+                )}
+                <button
+                  onClick={() => setShowAddCustomResource(!showAddCustomResource)}
+                  className="text-[10px] text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 py-1 rounded border border-amber-500/20 transition cursor-pointer flex items-center gap-1"
+                >
+                  <i className={`fa-solid ${showAddCustomResource ? 'fa-xmark' : 'fa-plus'}`}></i>
+                  <span>{showAddCustomResource ? 'Cancel' : 'Custom Resource'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Inline Custom Resource Creator */}
+            {showAddCustomResource && (
+              <form
+                onSubmit={handleAddCustomResource}
+                className="p-3 bg-slate-900/90 rounded-xl border border-amber-500/30 space-y-2.5 text-xs animate-fadeIn"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-amber-300 uppercase tracking-wider text-[11px] flex items-center gap-1">
+                    <i className="fa-solid fa-plus-circle"></i> Add Custom Daily Tracker
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                  <div className="sm:col-span-2">
+                    <label className="text-[10px] text-slate-400 block mb-0.5">Resource Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Wand of Fireballs, Dragon Breath, Action Points"
+                      value={customName}
+                      onChange={e => setCustomName(e.target.value)}
+                      required
+                      className="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5">Max Usages / Pool</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={customMaxUses}
+                      onChange={e => setCustomMaxUses(e.target.value)}
+                      required
+                      className="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-100 focus:outline-none focus:border-amber-500 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5">Unit Descriptor</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. uses, charges, rounds"
+                      value={customUnit}
+                      onChange={e => setCustomUnit(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-100 focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-center">
+                  <div className="sm:col-span-3">
+                    <input
+                      type="text"
+                      placeholder="Optional notes or rule reminder..."
+                      value={customDescription}
+                      onChange={e => setCustomDescription(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="flex items-center gap-1 text-[11px] text-slate-400 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={customIsPool}
+                        onChange={e => setCustomIsPool(e.target.checked)}
+                        className="rounded bg-slate-950 border-slate-700 text-amber-500 h-3.5 w-3.5"
+                      />
+                      <span>Point Pool</span>
+                    </label>
+                    <button
+                      type="submit"
+                      className="btn btn-primary text-xs py-1 px-3"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )}
+
+            {/* Active Resources Cards Grid */}
+            {dailyResources.length === 0 ? (
+              <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800/80 text-center text-xs text-slate-400 space-y-1">
+                <i className="fa-solid fa-battery-empty text-slate-600 text-lg mb-1 block"></i>
+                <p className="font-semibold text-slate-300">No active daily class resources detected for this character.</p>
+                <p className="text-[11px] text-slate-500">
+                  Classes like Barbarian (Rage), Paladin (Smite Evil, Lay on Hands, Turn Undead), Cleric (Turn Undead),
+                  Bard (Bardic Music), Druid (Wild Shape), and Monk (Stunning Fist) automatically populate here.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {dailyResources.map(res => {
+                  const remaining = Math.max(0, res.maxUses - res.usedUses);
+                  const isPool = Boolean(res.isPool);
+                  const percentLeft = Math.round((remaining / res.maxUses) * 100);
+
+                  return (
+                    <div
+                      key={res.id}
+                      className={`p-3 rounded-xl border flex flex-col justify-between space-y-2.5 transition ${
+                        remaining === 0
+                          ? 'bg-slate-900/40 border-slate-800/70 text-slate-400'
+                          : 'bg-slate-900/80 border-slate-800 text-slate-200 shadow-xs'
+                      }`}
+                    >
+                      {/* Top Resource Card Line */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="space-y-0.5 flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <i className={`${res.icon || 'fa-solid fa-bolt'} text-xs ${remaining > 0 ? 'text-amber-400' : 'text-slate-500'}`}></i>
+                            <h4 className="font-bold text-xs text-slate-100 truncate">{res.name}</h4>
+                            <span className={`badge text-[9px] font-mono px-1.5 py-0.2 rounded border ${res.badgeColor || 'bg-slate-800 text-slate-300 border-slate-700'}`}>
+                              {res.source}
+                            </span>
+                          </div>
+                          {res.description && (
+                            <p className="text-[10.5px] text-slate-400 leading-tight line-clamp-2">{res.description}</p>
+                          )}
+                        </div>
+
+                        {/* Status Count & Reset/Delete */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <div className="text-right font-mono">
+                            <span className={`font-bold text-xs ${remaining === 0 ? 'text-rose-400' : remaining <= 1 && res.maxUses > 1 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                              {remaining}
+                            </span>
+                            <span className="text-[10px] text-slate-500"> / {res.maxUses} {res.unit || 'uses'}</span>
+                          </div>
+                          {res.usedUses > 0 && (
+                            <button
+                              onClick={() => handleResetResource(res.id)}
+                              className="text-[10px] text-slate-400 hover:text-emerald-300 p-1 rounded hover:bg-slate-800 transition cursor-pointer"
+                              title="Reset this resource to full"
+                            >
+                              <i className="fa-solid fa-rotate-left"></i>
+                            </button>
+                          )}
+                          {res.category === 'custom' && (
+                            <button
+                              onClick={() => handleDeleteCustomResource(res.id)}
+                              className="text-[10px] text-slate-500 hover:text-rose-400 p-1 rounded hover:bg-slate-800 transition cursor-pointer"
+                              title="Remove custom resource"
+                            >
+                              <i className="fa-solid fa-trash-can"></i>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Interactive Controls Line */}
+                      {isPool ? (
+                        /* Lay on Hands / Point Pool View with Progress Bar & Stepper */
+                        <div className="space-y-1.5 pt-1 border-t border-slate-800/80">
+                          <div className="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800 flex relative">
+                            <div
+                              className={`h-full transition-all duration-300 ${
+                                percentLeft > 50
+                                  ? 'bg-emerald-500'
+                                  : percentLeft > 25
+                                  ? 'bg-amber-500'
+                                  : 'bg-rose-500'
+                              }`}
+                              style={{ width: `${percentLeft}%` }}
+                            ></div>
+                          </div>
+
+                          <div className="flex flex-wrap items-center justify-between gap-1 pt-1">
+                            <div className="flex items-center gap-1 font-mono text-[11px]">
+                              <span className="text-[9px] uppercase font-bold text-slate-500 mr-0.5">Spend:</span>
+                              <button
+                                onClick={() => handleUseResource(res.id, 10, res.maxUses)}
+                                disabled={remaining < 10}
+                                className="px-1.5 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 border border-rose-800/60 text-rose-300 text-[10px] font-bold transition cursor-pointer"
+                              >
+                                -10
+                              </button>
+                              <button
+                                onClick={() => handleUseResource(res.id, 5, res.maxUses)}
+                                disabled={remaining < 5}
+                                className="px-1.5 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 border border-rose-800/60 text-rose-300 text-[10px] font-bold transition cursor-pointer"
+                              >
+                                -5
+                              </button>
+                              <button
+                                onClick={() => handleUseResource(res.id, 1, res.maxUses)}
+                                disabled={remaining < 1}
+                                className="px-1.5 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 border border-rose-800/60 text-rose-300 text-[10px] font-bold transition cursor-pointer"
+                              >
+                                -1
+                              </button>
+                            </div>
+
+                            <div className="flex items-center gap-1 font-mono text-[11px]">
+                              <button
+                                onClick={() => handleUseResource(res.id, -1, res.maxUses)}
+                                disabled={res.usedUses <= 0}
+                                className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition cursor-pointer"
+                              >
+                                +1
+                              </button>
+                              <button
+                                onClick={() => handleUseResource(res.id, -5, res.maxUses)}
+                                disabled={res.usedUses < 5}
+                                className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition cursor-pointer"
+                              >
+                                +5
+                              </button>
+                              <button
+                                onClick={() => handleUseResource(res.id, -10, res.maxUses)}
+                                disabled={res.usedUses < 10}
+                                className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition cursor-pointer"
+                              >
+                                +10
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        /* Standard Resource Bubbles Display [●][●][○] */
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800/80">
+                          {/* Bubbles Array */}
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            {Array.from({ length: res.maxUses }, (_, i) => {
+                              const bubbleIndex = i + 1;
+                              const isAvailable = bubbleIndex <= remaining;
+
+                              return (
+                                <button
+                                  key={i}
+                                  type="button"
+                                  onClick={() => handleBubbleClick(res.id, bubbleIndex, res.maxUses, remaining)}
+                                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-all cursor-pointer select-none group ${
+                                    isAvailable
+                                      ? 'bg-amber-500/20 border-2 border-amber-400 text-amber-300 shadow-xs hover:scale-110 active:scale-95'
+                                      : 'bg-slate-950/70 border-2 border-slate-800 text-slate-600 hover:border-slate-600 hover:text-slate-400'
+                                  }`}
+                                  title={
+                                    isAvailable
+                                      ? `Use #${bubbleIndex} is Available (Click to spend)`
+                                      : `Use #${bubbleIndex} has been Spent (Click to restore)`
+                                  }
+                                >
+                                  {isAvailable ? (
+                                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-xs"></span>
+                                  ) : (
+                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {/* Quick [-] / [+] Stepper */}
+                          <div className="flex items-center gap-1 font-mono text-xs">
+                            <button
+                              onClick={() => handleUseResource(res.id, 1, res.maxUses)}
+                              disabled={remaining <= 0}
+                              className="px-2 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 disabled:cursor-not-allowed border border-rose-800/60 text-rose-300 text-[10px] font-bold transition cursor-pointer flex items-center gap-1"
+                              title="Spend 1 use"
+                            >
+                              <i className="fa-solid fa-minus text-[9px]"></i> Use
+                            </button>
+                            <button
+                              onClick={() => handleUseResource(res.id, -1, res.maxUses)}
+                              disabled={res.usedUses <= 0}
+                              className="px-2 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 disabled:cursor-not-allowed border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition cursor-pointer flex items-center gap-1"
+                              title="Restore 1 use"
+                            >
+                              <i className="fa-solid fa-plus text-[9px]"></i> Restore
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* ═══════════════════════════════════════════════════════════════════════ */}
+          {/* CONDITIONS ENGINE SECTION                                              */}
+          {/* ═══════════════════════════════════════════════════════════════════════ */}
           <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-3.5 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
