@@ -720,6 +720,182 @@ def extract_deities(domains=None):
     print(f"Extracted {len(deities)} deities -> src/data/deities.json & public/data/deities.json")
     return deities
 
+def extract_spells():
+    import urllib.request
+    import re
+    print("Extracting 3.5e Core Spells & Supplemental Domain Spells...")
+    
+    # 1. Fetch official 3.5e core spells (Player's Handbook / SRD)
+    url = "https://raw.githubusercontent.com/eriq-augustine/dnd-spell-cards/master/data/clean-full.json"
+    req = urllib.request.Request(url, headers={"User-Agent": "HeroForgeNG-DataExtractor/1.0"})
+    with urllib.request.urlopen(req) as res:
+        raw_spells = json.loads(res.read().decode("utf-8"))
+        
+    core_spells = []
+    core_names_set = set()
+    
+    for sp in raw_spells:
+        name = sp.get("name") or sp.get("raw_name")
+        if not name:
+            continue
+            
+        sp_id = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+        core_names_set.add(name.strip().lower())
+        if sp.get("raw_name"):
+            core_names_set.add(sp.get("raw_name").strip().lower())
+            
+        school = sp.get("school") or "Universal"
+        subschool = sp.get("subschool") or None
+        descriptors = sp.get("descriptors") or []
+        
+        # Levels mapping
+        levels = {}
+        lvl_raw = sp.get("level", {})
+        if isinstance(lvl_raw, dict):
+            if "__structured__" in lvl_raw:
+                for cls_k, lvl_v in lvl_raw["__structured__"].items():
+                    try:
+                        levels[cls_k] = int(lvl_v)
+                    except (ValueError, TypeError):
+                        pass
+        
+        # Casting Time
+        ct_raw = sp.get("casting_time")
+        if isinstance(ct_raw, dict):
+            casting_time = ct_raw.get("__raw__") or ct_raw.get("__structured__", {}).get("casting_time", "1 standard action")
+        else:
+            casting_time = str(ct_raw or "1 standard action")
+            
+        # Range
+        r_raw = sp.get("range")
+        if isinstance(r_raw, dict):
+            range_val = r_raw.get("__raw__") or r_raw.get("__structured__", {}).get("range", "Touch")
+        else:
+            range_val = str(r_raw or "Touch")
+            
+        # Target / Area / Effect
+        target_area = (
+            sp.get("target") or 
+            sp.get("area_or_target") or 
+            sp.get("target_or_area") or 
+            sp.get("target_or_targets") or 
+            sp.get("target,_effect,_or_area") or 
+            sp.get("target/effect") or 
+            sp.get("effect") or 
+            ""
+        )
+        
+        # Duration
+        dur_raw = sp.get("duration")
+        if isinstance(dur_raw, dict):
+            duration = dur_raw.get("__raw__") or dur_raw.get("__structured__", {}).get("duration", "Instantaneous")
+        else:
+            duration = str(dur_raw or "Instantaneous")
+            
+        saving_throw = sp.get("saving_throw") or "None"
+        spell_resistance = sp.get("spell_resistance") or "No"
+        
+        # Description
+        desc_raw = sp.get("description")
+        if isinstance(desc_raw, list):
+            description = "\n\n".join(desc_raw)
+        else:
+            description = str(desc_raw or "")
+            
+        # Components
+        comp_raw = sp.get("components")
+        components = ""
+        if isinstance(comp_raw, dict):
+            components = comp_raw.get("__raw__", "")
+        elif comp_raw:
+            components = str(comp_raw)
+            
+        core_spells.append({
+            "id": sp_id,
+            "name": name,
+            "school": school,
+            "subschool": subschool,
+            "descriptors": descriptors,
+            "levels": levels,
+            "components": components,
+            "castingTime": casting_time,
+            "range": range_val,
+            "targetArea": target_area,
+            "duration": duration,
+            "savingThrow": saving_throw,
+            "spellResistance": spell_resistance,
+            "description": description,
+            "source": "PHB"
+        })
+        
+    with open(os.path.join(OUTPUT_DIR, "spells.json"), "w", encoding="utf-8") as f:
+        json.dump(core_spells, f, indent=2)
+    with open(os.path.join(PUBLIC_DATA_DIR, "spells.json"), "w", encoding="utf-8") as f:
+        json.dump(core_spells, f, indent=2)
+    print(f"Extracted {len(core_spells)} 3.5e core spells -> src/data/spells.json & public/data/spells.json")
+    
+    # 2. Extract supplemental domain spells from Excel workbook not in core PHB
+    df_dom = pd.read_excel("HeroForge Anew 3.5 v7.4.0.1.xlsm", sheet_name="Domains", header=None)
+    supp_spells_map = {}
+    current_source = "PHB"
+    
+    for row_idx, row in df_dom.iterrows():
+        raw_name = row[0]
+        if pd.isna(raw_name):
+            continue
+        s_val = str(raw_name).strip()
+        if s_val.startswith("-") and s_val.endswith("-"):
+            src_tag = s_val.strip("- ").replace(" Domains", "").strip()
+            current_source = src_tag
+            continue
+        if s_val.startswith("-") or s_val.lower() in ["no", "select domain", "nan"]:
+            continue
+            
+        clean_domain_name = re.sub(r"^xx-|-xx$", "", s_val).strip()
+        if not clean_domain_name:
+            continue
+            
+        power = str(row[1]).strip() if pd.notna(row[1]) and str(row[1]).strip().lower() != "nan" else "No domain power listed."
+        
+        for lvl_idx in range(1, 10):
+            col_val = row[lvl_idx + 1]
+            if pd.notna(col_val) and str(col_val).strip().lower() not in ["nan", "none", ""]:
+                sp_name = str(col_val).strip().replace("’", "'").replace("‘", "'")
+                sp_lower = sp_name.lower()
+                
+                # Check if in core list
+                if sp_lower not in core_names_set:
+                    sp_id = re.sub(r"[^a-z0-9]+", "_", sp_lower).strip("_")
+                    if sp_id not in supp_spells_map:
+                        supp_spells_map[sp_id] = {
+                            "id": sp_id,
+                            "name": sp_name,
+                            "source": current_source,
+                            "excelOrigin": {
+                                "sheet": "Domains",
+                                "row": row_idx + 1
+                            },
+                            "domains": [],
+                            "levels": {}
+                        }
+                    
+                    supp_spells_map[sp_id]["domains"].append({
+                        "domain": clean_domain_name,
+                        "level": lvl_idx,
+                        "domainPower": power,
+                        "source": current_source
+                    })
+                    supp_spells_map[sp_id]["levels"][clean_domain_name] = lvl_idx
+                    
+    supp_spells_list = list(supp_spells_map.values())
+    with open(os.path.join(OUTPUT_DIR, "supplemental_domain_spells.json"), "w", encoding="utf-8") as f:
+        json.dump(supp_spells_list, f, indent=2)
+    with open(os.path.join(PUBLIC_DATA_DIR, "supplemental_domain_spells.json"), "w", encoding="utf-8") as f:
+        json.dump(supp_spells_list, f, indent=2)
+    print(f"Extracted {len(supp_spells_list)} supplemental domain spells -> src/data/supplemental_domain_spells.json & public/data/supplemental_domain_spells.json")
+    
+    return core_spells, supp_spells_list
+
 if __name__ == "__main__":
     extract_classes()
     extract_races()
@@ -732,7 +908,9 @@ if __name__ == "__main__":
     doms = extract_domains()
     extract_deities(doms)
     extract_tables()
+    extract_spells()
     print("Data extraction complete!")
+
 
 
 

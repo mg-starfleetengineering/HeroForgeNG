@@ -455,6 +455,70 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
           </div>
         </div>
       )
+    },
+    {
+      id: 'legal-attribution',
+      title: 'Legal & OGL Attribution',
+      icon: 'fa-scale-balanced',
+      content: (
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-amber-300 font-heading">Legal Notices, Open Game License & Attributions</h3>
+          <p className="text-slate-300 text-sm leading-relaxed">
+            HeroForgeNG is an open-source, client-side fan project and utility tool for tabletop Dungeons & Dragons 3.5th Edition players, provided for non-commercial personal use.
+          </p>
+
+          <div className="space-y-3">
+            {/* OGL Section 15 Notice */}
+            <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-certificate text-xs"></i> Open Game License v1.0a (OGL 1.0a)
+              </h4>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                Portions of the rules content, spells, classes, and mechanics in this application are Open Game Content (OGC) distributed under the terms of the <strong>Open Game License Version 1.0a</strong>.
+              </p>
+              <div className="bg-slate-950 p-3 rounded-lg font-mono text-[11px] text-slate-300 border border-slate-800/80 space-y-1.5 leading-relaxed">
+                <p className="font-bold text-amber-300">OPEN GAME LICENSE Version 1.0a Section 15 Copyright Notice:</p>
+                <p>
+                  <strong>Open Game License v 1.0a</strong> Copyright 2000, Wizards of the Coast, Inc.
+                </p>
+                <p>
+                  <strong>System Reference Document</strong> Copyright 2000-2003, Wizards of the Coast, Inc.; Authors Jonathan Tweet, Monte Cook, Skip Williams, Rich Baker, Andy Collins, David Noonan, Rich Redman, Bruce R. Cordell, John D. Rateliff, Thomas Reid, James Wyatt, based on original material by E. Gary Gygax and Dave Arneson.
+                </p>
+              </div>
+            </div>
+
+            {/* HeroForge Anew Attribution */}
+            <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-code-fork text-xs"></i> HeroForge Anew Project
+              </h4>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                HeroForgeNG is adapted from and based upon the classic <strong>HeroForge Anew 3.5</strong> spreadsheet project originally created and maintained by <strong>Heliomance</strong> and the broader HeroForge fan community.
+              </p>
+            </div>
+
+            {/* 3.5e Spell Database & Open-Source Compilers */}
+            <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-book-open text-xs"></i> 3.5e Spell Compendium Dataset Attribution
+              </h4>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                The 3.5e Core Spells database schema and rules descriptions are structured with assistance from open-source 3.5e SRD compiler tools created by <strong>eriq-augustine</strong> (<code>dnd-spell-cards</code>, MIT License).
+              </p>
+            </div>
+
+            {/* Trademark Disclaimer */}
+            <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-shield-halved text-xs"></i> Trademark & Fair Use Disclaimer
+              </h4>
+              <p className="text-slate-400 text-xs leading-relaxed">
+                <em>Dungeons & Dragons</em>, <em>D&D</em>, <em>Player&apos;s Handbook</em>, <em>Dungeon Master&apos;s Guide</em>, <em>Monster Manual</em>, and Wizards of the Coast are trademarks of Wizards of the Coast LLC, a subsidiary of Hasbro, Inc. This application is not affiliated with, endorsed, sponsored, or approved by Wizards of the Coast LLC.
+              </p>
+            </div>
+          </div>
+        </div>
+      )
     }
   ];
 

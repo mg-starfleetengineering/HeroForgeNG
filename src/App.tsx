@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { CharacterSheetData, CharacterSummary, CharacterState, RaceData, ClassData, WeaponData, FeatData, TraitData, FlawData, SkillTrickData, TemplateData, DomainData, DeityData, FamiliarData, AnimalCompanionData, WildShapeFormData } from './types/character';
+import { CharacterSheetData, CharacterSummary, CharacterState, RaceData, ClassData, WeaponData, FeatData, TraitData, FlawData, SkillTrickData, TemplateData, DomainData, DeityData, FamiliarData, AnimalCompanionData, WildShapeFormData, SpellData, SupplementalDomainSpellData } from './types/character';
+
 import { Header } from './components/Header';
 import { StatsTab } from './components/StatsTab';
 import { RaceClassTab } from './components/RaceClassTab';
@@ -161,6 +162,8 @@ export const App: React.FC = () => {
   const [familiarsData, setFamiliarsData] = useState<FamiliarData[]>([]);
   const [animalCompanionsData, setAnimalCompanionsData] = useState<AnimalCompanionData[]>([]);
   const [wildShapeFormsData, setWildShapeFormsData] = useState<WildShapeFormData[]>([]);
+  const [spellsData, setSpellsData] = useState<SpellData[]>([]);
+  const [supplementalSpellsData, setSupplementalSpellsData] = useState<SupplementalDomainSpellData[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refreshSummaries = async () => {
@@ -182,8 +185,10 @@ export const App: React.FC = () => {
       fetch('./data/deities.json').then(res => res.json()),
       fetch('./data/familiars.json').then(res => res.json()),
       fetch('./data/animal_companions.json').then(res => res.json()),
-      fetch('./data/wildshape_forms.json').then(res => res.json())
-    ]).then(([races, classes, weapons, feats, traits, flaws, tricks, templates, domains, deities, familiars, companions, wildshapeForms]) => {
+      fetch('./data/wildshape_forms.json').then(res => res.json()),
+      fetch('./data/spells.json').then(res => res.json()).catch(() => []),
+      fetch('./data/supplemental_domain_spells.json').then(res => res.json()).catch(() => [])
+    ]).then(([races, classes, weapons, feats, traits, flaws, tricks, templates, domains, deities, familiars, companions, wildshapeForms, spells, suppSpells]) => {
       setRacesData(races);
       setClassesData(classes);
       setWeaponsData(weapons);
@@ -197,6 +202,8 @@ export const App: React.FC = () => {
       setFamiliarsData(familiars);
       setAnimalCompanionsData(companions);
       setWildShapeFormsData(wildshapeForms);
+      setSpellsData(spells || []);
+      setSupplementalSpellsData(suppSpells || []);
 
       runLegacyMigrationIfNeeded(DEFAULT_CHARACTER).then(({ activeCharacter }) => {
         const synced = syncEquippedItemsToInventory(activeCharacter, weapons);
@@ -467,7 +474,7 @@ export const App: React.FC = () => {
           {activeTab === 'skills' && <SkillsTab character={character} racesData={racesData} classesData={classesData} traitsData={traitsData} flawsData={flawsData} skillTricksData={skillTricksData} onChange={updateCharacter} />}
           {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} classesData={classesData} racesData={racesData} onChange={updateCharacter} />}
           {activeTab === 'equipment' && <EquipmentTab character={character} weaponsData={weaponsData} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
-          {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} racesData={racesData} domainsData={domainsData} deitiesData={deitiesData} onChange={updateCharacter} />}
+          {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} racesData={racesData} domainsData={domainsData} deitiesData={deitiesData} spellsData={spellsData} supplementalSpellsData={supplementalSpellsData} onChange={updateCharacter} />}
           {activeTab === 'familiar' && <FamiliarTab character={character} classesData={classesData} familiarsData={familiarsData} onChange={updateCharacter} />}
           {activeTab === 'companion' && <AnimalCompanionTab character={character} companionsData={animalCompanionsData} onChange={updateCharacter} />}
           {activeTab === 'auras' && <AurasTab character={character} onChange={updateCharacter} />}
