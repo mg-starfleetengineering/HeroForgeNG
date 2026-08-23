@@ -442,6 +442,44 @@ export interface DomainData {
   source?: string;
 }
 
+export interface SpellData {
+  id: string;
+  name: string;
+  school: string;
+  subschool?: string | null;
+  descriptors?: string[];
+  levels: Record<string, number>;
+  components?: string;
+  castingTime: string;
+  range: string;
+  targetArea: string;
+  duration: string;
+  savingThrow: string;
+  spellResistance: string;
+  description: string;
+  source: string;
+}
+
+export interface SupplementalDomainGrant {
+  domain: string;
+  level: number;
+  domainPower: string;
+  source: string;
+}
+
+export interface SupplementalDomainSpellData {
+  id: string;
+  name: string;
+  source: string;
+  excelOrigin: {
+    sheet: string;
+    row: number;
+  };
+  domains: SupplementalDomainGrant[];
+  levels: Record<string, number>;
+}
+
+
 export interface DeityData {
   id: string;
   name: string;
