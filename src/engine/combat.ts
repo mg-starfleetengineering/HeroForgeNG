@@ -8,6 +8,8 @@ export const DEFAULT_TACTICAL_COMBAT: TacticalCombatState = {
   rage: false,
   whirlingFrenzy: false,
   flurryOfBlows: false,
+  smiteEvil: false,
+  stunningFist: false,
   isCollapsed: false
 };
 
@@ -27,6 +29,8 @@ export function getTacticalCombatState(character: CharacterState, bab: number = 
     rage: !!tc.rage,
     whirlingFrenzy: !!tc.whirlingFrenzy,
     flurryOfBlows: !!tc.flurryOfBlows,
+    smiteEvil: !!tc.smiteEvil,
+    stunningFist: !!tc.stunningFist,
     isCollapsed: !!tc.isCollapsed
   };
 }
@@ -296,6 +300,45 @@ export function getActiveCombatModifiers(tcState: TacticalCombatState, totalLeve
         attack: -2,
         extraAttacks: 1
       }
+    });
+  }
+
+  if (tcState.smiteEvil) {
+    active.push({
+      id: 'smiteEvil',
+      name: 'Smite Evil',
+      icon: 'fa-solid fa-gavel',
+      colorClass: {
+        bg: 'bg-blue-500/10',
+        text: 'text-blue-300',
+        border: 'border-blue-500/30',
+        badge: 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+      },
+      summary: '+Cha mod Attack, +Paladin Level Damage vs Evil',
+      effects: [
+        '+Cha modifier bonus to attack roll',
+        '+Paladin level bonus to melee damage against evil foe'
+      ],
+      affectedStats: {}
+    });
+  }
+
+  if (tcState.stunningFist) {
+    active.push({
+      id: 'stunningFist',
+      name: 'Stunning Fist',
+      icon: 'fa-solid fa-hand-back-fist',
+      colorClass: {
+        bg: 'bg-orange-500/10',
+        text: 'text-orange-300',
+        border: 'border-orange-500/30',
+        badge: 'bg-orange-500/20 text-orange-300 border-orange-500/30'
+      },
+      summary: 'Fort save DC 10 + 1/2 Lvl + Wis mod or Stunned 1 round',
+      effects: [
+        'On hit, target must succeed on a Fortitude save or be stunned for 1 round'
+      ],
+      affectedStats: {}
     });
   }
 
