@@ -147,7 +147,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
           <div>
             <h1 className="text-xl font-bold font-heading bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 bg-clip-text text-transparent tracking-wide">
-              HeroForgeNG <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">v1.4</span>
+              HeroForgeNG <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">v2.0</span>
             </h1>
             <p className="text-xs text-slate-400">D&D 3.5 Character Generator & Sheet Engine</p>
           </div>

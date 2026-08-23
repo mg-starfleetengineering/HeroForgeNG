@@ -12,6 +12,14 @@ Given a version number MAJOR.SOURCE.MINOR.BUGFIX, increment the:
 
 Prior to version 7.4.0.0, the difference between SOURCE and MINOR, and between MINOR and BUGFIX updates, was highly subjective.
 
+## [2.0.0] - 2026-08-23
+### Added
+- **Active Spell Slot Cast Tracking & Long Rest Sync**: Dynamic active spell slot tracking engine with interactive usage bubbles `[●][●][○]`, spend/restore steppers, and class-level restore.
+- **Daily Class Resources & Usage Tracking HUD**: Unified combat tracking section housing active ability usages (Rage, Lay on Hands, Smite, Turn Undead, Wild Shape, etc.), resource pools, and spell slots directly on the Character Sheet view.
+- **Prepared Spell Cast Synchronization**: Dedicated `[Cast]` / `[Expended]` buttons per prepared spell that automatically deduct and restore available slot capacity and usage bubbles in real-time.
+- **8-Hour Long Rest Automation**: Synchronized long rest action automatically restores character HP, daily class resource usages, point pools, expended spell slots, and marks all prepared spells ready.
+- **Clean Static Printable Sheet View**: Separated live combat HUD from printable `#printable-character-sheet` layout, providing a clean non-interactive layout with paper-friendly checkboxes for PDF/print export.
+
 ## [1.4.0] - 2026-08-16
 ### Added
 - **Active Combat Modifiers & Tactical Stances Display**: Comprehensive active combat modifiers engine tracking and banner across character sheet and equipment views. Displays active stances (Whirling Frenzy, Barbarian Rage, Haste, Power Attack, Combat Expertise, Fighting Defensively, Flurry of Blows) with icons, bonus/penalty breakdowns, and inline dismissal buttons.

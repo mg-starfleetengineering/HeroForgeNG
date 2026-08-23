@@ -1,4 +1,4 @@
-# HeroForgeNG User Guide (v1.4.0)
+# HeroForgeNG User Guide (v2.0.0)
 
 Welcome to the **HeroForgeNG User Guide**. HeroForgeNG is a modern, high-performance web application designed for creating, customizing, and managing D&D 3.5e character sheets.
 

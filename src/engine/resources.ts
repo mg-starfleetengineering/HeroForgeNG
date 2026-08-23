@@ -550,6 +550,7 @@ export function performLongRest(
     tempHp: 0,
     nonlethalDamage: 0,
     resourceUsages: {},
+    expendedSpellSlots: {},
     activeConditions: remainingConditions,
     tacticalCombat: updatedTactical,
     ...(updatedPreparedSpells ? { preparedSpells: updatedPreparedSpells } : {})

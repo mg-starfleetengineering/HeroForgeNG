@@ -15,7 +15,15 @@ import {
   addSpellToSpellbook,
   removeSpellFromSpellbook,
   getStarterWizardCantripIds,
-  getAvailableSpellsForPreparation
+  getAvailableSpellsForPreparation,
+  getSpellSlotUsageKey,
+  getExpendedSpellSlotsCount,
+  getRemainingSpellSlotsCount,
+  expendSpellSlot,
+  restoreSpellSlot,
+  setExpendedSpellSlots,
+  resetExpendedSpellSlotsForClass,
+  resetAllExpendedSpellSlots
 } from '../spells';
 import spellsData from '../../data/spells.json';
 import suppSpellsData from '../../data/supplemental_domain_spells.json';
@@ -406,6 +414,92 @@ describe('D&D 3.5e Spells Engine & Data Verification', () => {
         const names = domainSpellsLvl1.map(s => s.name);
         expect(names).toContain('Magic Weapon');
         expect(names).toContain('Cure Light Wounds');
+      });
+    });
+
+    describe('Active Spell Slot Cast Tracking & Clamping', () => {
+      it('should generate deterministic slot keys for any class and spell level', () => {
+        expect(getSpellSlotUsageKey('Sorcerer', 1)).toBe('sorcerer_lvl1');
+        expect(getSpellSlotUsageKey('Wizard', 0)).toBe('wizard_lvl0');
+        expect(getSpellSlotUsageKey('Favored Soul', 3)).toBe('favored_soul_lvl3');
+        expect(getSpellSlotUsageKey('Cleric', 9)).toBe('cleric_lvl9');
+      });
+
+      it('should read expended count and compute remaining slots correctly', () => {
+        const expendedMap = {
+          sorcerer_lvl1: 2,
+          sorcerer_lvl0: 0,
+          cleric_lvl1: 1
+        };
+
+        expect(getExpendedSpellSlotsCount(expendedMap, 'Sorcerer', 1)).toBe(2);
+        expect(getExpendedSpellSlotsCount(expendedMap, 'Sorcerer', 0)).toBe(0);
+        expect(getExpendedSpellSlotsCount(expendedMap, 'Sorcerer', 2)).toBe(0);
+        expect(getExpendedSpellSlotsCount(undefined, 'Sorcerer', 1)).toBe(0);
+
+        expect(getRemainingSpellSlotsCount(expendedMap, 'Sorcerer', 1, 4)).toBe(2);
+        expect(getRemainingSpellSlotsCount(expendedMap, 'Sorcerer', 1, 2)).toBe(0);
+        expect(getRemainingSpellSlotsCount(expendedMap, 'Sorcerer', 2, 3)).toBe(3);
+      });
+
+      it('should expend spell slots with upper clamp to maxSlots', () => {
+        let map: Record<string, number> | undefined = undefined;
+
+        // Spend 1 slot out of 4
+        map = expendSpellSlot(map, 'Sorcerer', 1, 4, 1);
+        expect(map['sorcerer_lvl1']).toBe(1);
+
+        // Spend 2 more
+        map = expendSpellSlot(map, 'Sorcerer', 1, 4, 2);
+        expect(map['sorcerer_lvl1']).toBe(3);
+
+        // Spend 5 more (should clamp to maxSlots 4)
+        map = expendSpellSlot(map, 'Sorcerer', 1, 4, 5);
+        expect(map['sorcerer_lvl1']).toBe(4);
+      });
+
+      it('should restore spell slots with lower clamp to 0', () => {
+        let map: Record<string, number> = { sorcerer_lvl1: 3 };
+
+        // Restore 1 slot
+        map = restoreSpellSlot(map, 'Sorcerer', 1, 4, 1);
+        expect(map['sorcerer_lvl1']).toBe(2);
+
+        // Restore 10 slots (should clamp to 0)
+        map = restoreSpellSlot(map, 'Sorcerer', 1, 4, 10);
+        expect(map['sorcerer_lvl1']).toBe(0);
+      });
+
+      it('should directly set expended slots clamped between 0 and maxSlots', () => {
+        let map = setExpendedSpellSlots(undefined, 'Wizard', 2, 2, 4);
+        expect(map['wizard_lvl2']).toBe(2);
+
+        // Setting negative count clamps to 0
+        map = setExpendedSpellSlots(map, 'Wizard', 2, -5, 4);
+        expect(map['wizard_lvl2']).toBe(0);
+
+        // Setting above max clamps to maxSlots
+        map = setExpendedSpellSlots(map, 'Wizard', 2, 10, 4);
+        expect(map['wizard_lvl2']).toBe(4);
+      });
+
+      it('should reset expended slots for a single class without affecting other classes', () => {
+        const multiclassMap = {
+          sorcerer_lvl0: 2,
+          sorcerer_lvl1: 3,
+          cleric_lvl1: 2,
+          cleric_lvl2: 1
+        };
+
+        const afterSorcererReset = resetExpendedSpellSlotsForClass(multiclassMap, 'Sorcerer');
+        expect(afterSorcererReset['sorcerer_lvl0']).toBeUndefined();
+        expect(afterSorcererReset['sorcerer_lvl1']).toBeUndefined();
+        expect(afterSorcererReset['cleric_lvl1']).toBe(2);
+        expect(afterSorcererReset['cleric_lvl2']).toBe(1);
+      });
+
+      it('should reset all expended spell slots across all classes', () => {
+        expect(resetAllExpendedSpellSlots()).toEqual({});
       });
     });
   });

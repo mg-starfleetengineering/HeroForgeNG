@@ -1,5 +1,5 @@
 import React from 'react';
-import { CharacterState, RaceData, ClassData, WeaponData, Equipment, TraitData, FlawData, TemplateData, DomainData, DeityData, WildShapeFormData } from '../types/character';
+import { CharacterState, RaceData, ClassData, WeaponData, Equipment, TraitData, FlawData, TemplateData, DomainData, DeityData, WildShapeFormData, SpellData } from '../types/character';
 import {
   calculateTotalScore,
   getAbilityMod,
@@ -23,6 +23,12 @@ import {
   isClassSkillForCharacter,
   calculatePerceptionStats
 } from '../engine/skills';
+import {
+  SPELLCASTING_CLASSES,
+  getSpellSlotsForClass,
+  isSpellcastingClassName,
+  isPreparedCaster
+} from '../engine/spells';
 import { TacticalCombatWidget } from './TacticalCombatWidget';
 import { VitalsCombatTracker } from './VitalsCombatTracker';
 import {
@@ -50,6 +56,7 @@ interface SheetViewTabProps {
   domainsData?: DomainData[];
   deitiesData?: DeityData[];
   wildShapeFormsData?: WildShapeFormData[];
+  spellsData?: SpellData[];
   onChange?: (updated: Partial<CharacterState>) => void;
 }
 
@@ -64,8 +71,25 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   domainsData = [],
   deitiesData = [],
   wildShapeFormsData = [],
+  spellsData = [],
   onChange
 }) => {
+  // Spellcasting Classes & Active Slot Tracking
+  const sheetClassLevelsMap: Record<string, number> = {};
+  (character.levelProgression || []).forEach(l => {
+    if (l.primaryClass) {
+      sheetClassLevelsMap[l.primaryClass] = (sheetClassLevelsMap[l.primaryClass] || 0) + 1;
+    }
+    if (l.secondaryClass) {
+      sheetClassLevelsMap[l.secondaryClass] = (sheetClassLevelsMap[l.secondaryClass] || 0) + 1;
+    }
+  });
+
+  const sheetCasterEntries = Object.entries(sheetClassLevelsMap).filter(([clsName]) => {
+    const clsObj = classesData.find(c => c.name === clsName);
+    return isSpellcastingClassName(clsName, clsObj);
+  });
+
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
   const templateObj: Partial<TemplateData> | undefined = templatesData.find(t => t.name === character.selectedTemplate || t.id === character.selectedTemplate);
   const raceMods = parseRaceMods(raceObj);
@@ -441,6 +465,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
             character={character}
             maxHp={maxHp}
             racesData={racesData}
+            classesData={classesData}
             templatesData={templatesData}
             traitsData={traitsData}
             flawsData={flawsData}
@@ -999,6 +1024,129 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
             )}
           </div>
         </div>
+
+        {/* Printable Spellcasting & Spells Known/Prepared Section (Static & Non-interactive for Paper/PDF) */}
+        {sheetCasterEntries.length > 0 && (
+          <div className="space-y-3 print:space-y-2 print:break-inside-avoid">
+            {sheetCasterEntries.map(([clsName, clsLvl]) => {
+              const key = clsName.toLowerCase().replace(/[\s\/-]+/g, '_');
+              const info = SPELLCASTING_CLASSES[key] || {
+                name: clsName,
+                keyAbility: 'int' as const,
+                type: 'Arcane' as const,
+                method: 'Prepared' as const,
+                maxSpellLevel: 9
+              };
+              const abilityScore = calculateTotalScore(
+                info.keyAbility,
+                character.baseStats,
+                raceMods,
+                character.levelBumps || {},
+                character.enhancementMods || {},
+                totalLevel,
+                traitFlawStatMods
+              );
+              const abilityMod = getAbilityMod(abilityScore);
+              const spellSlotsData = getSpellSlotsForClass(clsName, clsLvl, abilityMod);
+              if (!spellSlotsData) return null;
+
+              const isPrepared = isPreparedCaster(clsName);
+              const classPreparedSlots = (character.preparedSpells || []).filter(
+                s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === key
+              );
+
+              return (
+                <div
+                  key={clsName}
+                  className="border border-slate-300 rounded-lg p-3 print:p-2 bg-slate-50 space-y-2.5 print:space-y-1.5 shadow-xs"
+                >
+                  {/* Caster Header */}
+                  <div className="flex flex-wrap items-center justify-between border-b border-slate-300 pb-1.5 print:pb-1 gap-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xs print:text-[11px] font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5 font-heading">
+                        <i className="fa-solid fa-wand-magic-sparkles text-amber-600"></i> {clsName} Spellcasting & Spells
+                      </h3>
+                      <span className="text-[10px] print:text-[9px] font-mono font-bold bg-slate-200 text-slate-800 border border-slate-300 px-1.5 py-0.2 rounded">
+                        CL {clsLvl} &bull; {info.type} ({info.method})
+                      </span>
+                    </div>
+
+                    <div className="text-xs print:text-[10px] font-mono text-slate-700">
+                      Key Ability: <strong className="text-slate-900">{info.keyAbility.toUpperCase()} {abilityScore}</strong> ({abilityMod >= 0 ? `+${abilityMod}` : abilityMod})
+                    </div>
+                  </div>
+
+                  {/* Spell Level Slots Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 print:grid-cols-5 print:gap-1.5">
+                    {spellSlotsData.slots.filter(s => s.canCast && s.total > 0).map(slot => {
+                      const levelPreparedSpells = classPreparedSlots.filter(s => s.spellLevel === slot.spellLevel && !!s.spellId);
+
+                      return (
+                        <div
+                          key={slot.spellLevel}
+                          className="p-2 bg-white rounded border border-slate-300 shadow-xs space-y-1.5 print:space-y-1 flex flex-col justify-between"
+                        >
+                          <div className="flex items-center justify-between border-b border-slate-200 pb-1">
+                            <span className="font-bold text-slate-900 text-xs print:text-[10px] font-mono">
+                              {slot.spellLevel === 0 ? 'Cantrips (0th)' : `Level ${slot.spellLevel}`}
+                            </span>
+                            <span className="text-[10px] print:text-[9px] font-mono font-bold text-slate-800 bg-slate-100 border border-slate-300 px-1.5 py-0.2 rounded">
+                              DC {slot.saveDc}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[10.5px] print:text-[9px] font-mono">
+                            <span className="text-slate-600">
+                              Slots/Day: <strong className="text-slate-900">{slot.total}</strong>
+                            </span>
+                            <span className="text-slate-500 text-[10px] print:text-[8.5px]">
+                              ({slot.base}b{slot.bonus > 0 ? `+${slot.bonus}` : ''})
+                            </span>
+                          </div>
+
+                          {/* Printable Slot Bubbles (Static circles for pencil marking) */}
+                          <div className="flex flex-wrap items-center gap-1 py-0.5">
+                            <span className="text-[9px] print:text-[8px] uppercase font-bold text-slate-400 mr-0.5">Slots:</span>
+                            {Array.from({ length: slot.total }, (_, i) => (
+                              <span
+                                key={i}
+                                className="w-3.5 h-3.5 print:w-3 print:h-3 rounded-full border border-slate-600 bg-white inline-block"
+                                title={`Slot ${i + 1}`}
+                              />
+                            ))}
+                          </div>
+
+                          {/* Assigned Prepared Spells list (if prepared caster) */}
+                          {isPrepared && levelPreparedSpells.length > 0 && (
+                            <div className="pt-1 border-t border-slate-200 space-y-1">
+                              <span className="text-[9px] print:text-[8px] uppercase font-bold text-slate-500 block font-sans">
+                                Prepared Spells:
+                              </span>
+                              <div className="space-y-0.5 font-mono text-[10px] print:text-[9px]">
+                                {levelPreparedSpells.map(prepSlot => (
+                                  <div
+                                    key={prepSlot.id}
+                                    className="flex items-center gap-1.5 p-0.5 rounded border border-slate-200 bg-slate-50/50"
+                                  >
+                                    <span className="w-2.5 h-2.5 rounded border border-slate-400 bg-white inline-block shrink-0" />
+                                    <span className="truncate font-medium text-slate-800" title={prepSlot.spellName || 'Prepared Spell'}>
+                                      {prepSlot.spellName || 'Spell'}
+                                      {prepSlot.isDomain ? ' ★' : ''}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Page 2: Character Skills & Skill Tricks Section */}
         <div className="space-y-3 print-page-break-before">

@@ -605,4 +605,114 @@ export function getAvailableSpellsForPreparation(
   });
 }
 
+/**
+ * Generates deterministic slot key for tracking active expended spell slots by class and level.
+ */
+export function getSpellSlotUsageKey(className: string, spellLevel: number): string {
+  const cKey = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  return `${cKey}_lvl${spellLevel}`;
+}
+
+/**
+ * Returns the count of expended spell slots for a given class and spell level.
+ */
+export function getExpendedSpellSlotsCount(
+  expendedMap: Record<string, number> | undefined,
+  className: string,
+  spellLevel: number
+): number {
+  if (!expendedMap) return 0;
+  const key = getSpellSlotUsageKey(className, spellLevel);
+  return Math.max(0, expendedMap[key] || 0);
+}
+
+/**
+ * Returns the remaining available spell slots for a given class and spell level.
+ */
+export function getRemainingSpellSlotsCount(
+  expendedMap: Record<string, number> | undefined,
+  className: string,
+  spellLevel: number,
+  totalSlots: number
+): number {
+  const expended = getExpendedSpellSlotsCount(expendedMap, className, spellLevel);
+  return Math.max(0, totalSlots - expended);
+}
+
+/**
+ * Expends (or restores if negative delta) spell slots for a class & level, clamping between 0 and maxSlots.
+ */
+export function expendSpellSlot(
+  expendedMap: Record<string, number> | undefined,
+  className: string,
+  spellLevel: number,
+  maxSlots: number,
+  delta: number = 1
+): Record<string, number> {
+  const key = getSpellSlotUsageKey(className, spellLevel);
+  const current = (expendedMap && expendedMap[key]) || 0;
+  const next = Math.min(maxSlots, Math.max(0, current + delta));
+  return {
+    ...(expendedMap || {}),
+    [key]: next
+  };
+}
+
+/**
+ * Restores spell slots (decreases expended count) for a class & level.
+ */
+export function restoreSpellSlot(
+  expendedMap: Record<string, number> | undefined,
+  className: string,
+  spellLevel: number,
+  maxSlots: number,
+  delta: number = 1
+): Record<string, number> {
+  return expendSpellSlot(expendedMap, className, spellLevel, maxSlots, -delta);
+}
+
+/**
+ * Directly sets the expended spell slots count for a class & level, clamped between 0 and maxSlots.
+ */
+export function setExpendedSpellSlots(
+  expendedMap: Record<string, number> | undefined,
+  className: string,
+  spellLevel: number,
+  count: number,
+  maxSlots: number
+): Record<string, number> {
+  const key = getSpellSlotUsageKey(className, spellLevel);
+  const clamped = Math.min(maxSlots, Math.max(0, count));
+  return {
+    ...(expendedMap || {}),
+    [key]: clamped
+  };
+}
+
+/**
+ * Resets all expended spell slots for a specific class (e.g. on rest).
+ */
+export function resetExpendedSpellSlotsForClass(
+  expendedMap: Record<string, number> | undefined,
+  className: string
+): Record<string, number> {
+  if (!expendedMap) return {};
+  const cKey = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const prefix = `${cKey}_lvl`;
+  const result: Record<string, number> = {};
+  for (const [k, v] of Object.entries(expendedMap)) {
+    if (!k.startsWith(prefix)) {
+      result[k] = v;
+    }
+  }
+  return result;
+}
+
+/**
+ * Resets all expended spell slots across all classes.
+ */
+export function resetAllExpendedSpellSlots(): Record<string, number> {
+  return {};
+}
+
 

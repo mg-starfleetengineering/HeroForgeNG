@@ -1,4 +1,4 @@
-# HeroForgeNG (HeroForge-Anew Web Edition v1.4.0)
+# HeroForgeNG (HeroForge-Anew Web Edition v2.0.0)
 
 > **HeroForgeNG** is a modern, high-performance web application designed for **Dungeons & Dragons 3.5e** character creation, tactical combat management, and multi-character roster storage.
 
@@ -6,7 +6,10 @@ Built with **React 18**, **Vite**, **TypeScript**, and **Tailwind CSS**, HeroFor
 
 ---
 
-## 🌟 Key Features & Capabilities (v1.4.0)
+## 🌟 Key Features & Capabilities (v2.0.0)
+
+- ✨ **Active Spell Slot Cast Tracking & Long Rest Sync**: Dynamic active spell slot tracking engine with interactive usage bubbles `[●][●][○]`, 1-click `[Cast]` toggles, spend/restore steppers, and automated Long Rest sync.
+- ⚡ **Daily Class Resources & Usage Tracking HUD**: Unified combat tracking section housing active ability usages (Rage, Lay on Hands, Smite, Turn Undead, Wild Shape, etc.), resource pools, and spell slots directly on the Character Sheet view.
 
 - ⚔️ **Active Combat Stances Banner & Stat Cause Breakdowns**: Real-time active combat modifiers banner (Power Attack, Fighting Defensively, Combat Expertise, Haste, Whirling Frenzy, Barbarian Rage, Flurry of Blows, Flanking, Charge) with color-coded stance badges and 1-click inline stance dismissal (`x`). Explicit cause breakdowns displayed inline across Ability Scores, Saves, Vitals, and Attacks.
 - 🔮 **Spell Resistance (SR) & Grapple Engines**: Comprehensive SR engine aggregating racial traits (Drow SR 11+Lvl, Svirfneblin, Elan), templates, feats (*Diamond Soul*, *Indomitable Soul*), and spell effects. Full D&D 3.5e Grapple modifier calculation with size category scaling (-16 Fine to +16 Colossal).
