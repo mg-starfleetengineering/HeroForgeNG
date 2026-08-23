@@ -763,3 +763,14 @@ export interface MultiCharacterStore {
   activeCharacterId: string | null;
   characters: Record<string, CharacterSheetData>;
 }
+
+export type {
+  RollType,
+  RollStatus,
+  DiceTerm,
+  ModifierTerm,
+  ParsedTerm,
+  RollOptions,
+  RollResult
+} from '../engine/dice';
+
