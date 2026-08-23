@@ -7,7 +7,10 @@ import {
   RaceData,
   TemplateData,
   TraitData,
-  FlawData
+  FlawData,
+  ClassData,
+  PreparedSpellSlot,
+  StatType
 } from '../types/character';
 import {
   DND_CONDITIONS,
@@ -25,6 +28,27 @@ import {
   setResourceUsed,
   resetResource
 } from '../engine/resources';
+import {
+  calculateTotalScore,
+  getAbilityMod,
+  parseRaceMods,
+  parseTemplateMods,
+  calculateTraitFlawStatMods,
+  getCharacterLevel
+} from '../engine/stats';
+import {
+  SPELLCASTING_CLASSES,
+  getSpellSlotsForClass,
+  isSpellcastingClassName,
+  isPreparedCaster,
+  getSpellSlotUsageKey,
+  getExpendedSpellSlotsCount,
+  setExpendedSpellSlots,
+  expendSpellSlot,
+  restoreSpellSlot,
+  resetExpendedSpellSlotsForClass,
+  togglePreparedSpellSlotCast
+} from '../engine/spells';
 
 interface VitalsCombatTrackerProps {
   character: CharacterState;
@@ -33,6 +57,7 @@ interface VitalsCombatTrackerProps {
   className?: string;
   isCompact?: boolean;
   racesData?: RaceData[];
+  classesData?: ClassData[];
   templatesData?: TemplateData[];
   traitsData?: TraitData[];
   flawsData?: FlawData[];
@@ -45,6 +70,7 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
   className = '',
   isCompact = false,
   racesData = [],
+  classesData = [],
   templatesData = [],
   traitsData = [],
   flawsData = []
@@ -86,6 +112,111 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
     flawsData
   );
 
+  // Spellcasting Classes & Active Slot Tracking
+  const classLevelsMap: Record<string, number> = {};
+  (character.levelProgression || []).forEach(l => {
+    if (l.primaryClass) {
+      classLevelsMap[l.primaryClass] = (classLevelsMap[l.primaryClass] || 0) + 1;
+    }
+    if (l.secondaryClass) {
+      classLevelsMap[l.secondaryClass] = (classLevelsMap[l.secondaryClass] || 0) + 1;
+    }
+  });
+
+  const totalLevel = getCharacterLevel(character.levelProgression);
+  const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
+  const templateObj: Partial<TemplateData> | undefined = templatesData.find(
+    t => t.name === character.selectedTemplate || t.id === character.selectedTemplate
+  );
+  const raceMods = parseRaceMods(raceObj);
+  const templateMods = parseTemplateMods(templateObj);
+  const traitFlawMods = calculateTraitFlawStatMods(
+    character.selectedTraits || [],
+    character.selectedFlaws || [],
+    traitsData,
+    flawsData
+  );
+
+  const casterEntries = Object.entries(classLevelsMap).filter(([clsName]) => {
+    const clsObj = classesData.find(c => c.name === clsName);
+    return isSpellcastingClassName(clsName, clsObj);
+  });
+
+  const casterSlotTracks: Array<{
+    className: string;
+    classLevel: number;
+    spellLevel: number;
+    spellLevelName: string;
+    totalSlots: number;
+    expendedSlots: number;
+    remainingSlots: number;
+    saveDc: number;
+    keyAbility: string;
+    abilityMod: number;
+    isPrepared: boolean;
+    preparedSpells: PreparedSpellSlot[];
+  }> = [];
+
+  for (const [clsName, clsLvl] of casterEntries) {
+    const key = clsName.toLowerCase().replace(/[\s\/-]+/g, '_');
+    const info = SPELLCASTING_CLASSES[key] || {
+      name: clsName,
+      keyAbility: 'int' as StatType,
+      type: 'Arcane' as const,
+      method: 'Prepared' as const,
+      maxSpellLevel: 9
+    };
+    const totalScore = calculateTotalScore(
+      info.keyAbility,
+      character.baseStats,
+      raceMods,
+      character.levelBumps || {},
+      character.enhancementMods || {},
+      totalLevel,
+      traitFlawMods,
+      templateMods
+    );
+    const abilityMod = getAbilityMod(totalScore);
+    const slotsData = getSpellSlotsForClass(clsName, clsLvl, abilityMod);
+    if (!slotsData) continue;
+
+    const isPrepared = isPreparedCaster(clsName);
+    const classPreparedSlots = (character.preparedSpells || []).filter(
+      s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === key
+    );
+
+    for (const slot of slotsData.slots) {
+      if (!slot.canCast || slot.total <= 0) continue;
+      const levelPreparedSpells = classPreparedSlots.filter(
+        s => s.spellLevel === slot.spellLevel && !!s.spellId
+      );
+      const castPreparedCount = isPrepared
+        ? levelPreparedSpells.filter(s => s.isCast).length
+        : 0;
+      const key = getSpellSlotUsageKey(clsName, slot.spellLevel);
+      const hasKey = character.expendedSpellSlots && character.expendedSpellSlots[key] !== undefined;
+      const expended = hasKey
+        ? getExpendedSpellSlotsCount(character.expendedSpellSlots, clsName, slot.spellLevel)
+        : castPreparedCount;
+      const remaining = Math.max(0, slot.total - expended);
+
+      casterSlotTracks.push({
+        className: clsName,
+        classLevel: clsLvl,
+        spellLevel: slot.spellLevel,
+        spellLevelName: slot.spellLevel === 0 ? 'Cantrips (0th Level)' : `Level ${slot.spellLevel} Spells`,
+        totalSlots: slot.total,
+        expendedSlots: expended,
+        remainingSlots: remaining,
+        saveDc: slot.saveDc,
+        keyAbility: info.keyAbility.toUpperCase(),
+        abilityMod,
+        isPrepared,
+        preparedSpells: levelPreparedSpells
+      });
+    }
+  }
+
   // Quick State Updaters
   const handleApplyDamage = (amount: number, nonlethal: boolean = false) => {
     if (amount <= 0) return;
@@ -111,7 +242,7 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
   const handleLongRest = () => {
     const updated = performLongRest(character, maxHp);
     onChange(updated);
-    setRestToast('8-Hour Long Rest completed! HP restored, daily resources refilled, and temporary fatigue/shaken conditions cleared.');
+    setRestToast('8-Hour Long Rest completed! HP restored, daily resources & spell slots refilled, and temporary fatigue/shaken conditions cleared.');
     setTimeout(() => {
       setRestToast(null);
     }, 4500);
@@ -143,16 +274,11 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
   };
 
   const handleBubbleClick = (resourceId: string, bubbleIndex: number, maxUses: number, remaining: number) => {
-    // bubbleIndex is 1-based (1..maxUses)
-    // If clicking on an available bubble (bubbleIndex <= remaining): expend uses so this bubble and prior are used, or spend 1
-    // If clicking on an expended bubble (bubbleIndex > remaining): restore uses up to that bubble!
     if (bubbleIndex <= remaining) {
-      // Spend down to bubbleIndex - 1 available (i.e. used = maxUses - bubbleIndex + 1)
       const newUsed = maxUses - bubbleIndex + 1;
       const updated = setResourceUsed(resourceUsages, resourceId, newUsed, maxUses);
       onChange({ resourceUsages: updated });
     } else {
-      // Restore up to bubbleIndex available (i.e. used = maxUses - bubbleIndex)
       const newUsed = maxUses - bubbleIndex;
       const updated = setResourceUsed(resourceUsages, resourceId, newUsed, maxUses);
       onChange({ resourceUsages: updated });
@@ -165,7 +291,125 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
   };
 
   const handleResetAllResources = () => {
-    onChange({ resourceUsages: {} });
+    const updatedPrepared = character.preparedSpells
+      ? character.preparedSpells.map(s => (s.isCast ? { ...s, isCast: false } : s))
+      : undefined;
+    onChange({
+      resourceUsages: {},
+      expendedSpellSlots: {},
+      ...(updatedPrepared ? { preparedSpells: updatedPrepared } : {})
+    });
+  };
+
+  // Spell Slot Usage Handlers
+  const handleSpellSlotBubbleClick = (
+    className: string,
+    spellLevel: number,
+    bubbleIndex: number,
+    maxSlots: number,
+    remaining: number
+  ) => {
+    let newExpended = 0;
+    if (bubbleIndex <= remaining) {
+      newExpended = maxSlots - bubbleIndex + 1;
+    } else {
+      newExpended = maxSlots - bubbleIndex;
+    }
+    const updatedExpended = setExpendedSpellSlots(
+      character.expendedSpellSlots,
+      className,
+      spellLevel,
+      newExpended,
+      maxSlots
+    );
+    onChange({ expendedSpellSlots: updatedExpended });
+  };
+
+  const handleExpendSpellSlot = (className: string, spellLevel: number, maxSlots: number) => {
+    const key = getSpellSlotUsageKey(className, spellLevel);
+    const hasKey = character.expendedSpellSlots && character.expendedSpellSlots[key] !== undefined;
+    const currentExp = hasKey
+      ? getExpendedSpellSlotsCount(character.expendedSpellSlots, className, spellLevel)
+      : (character.preparedSpells || []).filter(
+          s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === className.toLowerCase().replace(/[\s\/-]+/g, '_') &&
+               s.spellLevel === spellLevel &&
+               s.isCast &&
+               !!s.spellId
+        ).length;
+    const newExpended = Math.min(maxSlots, currentExp + 1);
+    const updatedExpended = setExpendedSpellSlots(character.expendedSpellSlots, className, spellLevel, newExpended, maxSlots);
+    onChange({ expendedSpellSlots: updatedExpended });
+  };
+
+  const handleRestoreSpellSlot = (className: string, spellLevel: number, maxSlots: number) => {
+    const key = getSpellSlotUsageKey(className, spellLevel);
+    const hasKey = character.expendedSpellSlots && character.expendedSpellSlots[key] !== undefined;
+    const currentExp = hasKey
+      ? getExpendedSpellSlotsCount(character.expendedSpellSlots, className, spellLevel)
+      : (character.preparedSpells || []).filter(
+          s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === className.toLowerCase().replace(/[\s\/-]+/g, '_') &&
+               s.spellLevel === spellLevel &&
+               s.isCast &&
+               !!s.spellId
+        ).length;
+    const newExpended = Math.max(0, currentExp - 1);
+    const updatedExpended = setExpendedSpellSlots(character.expendedSpellSlots, className, spellLevel, newExpended, maxSlots);
+    onChange({ expendedSpellSlots: updatedExpended });
+  };
+
+  const handleResetSpellLevelSlots = (className: string, spellLevel: number, maxSlots: number) => {
+    const updatedExpended = setExpendedSpellSlots(character.expendedSpellSlots, className, spellLevel, 0, maxSlots);
+    const cKey = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+    const updatedPrepared = (character.preparedSpells || []).map(s => {
+      if (s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey && s.spellLevel === spellLevel) {
+        return { ...s, isCast: false };
+      }
+      return s;
+    });
+    onChange({
+      expendedSpellSlots: updatedExpended,
+      preparedSpells: updatedPrepared
+    });
+  };
+
+  const handleTogglePreparedSlotCast = (slotId: string) => {
+    const prepSpells = character.preparedSpells || [];
+    const targetSlot = prepSpells.find(s => s.id === slotId);
+    const updatedPrepared = togglePreparedSpellSlotCast(prepSpells, slotId);
+    if (!targetSlot) {
+      onChange({ preparedSpells: updatedPrepared });
+      return;
+    }
+
+    const clsName = targetSlot.className;
+    const spellLevel = targetSlot.spellLevel;
+    const cKey = clsName.toLowerCase().replace(/[\s\/-]+/g, '_');
+
+    // Count how many prepared spells will be cast for this class and level
+    const classLevelPrepared = updatedPrepared.filter(
+      s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey &&
+           s.spellLevel === spellLevel &&
+           !!s.spellId
+    );
+    const newCastCount = classLevelPrepared.filter(s => s.isCast).length;
+
+    const track = casterSlotTracks.find(
+      t => t.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey && t.spellLevel === spellLevel
+    );
+    const maxSlots = track ? track.totalSlots : 99;
+
+    const updatedExpended = setExpendedSpellSlots(
+      character.expendedSpellSlots,
+      clsName,
+      spellLevel,
+      newCastCount,
+      maxSlots
+    );
+
+    onChange({
+      preparedSpells: updatedPrepared,
+      expendedSpellSlots: updatedExpended
+    });
   };
 
   // Custom Resource Management
@@ -272,16 +516,16 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
                   {activeConditions.length} Condition{activeConditions.length > 1 ? 's' : ''}
                 </span>
               )}
-              {dailyResources.length > 0 && (
+              {dailyResources.length + casterSlotTracks.length > 0 && (
                 <span className="badge bg-indigo-500/20 text-indigo-300 border-indigo-500/30 text-[10px] font-mono px-1.5 py-0.5">
-                  {dailyResources.length} Tracked Resource{dailyResources.length > 1 ? 's' : ''}
+                  {dailyResources.length + casterSlotTracks.length} Tracked Resource{dailyResources.length + casterSlotTracks.length > 1 ? 's' : ''}
                 </span>
               )}
             </div>
             <p className="text-[11px] text-slate-400">
               {isCollapsed
-                ? 'Click to expand live HP adjustments, daily resource bubbles, conditions, and 8-hour long rest.'
-                : 'Real-time Hit Points, interactive daily class resource bubbles, combat conditions, and 1-click Long Rest.'}
+                ? 'Click to expand live HP adjustments, daily resource & spell slot bubbles, conditions, and 8-hour long rest.'
+                : 'Real-time Hit Points, interactive daily class resource & spell slot bubbles, combat conditions, and 1-click Long Rest.'}
             </p>
           </div>
         </div>
@@ -319,6 +563,20 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
                 </span>
               );
             })}
+            {casterSlotTracks.map(st => (
+              <span
+                key={`${st.className}_lvl${st.spellLevel}`}
+                className={`badge text-[10px] font-mono ${
+                  st.remainingSlots === 0
+                    ? 'bg-slate-800 text-slate-500 border-slate-700'
+                    : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                }`}
+                title={`${st.className} ${st.spellLevelName}: ${st.remainingSlots}/${st.totalSlots} slots left (DC ${st.saveDc})`}
+              >
+                <i className="fa-solid fa-wand-magic-sparkles mr-1 text-[9px]"></i>
+                {st.className} {st.spellLevel === 0 ? 'Cantrips' : `Lvl ${st.spellLevel}`}: {st.remainingSlots}/{st.totalSlots}
+              </span>
+            ))}
             {activeConditions.map(condId => {
               const def = CONDITION_MAP[condId];
               return (
@@ -577,25 +835,25 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
           )}
 
           {/* ═══════════════════════════════════════════════════════════════════════ */}
-          {/* DAILY CLASS RESOURCES & BUBBLE TRACKER SECTION                         */}
+          {/* DAILY CLASS RESOURCES & SPELL SLOT USAGE TRACKING                      */}
           {/* ═══════════════════════════════════════════════════════════════════════ */}
           <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-3.5 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-900 pb-2.5">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                  <i className="fa-solid fa-battery-half text-amber-400"></i> Daily Class Resources & Usage Tracking
+                  <i className="fa-solid fa-battery-half text-amber-400"></i> Daily Class Resources & Spell Slot Usage Tracking
                 </span>
                 <span className="badge bg-slate-800 text-slate-400 border-slate-700 text-[10px] font-mono px-2 py-0.5">
-                  {dailyResources.length} Track{dailyResources.length !== 1 ? 's' : ''}
+                  {dailyResources.length + casterSlotTracks.length} Track{dailyResources.length + casterSlotTracks.length !== 1 ? 's' : ''}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
-                {dailyResources.length > 0 && (
+                {dailyResources.length + casterSlotTracks.length > 0 && (
                   <button
                     onClick={handleResetAllResources}
                     className="text-[10px] text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 px-2 py-1 rounded border border-emerald-500/20 transition cursor-pointer flex items-center gap-1 font-mono"
-                    title="Refill all daily class resources to full capacity"
+                    title="Refill all daily class resources and spell slots to full capacity"
                   >
                     <i className="fa-solid fa-rotate-left"></i> Refill All
                   </button>
@@ -618,69 +876,86 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
               >
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-amber-300 uppercase tracking-wider text-[11px] flex items-center gap-1">
-                    <i className="fa-solid fa-plus-circle"></i> Add Custom Daily Tracker
+                    <i className="fa-solid fa-plus-circle"></i> Add Custom Daily Tracked Resource
                   </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddCustomResource(false)}
+                    className="text-slate-400 hover:text-slate-200"
+                  >
+                    <i className="fa-solid fa-xmark"></i>
+                  </button>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                  <div className="sm:col-span-2">
-                    <label className="text-[10px] text-slate-400 block mb-0.5">Resource Name</label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase font-bold text-slate-400 block">Resource Name</label>
                     <input
                       type="text"
-                      placeholder="e.g. Wand of Fireballs, Dragon Breath, Action Points"
+                      placeholder="e.g. Boots of Speed, Ki Pool"
                       value={customName}
                       onChange={e => setCustomName(e.target.value)}
                       required
-                      className="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500"
                     />
                   </div>
-                  <div>
-                    <label className="text-[10px] text-slate-400 block mb-0.5">Max Usages / Pool</label>
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase font-bold text-slate-400 block">Max Uses / Day</label>
                     <input
                       type="number"
                       min="1"
+                      max="999"
                       value={customMaxUses}
                       onChange={e => setCustomMaxUses(e.target.value)}
                       required
-                      className="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-100 focus:outline-none focus:border-amber-500 font-mono"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-mono"
                     />
                   </div>
-                  <div>
-                    <label className="text-[10px] text-slate-400 block mb-0.5">Unit Descriptor</label>
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase font-bold text-slate-400 block">Unit Label</label>
                     <input
                       type="text"
-                      placeholder="e.g. uses, charges, rounds"
+                      placeholder="uses, rds, points"
                       value={customUnit}
                       onChange={e => setCustomUnit(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-100 focus:outline-none focus:border-amber-500"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-center">
-                  <div className="sm:col-span-3">
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase font-bold text-slate-400 block">Description / Notes (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 10 rounds/day activated as a free action."
+                    value={customDescription}
+                    onChange={e => setCustomDescription(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <label className="flex items-center gap-2 cursor-pointer select-none text-slate-300 text-[11px]">
                     <input
-                      type="text"
-                      placeholder="Optional notes or rule reminder..."
-                      value={customDescription}
-                      onChange={e => setCustomDescription(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                      type="checkbox"
+                      checked={customIsPool}
+                      onChange={e => setCustomIsPool(e.target.checked)}
+                      className="rounded border-slate-700 bg-slate-950 text-amber-500 focus:ring-0 cursor-pointer"
                     />
-                  </div>
-                  <div className="flex items-center justify-between gap-2">
-                    <label className="flex items-center gap-1 text-[11px] text-slate-400 cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={customIsPool}
-                        onChange={e => setCustomIsPool(e.target.checked)}
-                        className="rounded bg-slate-950 border-slate-700 text-amber-500 h-3.5 w-3.5"
-                      />
-                      <span>Point Pool</span>
-                    </label>
+                    <span>Large Point Pool (Progress bar with quick +/- steppers)</span>
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddCustomResource(false)}
+                      className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
+                    >
+                      Cancel
+                    </button>
                     <button
                       type="submit"
-                      className="btn btn-primary text-xs py-1 px-3"
+                      className="px-3 py-1 rounded bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs cursor-pointer shadow-xs"
                     >
-                      Save
+                      Add Resource
                     </button>
                   </div>
                 </div>
@@ -688,17 +963,17 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
             )}
 
             {/* Active Resources Cards Grid */}
-            {dailyResources.length === 0 ? (
+            {dailyResources.length === 0 && casterSlotTracks.length === 0 ? (
               <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800/80 text-center text-xs text-slate-400 space-y-1">
                 <i className="fa-solid fa-battery-empty text-slate-600 text-lg mb-1 block"></i>
-                <p className="font-semibold text-slate-300">No active daily class resources detected for this character.</p>
+                <p className="font-semibold text-slate-300">No active daily class resources or spell slots detected for this character.</p>
                 <p className="text-[11px] text-slate-500">
-                  Classes like Barbarian (Rage), Paladin (Smite Evil, Lay on Hands, Turn Undead), Cleric (Turn Undead),
-                  Bard (Bardic Music), Druid (Wild Shape), and Monk (Stunning Fist) automatically populate here.
+                  Classes with spellcasting (Wizard, Sorcerer, Cleric, Druid, Bard, Paladin, Ranger, etc.) and class abilities (Barbarian Rage, Paladin Smite/Lay on Hands, Cleric Turn Undead, Druid Wild Shape, Monk Stunning Fist) automatically populate here.
                 </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* 1. Daily Ability Resources */}
                 {dailyResources.map(res => {
                   const remaining = Math.max(0, res.maxUses - res.usedUses);
                   const isPool = Boolean(res.isPool);
@@ -713,7 +988,6 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
                           : 'bg-slate-900/80 border-slate-800 text-slate-200 shadow-xs'
                       }`}
                     >
-                      {/* Top Resource Card Line */}
                       <div className="flex items-start justify-between gap-2">
                         <div className="space-y-0.5 flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
@@ -728,7 +1002,6 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
                           )}
                         </div>
 
-                        {/* Status Count & Reset/Delete */}
                         <div className="flex items-center gap-1.5 shrink-0">
                           <div className="text-right font-mono">
                             <span className={`font-bold text-xs ${remaining === 0 ? 'text-rose-400' : remaining <= 1 && res.maxUses > 1 ? 'text-amber-400' : 'text-emerald-400'}`}>
@@ -757,127 +1030,111 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
                         </div>
                       </div>
 
-                      {/* Interactive Controls Line */}
                       {isPool ? (
-                        /* Lay on Hands / Point Pool View with Progress Bar & Stepper */
                         <div className="space-y-1.5 pt-1 border-t border-slate-800/80">
                           <div className="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800 flex relative">
                             <div
-                              className={`h-full transition-all duration-300 ${
-                                percentLeft > 50
-                                  ? 'bg-emerald-500'
-                                  : percentLeft > 25
-                                  ? 'bg-amber-500'
-                                  : 'bg-rose-500'
-                              }`}
+                              className={`h-full transition-all duration-300 ${percentLeft > 50 ? 'bg-emerald-500' : percentLeft > 25 ? 'bg-amber-500' : 'bg-rose-500'}`}
                               style={{ width: `${percentLeft}%` }}
                             ></div>
                           </div>
-
                           <div className="flex flex-wrap items-center justify-between gap-1 pt-1">
                             <div className="flex items-center gap-1 font-mono text-[11px]">
                               <span className="text-[9px] uppercase font-bold text-slate-500 mr-0.5">Spend:</span>
-                              <button
-                                onClick={() => handleUseResource(res.id, 10, res.maxUses)}
-                                disabled={remaining < 10}
-                                className="px-1.5 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 border border-rose-800/60 text-rose-300 text-[10px] font-bold transition cursor-pointer"
-                              >
-                                -10
-                              </button>
-                              <button
-                                onClick={() => handleUseResource(res.id, 5, res.maxUses)}
-                                disabled={remaining < 5}
-                                className="px-1.5 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 border border-rose-800/60 text-rose-300 text-[10px] font-bold transition cursor-pointer"
-                              >
-                                -5
-                              </button>
-                              <button
-                                onClick={() => handleUseResource(res.id, 1, res.maxUses)}
-                                disabled={remaining < 1}
-                                className="px-1.5 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 border border-rose-800/60 text-rose-300 text-[10px] font-bold transition cursor-pointer"
-                              >
-                                -1
-                              </button>
+                              <button onClick={() => handleUseResource(res.id, 10, res.maxUses)} disabled={remaining < 10} className="px-1.5 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 border border-rose-800/60 text-rose-300 text-[10px] font-bold transition cursor-pointer">-10</button>
+                              <button onClick={() => handleUseResource(res.id, 5, res.maxUses)} disabled={remaining < 5} className="px-1.5 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 border border-rose-800/60 text-rose-300 text-[10px] font-bold transition cursor-pointer">-5</button>
+                              <button onClick={() => handleUseResource(res.id, 1, res.maxUses)} disabled={remaining < 1} className="px-1.5 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 border border-rose-800/60 text-rose-300 text-[10px] font-bold transition cursor-pointer">-1</button>
                             </div>
-
                             <div className="flex items-center gap-1 font-mono text-[11px]">
-                              <button
-                                onClick={() => handleUseResource(res.id, -1, res.maxUses)}
-                                disabled={res.usedUses <= 0}
-                                className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition cursor-pointer"
-                              >
-                                +1
-                              </button>
-                              <button
-                                onClick={() => handleUseResource(res.id, -5, res.maxUses)}
-                                disabled={res.usedUses < 5}
-                                className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition cursor-pointer"
-                              >
-                                +5
-                              </button>
-                              <button
-                                onClick={() => handleUseResource(res.id, -10, res.maxUses)}
-                                disabled={res.usedUses < 10}
-                                className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition cursor-pointer"
-                              >
-                                +10
-                              </button>
+                              <button onClick={() => handleUseResource(res.id, -1, res.maxUses)} disabled={res.usedUses <= 0} className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition cursor-pointer">+1</button>
+                              <button onClick={() => handleUseResource(res.id, -5, res.maxUses)} disabled={res.usedUses < 5} className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition cursor-pointer">+5</button>
+                              <button onClick={() => handleUseResource(res.id, -10, res.maxUses)} disabled={res.usedUses < 10} className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition cursor-pointer">+10</button>
                             </div>
                           </div>
                         </div>
                       ) : (
-                        /* Standard Resource Bubbles Display [●][●][○] */
                         <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800/80">
-                          {/* Bubbles Array */}
                           <div className="flex flex-wrap items-center gap-1.5">
                             {Array.from({ length: res.maxUses }, (_, i) => {
                               const bubbleIndex = i + 1;
                               const isAvailable = bubbleIndex <= remaining;
-
                               return (
-                                <button
-                                  key={i}
-                                  type="button"
-                                  onClick={() => handleBubbleClick(res.id, bubbleIndex, res.maxUses, remaining)}
-                                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-all cursor-pointer select-none group ${
-                                    isAvailable
-                                      ? 'bg-amber-500/20 border-2 border-amber-400 text-amber-300 shadow-xs hover:scale-110 active:scale-95'
-                                      : 'bg-slate-950/70 border-2 border-slate-800 text-slate-600 hover:border-slate-600 hover:text-slate-400'
-                                  }`}
-                                  title={
-                                    isAvailable
-                                      ? `Use #${bubbleIndex} is Available (Click to spend)`
-                                      : `Use #${bubbleIndex} has been Spent (Click to restore)`
-                                  }
-                                >
-                                  {isAvailable ? (
-                                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-xs"></span>
-                                  ) : (
-                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
-                                  )}
+                                <button key={i} type="button" onClick={() => handleBubbleClick(res.id, bubbleIndex, res.maxUses, remaining)} className={`w-6 h-6 rounded-full flex items-center justify-center transition-all cursor-pointer select-none group ${isAvailable ? 'bg-amber-500/20 border-2 border-amber-400 text-amber-300 shadow-xs hover:scale-110 active:scale-95' : 'bg-slate-950/70 border-2 border-slate-800 text-slate-600 hover:border-slate-600 hover:text-slate-400'}`}>
+                                  {isAvailable ? <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-xs"></span> : <span className="w-1.5 h-1.5 rounded-full bg-slate-700"></span>}
                                 </button>
                               );
                             })}
                           </div>
-
-                          {/* Quick [-] / [+] Stepper */}
                           <div className="flex items-center gap-1 font-mono text-xs">
-                            <button
-                              onClick={() => handleUseResource(res.id, 1, res.maxUses)}
-                              disabled={remaining <= 0}
-                              className="px-2 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 disabled:cursor-not-allowed border border-rose-800/60 text-rose-300 text-[10px] font-bold transition cursor-pointer flex items-center gap-1"
-                              title="Spend 1 use"
-                            >
-                              <i className="fa-solid fa-minus text-[9px]"></i> Use
+                            <button onClick={() => handleUseResource(res.id, 1, res.maxUses)} disabled={remaining <= 0} className="px-2 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 border border-rose-800/60 text-rose-300 text-[10px] font-bold transition cursor-pointer flex items-center gap-1"><i className="fa-solid fa-minus text-[9px]"></i> Use</button>
+                            <button onClick={() => handleUseResource(res.id, -1, res.maxUses)} disabled={res.usedUses <= 0} className="px-2 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition cursor-pointer flex items-center gap-1"><i className="fa-solid fa-plus text-[9px]"></i> Restore</button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {/* 2. Active Spell Slot Tracks */}
+                {casterSlotTracks.map(st => {
+                  const hasSlots = st.totalSlots > 0;
+                  return (
+                    <div key={`${st.className}_lvl${st.spellLevel}`} className={`p-3 rounded-xl border flex flex-col justify-between space-y-2.5 transition ${st.remainingSlots === 0 ? 'bg-slate-900/40 border-rose-500/30 text-slate-400' : 'bg-slate-900/80 border-slate-800 text-slate-200 shadow-xs hover:border-amber-500/40'}`}>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="space-y-0.5 flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <i className={`fa-solid fa-wand-magic-sparkles text-xs ${st.remainingSlots > 0 ? 'text-amber-400' : 'text-slate-500'}`}></i>
+                            <h4 className="font-bold text-xs text-slate-100 truncate">{st.className} {st.spellLevelName}</h4>
+                            <span className="badge text-[9px] font-mono px-1.5 py-0.2 rounded border bg-amber-500/20 text-amber-300 border-amber-500/30">{st.className} {st.classLevel}</span>
+                            <span className="badge text-[9px] font-mono px-1.5 py-0.2 rounded border bg-emerald-950/80 text-emerald-300 border-emerald-500/30 font-bold">DC {st.saveDc}</span>
+                          </div>
+                          <p className="text-[10.5px] text-slate-400 leading-tight">Key: {st.keyAbility} ({st.abilityMod >= 0 ? `+${st.abilityMod}` : st.abilityMod}) • {st.isPrepared ? 'Prepared Slots' : 'Spontaneous Pool'}</p>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <div className="text-right font-mono">
+                            <span className={`font-bold text-xs ${st.remainingSlots === 0 ? 'text-rose-400' : st.remainingSlots < st.totalSlots ? 'text-amber-400' : 'text-emerald-400'}`}>{st.remainingSlots}</span>
+                            <span className="text-[10px] text-slate-500"> / {st.totalSlots} slots</span>
+                          </div>
+                          {st.expendedSlots > 0 && (
+                            <button onClick={() => handleResetSpellLevelSlots(st.className, st.spellLevel, st.totalSlots)} className="text-[10px] text-slate-400 hover:text-emerald-300 p-1 rounded hover:bg-slate-800 transition cursor-pointer" title="Restore all slots at this level">
+                              <i className="fa-solid fa-rotate-left"></i>
                             </button>
-                            <button
-                              onClick={() => handleUseResource(res.id, -1, res.maxUses)}
-                              disabled={res.usedUses <= 0}
-                              className="px-2 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 disabled:cursor-not-allowed border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition cursor-pointer flex items-center gap-1"
-                              title="Restore 1 use"
-                            >
-                              <i className="fa-solid fa-plus text-[9px]"></i> Restore
-                            </button>
+                          )}
+                        </div>
+                      </div>
+                      {hasSlots && (
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800/80">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            {Array.from({ length: st.totalSlots }, (_, i) => {
+                              const bubbleIndex = i + 1;
+                              const isAvailable = bubbleIndex <= st.remainingSlots;
+                              return (
+                                <button key={i} type="button" onClick={() => handleSpellSlotBubbleClick(st.className, st.spellLevel, bubbleIndex, st.totalSlots, st.remainingSlots)} className={`w-6 h-6 rounded-full flex items-center justify-center transition-all cursor-pointer select-none group ${isAvailable ? 'bg-amber-500/20 border-2 border-amber-400 text-amber-300 shadow-xs hover:scale-110 active:scale-95' : 'bg-slate-950/70 border-2 border-slate-800 text-slate-600 hover:border-slate-600 hover:text-slate-400'}`}>
+                                  {isAvailable ? <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-xs"></span> : <i className="fa-solid fa-xmark text-[10px] text-slate-600 group-hover:text-slate-400"></i>}
+                                </button>
+                              );
+                            })}
+                          </div>
+                          <div className="flex items-center gap-1 font-mono text-xs">
+                            <button onClick={() => handleExpendSpellSlot(st.className, st.spellLevel, st.totalSlots)} disabled={st.remainingSlots <= 0} className="px-2 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 border border-rose-800/60 text-rose-300 text-[10px] font-bold transition cursor-pointer flex items-center gap-1"><i className="fa-solid fa-minus text-[9px]"></i> Use</button>
+                            <button onClick={() => handleRestoreSpellSlot(st.className, st.spellLevel, st.totalSlots)} disabled={st.expendedSlots <= 0} className="px-2 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition cursor-pointer flex items-center gap-1"><i className="fa-solid fa-plus text-[9px]"></i> Restore</button>
+                          </div>
+                        </div>
+                      )}
+                      {st.isPrepared && st.preparedSpells.length > 0 && (
+                        <div className="pt-1.5 border-t border-slate-800/60 space-y-1">
+                          <span className="text-[9px] uppercase font-bold text-slate-400 block">Prepared Spells:</span>
+                          <div className="space-y-1 font-mono text-[10px]">
+                            {st.preparedSpells.map(prepSlot => (
+                              <div key={prepSlot.id} className={`flex items-center justify-between p-1 rounded border transition ${prepSlot.isCast ? 'bg-slate-950/40 border-slate-800 opacity-60' : 'bg-slate-950/80 border-slate-700/80'}`}>
+                                <span className={`truncate ${prepSlot.isCast ? 'line-through text-slate-500' : 'font-semibold text-slate-200'}`} title={prepSlot.spellName || 'Prepared Spell'}>
+                                  {prepSlot.spellName || 'Spell'}{prepSlot.isDomain ? ' ★' : ''}
+                                </span>
+                                <button type="button" onClick={() => handleTogglePreparedSlotCast(prepSlot.id)} className={`ml-1 text-[9px] font-bold px-1.5 py-0.2 rounded border transition cursor-pointer ${prepSlot.isCast ? 'bg-slate-900 text-slate-500 border-slate-700 hover:bg-emerald-950 hover:text-emerald-300' : 'bg-emerald-950/80 text-emerald-300 border-emerald-500/30 hover:bg-rose-950 hover:text-rose-300'}`}>
+                                  {prepSlot.isCast ? 'Expended' : 'Cast'}
+                                </button>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       )}

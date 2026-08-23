@@ -27,7 +27,14 @@ import {
   removeSpellFromSpellbook,
   getStarterWizardCantripIds,
   getAvailableSpellsForPreparation,
-  calculateSpellSaveDc
+  calculateSpellSaveDc,
+  getSpellSlotUsageKey,
+  getExpendedSpellSlotsCount,
+  getRemainingSpellSlotsCount,
+  expendSpellSlot,
+  restoreSpellSlot,
+  setExpendedSpellSlots,
+  resetExpendedSpellSlotsForClass
 } from '../engine/spells';
 import { getSourceBadgeInfo, isSourceAllowed } from '../utils/sourceFilter';
 
@@ -436,8 +443,40 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
   };
 
   const handleToggleCastSlot = (slotId: string) => {
+    const targetSlot = syncedPreparedSlots.find(s => s.id === slotId);
     const updated = togglePreparedSpellSlotCast(syncedPreparedSlots, slotId);
-    onChange?.({ preparedSpells: updated });
+    if (!targetSlot) {
+      onChange?.({ preparedSpells: updated });
+      return;
+    }
+
+    const clsName = targetSlot.className || currentPrepClassName;
+    const spellLevel = targetSlot.spellLevel;
+    const cKey = clsName.toLowerCase().replace(/[\s\/-]+/g, '_');
+
+    // Count how many prepared spells will be cast for this class and level
+    const classLevelPrepared = updated.filter(
+      s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey &&
+           s.spellLevel === spellLevel &&
+           !!s.spellId
+    );
+    const newCastCount = classLevelPrepared.filter(s => s.isCast).length;
+
+    const levelSlots = prepSlotsStructure.find(ps => ps.spellLevel === spellLevel);
+    const maxSlots = levelSlots ? levelSlots.totalSlots : 99;
+
+    const updatedExpended = setExpendedSpellSlots(
+      character.expendedSpellSlots,
+      clsName,
+      spellLevel,
+      newCastCount,
+      maxSlots
+    );
+
+    onChange?.({
+      preparedSpells: updated,
+      expendedSpellSlots: updatedExpended
+    });
   };
 
   const handleClearAllSlots = () => {
@@ -446,8 +485,81 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
   };
 
   const handleResetAllCast = () => {
-    const updated = resetAllPreparedSlotsCast(syncedPreparedSlots, currentPrepClassName);
-    onChange?.({ preparedSpells: updated });
+    const updatedPrepared = resetAllPreparedSlotsCast(syncedPreparedSlots, currentPrepClassName);
+    const updatedExpended = resetExpendedSpellSlotsForClass(character.expendedSpellSlots, currentPrepClassName);
+    onChange?.({
+      preparedSpells: updatedPrepared,
+      expendedSpellSlots: updatedExpended
+    });
+  };
+
+  // -----------------------------------------------------------------------------
+  // ACTIVE SPELL SLOT CAST TRACKING ACTIONS
+  // -----------------------------------------------------------------------------
+  const handleSlotBubbleClick = (
+    className: string,
+    spellLevel: number,
+    bubbleIndex: number,
+    maxSlots: number,
+    remaining: number
+  ) => {
+    let newExpended = 0;
+    if (bubbleIndex <= remaining) {
+      // Spend down to bubbleIndex - 1 available (i.e. expended = maxSlots - bubbleIndex + 1)
+      newExpended = maxSlots - bubbleIndex + 1;
+    } else {
+      // Restore up to bubbleIndex available (i.e. expended = maxSlots - bubbleIndex)
+      newExpended = maxSlots - bubbleIndex;
+    }
+    const updatedExpended = setExpendedSpellSlots(
+      character.expendedSpellSlots,
+      className,
+      spellLevel,
+      newExpended,
+      maxSlots
+    );
+    onChange?.({ expendedSpellSlots: updatedExpended });
+  };
+
+  const handleExpendSlot = (className: string, spellLevel: number, maxSlots: number) => {
+    const key = getSpellSlotUsageKey(className, spellLevel);
+    const hasKey = character.expendedSpellSlots && character.expendedSpellSlots[key] !== undefined;
+    const currentExp = hasKey
+      ? getExpendedSpellSlotsCount(character.expendedSpellSlots, className, spellLevel)
+      : syncedPreparedSlots.filter(
+          s => (s.className || currentPrepClassName).toLowerCase().replace(/[\s\/-]+/g, '_') === className.toLowerCase().replace(/[\s\/-]+/g, '_') &&
+               s.spellLevel === spellLevel &&
+               s.isCast &&
+               !!s.spellId
+        ).length;
+    const newExpended = Math.min(maxSlots, currentExp + 1);
+    const updatedExpended = setExpendedSpellSlots(character.expendedSpellSlots, className, spellLevel, newExpended, maxSlots);
+    onChange?.({ expendedSpellSlots: updatedExpended });
+  };
+
+  const handleRestoreSlot = (className: string, spellLevel: number, maxSlots: number) => {
+    const key = getSpellSlotUsageKey(className, spellLevel);
+    const hasKey = character.expendedSpellSlots && character.expendedSpellSlots[key] !== undefined;
+    const currentExp = hasKey
+      ? getExpendedSpellSlotsCount(character.expendedSpellSlots, className, spellLevel)
+      : syncedPreparedSlots.filter(
+          s => (s.className || currentPrepClassName).toLowerCase().replace(/[\s\/-]+/g, '_') === className.toLowerCase().replace(/[\s\/-]+/g, '_') &&
+               s.spellLevel === spellLevel &&
+               s.isCast &&
+               !!s.spellId
+        ).length;
+    const newExpended = Math.max(0, currentExp - 1);
+    const updatedExpended = setExpendedSpellSlots(character.expendedSpellSlots, className, spellLevel, newExpended, maxSlots);
+    onChange?.({ expendedSpellSlots: updatedExpended });
+  };
+
+  const handleResetClassSlots = (className: string) => {
+    const updatedExpended = resetExpendedSpellSlotsForClass(character.expendedSpellSlots, className);
+    const updatedPrepared = resetAllPreparedSlotsCast(character.preparedSpells || [], className);
+    onChange?.({
+      expendedSpellSlots: updatedExpended,
+      preparedSpells: updatedPrepared
+    });
   };
 
   // -----------------------------------------------------------------------------
@@ -863,8 +975,8 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
                                         }`}
                                         title={slot.isCast ? 'Click to mark as prepared (ready)' : 'Click to expend slot (cast)'}
                                       >
-                                        <i className={`fa-solid ${slot.isCast ? 'fa-hourglass-end' : 'fa-check'} mr-1`}></i>
-                                        {slot.isCast ? 'Expended' : 'Ready'}
+                                        <i className={`fa-solid ${slot.isCast ? 'fa-hourglass-end' : 'fa-wand-magic-sparkles'} mr-1`}></i>
+                                        {slot.isCast ? 'Expended' : 'Cast'}
                                       </button>
 
                                       {/* Clear Slot Button */}
@@ -1619,7 +1731,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
                   <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
                     <div>
                       <h2 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2">
-                        <i className="fa-solid fa-hat-wizard text-amber-500"></i> {clsName} Spellcasting
+                        <i className="fa-solid fa-hat-wizard text-amber-500"></i> {clsName} Spellcasting & Slot Tracker
                       </h2>
                       <p className="text-xs text-slate-400">
                         {info.type} • {info.method} Caster • Level {clsLvl} (Caster Level {clsLvl})
@@ -1634,54 +1746,154 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
                           {abilityScore} ({abilityMod >= 0 ? `+${abilityMod}` : abilityMod})
                         </span>
                       </div>
+
+                      <button
+                        onClick={() => handleResetClassSlots(clsName)}
+                        className="px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300 font-bold text-xs transition flex items-center gap-1.5 shadow-sm"
+                        title="Restore all spell slots for this class back to full capacity"
+                      >
+                        <i className="fa-solid fa-rotate text-xs"></i> Rest / Restore All Slots
+                      </button>
                     </div>
                   </div>
 
-                  {/* Spell Slots Grid */}
+                  {/* Spell Slots Grid with Interactive Usage Bubbles */}
                   {spellSlotsData && (
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                          Spells Per Day & Save DCs
+                        <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                          <i className="fa-solid fa-battery-half text-amber-400"></i> Spells Per Day, Save DCs & Active Cast Bubbles
                         </h3>
                         <span className="text-[11px] text-amber-400 font-mono">
                           Base Slots + Bonus ({info.keyAbility.toUpperCase()} Mod {abilityMod >= 0 ? `+${abilityMod}` : abilityMod})
                         </span>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
-                        {spellSlotsData.slots.map(slot => (
-                          <div
-                            key={slot.spellLevel}
-                            className={`p-3 rounded-xl border text-center transition-all ${
-                              slot.canCast
-                                ? 'bg-slate-950/80 border-slate-800 hover:border-amber-500/50'
-                                : 'bg-slate-950/30 border-slate-900 opacity-50'
-                            }`}
-                          >
-                            <div className="text-[10px] text-slate-400 uppercase font-mono block font-semibold">
-                              {slot.spellLevel === 0 ? 'Cantrips (0)' : `Level ${slot.spellLevel}`}
-                            </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5">
+                        {spellSlotsData.slots.map(slot => {
+                          const isPrep = isPreparedCaster(clsName);
+                          const cKey = clsName.toLowerCase().replace(/[\s\/-]+/g, '_');
+                          const classPrep = (character.preparedSpells || []).filter(
+                            s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey && s.spellLevel === slot.spellLevel && !!s.spellId
+                          );
+                          const castPreparedCount = isPrep ? classPrep.filter(s => s.isCast).length : 0;
+                          const mapExpended = getExpendedSpellSlotsCount(character.expendedSpellSlots, clsName, slot.spellLevel);
+                          const expended = Math.max(mapExpended, castPreparedCount);
+                          const remaining = Math.max(0, slot.total - expended);
+                          const hasSlots = slot.canCast && slot.total > 0;
 
-                            <div className="py-1">
-                              <span
-                                className={`font-mono text-2xl font-bold ${
-                                  slot.canCast ? 'text-amber-400' : 'text-slate-600'
-                                }`}
-                              >
-                                {slot.total}
-                              </span>
-                              <span className="text-[10px] text-slate-400 block font-mono">
-                                {slot.base} base {slot.bonus > 0 ? `+ ${slot.bonus} bonus` : ''}
-                              </span>
-                            </div>
+                          return (
+                            <div
+                              key={slot.spellLevel}
+                              className={`p-3.5 rounded-xl border flex flex-col justify-between space-y-3 transition-all ${
+                                hasSlots
+                                  ? remaining === 0
+                                    ? 'bg-slate-950/90 border-rose-500/30 shadow-sm'
+                                    : 'bg-slate-950/80 border-slate-800 hover:border-amber-500/50 shadow-sm'
+                                  : 'bg-slate-950/30 border-slate-900 opacity-50'
+                              }`}
+                            >
+                              {/* Header & DC */}
+                              <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                                <div className="text-xs font-bold font-mono text-slate-200">
+                                  {slot.spellLevel === 0 ? 'Cantrips (0th)' : `Level ${slot.spellLevel}`}
+                                </div>
+                                <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded-lg">
+                                  DC {slot.saveDc}
+                                </span>
+                              </div>
 
-                            <div className="pt-1 border-t border-slate-800/60 mt-1">
-                              <span className="text-[10px] text-emerald-400 font-mono font-bold block">
-                                DC {slot.saveDc}
-                              </span>
+                              {/* Slot Capacity & Remaining Count */}
+                              <div className="flex items-center justify-between text-xs font-mono">
+                                <div>
+                                  <span className="text-[10px] text-slate-400 block uppercase">Capacity</span>
+                                  <span className="text-slate-300 font-semibold">{slot.total} Total</span>
+                                  <span className="text-[10px] text-slate-500 block">
+                                    ({slot.base}b {slot.bonus > 0 ? `+ ${slot.bonus}` : ''})
+                                  </span>
+                                </div>
+                                <div className="text-right">
+                                  <span className="text-[10px] text-slate-400 block uppercase">Available</span>
+                                  <span
+                                    className={`text-base font-bold ${
+                                      remaining === 0
+                                        ? 'text-rose-400'
+                                        : remaining < slot.total
+                                        ? 'text-amber-400'
+                                        : 'text-emerald-400'
+                                    }`}
+                                  >
+                                    {remaining} / {slot.total}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Interactive Spell Slot Usage Bubbles [O][O][X] */}
+                              {hasSlots && (
+                                <div className="space-y-2 pt-2 border-t border-slate-800/60">
+                                  <div className="flex flex-wrap items-center justify-center gap-1.5 py-1">
+                                    {Array.from({ length: slot.total }, (_, i) => {
+                                      const bubbleIndex = i + 1;
+                                      const isAvailable = bubbleIndex <= remaining;
+
+                                      return (
+                                        <button
+                                          key={i}
+                                          type="button"
+                                          onClick={() =>
+                                            handleSlotBubbleClick(
+                                              clsName,
+                                              slot.spellLevel,
+                                              bubbleIndex,
+                                              slot.total,
+                                              remaining
+                                            )
+                                          }
+                                          className={`w-6 h-6 rounded-full flex items-center justify-center transition-all cursor-pointer select-none group ${
+                                            isAvailable
+                                              ? 'bg-amber-500/20 border-2 border-amber-400 text-amber-300 shadow-xs hover:scale-110 active:scale-95'
+                                              : 'bg-slate-950/70 border-2 border-slate-800 text-slate-600 hover:border-slate-600 hover:text-slate-400'
+                                          }`}
+                                          title={
+                                            isAvailable
+                                              ? `Slot #${bubbleIndex} is Available (Click to expend)`
+                                              : `Slot #${bubbleIndex} has been Spent (Click to restore)`
+                                          }
+                                        >
+                                          {isAvailable ? (
+                                            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-xs"></span>
+                                          ) : (
+                                            <i className="fa-solid fa-xmark text-[10px] text-slate-600 group-hover:text-slate-400"></i>
+                                          )}
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+
+                                  {/* Quick Stepper Buttons */}
+                                  <div className="flex items-center justify-between pt-1 text-xs font-mono">
+                                    <button
+                                      onClick={() => handleExpendSlot(clsName, slot.spellLevel, slot.total)}
+                                      disabled={remaining <= 0}
+                                      className="px-2 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 disabled:opacity-30 disabled:cursor-not-allowed border border-rose-800/60 text-rose-300 text-[10px] font-bold transition flex items-center gap-1"
+                                      title="Cast / Expend 1 slot"
+                                    >
+                                      <i className="fa-solid fa-minus text-[8px]"></i> Spend
+                                    </button>
+
+                                    <button
+                                      onClick={() => handleRestoreSlot(clsName, slot.spellLevel, slot.total)}
+                                      disabled={expended <= 0}
+                                      className="px-2 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 disabled:opacity-30 disabled:cursor-not-allowed border border-emerald-800/60 text-emerald-300 text-[10px] font-bold transition flex items-center gap-1"
+                                      title="Restore 1 slot"
+                                    >
+                                      <i className="fa-solid fa-plus text-[8px]"></i> Restore
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}

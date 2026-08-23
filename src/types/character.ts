@@ -259,6 +259,7 @@ export interface CharacterState {
   barbarianVariant?: 'rage' | 'whirling_frenzy';
   spellbookSpells?: string[];
   preparedSpells?: PreparedSpellSlot[];
+  expendedSpellSlots?: Record<string, number>;
 }
 
 export interface DailyResourceTrack {

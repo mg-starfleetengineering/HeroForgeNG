@@ -482,12 +482,12 @@ export const App: React.FC = () => {
           {activeTab === 'notes' && <NotesTab character={character} onChange={updateCharacter} />}
         </div>
         <div className={activeTab === 'sheet' ? 'block' : 'hidden print:block'}>
-          <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} domainsData={domainsData} deitiesData={deitiesData} wildShapeFormsData={wildShapeFormsData} onChange={updateCharacter} />
+          <SheetViewTab character={character} racesData={racesData} classesData={classesData} weaponsData={weaponsData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} domainsData={domainsData} deitiesData={deitiesData} wildShapeFormsData={wildShapeFormsData} spellsData={spellsData} onChange={updateCharacter} />
         </div>
       </main>
 
       <footer className="mt-auto border-t border-slate-800/80 bg-slate-900/40 text-slate-400 text-xs py-4 px-4 text-center space-y-1">
-        <p>HeroForgeNG 3.5 Web Edition v1.4.0 &copy; 2026. Built with React, Vite & TypeScript.</p>
+        <p>HeroForgeNG 3.5 Web Edition v2.0.0 &copy; 2026. Built with React, Vite & TypeScript.</p>
         <p className="text-[11px] text-slate-500">
           Based on the original <a href="https://github.com/Heliomance/HeroForge-Anew" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline font-medium">HeroForge Anew project by Heliomance</a>.
         </p>

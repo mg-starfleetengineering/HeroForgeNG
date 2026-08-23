@@ -40,3 +40,10 @@ Restart the dev server if currently running after making changes.
 ### 5. Deployment Output
 - Running `npm run build` generates the complete static SPA build into `dist/`.
 - The `dist/` directory is 100% static and configured for drag-and-drop or GitHub integration on Cloudflare Pages.
+
+---
+
+### 6. Agent Execution & Dev Server Guidelines
+1. **Git Branch & Commits**: Before writing code, ensure you are working on a fresh feature branch (`git checkout -b feature/<chunk-name> main` or `master`). Make atomic commits using Conventional Commits syntax (`feat(<chunk-id>): short description`). **Do NOT try to commit anything until I have told you to.**
+2. **Dev Server & Live Preview**: After completing code edits, launch (or restart) the Vite dev server inside WSL as a background task (`wsl -d Ubuntu bash -c 'cd /mnt/c/Users/shado/.git/HeroForge-Anew && npx vite --host 0.0.0.0 --port 5173'`). Confirm when `http://localhost:5173` is ready so I can live-preview the changes in my browser. If follow-up code edits are made and polling doesn't refresh the UI, restart the server process.
+3. **Build Verification**: Run `wsl -d Ubuntu bash -c "cd /mnt/c/Users/shado/.git/HeroForge-Anew && npm run build"` to verify TypeScript compilation and production bundle build succeed before declaring completion. **Do not run the build until after you have started or restarted the dev server.**
