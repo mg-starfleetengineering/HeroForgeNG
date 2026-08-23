@@ -257,6 +257,8 @@ export interface CharacterState {
   resourceUsages?: Record<string, number>;
   customResources?: CustomResourceDefinition[];
   barbarianVariant?: 'rage' | 'whirling_frenzy';
+  spellbookSpells?: string[];
+  preparedSpells?: PreparedSpellSlot[];
 }
 
 export interface DailyResourceTrack {
@@ -459,6 +461,18 @@ export interface SpellData {
   description: string;
   source: string;
 }
+
+export interface PreparedSpellSlot {
+  id: string; // unique slot identifier (e.g. "Wizard_1_0" or "Cleric_domain_2_0")
+  className: string; // e.g. "Wizard", "Cleric", "Druid", "Paladin", "Ranger"
+  spellLevel: number; // 0 to 9
+  slotIndex: number; // 0-based index of slot at this level
+  spellId: string | null; // spell ID or null if unassigned
+  spellName?: string; // friendly spell name
+  isDomain?: boolean; // true if dedicated Cleric domain slot
+  isCast?: boolean; // expended/cast tracker in-play
+}
+
 
 export interface SupplementalDomainGrant {
   domain: string;

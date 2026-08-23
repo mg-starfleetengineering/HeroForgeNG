@@ -1,5 +1,22 @@
 import { describe, it, expect } from 'vitest';
-import { getSpellSlotsForClass, getBonusSpells, isSpellcastingClassName } from '../spells';
+import {
+  getSpellSlotsForClass,
+  getBonusSpells,
+  isSpellcastingClassName,
+  calculateSpellSaveDc,
+  isPreparedCaster,
+  getPreparedSlotsStructure,
+  syncPreparedSlotsForCharacter,
+  assignPreparedSpellSlot,
+  clearPreparedSpellSlot,
+  togglePreparedSpellSlotCast,
+  clearAllPreparedSlots,
+  resetAllPreparedSlotsCast,
+  addSpellToSpellbook,
+  removeSpellFromSpellbook,
+  getStarterWizardCantripIds,
+  getAvailableSpellsForPreparation
+} from '../spells';
 import spellsData from '../../data/spells.json';
 import suppSpellsData from '../../data/supplemental_domain_spells.json';
 
@@ -130,4 +147,267 @@ describe('D&D 3.5e Spells Engine & Data Verification', () => {
       });
     });
   });
+
+  describe('Chunk 5.2: Live Spellbook & Daily Preparation Workshop Engine', () => {
+    describe('Spell Save DC Calculation (10 + spellLevel + keyAbilityMod)', () => {
+      it('should calculate accurate DCs across 0th-9th level spells', () => {
+        // INT mod +4 (Wizard with 18 INT)
+        expect(calculateSpellSaveDc(0, 4)).toBe(14);
+        expect(calculateSpellSaveDc(1, 4)).toBe(15);
+        expect(calculateSpellSaveDc(3, 4)).toBe(17);
+        expect(calculateSpellSaveDc(9, 4)).toBe(23);
+
+        // WIS mod +6 (Cleric with 22 WIS)
+        expect(calculateSpellSaveDc(0, 6)).toBe(16);
+        expect(calculateSpellSaveDc(1, 6)).toBe(17);
+        expect(calculateSpellSaveDc(5, 6)).toBe(21);
+        expect(calculateSpellSaveDc(9, 6)).toBe(25);
+
+        // Paladin WIS mod +2 (14 WIS)
+        expect(calculateSpellSaveDc(1, 2)).toBe(13);
+        expect(calculateSpellSaveDc(4, 2)).toBe(16);
+      });
+    });
+
+    describe('Prepared Casters Identification', () => {
+      it('should identify prepared casters correctly', () => {
+        expect(isPreparedCaster('Wizard')).toBe(true);
+        expect(isPreparedCaster('Cleric')).toBe(true);
+        expect(isPreparedCaster('Druid')).toBe(true);
+        expect(isPreparedCaster('Paladin')).toBe(true);
+        expect(isPreparedCaster('Ranger')).toBe(true);
+        expect(isPreparedCaster('Archivist')).toBe(true);
+        expect(isPreparedCaster('Wu Jen')).toBe(true);
+
+        expect(isPreparedCaster('Sorcerer')).toBe(false);
+        expect(isPreparedCaster('Bard')).toBe(false);
+        expect(isPreparedCaster('Fighter')).toBe(false);
+        expect(isPreparedCaster('Rogue')).toBe(false);
+      });
+    });
+
+    describe('Prepared Slot Structure & Cleric Domain Slots', () => {
+      it('should generate accurate slot structure for Wizard 5 (+4 INT)', () => {
+        const structure = getPreparedSlotsStructure('Wizard', 5, 4);
+        expect(structure).toHaveLength(4); // 0, 1, 2, 3
+
+        // Level 0: 4 base, 0 bonus, 0 domain = 4 total, DC 14
+        expect(structure[0].spellLevel).toBe(0);
+        expect(structure[0].totalSlots).toBe(4);
+        expect(structure[0].domainSlots).toBe(0);
+        expect(structure[0].saveDc).toBe(14);
+
+        // Level 1: 3 base + 1 bonus = 4 total, DC 15
+        expect(structure[1].spellLevel).toBe(1);
+        expect(structure[1].totalSlots).toBe(4);
+        expect(structure[1].domainSlots).toBe(0);
+        expect(structure[1].saveDc).toBe(15);
+
+        // Level 2: 2 base + 1 bonus = 3 total, DC 16
+        expect(structure[2].spellLevel).toBe(2);
+        expect(structure[2].totalSlots).toBe(3);
+        expect(structure[2].domainSlots).toBe(0);
+        expect(structure[2].saveDc).toBe(16);
+
+        // Level 3: 1 base + 1 bonus = 2 total, DC 17
+        expect(structure[3].spellLevel).toBe(3);
+        expect(structure[3].totalSlots).toBe(2);
+        expect(structure[3].domainSlots).toBe(0);
+        expect(structure[3].saveDc).toBe(17);
+      });
+
+      it('should append +1 domain slot per spell level 1-9 for Clerics', () => {
+        const clericStruct = getPreparedSlotsStructure('Cleric', 5, 4, ['War', 'Healing']);
+        expect(clericStruct).toHaveLength(4); // 0, 1, 2, 3
+
+        // Level 0: 4 total, 0 domain slots
+        expect(clericStruct[0].spellLevel).toBe(0);
+        expect(clericStruct[0].regularSlots).toBe(4);
+        expect(clericStruct[0].domainSlots).toBe(0);
+        expect(clericStruct[0].totalSlots).toBe(4);
+
+        // Level 1: 4 regular (3+1) + 1 domain = 5 total
+        expect(clericStruct[1].spellLevel).toBe(1);
+        expect(clericStruct[1].regularSlots).toBe(4);
+        expect(clericStruct[1].domainSlots).toBe(1);
+        expect(clericStruct[1].totalSlots).toBe(5);
+
+        // Level 2: 3 regular (2+1) + 1 domain = 4 total
+        expect(clericStruct[2].spellLevel).toBe(2);
+        expect(clericStruct[2].regularSlots).toBe(3);
+        expect(clericStruct[2].domainSlots).toBe(1);
+        expect(clericStruct[2].totalSlots).toBe(4);
+
+        // Level 3: 2 regular (1+1) + 1 domain = 3 total
+        expect(clericStruct[3].spellLevel).toBe(3);
+        expect(clericStruct[3].regularSlots).toBe(2);
+        expect(clericStruct[3].domainSlots).toBe(1);
+        expect(clericStruct[3].totalSlots).toBe(3);
+      });
+    });
+
+    describe('Slot Synchronization, Assignment, and In-Play Cast Toggle', () => {
+      it('should synchronize slots and retain assigned spells', () => {
+        const initialSlots = syncPreparedSlotsForCharacter('Wizard', 5, 4);
+        expect(initialSlots.length).toBe(13); // 4 + 4 + 3 + 2 = 13 slots
+
+        // Assign Magic Missile to Wizard lvl 1 slot 0
+        const assigned = assignPreparedSpellSlot(initialSlots, 'wizard_lvl1_slot_0', {
+          id: 'magic_missile',
+          name: 'Magic Missile'
+        });
+
+        const slot = assigned.find(s => s.id === 'wizard_lvl1_slot_0');
+        expect(slot).toBeDefined();
+        expect(slot?.spellId).toBe('magic_missile');
+        expect(slot?.spellName).toBe('Magic Missile');
+        expect(slot?.isCast).toBe(false);
+
+        // Level up Wizard to 6 (re-sync)
+        const resynced = syncPreparedSlotsForCharacter('Wizard', 6, 4, [], assigned);
+        const retained = resynced.find(s => s.id === 'wizard_lvl1_slot_0');
+        expect(retained?.spellId).toBe('magic_missile');
+      });
+
+      it('should toggle cast/expended state and reset on rest', () => {
+        let slots = syncPreparedSlotsForCharacter('Wizard', 5, 4);
+        slots = assignPreparedSpellSlot(slots, 'wizard_lvl1_slot_0', {
+          id: 'magic_missile',
+          name: 'Magic Missile'
+        });
+
+        // Cast the spell
+        slots = togglePreparedSpellSlotCast(slots, 'wizard_lvl1_slot_0');
+        expect(slots.find(s => s.id === 'wizard_lvl1_slot_0')?.isCast).toBe(true);
+
+        // Reset after rest
+        slots = resetAllPreparedSlotsCast(slots, 'Wizard');
+        expect(slots.find(s => s.id === 'wizard_lvl1_slot_0')?.isCast).toBe(false);
+      });
+
+      it('should clear individual and all prepared slots', () => {
+        let slots = syncPreparedSlotsForCharacter('Wizard', 5, 4);
+        slots = assignPreparedSpellSlot(slots, 'wizard_lvl1_slot_0', {
+          id: 'magic_missile',
+          name: 'Magic Missile'
+        });
+        slots = assignPreparedSpellSlot(slots, 'wizard_lvl1_slot_1', {
+          id: 'shield',
+          name: 'Shield'
+        });
+
+        // Clear one slot
+        slots = clearPreparedSpellSlot(slots, 'wizard_lvl1_slot_0');
+        expect(slots.find(s => s.id === 'wizard_lvl1_slot_0')?.spellId).toBeNull();
+        expect(slots.find(s => s.id === 'wizard_lvl1_slot_1')?.spellId).toBe('shield');
+
+        // Clear all slots
+        slots = clearAllPreparedSlots(slots, 'Wizard');
+        expect(slots.every(s => s.spellId === null)).toBe(true);
+      });
+    });
+
+    describe('Live Spellbook Management', () => {
+      it('should add and remove spells from live spellbook without duplicates', () => {
+        let spellbook: string[] = [];
+
+        spellbook = addSpellToSpellbook(spellbook, 'magic_missile');
+        expect(spellbook).toEqual(['magic_missile']);
+
+        // Prevent duplicate
+        spellbook = addSpellToSpellbook(spellbook, 'magic_missile');
+        expect(spellbook).toHaveLength(1);
+
+        spellbook = addSpellToSpellbook(spellbook, 'fireball');
+        expect(spellbook).toEqual(['magic_missile', 'fireball']);
+
+        spellbook = removeSpellFromSpellbook(spellbook, 'magic_missile');
+        expect(spellbook).toEqual(['fireball']);
+      });
+
+      it('should return starter cantrips for wizard', () => {
+        const cantripIds = getStarterWizardCantripIds(spellsData as any);
+        expect(cantripIds.length).toBeGreaterThan(10);
+        expect(cantripIds).toContain('detect_magic');
+        expect(cantripIds).toContain('light');
+        expect(cantripIds).toContain('read_magic');
+      });
+    });
+
+    describe('Available Spells Resolution for Preparation', () => {
+      const mockCharacter: any = {
+        name: 'Elminster',
+        spellbookSpells: ['magic_missile', 'shield', 'fireball'],
+        selectedDomains: ['War', 'Healing']
+      };
+
+      it('should restrict Wizard preparation to spells recorded in Spellbook when onlySpellbook is true', () => {
+        const level1Spells = getAvailableSpellsForPreparation(
+          'Wizard',
+          1,
+          mockCharacter,
+          spellsData as any,
+          [],
+          false,
+          true // onlySpellbook
+        );
+
+        // Only magic_missile and shield are in spellbook
+        const ids = level1Spells.map(s => s.id);
+        expect(ids).toContain('magic_missile');
+        expect(ids).toContain('shield');
+        expect(ids).not.toContain('mage_armor'); // not in spellbook
+
+        // When onlySpellbook is false, returns all class spells for browsing & preparation
+        const allLevel1WizardSpells = getAvailableSpellsForPreparation(
+          'Wizard',
+          1,
+          mockCharacter,
+          spellsData as any,
+          [],
+          false,
+          false
+        );
+        const allIds = allLevel1WizardSpells.map(s => s.id);
+        expect(allIds).toContain('magic_missile');
+        expect(allIds).toContain('mage_armor');
+      });
+
+
+      it('should allow Cleric preparation from all divine spells of that level', () => {
+        const level1ClericSpells = getAvailableSpellsForPreparation(
+          'Cleric',
+          1,
+          mockCharacter,
+          spellsData as any
+        );
+
+        const ids = level1ClericSpells.map(s => s.id);
+        expect(ids).toContain('cure_light_wounds');
+        expect(ids).toContain('bless');
+        expect(ids).toContain('sanctuary');
+      });
+
+      it('should filter domain spells for Cleric domain slots', () => {
+        const mockDomains: any[] = [
+          { id: 'war', name: 'War', spells: ['Magic Weapon', 'Spiritual Weapon'] },
+          { id: 'healing', name: 'Healing', spells: ['Cure Light Wounds', 'Cure Moderate Wounds'] }
+        ];
+
+        const domainSpellsLvl1 = getAvailableSpellsForPreparation(
+          'Cleric',
+          1,
+          mockCharacter,
+          spellsData as any,
+          mockDomains,
+          true // isDomainSlot
+        );
+
+        const names = domainSpellsLvl1.map(s => s.name);
+        expect(names).toContain('Magic Weapon');
+        expect(names).toContain('Cure Light Wounds');
+      });
+    });
+  });
 });
+

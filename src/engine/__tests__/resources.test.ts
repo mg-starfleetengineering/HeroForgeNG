@@ -500,5 +500,20 @@ describe('Daily Class Resources & Long Rest Engine Tests', () => {
       // Rage is turned off
       expect(restResult.tacticalCombat?.rage).toBe(false);
     });
+
+    it('should reset all prepared spell slots isCast state to false', () => {
+      const casterWithCastSpells: any = {
+        preparedSpells: [
+          { id: 'wizard_lvl1_slot_0', spellId: 'magic_missile', isCast: true },
+          { id: 'wizard_lvl1_slot_1', spellId: 'shield', isCast: false },
+          { id: 'cleric_lvl1_domain_0', spellId: 'magic_weapon', isCast: true, isDomain: true }
+        ]
+      };
+
+      const restResult = performLongRest(casterWithCastSpells, 30);
+      expect(restResult.preparedSpells).toBeDefined();
+      expect(restResult.preparedSpells?.every(slot => slot.isCast === false)).toBe(true);
+    });
   });
 });
+

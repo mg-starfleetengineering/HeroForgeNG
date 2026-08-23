@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   CharacterState,
   ClassData,
@@ -6,10 +6,29 @@ import {
   DomainData,
   DeityData,
   SpellData,
-  SupplementalDomainSpellData
+  SupplementalDomainSpellData,
+  PreparedSpellSlot,
+  StatType
 } from '../types/character';
 import { calculateTotalScore, getAbilityMod, parseRaceMods, getCharacterLevel } from '../engine/stats';
-import { SPELLCASTING_CLASSES, getSpellSlotsForClass, isSpellcastingClassName } from '../engine/spells';
+import {
+  SPELLCASTING_CLASSES,
+  getSpellSlotsForClass,
+  isSpellcastingClassName,
+  isPreparedCaster,
+  getPreparedSlotsStructure,
+  syncPreparedSlotsForCharacter,
+  assignPreparedSpellSlot,
+  clearPreparedSpellSlot,
+  togglePreparedSpellSlotCast,
+  clearAllPreparedSlots,
+  resetAllPreparedSlotsCast,
+  addSpellToSpellbook,
+  removeSpellFromSpellbook,
+  getStarterWizardCantripIds,
+  getAvailableSpellsForPreparation,
+  calculateSpellSaveDc
+} from '../engine/spells';
 import { getSourceBadgeInfo, isSourceAllowed } from '../utils/sourceFilter';
 
 interface SpellsTabProps {
@@ -63,23 +82,6 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
   supplementalSpellsData = [],
   onChange
 }) => {
-  // Navigation sub-tab state (Default to Class Spell Slots)
-  const [activeSubTab, setActiveSubTab] = useState<'compendium' | 'slots' | 'domains'>('slots');
-
-  // Search and Filter States for Compendium
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedClass, setSelectedClass] = useState<string>('all');
-  const [selectedLevel, setSelectedLevel] = useState<string>('all');
-  const [selectedSchool, setSelectedSchool] = useState<string>('all');
-  const [selectedSave, setSelectedSave] = useState<string>('all');
-  const [onlyAllowedSources, setOnlyAllowedSources] = useState<boolean>(true);
-  const [selectedSpellModal, setSelectedSpellModal] = useState<SpellData | null>(null);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  // Pagination
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const ITEMS_PER_PAGE = 24;
-
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
   const raceMods = parseRaceMods(raceObj);
   const totalLevel = getCharacterLevel(character.levelProgression);
@@ -105,6 +107,62 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
     return isSpellcastingClassName(clsName, clsObj);
   });
 
+  const preparedCasterEntries = casterEntries.filter(([clsName]) => isPreparedCaster(clsName));
+
+  // Navigation sub-tab state (Default to Preparation if prepared caster, else Slots/Compendium)
+  const [activeSubTab, setActiveSubTab] = useState<'preparation' | 'spellbook' | 'compendium' | 'slots' | 'domains'>(
+    preparedCasterEntries.length > 0 ? 'preparation' : casterEntries.length > 0 ? 'slots' : 'compendium'
+  );
+
+  // Active prepared class in Daily Workshop
+  const [selectedPrepClass, setSelectedPrepClass] = useState<string>(
+    preparedCasterEntries[0]?.[0] || casterEntries[0]?.[0] || ''
+  );
+
+  // Update selected prep class when prepared caster entries change
+  useEffect(() => {
+    if (preparedCasterEntries.length > 0) {
+      if (!preparedCasterEntries.some(([c]) => c === selectedPrepClass)) {
+        setSelectedPrepClass(preparedCasterEntries[0][0]);
+      }
+    } else if (casterEntries.length > 0) {
+      if (!casterEntries.some(([c]) => c === selectedPrepClass)) {
+        setSelectedPrepClass(casterEntries[0][0]);
+      }
+    }
+  }, [character.levelProgression]);
+
+  // Slot assignment modal/drawer state
+  const [activeAssignSlot, setActiveAssignSlot] = useState<PreparedSpellSlot | null>(null);
+  const [assignSearchQuery, setAssignSearchQuery] = useState('');
+  const [assignSchoolFilter, setAssignSchoolFilter] = useState('all');
+  const [assignSourceFilter, setAssignSourceFilter] = useState<'all' | 'spellbook'>('all');
+
+  // Spellbook tab filter states
+  const [spellbookSearchQuery, setSpellbookSearchQuery] = useState('');
+  const [spellbookLevelFilter, setSpellbookLevelFilter] = useState('all');
+  const [spellbookSchoolFilter, setSpellbookSchoolFilter] = useState('all');
+
+  // Add Spell to Spellbook Modal
+  const [isAddSpellbookModalOpen, setIsAddSpellbookModalOpen] = useState(false);
+  const [addSpellbookSearch, setAddSpellbookSearch] = useState('');
+  const [addSpellbookLevel, setAddSpellbookLevel] = useState('all');
+  const [addSpellbookSchool, setAddSpellbookSchool] = useState('all');
+
+  // Compendium Search and Filter States
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedClass, setSelectedClass] = useState<string>('all');
+  const [selectedLevel, setSelectedLevel] = useState<string>('all');
+  const [selectedSchool, setSelectedSchool] = useState<string>('all');
+  const [selectedSave, setSelectedSave] = useState<string>('all');
+  const [onlyAllowedSources, setOnlyAllowedSources] = useState<boolean>(true);
+  const [selectedSpellModal, setSelectedSpellModal] = useState<SpellData | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Pagination for Compendium
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const ITEMS_PER_PAGE = 24;
+
   const selectedDomainsList = (character.selectedDomains || []).filter(Boolean);
   const resolvedDomains = selectedDomainsList.map(domName => {
     return (
@@ -117,7 +175,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
     );
   });
 
-  // Calculate Divine Caster Wisdom modifier for DC calculations if applicable
+  // Calculate Divine Caster Wisdom modifier for general DC reference
   const wisScore = calculateTotalScore(
     'wis',
     character.baseStats,
@@ -128,7 +186,84 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
   );
   const wisMod = getAbilityMod(wisScore);
 
-  // Filtered Spells
+  // Active preparation class stats & calculation
+  const currentPrepClassName = selectedPrepClass || preparedCasterEntries[0]?.[0] || casterEntries[0]?.[0] || '';
+  const currentPrepClassLevel = classLevelsMap[currentPrepClassName] || 0;
+  const currentPrepClassKey = currentPrepClassName.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const currentPrepClassInfo = SPELLCASTING_CLASSES[currentPrepClassKey] || {
+    name: currentPrepClassName,
+    keyAbility: 'int' as StatType,
+    type: 'Arcane' as const,
+    method: 'Prepared' as const,
+    maxSpellLevel: 9
+  };
+
+  const currentPrepScore = calculateTotalScore(
+    currentPrepClassInfo.keyAbility,
+    character.baseStats,
+    raceMods,
+    character.levelBumps || {},
+    character.enhancementMods || {},
+    totalLevel
+  );
+  const currentPrepMod = getAbilityMod(currentPrepScore);
+
+  // Synced Prepared Slots for current character
+  const syncedPreparedSlots = useMemo(() => {
+    if (!currentPrepClassName || currentPrepClassLevel <= 0) return [];
+    return syncPreparedSlotsForCharacter(
+      currentPrepClassName,
+      currentPrepClassLevel,
+      currentPrepMod,
+      character.selectedDomains || [],
+      character.preparedSpells || []
+    );
+  }, [
+    currentPrepClassName,
+    currentPrepClassLevel,
+    currentPrepMod,
+    character.selectedDomains,
+    character.preparedSpells
+  ]);
+
+  // Slots structure (levels, counts, save DCs)
+  const prepSlotsStructure = useMemo(() => {
+    if (!currentPrepClassName || currentPrepClassLevel <= 0) return [];
+    return getPreparedSlotsStructure(
+      currentPrepClassName,
+      currentPrepClassLevel,
+      currentPrepMod,
+      character.selectedDomains || []
+    );
+  }, [currentPrepClassName, currentPrepClassLevel, currentPrepMod, character.selectedDomains]);
+
+  // Total prepared count vs capacity
+  const currentClassPreparedSlots = syncedPreparedSlots.filter(
+    s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === currentPrepClassKey
+  );
+  const totalSlotsCapacity = currentClassPreparedSlots.length;
+  const totalSlotsFilled = currentClassPreparedSlots.filter(s => !!s.spellId).length;
+  const totalSlotsCast = currentClassPreparedSlots.filter(s => !!s.spellId && s.isCast).length;
+
+  // Spellbook Spells Resolution
+  const spellbookSpellIds = character.spellbookSpells || [];
+  const spellbookSpellObjects = useMemo(() => {
+    const map = new Map<string, SpellData>();
+    spellsData.forEach(s => map.set(s.id, s));
+    return spellbookSpellIds
+      .map(id => map.get(id))
+      .filter((s): s is SpellData => !!s);
+  }, [spellbookSpellIds, spellsData]);
+
+  // Calculate estimated spellbook page count (3.5e rule: cantrip = 1 page, level N = N pages)
+  const spellbookTotalPages = useMemo(() => {
+    return spellbookSpellObjects.reduce((sum, s) => {
+      const lvl = s.levels['Wizard'] ?? s.levels[currentPrepClassName] ?? 1;
+      return sum + Math.max(1, lvl);
+    }, 0);
+  }, [spellbookSpellObjects, currentPrepClassName]);
+
+  // Filtered Spells for Compendium
   const filteredSpells = useMemo(() => {
     return spellsData.filter(spell => {
       // 1. Text Search (name, description, descriptors)
@@ -151,7 +286,6 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
           });
           if (!hasAnyMyClass) return false;
         } else {
-          // Check standard class or domain key
           const lvl = spell.levels[selectedClass];
           if (lvl === undefined) return false;
         }
@@ -211,7 +345,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
     character.allowedSources
   ]);
 
-  // Reset pagination on filter changes
+  // Pagination for Compendium
   const totalPages = Math.ceil(filteredSpells.length / ITEMS_PER_PAGE) || 1;
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const paginatedSpells = useMemo(() => {
@@ -266,62 +400,261 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
     });
   };
 
+  // Open slot prepare modal with clean filters
+  const handleOpenAssignModal = (slot: PreparedSpellSlot) => {
+    setActiveAssignSlot(slot);
+    setAssignSearchQuery('');
+    setAssignSchoolFilter('all');
+    setAssignSourceFilter('all');
+  };
+
+  // -----------------------------------------------------------------------------
+  // PREPARATION WORKSHOP ACTIONS
+  // -----------------------------------------------------------------------------
+  const handleAssignSpellToSlot = (slotId: string, spell: SpellData) => {
+    const updated = assignPreparedSpellSlot(syncedPreparedSlots, slotId, {
+      id: spell.id,
+      name: spell.name
+    });
+
+    // Auto-record to spellbook if not yet present
+    let updatedSpellbook = character.spellbookSpells || [];
+    if (!updatedSpellbook.includes(spell.id)) {
+      updatedSpellbook = [...updatedSpellbook, spell.id];
+    }
+
+    onChange?.({
+      preparedSpells: updated,
+      spellbookSpells: updatedSpellbook
+    });
+    setActiveAssignSlot(null);
+  };
+
+  const handleClearSlot = (slotId: string) => {
+    const updated = clearPreparedSpellSlot(syncedPreparedSlots, slotId);
+    onChange?.({ preparedSpells: updated });
+  };
+
+  const handleToggleCastSlot = (slotId: string) => {
+    const updated = togglePreparedSpellSlotCast(syncedPreparedSlots, slotId);
+    onChange?.({ preparedSpells: updated });
+  };
+
+  const handleClearAllSlots = () => {
+    const updated = clearAllPreparedSlots(syncedPreparedSlots, currentPrepClassName);
+    onChange?.({ preparedSpells: updated });
+  };
+
+  const handleResetAllCast = () => {
+    const updated = resetAllPreparedSlotsCast(syncedPreparedSlots, currentPrepClassName);
+    onChange?.({ preparedSpells: updated });
+  };
+
+  // -----------------------------------------------------------------------------
+  // SPELLBOOK MANAGEMENT ACTIONS
+  // -----------------------------------------------------------------------------
+  const handleAddToSpellbook = (spellId: string) => {
+    const updated = addSpellToSpellbook(character.spellbookSpells || [], spellId);
+    onChange?.({ spellbookSpells: updated });
+  };
+
+  const handleRemoveFromSpellbook = (spellId: string) => {
+    const updated = removeSpellFromSpellbook(character.spellbookSpells || [], spellId);
+    // Also clear any prepared slots referencing this spell if from spellbook
+    const updatedPrepared = (character.preparedSpells || []).map(slot => {
+      if (slot.spellId === spellId) {
+        return { ...slot, spellId: null, spellName: undefined, isCast: false };
+      }
+      return slot;
+    });
+    onChange?.({ spellbookSpells: updated, preparedSpells: updatedPrepared });
+  };
+
+  const handleAddAllStarterCantrips = () => {
+    const cantripIds = getStarterWizardCantripIds(spellsData);
+    let current = [...(character.spellbookSpells || [])];
+    for (const cid of cantripIds) {
+      if (!current.includes(cid)) {
+        current.push(cid);
+      }
+    }
+    onChange?.({ spellbookSpells: current });
+  };
+
+  // Quick auto-assign to first empty slot of that level
+  const handleQuickPrepareFromSpellbook = (spell: SpellData) => {
+    const spellLevel = spell.levels[currentPrepClassName] ?? spell.levels['Wizard'] ?? 0;
+    const emptySlot = currentClassPreparedSlots.find(
+      s => s.spellLevel === spellLevel && !s.spellId && !s.isDomain
+    );
+    if (emptySlot) {
+      handleAssignSpellToSlot(emptySlot.id, spell);
+    } else {
+      // Find any slot for this level or open assignment modal
+      const anySlot = currentClassPreparedSlots.find(s => s.spellLevel === spellLevel);
+      if (anySlot) {
+        handleOpenAssignModal(anySlot);
+      }
+    }
+  };
+
+  // Raw base spells for active slot (without search query applied yet)
+  const baseSpellsForActiveSlot = useMemo(() => {
+    if (!activeAssignSlot) return [];
+    return getAvailableSpellsForPreparation(
+      currentPrepClassName,
+      activeAssignSlot.spellLevel,
+      character,
+      spellsData,
+      domainsData,
+      activeAssignSlot.isDomain,
+      false // fetch all eligible class spells, filter via UI
+    );
+  }, [activeAssignSlot, currentPrepClassName, character, spellsData, domainsData]);
+
+  // Filtered spells for active slot in assignment modal
+  const availableSpellsForActiveSlot = useMemo(() => {
+    return baseSpellsForActiveSlot.filter(s => {
+      if (assignSourceFilter === 'spellbook') {
+        if (!spellbookSpellIds.includes(s.id)) return false;
+      }
+      if (assignSearchQuery.trim()) {
+        const q = assignSearchQuery.toLowerCase();
+        const matchName = s.name.toLowerCase().includes(q);
+        const matchDesc = s.description.toLowerCase().includes(q);
+        const matchSchool = s.school.toLowerCase().includes(q);
+        const matchDescriptors = (s.descriptors || []).some(d => d.toLowerCase().includes(q));
+        if (!matchName && !matchDesc && !matchSchool && !matchDescriptors) {
+          return false;
+        }
+      }
+      if (assignSchoolFilter !== 'all') {
+        if (s.school.toLowerCase() !== assignSchoolFilter.toLowerCase()) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [
+    baseSpellsForActiveSlot,
+    assignSearchQuery,
+    assignSchoolFilter,
+    assignSourceFilter,
+    spellbookSpellIds
+  ]);
+
+  // Spells for "Add to Spellbook" compendium picker
+  const eligibleSpellsForSpellbookAdd = useMemo(() => {
+    return spellsData.filter(s => {
+      // Filter by class (Wizard or other arcane/divine)
+      const isWizard = s.levels['Wizard'] !== undefined;
+      if (!isWizard && selectedClass !== 'all' && s.levels[selectedClass] === undefined) {
+        return false;
+      }
+      if (addSpellbookSearch.trim()) {
+        const q = addSpellbookSearch.toLowerCase();
+        if (!s.name.toLowerCase().includes(q) && !s.description.toLowerCase().includes(q)) {
+          return false;
+        }
+      }
+      if (addSpellbookLevel !== 'all') {
+        const lvl = parseInt(addSpellbookLevel, 10);
+        if (s.levels['Wizard'] !== lvl) return false;
+      }
+      if (addSpellbookSchool !== 'all') {
+        if (s.school.toLowerCase() !== addSpellbookSchool.toLowerCase()) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [spellsData, addSpellbookSearch, addSpellbookLevel, addSpellbookSchool, selectedClass]);
+
   return (
     <div className="space-y-6">
       {/* Top Header & Sub-Tab Navigation Bar */}
-      <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4">
+      <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 shadow-xl">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-            <i className="fa-solid fa-wand-magic-sparkles text-lg"></i>
+          <div className="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-inner">
+            <i className="fa-solid fa-wand-magic-sparkles text-xl"></i>
           </div>
           <div>
             <h2 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2">
-              D&D 3.5e Spellcasting & Compendium
+              D&D 3.5e Live Spellbook & Daily Preparation Workshop
             </h2>
             <p className="text-xs text-slate-400">
-              Search the 3.5e core spell compendium ({spellsData.length} spells), track class spell slots per day, and review divine domains.
+              Prepare daily spell slots with 1-click assignment, maintain your recorded spellbook, and search {spellsData.length} core spells.
             </p>
           </div>
         </div>
 
         {/* Sub-Navigation Buttons */}
-        <div className="flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
+        <div className="flex flex-wrap items-center bg-slate-950/90 p-1.5 rounded-2xl border border-slate-800 text-xs font-semibold gap-1">
           <button
-            onClick={() => setActiveSubTab('compendium')}
-            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-              activeSubTab === 'compendium'
-                ? 'bg-amber-500 text-slate-950 font-bold shadow'
+            onClick={() => setActiveSubTab('preparation')}
+            className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 ${
+              activeSubTab === 'preparation'
+                ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            <i className="fa-solid fa-book-open"></i> Spell Compendium
-          </button>
-          <button
-            onClick={() => setActiveSubTab('slots')}
-            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-              activeSubTab === 'slots'
-                ? 'bg-amber-500 text-slate-950 font-bold shadow'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <i className="fa-solid fa-hat-wizard"></i> Class Spell Slots
-            {casterEntries.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 text-[10px] rounded-full bg-slate-900 text-amber-300 font-mono">
-                {casterEntries.length}
+            <i className="fa-solid fa-calendar-check"></i> Daily Preparation
+            {totalSlotsCapacity > 0 && (
+              <span className="ml-1 px-1.5 py-0.2 text-[10px] rounded-full bg-slate-900 text-amber-300 font-mono font-bold">
+                {totalSlotsFilled}/{totalSlotsCapacity}
               </span>
             )}
           </button>
+
           <button
-            onClick={() => setActiveSubTab('domains')}
-            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-              activeSubTab === 'domains'
-                ? 'bg-amber-500 text-slate-950 font-bold shadow'
+            onClick={() => setActiveSubTab('spellbook')}
+            className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 ${
+              activeSubTab === 'spellbook'
+                ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            <i className="fa-solid fa-ankh"></i> Domains & Racial SLAs
+            <i className="fa-solid fa-book-bookmark"></i> Live Spellbook
+            {spellbookSpellIds.length > 0 && (
+              <span className="ml-1 px-1.5 py-0.2 text-[10px] rounded-full bg-slate-900 text-amber-300 font-mono font-bold">
+                {spellbookSpellIds.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('compendium')}
+            className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 ${
+              activeSubTab === 'compendium'
+                ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <i className="fa-solid fa-book-open"></i> Compendium
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('slots')}
+            className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 ${
+              activeSubTab === 'slots'
+                ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <i className="fa-solid fa-hat-wizard"></i> Slots & DCs
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('domains')}
+            className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 ${
+              activeSubTab === 'domains'
+                ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <i className="fa-solid fa-ankh"></i> Domains & SLAs
             {selectedDomainsList.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 text-[10px] rounded-full bg-slate-900 text-amber-300 font-mono">
+              <span className="ml-1 px-1.5 py-0.2 text-[10px] rounded-full bg-slate-900 text-amber-300 font-mono font-bold">
                 {selectedDomainsList.length}
               </span>
             )}
@@ -330,12 +663,545 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
       </div>
 
       {/* ========================================================================= */}
-      {/* SUB-TAB 1: 3.5e SEARCHABLE SPELL COMPENDIUM                               */}
+      {/* SUB-TAB 1: DAILY PREPARATION WORKSHOP                                     */}
+      {/* ========================================================================= */}
+      {activeSubTab === 'preparation' && (
+        <div className="space-y-6">
+          {preparedCasterEntries.length === 0 ? (
+            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-8 rounded-2xl text-center space-y-4 shadow-xl">
+              <div className="w-16 h-16 rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mx-auto text-2xl">
+                <i className="fa-solid fa-wand-magic-sparkles"></i>
+              </div>
+              <h3 className="text-lg font-bold text-slate-100 font-heading">Daily Preparation Workshop</h3>
+              <p className="text-xs text-slate-400 max-w-lg mx-auto leading-relaxed">
+                Prepared casters in D&D 3.5e (such as <strong>Wizard</strong>, <strong>Cleric</strong>, <strong>Druid</strong>, <strong>Paladin</strong>, and <strong>Ranger</strong>) prepare specific spells each morning into their available spell slots per level.
+              </p>
+              <div className="p-4 bg-slate-950/80 rounded-xl text-slate-400 text-xs border border-slate-800 font-mono max-w-md mx-auto">
+                No prepared spellcasting class active on current character. Select a prepared caster in the Race & Class tab, or explore the Spell Compendium.
+              </div>
+              <div className="flex justify-center gap-3 pt-2">
+                <button
+                  onClick={() => setActiveSubTab('compendium')}
+                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition flex items-center gap-2"
+                >
+                  <i className="fa-solid fa-book-open"></i> Browse Spell Compendium
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Class Switcher Toolbar (if multiclass prepared caster) */}
+              {preparedCasterEntries.length > 1 && (
+                <div className="flex items-center gap-2 bg-slate-900/60 p-2 rounded-2xl border border-slate-800">
+                  <span className="text-xs text-slate-400 font-semibold px-2">Caster Class:</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {preparedCasterEntries.map(([clsName, clsLvl]) => (
+                      <button
+                        key={clsName}
+                        onClick={() => setSelectedPrepClass(clsName)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                          currentPrepClassName === clsName
+                            ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                            : 'bg-slate-950 border border-slate-800 text-slate-300 hover:text-slate-100'
+                        }`}
+                      >
+                        <i className="fa-solid fa-hat-wizard"></i> {clsName} {clsLvl}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Class Summary Banner & Quick Actions */}
+              <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-5 rounded-2xl space-y-4 shadow-xl">
+                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2">
+                        <i className="fa-solid fa-hat-wizard text-amber-400"></i> {currentPrepClassName} Preparation Workshop
+                      </h3>
+                      <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-lg bg-amber-950/80 text-amber-300 border border-amber-500/30">
+                        Level {currentPrepClassLevel} (CL {currentPrepClassLevel})
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      {currentPrepClassInfo.type} • {currentPrepClassInfo.method} Caster • Key Ability:{' '}
+                      <span className="font-mono text-amber-400 font-bold uppercase">{currentPrepClassInfo.keyAbility}</span>{' '}
+                      ({currentPrepScore} / {currentPrepMod >= 0 ? `+${currentPrepMod}` : currentPrepMod})
+                    </p>
+                  </div>
+
+                  {/* Prepared Progress Pill & Quick Rest/Clear Actions */}
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <div className="flex items-center gap-2 bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800 text-xs font-mono">
+                      <span className="text-slate-400">Prepared:</span>
+                      <span className="text-amber-400 font-bold">
+                        {totalSlotsFilled} / {totalSlotsCapacity}
+                      </span>
+                      {totalSlotsCast > 0 && (
+                        <span className="text-rose-400 text-[11px] font-bold">
+                          ({totalSlotsCast} Cast)
+                        </span>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={handleResetAllCast}
+                      className="px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300 font-bold text-xs transition flex items-center gap-1.5 shadow-sm"
+                      title="Reset all cast prepared spells back to ready"
+                    >
+                      <i className="fa-solid fa-rotate text-xs"></i> Rest / Ready All
+                    </button>
+
+                    <button
+                      onClick={handleClearAllSlots}
+                      className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-rose-950/60 border border-slate-800 hover:border-rose-500/30 text-slate-300 hover:text-rose-300 font-semibold text-xs transition flex items-center gap-1.5"
+                      title="Clear all assigned prepared spells for this class"
+                    >
+                      <i className="fa-solid fa-trash-can text-xs"></i> Clear All
+                    </button>
+
+                    {currentPrepClassKey === 'wizard' && spellbookSpellIds.length === 0 && (
+                      <button
+                        onClick={handleAddAllStarterCantrips}
+                        className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition flex items-center gap-1.5 shadow-md shadow-amber-500/10"
+                      >
+                        <i className="fa-solid fa-wand-magic-sparkles"></i> Add Starter Cantrips
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Spell Level Containers Grid */}
+                <div className="space-y-6">
+                  {prepSlotsStructure.filter(lvlGroup => lvlGroup.canCast).map(lvlGroup => {
+                    const levelSlots = currentClassPreparedSlots.filter(
+                      s => s.spellLevel === lvlGroup.spellLevel
+                    );
+                    const filledCount = levelSlots.filter(s => !!s.spellId).length;
+
+                    return (
+                      <div
+                        key={lvlGroup.spellLevel}
+                        className="p-4 sm:p-5 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-3.5 shadow-md"
+                      >
+                        {/* Spell Level Header & Individual Save DC */}
+                        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-2.5">
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-sm font-bold font-mono text-amber-300 flex items-center gap-1.5">
+                              <i className="fa-solid fa-sparkles text-amber-400 text-xs"></i>
+                              {lvlGroup.spellLevel === 0 ? 'Cantrips (0th Level)' : `Level ${lvlGroup.spellLevel} Spells`}
+                            </span>
+                            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300 font-semibold">
+                              {filledCount} / {lvlGroup.totalSlots} Prepared
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2.5">
+                            {/* Individual Spell Save DC Badge */}
+                            <div className="flex items-center gap-1.5 bg-emerald-950/80 border border-emerald-500/30 px-3 py-1 rounded-xl text-xs font-mono font-bold text-emerald-300 shadow-sm">
+                              <i className="fa-solid fa-shield-halved text-[11px]"></i>
+                              <span>Save DC {lvlGroup.saveDc}</span>
+                              <span className="text-[10px] text-emerald-400/80 font-normal">
+                                (10 + {lvlGroup.spellLevel} + {currentPrepMod})
+                              </span>
+                            </div>
+
+                            {lvlGroup.domainSlots > 0 && (
+                              <span className="text-[10px] font-mono font-bold px-2 py-1 rounded-xl bg-amber-950/80 text-amber-300 border border-amber-500/40">
+                                +1 Domain Slot
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Slots Container Cards */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                          {levelSlots.map((slot, idx) => {
+                            const assignedSpellObj = slot.spellId
+                              ? spellsData.find(s => s.id === slot.spellId)
+                              : null;
+
+                            return (
+                              <div
+                                key={slot.id}
+                                className={`relative p-3.5 rounded-xl border transition duration-200 flex flex-col justify-between space-y-2.5 ${
+                                  slot.isDomain
+                                    ? slot.spellId
+                                      ? slot.isCast
+                                        ? 'bg-slate-950/60 border-amber-500/30 opacity-60'
+                                        : 'bg-amber-950/20 border-amber-500/50 shadow-md shadow-amber-500/5'
+                                      : 'bg-amber-950/10 border-amber-500/30 border-dashed hover:border-amber-400'
+                                    : slot.spellId
+                                    ? slot.isCast
+                                      ? 'bg-slate-950/60 border-slate-800 opacity-60'
+                                      : 'bg-slate-900/80 border-slate-700/80 hover:border-amber-500/40 shadow-sm'
+                                    : 'bg-slate-950/40 border-slate-800 border-dashed hover:border-slate-700'
+                                }`}
+                              >
+                                {/* Slot Title / Domain Indicator */}
+                                <div className="flex items-center justify-between text-xs">
+                                  <span
+                                    className={`font-mono text-[10px] font-bold px-1.5 py-0.2 rounded border ${
+                                      slot.isDomain
+                                        ? 'bg-amber-950/80 text-amber-300 border-amber-500/40'
+                                        : 'bg-slate-950 text-slate-400 border-slate-800'
+                                    }`}
+                                  >
+                                    {slot.isDomain ? '★ Domain Slot' : `Slot #${idx + 1}`}
+                                  </span>
+
+                                  {slot.spellId && (
+                                    <div className="flex items-center gap-1.5">
+                                      {/* Cast / Ready Toggle */}
+                                      <button
+                                        onClick={() => handleToggleCastSlot(slot.id)}
+                                        className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-lg border transition ${
+                                          slot.isCast
+                                            ? 'bg-rose-950 text-rose-300 border-rose-500/40'
+                                            : 'bg-emerald-950/80 text-emerald-300 border-emerald-500/30 hover:bg-emerald-900'
+                                        }`}
+                                        title={slot.isCast ? 'Click to mark as prepared (ready)' : 'Click to expend slot (cast)'}
+                                      >
+                                        <i className={`fa-solid ${slot.isCast ? 'fa-hourglass-end' : 'fa-check'} mr-1`}></i>
+                                        {slot.isCast ? 'Expended' : 'Ready'}
+                                      </button>
+
+                                      {/* Clear Slot Button */}
+                                      <button
+                                        onClick={() => handleClearSlot(slot.id)}
+                                        className="text-slate-500 hover:text-rose-400 transition p-1 text-xs"
+                                        title="Clear spell from this slot"
+                                      >
+                                        <i className="fa-solid fa-xmark"></i>
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Slot Content */}
+                                {slot.spellId ? (
+                                  <div className="space-y-2">
+                                    <div className="space-y-1">
+                                      <h4
+                                        onClick={() => assignedSpellObj && setSelectedSpellModal(assignedSpellObj)}
+                                        className={`text-xs font-bold font-heading cursor-pointer hover:text-amber-300 transition line-clamp-1 ${
+                                          slot.isCast ? 'line-through text-slate-400' : 'text-slate-100'
+                                        }`}
+                                        title={slot.spellName || assignedSpellObj?.name}
+                                      >
+                                        {slot.spellName || assignedSpellObj?.name || slot.spellId}
+                                      </h4>
+
+                                      {assignedSpellObj && (
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                          <span
+                                            className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${getSchoolColor(
+                                              assignedSpellObj.school
+                                            )}`}
+                                          >
+                                            {assignedSpellObj.school}
+                                          </span>
+                                          <span className="text-[9px] font-mono text-emerald-400 font-bold">
+                                            DC {lvlGroup.saveDc}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* Parameters snippet */}
+                                    {assignedSpellObj && (
+                                      <div className="text-[10px] font-mono text-slate-400 bg-slate-950/80 p-1.5 rounded border border-slate-800/60 truncate">
+                                        <span>{assignedSpellObj.castingTime}</span> • <span>{assignedSpellObj.range}</span>
+                                      </div>
+                                    )}
+
+                                    {/* Action Links */}
+                                    <div className="flex items-center justify-between pt-1 border-t border-slate-800/60 text-[10px]">
+                                      <button
+                                        onClick={() => assignedSpellObj && setSelectedSpellModal(assignedSpellObj)}
+                                        className="text-amber-400/90 hover:text-amber-300 font-semibold flex items-center gap-1"
+                                      >
+                                        <i className="fa-solid fa-eye text-[9px]"></i> Details
+                                      </button>
+
+                                      <button
+                                        onClick={() => handleOpenAssignModal(slot)}
+                                        className="text-slate-400 hover:text-slate-200 font-semibold flex items-center gap-1"
+                                      >
+                                        <i className="fa-solid fa-arrow-right-arrow-left text-[9px]"></i> Change
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="py-2 text-center space-y-2">
+                                    <p className="text-[11px] text-slate-500 font-medium">Empty Slot</p>
+                                    <button
+                                      onClick={() => handleOpenAssignModal(slot)}
+                                      className={`w-full py-1.5 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                                        slot.isDomain
+                                          ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-sm'
+                                          : 'bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-700/80'
+                                      }`}
+                                    >
+                                      <i className="fa-solid fa-plus text-xs"></i> Prepare Spell
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* SUB-TAB 2: LIVE SPELLBOOK & KNOWN SPELLS                                  */}
+      {/* ========================================================================= */}
+      {activeSubTab === 'spellbook' && (
+        <div className="space-y-6">
+          {/* Spellbook Header & Management Toolbar */}
+          <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-5 rounded-2xl space-y-4 shadow-xl">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2">
+                  <i className="fa-solid fa-book-bookmark text-amber-400"></i> Recorded Spellbook & Spells Known
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Manage your recorded spells. Wizards prepare daily spells exclusively from their live spellbook.
+                </p>
+              </div>
+
+              {/* Spellbook Statistics & Quick Actions */}
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2 bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800 text-xs font-mono">
+                  <span className="text-slate-400">Total Recorded:</span>
+                  <span className="text-amber-400 font-bold">{spellbookSpellObjects.length} Spells</span>
+                  <span className="text-slate-500">({spellbookTotalPages} Pages Used)</span>
+                </div>
+
+                <button
+                  onClick={handleAddAllStarterCantrips}
+                  className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-amber-500/40 text-amber-300 font-bold text-xs transition flex items-center gap-1.5"
+                >
+                  <i className="fa-solid fa-wand-sparkles"></i> Add All Cantrips
+                </button>
+
+                <button
+                  onClick={() => setIsAddSpellbookModalOpen(true)}
+                  className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition flex items-center gap-1.5 shadow-md shadow-amber-500/10"
+                >
+                  <i className="fa-solid fa-plus"></i> Add New Spell
+                </button>
+              </div>
+            </div>
+
+            {/* Spellbook Filters */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="label-text">Search Spellbook</label>
+                <input
+                  type="text"
+                  value={spellbookSearchQuery}
+                  onChange={e => setSpellbookSearchQuery(e.target.value)}
+                  placeholder="Search recorded spells..."
+                  className="input-field text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="label-text">Spell Level</label>
+                <select
+                  value={spellbookLevelFilter}
+                  onChange={e => setSpellbookLevelFilter(e.target.value)}
+                  className="input-field text-xs font-mono"
+                >
+                  <option value="all">All Recorded Levels</option>
+                  <option value="0">Cantrips (0th Level)</option>
+                  {Array.from({ length: 9 }, (_, i) => i + 1).map(lvl => (
+                    <option key={lvl} value={lvl.toString()}>
+                      Level {lvl}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="label-text">Magic School</label>
+                <select
+                  value={spellbookSchoolFilter}
+                  onChange={e => setSpellbookSchoolFilter(e.target.value)}
+                  className="input-field text-xs"
+                >
+                  <option value="all">All Schools</option>
+                  {MAGIC_SCHOOLS.map(sch => (
+                    <option key={sch} value={sch}>
+                      {sch}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Spellbook Spell Cards grouped by Level */}
+          {spellbookSpellObjects.length === 0 ? (
+            <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-8 rounded-2xl text-center space-y-4">
+              <div className="w-16 h-16 rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mx-auto text-2xl">
+                <i className="fa-solid fa-book-open"></i>
+              </div>
+              <h3 className="text-md font-bold text-slate-200">Your Spellbook is Currently Empty</h3>
+              <p className="text-xs text-slate-400 max-w-md mx-auto">
+                Populate your spellbook with starter wizard cantrips or browse the 3.5e compendium to record new spells into your book.
+              </p>
+              <div className="flex justify-center gap-3 pt-2">
+                <button
+                  onClick={handleAddAllStarterCantrips}
+                  className="px-4 py-2 rounded-xl bg-slate-950 border border-amber-500/40 text-amber-300 font-bold text-xs hover:bg-slate-900 transition flex items-center gap-2"
+                >
+                  <i className="fa-solid fa-wand-sparkles"></i> Add All 0th Cantrips
+                </button>
+                <button
+                  onClick={() => setIsAddSpellbookModalOpen(true)}
+                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition flex items-center gap-2"
+                >
+                  <i className="fa-solid fa-plus"></i> Browse & Add Spells
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {Array.from({ length: 10 }, (_, i) => i).map(lvl => {
+                const spellsAtLevel = spellbookSpellObjects.filter(spell => {
+                  const spellLvl = spell.levels['Wizard'] ?? spell.levels[currentPrepClassName] ?? 0;
+                  if (spellLvl !== lvl) return false;
+
+                  if (spellbookSearchQuery.trim()) {
+                    const q = spellbookSearchQuery.toLowerCase();
+                    if (!spell.name.toLowerCase().includes(q) && !spell.description.toLowerCase().includes(q)) {
+                      return false;
+                    }
+                  }
+                  if (spellbookLevelFilter !== 'all') {
+                    if (parseInt(spellbookLevelFilter, 10) !== lvl) return false;
+                  }
+                  if (spellbookSchoolFilter !== 'all') {
+                    if (spell.school.toLowerCase() !== spellbookSchoolFilter.toLowerCase()) return false;
+                  }
+                  return true;
+                });
+
+                if (spellsAtLevel.length === 0) return null;
+
+                const saveDc = calculateSpellSaveDc(lvl, currentPrepMod);
+
+                return (
+                  <div
+                    key={lvl}
+                    className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-4 shadow-md"
+                  >
+                    <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-sm font-bold text-amber-400">
+                          {lvl === 0 ? 'Cantrips (0th Level)' : `Level ${lvl} Spells`}
+                        </span>
+                        <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300 font-semibold">
+                          {spellsAtLevel.length} {spellsAtLevel.length === 1 ? 'Spell' : 'Spells'}
+                        </span>
+                      </div>
+
+                      <span className="text-xs font-mono text-emerald-400 font-bold bg-emerald-950/80 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg">
+                        DC {saveDc}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
+                      {spellsAtLevel.map(spell => {
+                        const schoolColorClass = getSchoolColor(spell.school);
+
+                        return (
+                          <div
+                            key={spell.id}
+                            className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 transition duration-200 flex flex-col justify-between space-y-2.5 shadow-sm"
+                          >
+                            <div className="space-y-1.5">
+                              <div className="flex items-start justify-between gap-2">
+                                <h4
+                                  onClick={() => setSelectedSpellModal(spell)}
+                                  className="text-xs font-bold text-slate-100 hover:text-amber-300 transition cursor-pointer leading-snug line-clamp-1"
+                                >
+                                  {spell.name}
+                                </h4>
+                                <span
+                                  className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border shrink-0 ${schoolColorClass}`}
+                                >
+                                  {spell.school}
+                                </span>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-1 text-[10px] font-mono text-slate-400 bg-slate-950/60 p-1.5 rounded border border-slate-800/60">
+                                <div className="truncate">Time: {spell.castingTime}</div>
+                                <div className="truncate">Range: {spell.range}</div>
+                              </div>
+
+                              <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                                {spell.description}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 text-[10px]">
+                              {/* Quick Prepare Button */}
+                              <button
+                                onClick={() => handleQuickPrepareFromSpellbook(spell)}
+                                className="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold transition flex items-center gap-1"
+                                title="Quick prepare into an available slot"
+                              >
+                                <i className="fa-solid fa-plus text-[9px]"></i> Prepare
+                              </button>
+
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  onClick={() => setSelectedSpellModal(spell)}
+                                  className="p-1 text-slate-400 hover:text-slate-200 transition"
+                                  title="View full spell details"
+                                >
+                                  <i className="fa-solid fa-circle-info"></i>
+                                </button>
+                                <button
+                                  onClick={() => handleRemoveFromSpellbook(spell.id)}
+                                  className="p-1 text-slate-500 hover:text-rose-400 transition"
+                                  title="Remove from live spellbook"
+                                >
+                                  <i className="fa-solid fa-trash-can"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* SUB-TAB 3: SEARCHABLE COMPENDIUM                                          */}
       {/* ========================================================================= */}
       {activeSubTab === 'compendium' && (
         <div className="space-y-6">
           {/* Search & Multi-Filter Control Panel */}
-          <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-5 rounded-2xl space-y-4 shadow-lg">
+          <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-5 rounded-2xl space-y-4 shadow-xl">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -522,6 +1388,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
                 {paginatedSpells.map(spell => {
                   const badge = getSourceBadgeInfo(spell.source, character.allowedSources);
                   const schoolColorClass = getSchoolColor(spell.school);
+                  const inSpellbook = spellbookSpellIds.includes(spell.id);
 
                   // Extract class level string
                   const classLevelBadges = Object.entries(spell.levels)
@@ -549,13 +1416,15 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
                   return (
                     <div
                       key={spell.id}
-                      onClick={() => setSelectedSpellModal(spell)}
-                      className="group p-4 rounded-xl bg-slate-950/80 border border-slate-800/80 hover:border-amber-500/50 transition duration-200 cursor-pointer space-y-3 flex flex-col justify-between shadow-md hover:shadow-amber-500/5"
+                      className="group p-4 rounded-xl bg-slate-950/80 border border-slate-800/80 hover:border-amber-500/50 transition duration-200 space-y-3 flex flex-col justify-between shadow-md hover:shadow-amber-500/5"
                     >
                       {/* Card Header */}
                       <div className="space-y-1.5">
                         <div className="flex items-start justify-between gap-2">
-                          <h3 className="font-bold text-slate-100 group-hover:text-amber-300 transition text-sm flex-1 leading-snug">
+                          <h3
+                            onClick={() => setSelectedSpellModal(spell)}
+                            className="font-bold text-slate-100 group-hover:text-amber-300 transition text-sm flex-1 leading-snug cursor-pointer"
+                          >
                             {spell.name}
                           </h3>
                           <span
@@ -612,21 +1481,46 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
                         </p>
 
                         <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 text-[10px]">
-                          <span
-                            className={`px-1.5 py-0.2 rounded font-mono font-bold border ${
-                              badge.isAllowed
-                                ? badge.isCore
-                                  ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/30'
-                                  : 'bg-amber-950/80 text-amber-300 border-amber-500/30'
-                                : 'bg-rose-950/80 text-rose-300 border-rose-500/40'
-                            }`}
-                          >
-                            {badge.sourceCode}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className={`px-1.5 py-0.2 rounded font-mono font-bold border ${
+                                badge.isAllowed
+                                  ? badge.isCore
+                                    ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/30'
+                                    : 'bg-amber-950/80 text-amber-300 border-amber-500/30'
+                                  : 'bg-rose-950/80 text-rose-300 border-rose-500/40'
+                              }`}
+                            >
+                              {badge.sourceCode}
+                            </span>
 
-                          <span className="text-amber-400/80 group-hover:text-amber-300 font-semibold flex items-center gap-1">
+                            {/* 1-Click Add/Remove Spellbook Toggle */}
+                            <button
+                              onClick={() => {
+                                if (inSpellbook) {
+                                  handleRemoveFromSpellbook(spell.id);
+                                } else {
+                                  handleAddToSpellbook(spell.id);
+                                }
+                              }}
+                              className={`px-2 py-0.5 rounded-lg border font-mono font-bold transition flex items-center gap-1 ${
+                                inSpellbook
+                                  ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/30 hover:bg-rose-950 hover:text-rose-300 hover:border-rose-500/40'
+                                  : 'bg-slate-900 text-slate-400 hover:text-amber-300 border-slate-800'
+                              }`}
+                              title={inSpellbook ? 'In spellbook (click to remove)' : 'Add to live spellbook'}
+                            >
+                              <i className={`fa-solid ${inSpellbook ? 'fa-book-bookmark' : 'fa-plus'} text-[9px]`}></i>
+                              <span>{inSpellbook ? 'In Spellbook' : '+ Spellbook'}</span>
+                            </button>
+                          </div>
+
+                          <button
+                            onClick={() => setSelectedSpellModal(spell)}
+                            className="text-amber-400/80 group-hover:text-amber-300 font-semibold flex items-center gap-1"
+                          >
                             Details <i className="fa-solid fa-chevron-right text-[9px]"></i>
-                          </span>
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -674,7 +1568,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
       )}
 
       {/* ========================================================================= */}
-      {/* SUB-TAB 2: CLASS SPELLCASTING SLOTS TRACKER                               */}
+      {/* SUB-TAB 4: CLASS SPELLCASTING SLOTS TRACKER                               */}
       {/* ========================================================================= */}
       {activeSubTab === 'slots' && (
         <div className="space-y-6">
@@ -799,7 +1693,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
       )}
 
       {/* ========================================================================= */}
-      {/* SUB-TAB 3: DIVINE DOMAINS & RACIAL SPELL-LIKE TRAITS                       */}
+      {/* SUB-TAB 5: DIVINE DOMAINS & RACIAL SPELL-LIKE TRAITS                       */}
       {/* ========================================================================= */}
       {activeSubTab === 'domains' && (
         <div className="space-y-6">
@@ -957,6 +1851,356 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
       )}
 
       {/* ========================================================================= */}
+      {/* 1-CLICK SPELL ASSIGNMENT MODAL / DRAWER                                   */}
+      {/* ========================================================================= */}
+      {activeAssignSlot && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 w-full max-w-3xl max-h-[85vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="p-5 border-b border-slate-800 flex items-center justify-between gap-4 bg-slate-950/50">
+              <div>
+                <h3 className="text-base font-bold font-heading text-slate-100 flex items-center gap-2">
+                  <i className="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+                  Prepare Spell: {activeAssignSlot.className}{' '}
+                  {activeAssignSlot.spellLevel === 0 ? 'Cantrip (0th Level)' : `Level ${activeAssignSlot.spellLevel}`}
+                  {activeAssignSlot.isDomain ? (
+                    <span className="text-xs px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/40">
+                      ★ Domain Slot
+                    </span>
+                  ) : (
+                    <span className="text-xs px-2 py-0.5 rounded bg-slate-950 text-slate-300 border border-slate-800 font-mono">
+                      Slot #{activeAssignSlot.slotIndex + 1}
+                    </span>
+                  )}
+                </h3>
+                <p className="text-xs text-slate-400">
+                  {activeAssignSlot.isDomain
+                    ? 'Select a granted spell from your divine domains.'
+                    : 'Select a spell to prepare into this slot. Search any spell for your class at this level.'}
+                </p>
+              </div>
+
+              <button
+                onClick={() => setActiveAssignSlot(null)}
+                className="p-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-slate-200 transition"
+              >
+                <i className="fa-solid fa-xmark text-sm"></i>
+              </button>
+            </div>
+
+            {/* Filter Toolbar */}
+            <div className="p-4 border-b border-slate-800/80 bg-slate-950/30 flex flex-wrap items-center gap-3">
+              {/* Search input */}
+              <div className="flex-1 min-w-[200px] relative">
+                <input
+                  type="text"
+                  autoFocus
+                  value={assignSearchQuery}
+                  onChange={e => setAssignSearchQuery(e.target.value)}
+                  placeholder={`Search Level ${activeAssignSlot.spellLevel} ${activeAssignSlot.className} spells...`}
+                  className="input-field text-xs pr-8"
+                />
+                {assignSearchQuery && (
+                  <button
+                    onClick={() => setAssignSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs"
+                  >
+                    <i className="fa-solid fa-circle-xmark"></i>
+                  </button>
+                )}
+              </div>
+
+              {/* Source scope switcher (All vs Spellbook) */}
+              {!activeAssignSlot.isDomain && currentPrepClassKey === 'wizard' && (
+                <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
+                  <button
+                    onClick={() => setAssignSourceFilter('all')}
+                    className={`px-2.5 py-1 rounded-lg transition ${
+                      assignSourceFilter === 'all'
+                        ? 'bg-amber-500 text-slate-950 font-bold'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    All Spells ({baseSpellsForActiveSlot.length})
+                  </button>
+                  <button
+                    onClick={() => setAssignSourceFilter('spellbook')}
+                    className={`px-2.5 py-1 rounded-lg transition ${
+                      assignSourceFilter === 'spellbook'
+                        ? 'bg-amber-500 text-slate-950 font-bold'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    In Spellbook ({baseSpellsForActiveSlot.filter(s => spellbookSpellIds.includes(s.id)).length})
+                  </button>
+                </div>
+              )}
+
+              {/* School Filter */}
+              <select
+                value={assignSchoolFilter}
+                onChange={e => setAssignSchoolFilter(e.target.value)}
+                className="input-field text-xs w-36"
+              >
+                <option value="all">All Schools</option>
+                {MAGIC_SCHOOLS.map(sch => (
+                  <option key={sch} value={sch}>
+                    {sch}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Spells List */}
+            <div className="p-4 overflow-y-auto space-y-2 flex-1">
+              {availableSpellsForActiveSlot.length === 0 ? (
+                <div className="p-8 text-center space-y-3">
+                  <i className="fa-solid fa-book-open-reader text-3xl text-slate-600"></i>
+                  <h4 className="text-sm font-bold text-slate-300">No Spells Match Your Search</h4>
+                  <p className="text-xs text-slate-400 max-w-md mx-auto">
+                    {assignSourceFilter === 'spellbook'
+                      ? 'No recorded spells in your spellbook match this filter. Switch to "All Spells" to browse all class spells!'
+                      : 'No spells found matching your search term or school filter.'}
+                  </p>
+                  {assignSourceFilter === 'spellbook' && (
+                    <button
+                      onClick={() => setAssignSourceFilter('all')}
+                      className="mt-2 px-4 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs hover:bg-amber-400 transition"
+                    >
+                      Show All Class Spells
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {availableSpellsForActiveSlot.map(spell => {
+                    const schoolColorClass = getSchoolColor(spell.school);
+                    const isCurrentlySelected = activeAssignSlot.spellId === spell.id;
+                    const inSpellbook = spellbookSpellIds.includes(spell.id);
+
+                    return (
+                      <div
+                        key={spell.id}
+                        onClick={() => handleAssignSpellToSlot(activeAssignSlot.id, spell)}
+                        className={`p-3 rounded-xl border transition cursor-pointer flex flex-col justify-between gap-2.5 ${
+                          isCurrentlySelected
+                            ? 'bg-amber-500/20 border-amber-500 text-slate-100 shadow-md shadow-amber-500/10'
+                            : 'bg-slate-950/80 border-slate-800 hover:border-amber-500/50 text-slate-300 hover:text-slate-100'
+                        }`}
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="font-bold text-xs truncate leading-snug" title={spell.name}>
+                              {spell.name}
+                            </h4>
+                            <div className="flex items-center gap-1 shrink-0">
+                              <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${schoolColorClass}`}>
+                                {spell.school}
+                              </span>
+                              {inSpellbook && (
+                                <span className="text-[9px] font-mono font-bold px-1 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+                                  Book
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="text-[10px] font-mono text-slate-400 truncate">
+                            {spell.castingTime} • {spell.range} • {spell.savingThrow}
+                          </div>
+
+                          <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed font-sans">
+                            {spell.description}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-1.5 border-t border-slate-800/60 text-[10px]">
+                          <button
+                            type="button"
+                            onClick={e => {
+                              e.stopPropagation();
+                              setSelectedSpellModal(spell);
+                            }}
+                            className="text-slate-400 hover:text-amber-300 transition flex items-center gap-1"
+                          >
+                            <i className="fa-solid fa-circle-info"></i> Full Details
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={e => {
+                              e.stopPropagation();
+                              handleAssignSpellToSlot(activeAssignSlot.id, spell);
+                            }}
+                            className={`px-3 py-1 rounded-lg text-xs font-bold font-mono transition shrink-0 ${
+                              isCurrentlySelected
+                                ? 'bg-amber-500 text-slate-950'
+                                : 'bg-slate-900 text-amber-300 border border-slate-700 hover:bg-amber-500 hover:text-slate-950'
+                            }`}
+                          >
+                            {isCurrentlySelected ? 'Assigned' : '1-Click Assign'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs">
+              <span className="text-slate-400 font-mono">
+                Showing {availableSpellsForActiveSlot.length} of {baseSpellsForActiveSlot.length} spells
+              </span>
+              <button
+                onClick={() => setActiveAssignSlot(null)}
+                className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* ADD SPELL TO SPELLBOOK MODAL                                              */}
+      {/* ========================================================================= */}
+      {isAddSpellbookModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 w-full max-w-3xl max-h-[85vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-5 border-b border-slate-800 flex items-center justify-between gap-4 bg-slate-950/50">
+              <div>
+                <h3 className="text-base font-bold font-heading text-slate-100 flex items-center gap-2">
+                  <i className="fa-solid fa-book-bookmark text-amber-400"></i> Record New Spells in Spellbook
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Search and record spells from the compendium into your live spellbook.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsAddSpellbookModalOpen(false)}
+                className="p-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-slate-200 transition"
+              >
+                <i className="fa-solid fa-xmark text-sm"></i>
+              </button>
+            </div>
+
+            {/* Filters */}
+            <div className="p-4 border-b border-slate-800/80 bg-slate-950/30 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={addSpellbookSearch}
+                  onChange={e => setAddSpellbookSearch(e.target.value)}
+                  placeholder="Search spells to add..."
+                  className="input-field text-xs pr-8"
+                />
+                {addSpellbookSearch && (
+                  <button
+                    onClick={() => setAddSpellbookSearch('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs"
+                  >
+                    <i className="fa-solid fa-circle-xmark"></i>
+                  </button>
+                )}
+              </div>
+
+              <select
+                value={addSpellbookLevel}
+                onChange={e => setAddSpellbookLevel(e.target.value)}
+                className="input-field text-xs font-mono"
+              >
+                <option value="all">All Levels</option>
+                <option value="0">Cantrips (0th Level)</option>
+                {Array.from({ length: 9 }, (_, i) => i + 1).map(lvl => (
+                  <option key={lvl} value={lvl.toString()}>
+                    Level {lvl}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={addSpellbookSchool}
+                onChange={e => setAddSpellbookSchool(e.target.value)}
+                className="input-field text-xs"
+              >
+                <option value="all">All Schools</option>
+                {MAGIC_SCHOOLS.map(sch => (
+                  <option key={sch} value={sch}>
+                    {sch}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Spell List */}
+            <div className="p-4 overflow-y-auto space-y-2 flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {eligibleSpellsForSpellbookAdd.slice(0, 100).map(spell => {
+                  const inSpellbook = spellbookSpellIds.includes(spell.id);
+                  const schoolColorClass = getSchoolColor(spell.school);
+
+                  return (
+                    <div
+                      key={spell.id}
+                      className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between gap-3 text-xs"
+                    >
+                      <div className="space-y-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-bold text-slate-100 truncate" title={spell.name}>
+                            {spell.name}
+                          </span>
+                          <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${schoolColorClass}`}>
+                            {spell.school}
+                          </span>
+                        </div>
+                        <div className="text-[10px] font-mono text-slate-400">
+                          Level: {Object.entries(spell.levels).slice(0, 2).map(([c, l]) => `${c} ${l}`).join(', ')}
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          if (inSpellbook) {
+                            handleRemoveFromSpellbook(spell.id);
+                          } else {
+                            handleAddToSpellbook(spell.id);
+                          }
+                        }}
+                        className={`px-3 py-1 rounded-lg font-bold font-mono transition text-xs shrink-0 flex items-center gap-1.5 ${
+                          inSpellbook
+                            ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40 hover:bg-rose-950 hover:text-rose-300'
+                            : 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-sm'
+                        }`}
+                      >
+                        <i className={`fa-solid ${inSpellbook ? 'fa-check' : 'fa-plus'} text-[10px]`}></i>
+                        <span>{inSpellbook ? 'In Book' : 'Add'}</span>
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs">
+              <span className="text-slate-400 font-mono">
+                {spellbookSpellIds.length} recorded spells in live spellbook
+              </span>
+              <button
+                onClick={() => setIsAddSpellbookModalOpen(false)}
+                className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
       {/* FULL-DETAIL SPELL MODAL POPUP                                             */}
       {/* ========================================================================= */}
       {selectedSpellModal && (
@@ -1071,12 +2315,40 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
               <span className="text-slate-400 font-mono">
                 Source: <span className="text-amber-400 font-bold">{selectedSpellModal.source}</span>
               </span>
-              <button
-                onClick={() => setSelectedSpellModal(null)}
-                className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition"
-              >
-                Close
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const inSpellbook = spellbookSpellIds.includes(selectedSpellModal.id);
+                    if (inSpellbook) {
+                      handleRemoveFromSpellbook(selectedSpellModal.id);
+                    } else {
+                      handleAddToSpellbook(selectedSpellModal.id);
+                    }
+                  }}
+                  className={`px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5 ${
+                    spellbookSpellIds.includes(selectedSpellModal.id)
+                      ? 'bg-slate-900 text-rose-300 border border-slate-700 hover:border-rose-500'
+                      : 'bg-slate-900 text-amber-300 border border-slate-700 hover:border-amber-500'
+                  }`}
+                >
+                  <i
+                    className={`fa-solid ${
+                      spellbookSpellIds.includes(selectedSpellModal.id) ? 'fa-trash-can' : 'fa-book-bookmark'
+                    }`}
+                  ></i>
+                  <span>
+                    {spellbookSpellIds.includes(selectedSpellModal.id)
+                      ? 'Remove from Spellbook'
+                      : 'Add to Spellbook'}
+                  </span>
+                </button>
+                <button
+                  onClick={() => setSelectedSpellModal(null)}
+                  className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1084,5 +2356,3 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
     </div>
   );
 };
-
-
