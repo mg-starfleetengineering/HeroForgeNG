@@ -3,6 +3,11 @@
 This project is a Vite + React + TypeScript + Tailwind CSS web application located on Windows at:
 `C:\Users\shado\.git\HeroForge-Anew` (which maps inside WSL Ubuntu to `/mnt/c/Users/shado/.git/HeroForge-Anew`).
 
+### Host Shell: Windows PowerShell (No `&&` Chaining)
+All commands executed natively on Windows run in **Windows PowerShell** (not bash or cmd).
+- **NEVER use `&&`** when running host commands in PowerShell (it is invalid syntax in Windows PowerShell). Use `;` or run commands as separate tool calls.
+- `&&` is ONLY permitted inside WSL bash execution strings (e.g. `wsl -d Ubuntu bash -c "cd /mnt/c/... && npm run build"`).
+
 ### 1. Execute All Node/npm/Vite Tooling Inside WSL Ubuntu
 Do NOT attempt to run `npm`, `npx`, or `node` natively on Windows shell. All Node/Vite/npm commands MUST be run via WSL Ubuntu (`wsl -d Ubuntu`).
 
