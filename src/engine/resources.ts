@@ -541,12 +541,18 @@ export function performLongRest(
       }
     : undefined;
 
+  const updatedPreparedSpells = character.preparedSpells
+    ? character.preparedSpells.map(slot => (slot.isCast ? { ...slot, isCast: false } : slot))
+    : undefined;
+
   return {
     currentHp: maxHp,
     tempHp: 0,
     nonlethalDamage: 0,
     resourceUsages: {},
     activeConditions: remainingConditions,
-    tacticalCombat: updatedTactical
+    tacticalCombat: updatedTactical,
+    ...(updatedPreparedSpells ? { preparedSpells: updatedPreparedSpells } : {})
   };
 }
+

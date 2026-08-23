@@ -1,4 +1,12 @@
-import { ClassData, LevelProgression, StatType } from '../types/character';
+import {
+  ClassData,
+  LevelProgression,
+  StatType,
+  PreparedSpellSlot,
+  CharacterState,
+  SpellData,
+  DomainData
+} from '../types/character';
 
 export interface SpellcastingClassInfo {
   name: string;
@@ -217,3 +225,384 @@ export function isSpellcastingClassName(className: string, classData?: ClassData
   }
   return false;
 }
+
+/**
+ * Calculates individual Spell Save DC for a given spell level and ability score modifier.
+ * D&D 3.5e Core Rule: DC = 10 + Spell Level + Key Ability Modifier
+ */
+export function calculateSpellSaveDc(spellLevel: number, keyAbilityMod: number): number {
+  return 10 + spellLevel + keyAbilityMod;
+}
+
+/**
+ * Checks if a class is a prepared caster (prepares daily spell slots).
+ */
+export function isPreparedCaster(className: string): boolean {
+  if (!className) return false;
+  const key = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const info = SPELLCASTING_CLASSES[key];
+  if (info) {
+    return info.method === 'Prepared';
+  }
+  const lower = className.toLowerCase();
+  return (
+    lower.includes('wizard') ||
+    lower.includes('cleric') ||
+    lower.includes('druid') ||
+    lower.includes('paladin') ||
+    lower.includes('ranger') ||
+    lower.includes('archivist') ||
+    lower.includes('healer') ||
+    lower.includes('wu jen')
+  );
+}
+
+export interface PreparedLevelSlotGroup {
+  spellLevel: number;
+  baseSlots: number;
+  bonusSlots: number;
+  regularSlots: number;
+  domainSlots: number;
+  totalSlots: number;
+  canCast: boolean;
+  saveDc: number;
+}
+
+/**
+ * Returns the slot structure by spell level for a prepared class.
+ * Includes domain slots for Clerics (+1 slot per level 1..9 if they have spell slots at that level).
+ */
+export function getPreparedSlotsStructure(
+  className: string,
+  classLevel: number,
+  abilityMod: number,
+  selectedDomains: string[] = []
+): PreparedLevelSlotGroup[] {
+  const classSlots = getSpellSlotsForClass(className, classLevel, abilityMod);
+  if (!classSlots) return [];
+
+  const key = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const isCleric = key === 'cleric';
+
+  return classSlots.slots.map(slot => {
+    const isLevel1Plus = slot.spellLevel >= 1;
+    // Cleric gets +1 domain slot per spell level 1-9 if they can cast spells of that level
+    const hasDomainSlot = isCleric && isLevel1Plus && slot.canCast;
+    const domainSlotsCount = hasDomainSlot ? 1 : 0;
+    const totalSlotsWithDomain = slot.total + domainSlotsCount;
+
+    return {
+      spellLevel: slot.spellLevel,
+      baseSlots: slot.base,
+      bonusSlots: slot.bonus,
+      regularSlots: slot.total,
+      domainSlots: domainSlotsCount,
+      totalSlots: totalSlotsWithDomain,
+      canCast: totalSlotsWithDomain > 0,
+      saveDc: calculateSpellSaveDc(slot.spellLevel, abilityMod)
+    };
+  });
+}
+
+/**
+ * Builds a deterministic slot ID.
+ */
+export function buildSlotId(
+  className: string,
+  spellLevel: number,
+  slotIndex: number,
+  isDomain: boolean = false
+): string {
+  const cKey = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  return `${cKey}_lvl${spellLevel}_${isDomain ? 'domain_' : 'slot_'}${slotIndex}`;
+}
+
+/**
+ * Reconciles and synchronizes prepared spell slots for a character.
+ * Retains existing prepared spells if the slot remains valid.
+ */
+export function syncPreparedSlotsForCharacter(
+  className: string,
+  classLevel: number,
+  abilityMod: number,
+  selectedDomains: string[] = [],
+  currentPreparedSpells: PreparedSpellSlot[] = []
+): PreparedSpellSlot[] {
+  const structure = getPreparedSlotsStructure(className, classLevel, abilityMod, selectedDomains);
+  const existingMap = new Map<string, PreparedSpellSlot>();
+
+  for (const slot of currentPreparedSpells) {
+    existingMap.set(slot.id, slot);
+  }
+
+  // Preserve prepared slots from other classes
+  const cKey = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const otherClassSlots = currentPreparedSpells.filter(
+    s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') !== cKey
+  );
+
+  const syncedForThisClass: PreparedSpellSlot[] = [];
+
+  for (const lvlGroup of structure) {
+    if (!lvlGroup.canCast) continue;
+
+    // Regular slots
+    for (let idx = 0; idx < lvlGroup.regularSlots; idx++) {
+      const slotId = buildSlotId(className, lvlGroup.spellLevel, idx, false);
+      const existing = existingMap.get(slotId);
+      syncedForThisClass.push({
+        id: slotId,
+        className,
+        spellLevel: lvlGroup.spellLevel,
+        slotIndex: idx,
+        spellId: existing?.spellId || null,
+        spellName: existing?.spellName || undefined,
+        isDomain: false,
+        isCast: existing?.isCast || false
+      });
+    }
+
+    // Domain slot (if applicable)
+    if (lvlGroup.domainSlots > 0) {
+      const domSlotId = buildSlotId(className, lvlGroup.spellLevel, 0, true);
+      const existingDom = existingMap.get(domSlotId);
+      syncedForThisClass.push({
+        id: domSlotId,
+        className,
+        spellLevel: lvlGroup.spellLevel,
+        slotIndex: 0,
+        spellId: existingDom?.spellId || null,
+        spellName: existingDom?.spellName || undefined,
+        isDomain: true,
+        isCast: existingDom?.isCast || false
+      });
+    }
+  }
+
+  return [...otherClassSlots, ...syncedForThisClass];
+}
+
+/**
+ * Assigns a spell to a specific slot ID.
+ */
+export function assignPreparedSpellSlot(
+  preparedSpells: PreparedSpellSlot[] = [],
+  slotId: string,
+  spell: { id: string; name: string }
+): PreparedSpellSlot[] {
+  const index = preparedSpells.findIndex(s => s.id === slotId);
+  if (index === -1) {
+    // If not found, return unchanged
+    return preparedSpells;
+  }
+
+  const updated = [...preparedSpells];
+  updated[index] = {
+    ...updated[index],
+    spellId: spell.id,
+    spellName: spell.name,
+    isCast: false
+  };
+  return updated;
+}
+
+/**
+ * Clears an assigned spell from a slot ID.
+ */
+export function clearPreparedSpellSlot(
+  preparedSpells: PreparedSpellSlot[] = [],
+  slotId: string
+): PreparedSpellSlot[] {
+  const index = preparedSpells.findIndex(s => s.id === slotId);
+  if (index === -1) return preparedSpells;
+
+  const updated = [...preparedSpells];
+  updated[index] = {
+    ...updated[index],
+    spellId: null,
+    spellName: undefined,
+    isCast: false
+  };
+  return updated;
+}
+
+/**
+ * Toggles the in-play expended/cast state of a prepared slot.
+ */
+export function togglePreparedSpellSlotCast(
+  preparedSpells: PreparedSpellSlot[] = [],
+  slotId: string
+): PreparedSpellSlot[] {
+  const index = preparedSpells.findIndex(s => s.id === slotId);
+  if (index === -1) return preparedSpells;
+
+  const updated = [...preparedSpells];
+  updated[index] = {
+    ...updated[index],
+    isCast: !updated[index].isCast
+  };
+  return updated;
+}
+
+/**
+ * Clears all prepared spells for a class (or all classes if className is omitted).
+ */
+export function clearAllPreparedSlots(
+  preparedSpells: PreparedSpellSlot[] = [],
+  className?: string
+): PreparedSpellSlot[] {
+  const cKey = className ? className.toLowerCase().replace(/[\s\/-]+/g, '_') : null;
+  return preparedSpells.map(slot => {
+    if (!cKey || slot.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey) {
+      return {
+        ...slot,
+        spellId: null,
+        spellName: undefined,
+        isCast: false
+      };
+    }
+    return slot;
+  });
+}
+
+/**
+ * Resets all cast states (isCast = false) for a class (or all classes), e.g. after a rest.
+ */
+export function resetAllPreparedSlotsCast(
+  preparedSpells: PreparedSpellSlot[] = [],
+  className?: string
+): PreparedSpellSlot[] {
+  const cKey = className ? className.toLowerCase().replace(/[\s\/-]+/g, '_') : null;
+  return preparedSpells.map(slot => {
+    if (!cKey || slot.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey) {
+      return {
+        ...slot,
+        isCast: false
+      };
+    }
+    return slot;
+  });
+}
+
+/**
+ * Adds a spell ID to the character's live spellbook if not already present.
+ */
+export function addSpellToSpellbook(
+  spellbookSpells: string[] = [],
+  spellId: string
+): string[] {
+  if (!spellId) return spellbookSpells;
+  if (spellbookSpells.includes(spellId)) return spellbookSpells;
+  return [...spellbookSpells, spellId];
+}
+
+/**
+ * Removes a spell ID from the character's live spellbook.
+ */
+export function removeSpellFromSpellbook(
+  spellbookSpells: string[] = [],
+  spellId: string
+): string[] {
+  return spellbookSpells.filter(id => id !== spellId);
+}
+
+/**
+ * Returns all 0th level cantrips for Wizard from the core spells database.
+ * Used for the quick "Add All Cantrips" button in the Live Spellbook.
+ */
+export function getStarterWizardCantripIds(spellsData: SpellData[] = []): string[] {
+  return spellsData
+    .filter(s => s.levels && s.levels['Wizard'] === 0)
+    .map(s => s.id);
+}
+
+/**
+ * Resolves the spell level for a specific class name (case-insensitive, normalized).
+ */
+export function getSpellLevelForClass(spell: SpellData, className: string): number | undefined {
+  if (!spell || !spell.levels || !className) return undefined;
+  const target = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+
+  for (const [clsKey, lvl] of Object.entries(spell.levels)) {
+    const norm = clsKey.toLowerCase().replace(/[\s\/-]+/g, '_');
+    if (norm === target) return lvl;
+  }
+  return undefined;
+}
+
+/**
+ * Resolves available spells for daily preparation.
+ * For regular slots: returns matching spells of that spell level for the class.
+ * If onlySpellbook is true: filters by character.spellbookSpells.
+ * For Cleric Domain Slots: returns domain spells corresponding to the character's domains.
+ */
+export function getAvailableSpellsForPreparation(
+  className: string,
+  spellLevel: number,
+  character: CharacterState,
+  spellsData: SpellData[] = [],
+  domainsData: DomainData[] = [],
+  isDomainSlot: boolean = false,
+  onlySpellbook: boolean = false
+): SpellData[] {
+  const spellbook = new Set(character.spellbookSpells || []);
+
+  // 1. Cleric Domain Slot: Spells from character's selected domains at this level
+  if (isDomainSlot) {
+    const selectedDomains = (character.selectedDomains || []).map(d => d.toLowerCase().trim());
+
+    // Check domain spells directly from domain objects
+    const domainSpellNames = new Set<string>();
+    for (const domName of selectedDomains) {
+      const domObj = domainsData.find(
+        d => d.name.toLowerCase() === domName || d.id.toLowerCase() === domName
+      );
+      if (domObj && domObj.spells && domObj.spells[spellLevel - 1]) {
+        domainSpellNames.add(domObj.spells[spellLevel - 1].toLowerCase().trim());
+      }
+    }
+
+    const domainMatches = spellsData.filter(spell => {
+      // Direct name match from domain spell array
+      if (domainSpellNames.has(spell.name.toLowerCase().trim())) return true;
+      // Or spell.levels has this domain
+      for (const [domKey, domLvl] of Object.entries(spell.levels)) {
+        if (selectedDomains.includes(domKey.toLowerCase().trim()) && domLvl === spellLevel) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+    if (domainMatches.length > 0) {
+      return domainMatches;
+    }
+
+    // Fallback if domains not yet selected: return all domain spells at this level
+    return spellsData.filter(spell => {
+      for (const [lvlKey, lvlVal] of Object.entries(spell.levels)) {
+        if (
+          lvlVal === spellLevel &&
+          !['Wizard', 'Sorcerer', 'Cleric', 'Druid', 'Paladin', 'Ranger', 'Bard'].includes(lvlKey)
+        ) {
+          return true;
+        }
+      }
+      return getSpellLevelForClass(spell, 'Cleric') === spellLevel;
+    });
+  }
+
+  // 2. Regular slots for any spellcasting class
+  return spellsData.filter(spell => {
+    const classLvl = getSpellLevelForClass(spell, className);
+    if (classLvl !== spellLevel) return false;
+
+    if (onlySpellbook) {
+      return spellbook.has(spell.id);
+    }
+
+    return true;
+  });
+}
+
+
