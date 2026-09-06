@@ -44,6 +44,16 @@ import { calculateConditionPenalties, CONDITION_MAP } from '../engine/conditions
 import { calculateTotalDR } from '../engine/dr';
 import { calculateTotalSR } from '../engine/sr';
 import { resolveActiveWildShape, calculateWildShapeAttacks, getSizeAcModifier } from '../engine/wildshape';
+import {
+  rollAttack,
+  rollAttackSequence,
+  rollDamage,
+  rollSavingThrow,
+  rollSkillCheck,
+  rollAbilityCheck,
+  rollGrappleCheck,
+  rollInitiative
+} from '../engine/dice';
 
 interface SheetViewTabProps {
   character: CharacterState;
@@ -218,7 +228,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       keyAbility: skill.keyAbility.toUpperCase(),
       isClass,
       ranks,
-      totalMod
+      totalMod,
+      abMod,
+      tfSkillMod,
+      skillSpecificPenalty
     };
   });
 
@@ -576,17 +589,42 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
             <span className="text-xl print:text-lg font-bold text-amber-700">{drSummary.bestDRString}</span>
             <span className="text-[10px] print:text-[8.5px] text-slate-500 block leading-tight">{srSummary.hasSR ? srSummary.bestSRString : 'SR None'}</span>
           </div>
-          <div>
-            <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Initiative</span>
-            <span className="text-xl print:text-lg font-bold text-slate-900">{totalInitiative >= 0 ? '+' : ''}{totalInitiative}</span>
+          <div
+            onClick={() => rollInitiative(totalInitiative, {
+              components: [
+                { label: 'Dex', value: effectiveDexMod },
+                ...(traitFlawInitMod !== 0 ? [{ label: 'Trait/Flaw', value: traitFlawInitMod }] : []),
+                ...(conditionPenalties.initiativePenalty !== 0 ? [{ label: 'Condition', value: conditionPenalties.initiativePenalty }] : [])
+              ]
+            })}
+            className="cursor-pointer hover:bg-slate-200/80 rounded transition p-0.5 group"
+            title="Click to roll Initiative (1d20 + Init)"
+          >
+            <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold group-hover:text-amber-800 flex items-center justify-center gap-1">
+              Initiative <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
+            </span>
+            <span className="text-xl print:text-lg font-bold text-slate-900 group-hover:text-amber-800">
+              {totalInitiative >= 0 ? '+' : ''}{totalInitiative}
+            </span>
           </div>
           <div>
             <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Base Attack</span>
             <span className="text-xl print:text-lg font-bold text-slate-900">+{bab}</span>
-            <span className="text-[10px] print:text-[8.5px] text-slate-500 block leading-tight">
-              Grapple {grappleCalc.total >= 0 ? `+${grappleCalc.total}` : grappleCalc.total}
+            <div
+              onClick={() => rollGrappleCheck(grappleCalc.total, {
+                components: [
+                  { label: 'BAB', value: grappleCalc.bab },
+                  { label: 'Str', value: grappleCalc.strMod },
+                  ...(grappleCalc.sizeMod !== 0 ? [{ label: 'Size', value: grappleCalc.sizeMod }] : []),
+                  ...(grappleCalc.featBonus !== 0 ? [{ label: 'Feats', value: grappleCalc.featBonus }] : [])
+                ]
+              })}
+              className="text-[10px] print:text-[8.5px] text-slate-600 block leading-tight cursor-pointer hover:text-amber-800 transition"
+              title="Click to roll Grapple Check"
+            >
+              <span className="font-semibold underline decoration-dotted">Grapple {grappleCalc.total >= 0 ? `+${grappleCalc.total}` : grappleCalc.total}</span>
               {generalTcMods.strBonus > 0 && <span className="text-rose-700 text-[8.5px] ml-0.5">(+{Math.floor(generalTcMods.strBonus / 2)} Str)</span>}
-            </span>
+            </div>
           </div>
           <div>
             <span className="text-[10px] print:text-[9.5px] text-slate-500 block uppercase font-sans font-bold">Speed</span>
@@ -709,20 +747,66 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
             </thead>
             <tbody className="divide-y divide-slate-200 font-mono text-[11px] print:text-[10px]">
               {activeWeaponsList.map((item, idx) => (
-                <tr key={idx}>
-                  <td className="py-0.5 font-bold text-slate-900">
-                    <span className="text-[9.5px] font-sans font-semibold text-slate-500 uppercase mr-1">[{item.label}]</span>
-                    {item.weapon.name}
+                <tr key={idx} className="hover:bg-slate-100/80 transition-colors">
+                  <td className="py-1 font-bold text-slate-900">
+                    <div
+                      onClick={() => {
+                        if (item.weapon.id === 'grapple_maneuver') {
+                          rollGrappleCheck(item.attackBonus);
+                        } else if (item.fullSeq && item.fullSeq.includes('/')) {
+                          rollAttackSequence(item.fullSeq, `${item.weapon.name} Attack`, item.weapon);
+                        } else {
+                          rollAttack(item.attackBonus, `${item.weapon.name} Attack`, item.weapon);
+                        }
+                      }}
+                      className="cursor-pointer hover:text-amber-800 transition inline-flex items-center gap-1 group"
+                      title={`Click to roll ${item.weapon.name}`}
+                    >
+                      <span className="text-[9.5px] font-sans font-semibold text-slate-500 uppercase mr-1">[{item.label}]</span>
+                      <span>{item.weapon.name}</span>
+                      <i className="fa-solid fa-dice-d20 text-[10px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
+                    </div>
                   </td>
-                  <td className="py-0.5 text-center font-bold text-slate-900">
-                    <div>{item.fullSeq || (item.attackBonus >= 0 ? `+${item.attackBonus}` : `${item.attackBonus}`)}</div>
-                    {item.tacticalNote && (
-                      <div className="text-[8.5px] text-slate-500 font-sans font-normal leading-none">{item.tacticalNote}</div>
-                    )}
+                  <td className="py-1 text-center font-bold text-slate-900">
+                    <div
+                      onClick={() => {
+                        if (item.weapon.id === 'grapple_maneuver') {
+                          rollGrappleCheck(item.attackBonus);
+                        } else if (item.fullSeq && item.fullSeq.includes('/')) {
+                          rollAttackSequence(item.fullSeq, `${item.weapon.name} Attack`, item.weapon);
+                        } else {
+                          rollAttack(item.attackBonus, `${item.weapon.name} Attack`, item.weapon);
+                        }
+                      }}
+                      className="cursor-pointer hover:bg-slate-200/80 px-1.5 py-0.5 rounded transition inline-block group"
+                      title="Click to roll Attack sequence"
+                    >
+                      <span className="group-hover:text-amber-800 group-hover:underline">
+                        {item.fullSeq || (item.attackBonus >= 0 ? `+${item.attackBonus}` : `${item.attackBonus}`)}
+                      </span>
+                      {item.tacticalNote && (
+                        <div className="text-[8.5px] text-slate-500 font-sans font-normal leading-none">{item.tacticalNote}</div>
+                      )}
+                    </div>
                   </td>
-                  <td className="py-0.5 text-center text-slate-800">{item.damageStr}</td>
-                  <td className="py-0.5 text-center text-slate-800">{item.critStr}</td>
-                  <td className="py-0.5 text-center text-slate-800">{item.type}</td>
+                  <td className="py-1 text-center text-slate-800">
+                    <div
+                      onClick={() => {
+                        const formula = (item.damageStr || '').split(' ')[0];
+                        if (formula) {
+                          rollDamage(formula, `${item.weapon.name} Damage`);
+                        }
+                      }}
+                      className="cursor-pointer hover:bg-slate-200/80 px-1.5 py-0.5 rounded transition inline-block group"
+                      title="Click to roll Damage"
+                    >
+                      <span className="group-hover:text-amber-800 group-hover:underline font-bold">
+                        {item.damageStr}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-1 text-center text-slate-800">{item.critStr}</td>
+                  <td className="py-1 text-center text-slate-800">{item.type}</td>
                 </tr>
               ))}
             </tbody>
@@ -834,9 +918,14 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 font-mono">
-                  <tr className={activeWildShape ? 'bg-emerald-50' : (generalTcMods.strBonus > 0 ? 'bg-amber-100/80' : '')}>
-                    <td className="py-0.5 font-bold flex items-center gap-1">
+                  <tr
+                    onClick={() => rollAbilityCheck(effectiveStrMod, 'Strength')}
+                    className={`cursor-pointer hover:bg-slate-200/80 transition-colors group ${activeWildShape ? 'bg-emerald-50' : (generalTcMods.strBonus > 0 ? 'bg-amber-100/80' : '')}`}
+                    title="Click to roll Strength check (1d20 + Str)"
+                  >
+                    <td className="py-0.5 font-bold flex items-center gap-1 group-hover:text-amber-800">
                       STR
+                      <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
                       {activeWildShape && (
                         <span className="text-[8px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-1 rounded uppercase font-sans font-bold">
                           {activeWildShape.name}
@@ -852,13 +941,18 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                       {effectiveStrScore}
                       {generalTcMods.strBonus > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">(Base {strScore})</span>}
                     </td>
-                    <td className="py-0.5 text-center font-bold">
+                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">
                       {effectiveStrMod >= 0 ? `+${effectiveStrMod}` : effectiveStrMod}
                     </td>
                   </tr>
-                  <tr className={activeWildShape ? 'bg-emerald-50' : ''}>
-                    <td className="py-0.5 font-bold flex items-center gap-1">
+                  <tr
+                    onClick={() => rollAbilityCheck(dexMod, 'Dexterity')}
+                    className={`cursor-pointer hover:bg-slate-200/80 transition-colors group ${activeWildShape ? 'bg-emerald-50' : ''}`}
+                    title="Click to roll Dexterity check (1d20 + Dex)"
+                  >
+                    <td className="py-0.5 font-bold flex items-center gap-1 group-hover:text-amber-800">
                       DEX
+                      <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
                       {activeWildShape && (
                         <span className="text-[8px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-1 rounded uppercase font-sans font-bold">
                           {activeWildShape.name}
@@ -866,11 +960,16 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                       )}
                     </td>
                     <td className="py-0.5 text-center font-bold">{dexScore}</td>
-                    <td className="py-0.5 text-center font-bold">{dexMod >= 0 ? '+' : ''}{dexMod}</td>
+                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">{dexMod >= 0 ? '+' : ''}{dexMod}</td>
                   </tr>
-                  <tr className={activeWildShape ? 'bg-emerald-50' : (generalTcMods.conBonus > 0 ? 'bg-amber-100/80' : '')}>
-                    <td className="py-0.5 font-bold flex items-center gap-1">
+                  <tr
+                    onClick={() => rollAbilityCheck(effectiveConMod, 'Constitution')}
+                    className={`cursor-pointer hover:bg-slate-200/80 transition-colors group ${activeWildShape ? 'bg-emerald-50' : (generalTcMods.conBonus > 0 ? 'bg-amber-100/80' : '')}`}
+                    title="Click to roll Constitution check (1d20 + Con)"
+                  >
+                    <td className="py-0.5 font-bold flex items-center gap-1 group-hover:text-amber-800">
                       CON
+                      <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
                       {activeWildShape && (
                         <span className="text-[8px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-1 rounded uppercase font-sans font-bold">
                           {activeWildShape.name}
@@ -886,13 +985,46 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                       {effectiveConScore}
                       {generalTcMods.conBonus > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">(Base {conScore})</span>}
                     </td>
-                    <td className="py-0.5 text-center font-bold">
+                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">
                       {effectiveConMod >= 0 ? `+${effectiveConMod}` : effectiveConMod}
                     </td>
                   </tr>
-                  <tr><td className="py-0.5 font-bold">INT</td><td className="py-0.5 text-center">{intScore}</td><td className="py-0.5 text-center font-bold">{intMod >= 0 ? '+' : ''}{intMod}</td></tr>
-                  <tr><td className="py-0.5 font-bold">WIS</td><td className="py-0.5 text-center">{wisScore}</td><td className="py-0.5 text-center font-bold">{wisMod >= 0 ? '+' : ''}{wisMod}</td></tr>
-                  <tr><td className="py-0.5 font-bold">CHA</td><td className="py-0.5 text-center">{chaScore}</td><td className="py-0.5 text-center font-bold">{chaMod >= 0 ? '+' : ''}{chaMod}</td></tr>
+                  <tr
+                    onClick={() => rollAbilityCheck(intMod, 'Intelligence')}
+                    className="cursor-pointer hover:bg-slate-200/80 transition-colors group"
+                    title="Click to roll Intelligence check (1d20 + Int)"
+                  >
+                    <td className="py-0.5 font-bold flex items-center gap-1 group-hover:text-amber-800">
+                      INT
+                      <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
+                    </td>
+                    <td className="py-0.5 text-center">{intScore}</td>
+                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">{intMod >= 0 ? '+' : ''}{intMod}</td>
+                  </tr>
+                  <tr
+                    onClick={() => rollAbilityCheck(wisMod, 'Wisdom')}
+                    className="cursor-pointer hover:bg-slate-200/80 transition-colors group"
+                    title="Click to roll Wisdom check (1d20 + Wis)"
+                  >
+                    <td className="py-0.5 font-bold flex items-center gap-1 group-hover:text-amber-800">
+                      WIS
+                      <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
+                    </td>
+                    <td className="py-0.5 text-center">{wisScore}</td>
+                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">{wisMod >= 0 ? '+' : ''}{wisMod}</td>
+                  </tr>
+                  <tr
+                    onClick={() => rollAbilityCheck(chaMod, 'Charisma')}
+                    className="cursor-pointer hover:bg-slate-200/80 transition-colors group"
+                    title="Click to roll Charisma check (1d20 + Cha)"
+                  >
+                    <td className="py-0.5 font-bold flex items-center gap-1 group-hover:text-amber-800">
+                      CHA
+                      <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
+                    </td>
+                    <td className="py-0.5 text-center">{chaScore}</td>
+                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">{chaMod >= 0 ? '+' : ''}{chaMod}</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -910,9 +1042,23 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 font-mono text-[11px] print:text-[10px]">
-                  <tr>
-                    <td className="py-0.5 font-bold">FORTITUDE (Con)</td>
-                    <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px]">{totalFort >= 0 ? '+' : ''}{totalFort}</td>
+                  <tr
+                    onClick={() => rollSavingThrow(totalFort, 'Fortitude', {
+                      components: [
+                        { label: 'Base Fort', value: baseFort },
+                        { label: 'Con', value: effectiveConMod },
+                        ...(generalTcMods.fortSaveMod !== 0 ? [{ label: 'Tactical', value: generalTcMods.fortSaveMod }] : []),
+                        ...(traitFlawSaveMods.fort !== 0 ? [{ label: 'Trait/Flaw', value: traitFlawSaveMods.fort }] : [])
+                      ]
+                    })}
+                    className="cursor-pointer hover:bg-slate-200/80 transition-colors group"
+                    title="Click to roll Fortitude Save"
+                  >
+                    <td className="py-0.5 font-bold flex items-center gap-1 group-hover:text-amber-800">
+                      FORTITUDE (Con)
+                      <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
+                    </td>
+                    <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px] group-hover:text-amber-800">{totalFort >= 0 ? '+' : ''}{totalFort}</td>
                     <td className="py-0.5 text-center">{baseFort}</td>
                     <td className="py-0.5 text-center">{effectiveConMod >= 0 ? '+' : ''}{effectiveConMod}</td>
                     <td className="py-0.5 text-center text-[10px] print:text-[9px] text-slate-600">
@@ -924,9 +1070,23 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                       ) : '-'}
                     </td>
                   </tr>
-                  <tr>
-                    <td className="py-0.5 font-bold">REFLEX (Dex)</td>
-                    <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px]">{totalRef >= 0 ? '+' : ''}{totalRef}</td>
+                  <tr
+                    onClick={() => rollSavingThrow(totalRef, 'Reflex', {
+                      components: [
+                        { label: 'Base Ref', value: baseRef },
+                        { label: 'Dex', value: dexMod },
+                        ...(generalTcMods.refSaveMod !== 0 ? [{ label: 'Tactical', value: generalTcMods.refSaveMod }] : []),
+                        ...(traitFlawSaveMods.ref !== 0 ? [{ label: 'Trait/Flaw', value: traitFlawSaveMods.ref }] : [])
+                      ]
+                    })}
+                    className="cursor-pointer hover:bg-slate-200/80 transition-colors group"
+                    title="Click to roll Reflex Save"
+                  >
+                    <td className="py-0.5 font-bold flex items-center gap-1 group-hover:text-amber-800">
+                      REFLEX (Dex)
+                      <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
+                    </td>
+                    <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px] group-hover:text-amber-800">{totalRef >= 0 ? '+' : ''}{totalRef}</td>
                     <td className="py-0.5 text-center">{baseRef}</td>
                     <td className="py-0.5 text-center">{dexMod >= 0 ? '+' : ''}{dexMod}</td>
                     <td className="py-0.5 text-center text-[10px] print:text-[9px] text-slate-600">
@@ -941,9 +1101,23 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                       ) : '-'}
                     </td>
                   </tr>
-                  <tr>
-                    <td className="py-0.5 font-bold">WILL (Wis)</td>
-                    <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px]">{totalWill >= 0 ? '+' : ''}{totalWill}</td>
+                  <tr
+                    onClick={() => rollSavingThrow(totalWill, 'Will', {
+                      components: [
+                        { label: 'Base Will', value: baseWill },
+                        { label: 'Wis', value: wisMod },
+                        ...(generalTcMods.willSaveMod !== 0 ? [{ label: 'Tactical', value: generalTcMods.willSaveMod }] : []),
+                        ...(traitFlawSaveMods.will !== 0 ? [{ label: 'Trait/Flaw', value: traitFlawSaveMods.will }] : [])
+                      ]
+                    })}
+                    className="cursor-pointer hover:bg-slate-200/80 transition-colors group"
+                    title="Click to roll Will Save"
+                  >
+                    <td className="py-0.5 font-bold flex items-center gap-1 group-hover:text-amber-800">
+                      WILL (Wis)
+                      <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
+                    </td>
+                    <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px] group-hover:text-amber-800">{totalWill >= 0 ? '+' : ''}{totalWill}</td>
                     <td className="py-0.5 text-center">{baseWill}</td>
                     <td className="py-0.5 text-center">{wisMod >= 0 ? '+' : ''}{wisMod}</td>
                     <td className="py-0.5 text-center text-[10px] print:text-[9px] text-slate-600">
@@ -1180,7 +1354,19 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {leftSkills.map(sk => (
-                    <tr key={sk.name}>
+                    <tr
+                      key={sk.name}
+                      onClick={() => rollSkillCheck(sk.totalMod, sk.name, {
+                        components: [
+                          ...(sk.ranks > 0 ? [{ label: 'Ranks', value: Math.floor(sk.ranks) }] : []),
+                          { label: sk.keyAbility, value: sk.abMod },
+                          ...(sk.tfSkillMod !== 0 ? [{ label: 'Trait/Flaw', value: sk.tfSkillMod }] : []),
+                          ...(sk.skillSpecificPenalty !== 0 ? [{ label: 'Penalty', value: sk.skillSpecificPenalty }] : [])
+                        ]
+                      })}
+                      className="hover:bg-slate-200/80 cursor-pointer transition-colors group"
+                      title={`Click to roll ${sk.name} Check`}
+                    >
                       <td className="py-0.5 px-1 text-center">
                         {sk.isClass ? (
                           <span className="font-bold text-[9px] text-slate-900 bg-slate-200 px-1 rounded">C</span>
@@ -1188,10 +1374,15 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                           <span className="text-[9px] text-slate-400">-</span>
                         )}
                       </td>
-                      <td className="py-0.5 px-1 font-sans font-semibold text-slate-900">{sk.name}</td>
+                      <td className="py-0.5 px-1 font-sans font-semibold text-slate-900 group-hover:text-amber-800">
+                        <span className="flex items-center justify-between">
+                          <span>{sk.name}</span>
+                          <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition mr-1"></i>
+                        </span>
+                      </td>
                       <td className="py-0.5 px-1 text-center text-slate-600 text-[10px]">{sk.keyAbility}</td>
                       <td className="py-0.5 px-1 text-center text-slate-700">{sk.ranks > 0 ? sk.ranks : '-'}</td>
-                      <td className="py-0.5 px-1 text-right font-bold text-slate-900">
+                      <td className="py-0.5 px-1 text-right font-bold text-slate-900 group-hover:text-amber-800">
                         {sk.totalMod >= 0 ? `+${sk.totalMod}` : sk.totalMod}
                       </td>
                     </tr>
@@ -1212,7 +1403,19 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {rightSkills.map(sk => (
-                    <tr key={sk.name}>
+                    <tr
+                      key={sk.name}
+                      onClick={() => rollSkillCheck(sk.totalMod, sk.name, {
+                        components: [
+                          ...(sk.ranks > 0 ? [{ label: 'Ranks', value: Math.floor(sk.ranks) }] : []),
+                          { label: sk.keyAbility, value: sk.abMod },
+                          ...(sk.tfSkillMod !== 0 ? [{ label: 'Trait/Flaw', value: sk.tfSkillMod }] : []),
+                          ...(sk.skillSpecificPenalty !== 0 ? [{ label: 'Penalty', value: sk.skillSpecificPenalty }] : [])
+                        ]
+                      })}
+                      className="hover:bg-slate-200/80 cursor-pointer transition-colors group"
+                      title={`Click to roll ${sk.name} Check`}
+                    >
                       <td className="py-0.5 px-1 text-center">
                         {sk.isClass ? (
                           <span className="font-bold text-[9px] text-slate-900 bg-slate-200 px-1 rounded">C</span>
@@ -1220,10 +1423,15 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                           <span className="text-[9px] text-slate-400">-</span>
                         )}
                       </td>
-                      <td className="py-0.5 px-1 font-sans font-semibold text-slate-900">{sk.name}</td>
+                      <td className="py-0.5 px-1 font-sans font-semibold text-slate-900 group-hover:text-amber-800">
+                        <span className="flex items-center justify-between">
+                          <span>{sk.name}</span>
+                          <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition mr-1"></i>
+                        </span>
+                      </td>
                       <td className="py-0.5 px-1 text-center text-slate-600 text-[10px]">{sk.keyAbility}</td>
                       <td className="py-0.5 px-1 text-center text-slate-700">{sk.ranks > 0 ? sk.ranks : '-'}</td>
-                      <td className="py-0.5 px-1 text-right font-bold text-slate-900">
+                      <td className="py-0.5 px-1 text-right font-bold text-slate-900 group-hover:text-amber-800">
                         {sk.totalMod >= 0 ? `+${sk.totalMod}` : sk.totalMod}
                       </td>
                     </tr>

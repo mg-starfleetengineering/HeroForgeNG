@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   parseDiceFormula,
   formatBreakdown,
+  formatDetailedBreakdown,
   rollDice,
   rollAttack,
   rollAttackSequence,
@@ -370,6 +371,54 @@ describe('Interactive Dice Engine (src/engine/dice.ts)', () => {
 
       expect(getThreatMin({ threatMin: 17 })).toBe(17);
       expect(getCritMultiplier({ critMultiplier: 4 })).toBe(4);
+    });
+  });
+
+  describe('Detailed Math Breakdowns with Components', () => {
+    it('formats itemized attack components (e.g. d20 (17) + BAB (5) + Str (3) + Enh (1) = 26)', () => {
+      const customRng = () => 17;
+      const result = rollAttack(9, 'Longsword Attack', undefined, {
+        customRng,
+        components: [
+          { label: 'BAB', value: 5 },
+          { label: 'Str', value: 3 },
+          { label: 'Enh', value: 1 }
+        ]
+      });
+
+      expect(result.total).toBe(26);
+      expect(result.detailedBreakdown).toBe('d20 (17) + BAB (5) + Str (3) + Enh (1) = 26');
+      expect(result.summary).toContain('d20 (17) + BAB (5) + Str (3) + Enh (1) = 26');
+    });
+
+    it('handles negative components correctly', () => {
+      const customRng = () => 14;
+      const result = rollAttack(6, 'Power Attack', undefined, {
+        customRng,
+        components: [
+          { label: 'BAB', value: 5 },
+          { label: 'Str', value: 3 },
+          { label: 'PA', value: -2 }
+        ]
+      });
+
+      expect(result.total).toBe(20);
+      expect(result.detailedBreakdown).toBe('d20 (14) + BAB (5) + Str (3) - PA (2) = 20');
+    });
+
+    it('formats saving throw components', () => {
+      const customRng = () => 12;
+      const result = rollSavingThrow(6, 'Fortitude', {
+        customRng,
+        components: [
+          { label: 'Base Fort', value: 3 },
+          { label: 'Con', value: 2 },
+          { label: 'Rage', value: 1 }
+        ]
+      });
+
+      expect(result.total).toBe(18);
+      expect(result.detailedBreakdown).toBe('d20 (12) + Base Fort (3) + Con (2) + Rage (1) = 18');
     });
   });
 });

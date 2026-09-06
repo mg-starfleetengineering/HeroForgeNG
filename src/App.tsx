@@ -17,6 +17,7 @@ import { PortraitModal } from './components/PortraitModal';
 import { CharacterRosterModal } from './components/CharacterRosterModal';
 import { DocumentationModal } from './components/DocumentationModal';
 import { SourceBooksTab } from './components/SourceBooksTab';
+import { DiceTrayWidget } from './components/DiceTrayWidget';
 import { CORE_SOURCES } from './utils/sourceFilter';
 import { generateRoll20JSON } from './engine/roll20Export';
 import { syncEquippedItemsToInventory } from './engine/equipment';
@@ -486,12 +487,15 @@ export const App: React.FC = () => {
         </div>
       </main>
 
-      <footer className="mt-auto border-t border-slate-800/80 bg-slate-900/40 text-slate-400 text-xs py-4 px-4 text-center space-y-1">
+      <footer className="mt-auto border-t border-slate-800/80 bg-slate-900/40 text-slate-400 text-xs py-4 pb-16 px-4 text-center space-y-1 print:hidden">
         <p>HeroForgeNG 3.5 Web Edition v2.0.0 &copy; 2026. Built with React, Vite & TypeScript.</p>
         <p className="text-[11px] text-slate-500">
           Based on the original <a href="https://github.com/Heliomance/HeroForge-Anew" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline font-medium">HeroForge Anew project by Heliomance</a>.
         </p>
       </footer>
+
+      {/* Global Bottom Dockable Dice Tray HUD */}
+      <DiceTrayWidget />
 
       {/* Global Portrait Upload Modal */}
       <PortraitModal

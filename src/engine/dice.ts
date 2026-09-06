@@ -30,6 +30,11 @@ export interface ModifierTerm {
 
 export type ParsedTerm = DiceTerm | ModifierTerm;
 
+export interface RollComponent {
+  label: string;
+  value: number;
+}
+
 export interface RollOptions {
   threatMin?: number; // Minimum roll on d20 to trigger critical threat (e.g. 19 for 19-20, 18 for 18-20, default 20)
   critMultiplier?: number; // Critical damage multiplier (e.g. 2 for x2, 3 for x3, default 2)
@@ -38,6 +43,8 @@ export interface RollOptions {
   customRng?: (sides: number) => number; // Custom deterministic RNG provider: returns integer in [1, sides]
   autoConfirmCrit?: boolean; // Default true: automatically roll confirmation if crit threat
   isConfirmationRoll?: boolean; // Internal flag to avoid infinite loops on confirmation
+  components?: RollComponent[]; // Itemized modifier components (e.g. BAB: 5, Str: 3, Enh: 1)
+  detailedBreakdown?: string;
   metadata?: Record<string, unknown>;
 }
 
@@ -56,9 +63,11 @@ export interface RollResult {
   critMultiplier: number;
   confirmationRoll?: RollResult;
   breakdown: string;
+  detailedBreakdown: string; // e.g. "d20 (17) + BAB (5) + Str (3) + Enh (1) = 26"
   rollType: RollType;
   status: RollStatus;
   summary: string;
+  components?: RollComponent[];
   notes?: string[];
 }
 
@@ -186,6 +195,47 @@ export function formatBreakdown(terms: ParsedTerm[], total: number): string {
 }
 
 /**
+ * Formats rich itemized math breakdown (e.g. "d20 (17) + BAB (5) + Str (3) + Enh (1) = 26").
+ */
+export function formatDetailedBreakdown(
+  terms: ParsedTerm[],
+  total: number,
+  components?: RollComponent[],
+  primaryD20Result?: number
+): string {
+  if (components && components.length > 0) {
+    const parts: string[] = [];
+
+    // First, represent the primary roll
+    if (primaryD20Result !== undefined) {
+      parts.push(`d20 (${primaryD20Result})`);
+    } else {
+      // Multiple/other dice
+      const diceTerms = terms.filter((t): t is DiceTerm => t.type === 'dice');
+      if (diceTerms.length > 0) {
+        diceTerms.forEach((dt, idx) => {
+          const prefix = idx > 0 ? (dt.sign === '-' ? ' - ' : ' + ') : (dt.sign === '-' ? '-' : '');
+          parts.push(`${prefix}${dt.count}d${dt.sides} (${dt.results.join(' + ')})`);
+        });
+      }
+    }
+
+    // Append each non-zero component
+    for (const comp of components) {
+      if (comp.value === 0) continue;
+      const sign = comp.value >= 0 ? '+' : '-';
+      const absVal = Math.abs(comp.value);
+      parts.push(`${sign} ${comp.label} (${absVal})`);
+    }
+
+    return `${parts.join(' ')} = ${total}`;
+  }
+
+  // Fallback to standard breakdown
+  return formatBreakdown(terms, total);
+}
+
+/**
  * Evaluates a dice roll formula and returns a complete RollResult with threat, fumble,
  * and optional automatic critical confirmation roll detection.
  */
@@ -266,6 +316,9 @@ export function rollDice(
   }
 
   const breakdown = formatBreakdown(evaluatedTerms, total);
+  const detailedBreakdown =
+    options.detailedBreakdown ||
+    formatDetailedBreakdown(evaluatedTerms, total, options.components, primaryD20Result);
 
   // Automatic Critical Confirmation Roll on Threat
   let confirmationRoll: RollResult | undefined = undefined;
@@ -281,20 +334,20 @@ export function rollDice(
 
   // Construct readable summary text
   const labelPrefix = label ? `${label}: ` : '';
-  let summary = `${labelPrefix}${total} (${breakdown})`;
+  let summary = `${labelPrefix}${total} (${detailedBreakdown})`;
 
   if (isNatural1) {
     summary += ' 💀 NATURAL 1 (Fumble!)';
   } else if (isNatural20) {
     summary += ' 💥 NATURAL 20!';
     if (confirmationRoll) {
-      summary += ` Confirmation: ${confirmationRoll.total} (${confirmationRoll.breakdown})`;
+      summary += ` Confirmation: ${confirmationRoll.total} (${confirmationRoll.detailedBreakdown})`;
     }
   } else if (isCritThreat) {
     const rangeStr = threatMin < 20 ? `${threatMin}-20` : '20';
     summary += ` ⚡ CRITICAL THREAT (${rangeStr})!`;
     if (confirmationRoll) {
-      summary += ` Confirmation: ${confirmationRoll.total} (${confirmationRoll.breakdown})`;
+      summary += ` Confirmation: ${confirmationRoll.total} (${confirmationRoll.detailedBreakdown})`;
     }
   }
 
@@ -313,9 +366,11 @@ export function rollDice(
     critMultiplier,
     confirmationRoll,
     breakdown,
+    detailedBreakdown,
     rollType,
     status,
-    summary
+    summary,
+    components: options.components
   };
 
   // Add to in-memory history
@@ -328,7 +383,7 @@ export function rollDice(
 
 /**
  * Standard D&D 3.5e Attack Roll helper.
- * Supports attack bonuses like 7, "+7", "-2", etc.
+ * Supports attack bonuses like 7, "+7", "-2", etc. and detailed math components.
  */
 export function rollAttack(
   attackBonus: number | string,
@@ -485,6 +540,13 @@ export function getRollHistory(): RollResult[] {
 
 export function clearRollHistory(): void {
   rollHistoryList = [];
+  rollSubscribers.forEach(listener => {
+    try {
+      // Notify with null/dummy event if needed
+    } catch {
+      // ignore
+    }
+  });
 }
 
 export function subscribeRolls(listener: (result: RollResult) => void): () => void {
