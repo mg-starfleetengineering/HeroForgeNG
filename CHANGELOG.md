@@ -12,6 +12,18 @@ Given a version number MAJOR.SOURCE.MINOR.BUGFIX, increment the:
 
 Prior to version 7.4.0.0, the difference between SOURCE and MINOR, and between MINOR and BUGFIX updates, was highly subjective.
 
+## [2.1.0] - 2026-09-06
+### Added
+- **Complete Feat Deduplication & Canonical Resolution**: Aggregates all cross-reference dashed feat records (`-- Feat Name --`) and edition aliases into singular canonical entries, reducing library clutter across all 103 dashed entries.
+- **3.0e & Variant Edition Alias Support**: Automatically resolves older edition/variant feat names (*Ki Shout* -> *Kiai Shout*, *Remain Conscious* -> *Diehard*, *Superior Expertise* -> *Improved Combat Expertise*, *Longstrider Elite* -> *Longstride Elite*, *Tunnel Fighter* -> *Tunnel Fighting*) to modern 3.5e equivalents.
+- **Multi-Sourcebook Feat Inclusions & Badging**: Feats existing in multiple sourcebooks (e.g. *MM4* and *PHB*) aggregate all sources (`sources: string[]`), qualify as Allowed if any source is enabled in Allowed Sources settings, and render multi-source badge indicators.
+- **Smart Description Merging**: Intelligently evaluates description variations to preserve specific tactical rules, timings (e.g. *Clinging Breath* extra damage 1 round later), action economy, and penalty mechanics (e.g. *Fling Enemy* -20 grapple check), while stripping generic pointer stubs.
+- **Base Save Prerequisite Validation**: Prerequisite engine natively parses and evaluates `Base Fortitude save bonus +X`, `Base Will save +X`, and `Base Reflex save +X` directly against calculated class progression base saves.
+
+### Fixed
+- **Search Bar Magnifying Glass Icon Overlap**: Corrected input field padding and icon absolute positioning across Feats, Feat Tree, Skills, and Traits/Flaws search bars to ensure typed text never overlaps search icons.
+- **Tunnel Fighting Description Correction**: Corrected dataset copy-paste anomaly where *PH* table had errant *Goad* description, restoring authentic *Dungeonscape* squeezing mechanics.
+
 ## [2.0.0] - 2026-08-23
 ### Added
 - **Active Spell Slot Cast Tracking & Long Rest Sync**: Dynamic active spell slot tracking engine with interactive usage bubbles `[●][●][○]`, spend/restore steppers, and class-level restore.

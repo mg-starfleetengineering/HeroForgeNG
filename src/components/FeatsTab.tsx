@@ -8,11 +8,12 @@ import {
   TraitData,
   FlawData
 } from '../types/character';
-import { getSourceBadgeInfo, sortDropdownItems } from '../utils/sourceFilter';
+import { getSourceBadgeInfo, getAllSourceBadges, sortDropdownItems } from '../utils/sourceFilter';
 import { calculateBonusFeatsFromFlaws, calculateTotalFeatSlots } from '../engine/stats';
 import {
   buildCharacterPrereqContext,
-  evaluateFeatPrerequisitesWithContext
+  evaluateFeatPrerequisitesWithContext,
+  aggregateAndDeduplicateFeats
 } from '../engine/featPrereqs';
 import { FeatTreeModal } from './FeatTreeModal';
 
@@ -79,9 +80,14 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
     [character, classesData, racesData, traitsData, flawsData, templatesData]
   );
 
+  const deduplicatedFeatsData = useMemo(
+    () => aggregateAndDeduplicateFeats(featsData),
+    [featsData]
+  );
+
   const sortedFeatsData = useMemo(
-    () => sortDropdownItems(featsData, character.allowedSources),
-    [featsData, character.allowedSources]
+    () => sortDropdownItems(deduplicatedFeatsData, character.allowedSources),
+    [deduplicatedFeatsData, character.allowedSources]
   );
 
   const handleRemoveFeat = (featName: string) => {
@@ -236,7 +242,7 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
               // Try match base feat or exact
               const aliasMatch = featName.match(/^(.+?)\s*\((.+?)\)$/);
               const baseFeatName = aliasMatch ? aliasMatch[1].trim() : featName;
-              const featObj: FeatData = featsData.find(
+              const featObj: FeatData = deduplicatedFeatsData.find(
                 f =>
                   f.name.toLowerCase() === baseFeatName.toLowerCase() ||
                   f.name.toLowerCase() === featName.toLowerCase()
@@ -295,7 +301,7 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
           <div>
             <h2 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2">
-              <i className="fa-solid fa-book-bookmark text-amber-500"></i> D&D 3.5 Feat Library ({featsData.length}+ Feats)
+              <i className="fa-solid fa-book-bookmark text-amber-500"></i> D&D 3.5 Feat Library ({deduplicatedFeatsData.length.toLocaleString()} Feats)
             </h2>
             <p className="text-xs text-slate-400">Search by feat name, prerequisite, or description</p>
           </div>
@@ -336,13 +342,13 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
             </button>
 
             <div className="relative min-w-[220px]">
-              <i className="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+              <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Search feats..."
-                className="input-field pl-8 text-xs"
+                className="input-field !pl-9 text-xs"
               />
             </div>
           </div>
@@ -368,7 +374,7 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
               const isSelected = selectedFeats.some(
                 sf => sf === feat.name || sf.startsWith(`${feat.name} (`)
               );
-              const badge = getSourceBadgeInfo(feat.source, character.allowedSources);
+              const sourceBadgeResult = getAllSourceBadges(feat, character.allowedSources);
               const validation = evaluateFeatPrerequisitesWithContext(feat, prereqContext);
 
               return (
@@ -377,7 +383,7 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
                   className={`p-4 rounded-xl border transition-all text-xs space-y-2.5 ${
                     isSelected
                       ? 'bg-amber-500/10 border-amber-500/30'
-                      : !badge.isAllowed
+                      : !sourceBadgeResult.isAllowed
                       ? 'bg-slate-950/40 border-rose-500/20 hover:border-rose-500/40'
                       : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
                   }`}
@@ -403,25 +409,31 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
                         </span>
                       )}
 
-                      {!badge.isAllowed && (
+                      {!sourceBadgeResult.isAllowed && (
                         <span
                           className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/40"
-                          title="Restricted Sourcebook"
+                          title="Restricted Sourcebook: None of this feat's sourcebooks are enabled in Allowed Sources"
                         >
-                          ⚠️ {badge.sourceCode}
+                          ⚠️ Restricted
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span
-                        className={`badge font-mono text-[10px] ${
-                          badge.isAllowed
-                            ? 'bg-slate-800 text-slate-400'
-                            : 'bg-rose-950/40 text-rose-400 border border-rose-500/20'
-                        }`}
-                      >
-                        {feat.source || 'PH'}
-                      </span>
+                      <div className="flex items-center gap-1 flex-wrap">
+                        {sourceBadgeResult.badges.map(b => (
+                          <span
+                            key={b.sourceCode}
+                            className={`badge font-mono text-[10px] px-1.5 py-0.5 rounded border ${
+                              b.isAllowed
+                                ? 'bg-slate-800 text-slate-300 border-slate-700'
+                                : 'bg-rose-950/40 text-rose-400 border-rose-500/30'
+                            }`}
+                            title={`${b.sourceName}${b.isAllowed ? ' (Allowed)' : ' (Not Selected)'}`}
+                          >
+                            {b.sourceCode}
+                          </span>
+                        ))}
+                      </div>
                       <button
                         onClick={() =>
                           isSelected ? handleRemoveFeat(feat.name) : handleSelectLibraryFeat(feat)
@@ -536,7 +548,7 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
         isOpen={isTreeModalOpen}
         onClose={() => setIsTreeModalOpen(false)}
         character={character}
-        featsData={featsData}
+        featsData={deduplicatedFeatsData}
         classesData={classesData}
         racesData={racesData}
         templatesData={templatesData}

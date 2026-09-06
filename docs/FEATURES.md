@@ -1,4 +1,4 @@
-# HeroForgeNG Feature & Engine Specification (v2.0.0)
+# HeroForgeNG Feature & Engine Specification (v2.1.0)
 
 This document provides a technical overview of the core calculation engines, state storage models, and architecture of **HeroForgeNG**.
 

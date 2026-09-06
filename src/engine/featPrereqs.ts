@@ -15,7 +15,7 @@ import {
   parseTemplateMods,
   calculateTraitFlawStatMods
 } from './stats';
-import { calculateBAB } from './classes';
+import { calculateBAB, calculateBaseSave } from './classes';
 import { SPELLCASTING_CLASSES, getSpellSlotsForClass } from './spells';
 
 export interface FeatPrereqValidationResult {
@@ -28,6 +28,11 @@ export interface FeatPrereqValidationResult {
 export interface CharacterPrereqContext {
   stats: Record<StatType, number>;
   bab: number;
+  baseSaves: {
+    fort: number;
+    ref: number;
+    will: number;
+  };
   characterLevel: number;
   classLevels: Record<string, number>;
   activeFeats: string[];
@@ -115,15 +120,27 @@ const KNOWN_ITEM_CREATION_FEATS = new Set([
   'inscribe rune'
 ]);
 
+// Aliases mapping older edition / variant feat names to their canonical 3.5e counterpart
+export const FEAT_EDITION_ALIASES: Record<string, string> = {
+  'ki shout': 'kiai shout',
+  'great ki shout': 'greater kiai shout',
+  'remain conscious': 'diehard',
+  'superior expertise': 'improved combat expertise',
+  'longstrider elite': 'longstride elite',
+  'tunnel fighter': 'tunnel fighting'
+};
+
 /**
- * Normalizes feat name for comparison (lowercasing, trimming, removing parenthetical targets).
+ * Normalizes feat name for comparison (lowercasing, trimming, removing dashes, parenthetical targets, and resolving aliases).
  */
 export function normalizeFeatName(featName: string): string {
   if (!featName) return '';
-  return featName
+  const stripped = featName
     .toLowerCase()
+    .replace(/^[\s\-–—]+|[\s\-–—]+$/g, '')
     .replace(/\s*\([^)]*\)/g, '')
     .trim();
+  return FEAT_EDITION_ALIASES[stripped] || stripped;
 }
 
 /**
@@ -176,8 +193,13 @@ export function buildCharacterPrereqContext(
     cha: calculateTotalScore('cha', character.baseStats, raceMods, character.levelBumps, character.enhancementMods, characterLevel, traitFlawMods, templateMods)
   };
 
-  // 2. Base Attack Bonus
+  // 2. Base Attack Bonus & Base Saves
   const bab = calculateBAB(character.levelProgression || [], classesData);
+  const baseSaves = {
+    fort: calculateBaseSave('fort', character.levelProgression || [], classesData),
+    ref: calculateBaseSave('ref', character.levelProgression || [], classesData),
+    will: calculateBaseSave('will', character.levelProgression || [], classesData)
+  };
 
   // 3. Class Levels Count
   const classLevels: Record<string, number> = {};
@@ -439,6 +461,7 @@ export function buildCharacterPrereqContext(
   return {
     stats,
     bab,
+    baseSaves,
     characterLevel,
     classLevels,
     activeFeats,
@@ -551,6 +574,31 @@ function evaluateAtomicPrerequisite(
       return {
         satisfied: false,
         unmetDescription: `Requires BAB +${reqBab} (current: +${context.bab})`
+      };
+    }
+  }
+
+  // 3b. Base Save Requirements (e.g. "Base Fortitude save bonus +2.", "Base Reflex save +3", "Base Will save bonus +4", "Fortitude save bonus +2")
+  const saveMatch = clause.match(
+    /\b(?:Base\s+)?(Fortitude|Fort|Reflex|Ref|Will)\s+save(?:\s+bonus)?\s*\+?(\d+)\b/i
+  );
+  if (saveMatch) {
+    const saveRaw = saveMatch[1].toLowerCase();
+    const saveType: 'fort' | 'ref' | 'will' = saveRaw.startsWith('fort')
+      ? 'fort'
+      : saveRaw.startsWith('ref')
+      ? 'ref'
+      : 'will';
+    const reqBonus = parseInt(saveMatch[2], 10);
+    if (!isNaN(reqBonus)) {
+      const curBonus = context.baseSaves ? (context.baseSaves[saveType] || 0) : 0;
+      const saveDisplayName = saveType === 'fort' ? 'Fortitude' : saveType === 'ref' ? 'Reflex' : 'Will';
+      if (curBonus >= reqBonus) {
+        return { satisfied: true, satisfiedDescription: `Base ${saveDisplayName} save +${reqBonus}` };
+      }
+      return {
+        satisfied: false,
+        unmetDescription: `Requires Base ${saveDisplayName} save +${reqBonus} (current: +${curBonus})`
       };
     }
   }
@@ -1104,3 +1152,168 @@ export function evaluateFeatPrerequisitesWithContext(
     rawPrerequisites
   };
 }
+
+function isPointerDesc(desc?: string): boolean {
+  if (!desc) return true;
+  const clean = desc.replace(/^:\s*/, '').trim().toLowerCase();
+  return (
+    clean === '' ||
+    clean === 'no description available.' ||
+    clean === 'see text' ||
+    clean.startsWith('-see ') ||
+    clean.startsWith('(see ')
+  );
+}
+
+function isPointerPrereq(prereq?: string): boolean {
+  if (!prereq) return true;
+  const clean = prereq.trim().toLowerCase();
+  return (
+    clean === '' ||
+    clean === 'none' ||
+    clean === '-' ||
+    clean === '—' ||
+    clean.startsWith('(see ') ||
+    clean.startsWith('-see ') ||
+    clean.startsWith('see ')
+  );
+}
+
+function cleanDescText(desc?: string): string {
+  if (!desc) return '';
+  let cleaned = desc.replace(/^:\s*/, '').trim();
+  if (cleaned.length > 0 && !/[.!?]$/.test(cleaned)) {
+    cleaned += '.';
+  }
+  return cleaned;
+}
+
+function selectOrMergeDescriptions(desc1?: string, desc2?: string): string {
+  const d1 = cleanDescText(desc1);
+  const d2 = cleanDescText(desc2);
+
+  if (isPointerDesc(d1) && isPointerDesc(d2)) return d1 || d2 || '';
+  if (isPointerDesc(d1)) return d2;
+  if (isPointerDesc(d2)) return d1;
+
+  if (d1.toLowerCase() === d2.toLowerCase()) return d1;
+
+  const d1Lower = d1.toLowerCase();
+  const d2Lower = d2.toLowerCase();
+
+  // If one contains the other
+  if (d1Lower.includes(d2Lower.replace(/\.$/, ''))) return d1;
+  if (d2Lower.includes(d1Lower.replace(/\.$/, ''))) return d2;
+
+  // Clinging Breath special case
+  if (
+    (d1Lower.includes('continues to affect') && d2Lower.includes('1 round later')) ||
+    (d2Lower.includes('continues to affect') && d1Lower.includes('1 round later'))
+  ) {
+    return 'Your breath weapon continues to affect targets after you breathe, dealing extra damage 1 round later.';
+  }
+
+  // Tunnel Fighting special case (ignore dataset copy-paste error where PH had Goad's description)
+  if (d1Lower.includes('squeezing')) return d1;
+  if (d2Lower.includes('squeezing')) return d2;
+
+  // Check if one is a brief generic summary (<= 45 chars) while the other has detailed gameplay mechanics
+  if (d1.length <= 45 && d2.length > 55) return d2;
+  if (d2.length <= 45 && d1.length > 55) return d1;
+
+  // Otherwise, choose the longer, more descriptive one
+  return d1.length >= d2.length ? d1 : d2;
+}
+
+/**
+ * Aggregates and deduplicates cross-reference and multi-source feat entries.
+ * Merges dashed pointer records (e.g. "-- Improved Toughness --" from PH) and
+ * edition/variant aliases into their canonical counterparts (e.g. "Improved Toughness" from MM4)
+ * while collecting all sourcebooks into feat.sources and retaining the richest rules descriptions.
+ */
+export function aggregateAndDeduplicateFeats(feats: FeatData[]): FeatData[] {
+  if (!feats || feats.length === 0) return [];
+
+  const map = new Map<string, { canonical: FeatData; candidates: FeatData[] }>();
+
+  for (const feat of feats) {
+    // Strip leading/trailing hyphens, dashes, and whitespace
+    const rawClean = feat.name.replace(/^[\s\-–—]+|[\s\-–—]+$/g, '').trim();
+    const cleanLower = rawClean.toLowerCase();
+    const canonicalKey = FEAT_EDITION_ALIASES[cleanLower] || cleanLower;
+
+    if (!map.has(canonicalKey)) {
+      map.set(canonicalKey, {
+        canonical: {
+          ...feat,
+          name: rawClean,
+          sources: feat.sources && feat.sources.length > 0 
+            ? [...feat.sources] 
+            : [feat.source || 'PHB']
+        },
+        candidates: [feat]
+      });
+    } else {
+      const entry = map.get(canonicalKey)!;
+      entry.candidates.push(feat);
+
+      // Collect sources
+      const existingSources = entry.canonical.sources || [];
+      if (feat.source && !existingSources.includes(feat.source)) {
+        existingSources.push(feat.source);
+      }
+      if (feat.sources) {
+        feat.sources.forEach(s => {
+          if (s && !existingSources.includes(s)) {
+            existingSources.push(s);
+          }
+        });
+      }
+      entry.canonical.sources = existingSources;
+
+      // 1. Pick the best prerequisite (never keep a '(See ...)' pointer if a real prerequisite exists)
+      const curIsPointer = isPointerPrereq(entry.canonical.prerequisites);
+      const candIsPointer = isPointerPrereq(feat.prerequisites);
+
+      let bestPrereq = entry.canonical.prerequisites;
+      if (curIsPointer && !candIsPointer) {
+        bestPrereq = feat.prerequisites;
+      }
+
+      // 2. Intelligently merge/select descriptions
+      const bestDesc = selectOrMergeDescriptions(entry.canonical.description, feat.description);
+
+      // 3. ID and primary display name (prefer non-dashed, non-aliased entry name and ID)
+      const curIsDashed = /^[\s\-–—]+/.test(entry.canonical.id || entry.canonical.name);
+      const candIsDashed = /^[\s\-–—]+/.test(feat.id || feat.name);
+      const curIsAliased = Object.prototype.hasOwnProperty.call(FEAT_EDITION_ALIASES, entry.canonical.name.toLowerCase());
+      const candIsAliased = Object.prototype.hasOwnProperty.call(FEAT_EDITION_ALIASES, cleanLower);
+
+      const curIsDashedOrAliased = curIsDashed || curIsAliased;
+      const candIsDashedOrAliased = candIsDashed || candIsAliased;
+
+      let bestId = entry.canonical.id;
+      let bestName = entry.canonical.name;
+
+      if (curIsDashedOrAliased && !candIsDashedOrAliased) {
+        bestId = feat.id;
+        bestName = rawClean;
+      } else if (!curIsDashedOrAliased) {
+        bestName = entry.canonical.name;
+      }
+
+      entry.canonical = {
+        ...entry.canonical,
+        id: bestId,
+        name: bestName,
+        prerequisites: bestPrereq,
+        description: bestDesc,
+        sources: existingSources
+      };
+    }
+  }
+
+  return Array.from(map.values()).map(e => e.canonical);
+}
+
+

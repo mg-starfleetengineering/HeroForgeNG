@@ -12,9 +12,10 @@ import {
   CharacterPrereqContext,
   buildCharacterPrereqContext,
   evaluateFeatPrerequisitesWithContext,
-  normalizeFeatName
+  normalizeFeatName,
+  aggregateAndDeduplicateFeats
 } from '../engine/featPrereqs';
-import { getSourceBadgeInfo } from '../utils/sourceFilter';
+import { getSourceBadgeInfo, getAllSourceBadges } from '../utils/sourceFilter';
 
 export interface FeatTreeNode {
   id: string; // Base name or ID matching featsData
@@ -595,12 +596,17 @@ export const FeatTreeModal: React.FC<FeatTreeModalProps> = ({
     [activeChainId]
   );
 
+  const dedupedFeats = useMemo(
+    () => aggregateAndDeduplicateFeats(featsData),
+    [featsData]
+  );
+
   const selectedFeats = character.selectedFeats || [];
 
   // Find feat object from database
   const getFeatData = (nodeName: string): FeatData => {
     const norm = normalizeFeatName(nodeName);
-    const found = featsData.find(
+    const found = dedupedFeats.find(
       f =>
         f.name.toLowerCase() === nodeName.toLowerCase() ||
         normalizeFeatName(f.name) === norm ||
@@ -785,8 +791,8 @@ export const FeatTreeModal: React.FC<FeatTreeModalProps> = ({
     ? evaluateFeatPrerequisitesWithContext(selectedFeatData, prereqContext)
     : null;
   const selectedFeatStatus = selectedFeatId ? getFeatStatus(selectedFeatId) : null;
-  const selectedBadge = selectedFeatData
-    ? getSourceBadgeInfo(selectedFeatData.source, character.allowedSources)
+  const selectedSourceBadges = selectedFeatData
+    ? getAllSourceBadges(selectedFeatData, character.allowedSources)
     : null;
 
   return (
@@ -811,13 +817,13 @@ export const FeatTreeModal: React.FC<FeatTreeModalProps> = ({
           <div className="flex items-center gap-3">
             {/* Search Input in Tree */}
             <div className="relative min-w-[200px]">
-              <i className="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+              <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Highlight feat..."
-                className="input-field pl-8 py-1.5 text-xs"
+                className="input-field !pl-9 py-1.5 text-xs"
               />
             </div>
 
@@ -904,7 +910,7 @@ export const FeatTreeModal: React.FC<FeatTreeModalProps> = ({
                     <h3 className="text-base font-bold text-slate-100 font-heading">
                       {selectedFeatData.name}
                     </h3>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
                       {selectedFeatStatus === 'owned' ? (
                         <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
                           <i className="fa-solid fa-check text-amber-400"></i> Active On Character
@@ -919,15 +925,21 @@ export const FeatTreeModal: React.FC<FeatTreeModalProps> = ({
                         </span>
                       )}
 
-                      <span
-                        className={`badge font-mono text-[10px] ${
-                          selectedBadge?.isAllowed
-                            ? 'bg-slate-800 text-slate-400'
-                            : 'bg-rose-950/40 text-rose-400 border border-rose-500/20'
-                        }`}
-                      >
-                        {selectedFeatData.source || 'PH'}
-                      </span>
+                      <div className="flex items-center gap-1 flex-wrap">
+                        {selectedSourceBadges?.badges.map(b => (
+                          <span
+                            key={b.sourceCode}
+                            className={`badge font-mono text-[10px] px-1.5 py-0.5 rounded border ${
+                              b.isAllowed
+                                ? 'bg-slate-800 text-slate-300 border-slate-700'
+                                : 'bg-rose-950/40 text-rose-400 border-rose-500/30'
+                            }`}
+                            title={`${b.sourceName}${b.isAllowed ? ' (Allowed)' : ' (Not Selected)'}`}
+                          >
+                            {b.sourceCode}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
