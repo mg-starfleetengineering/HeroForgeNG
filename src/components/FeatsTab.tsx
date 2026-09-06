@@ -1,13 +1,28 @@
 import React, { useState, useMemo } from 'react';
-import { CharacterState, FeatData, ClassData, RaceData } from '../types/character';
+import {
+  CharacterState,
+  FeatData,
+  ClassData,
+  RaceData,
+  TemplateData,
+  TraitData,
+  FlawData
+} from '../types/character';
 import { getSourceBadgeInfo, sortDropdownItems } from '../utils/sourceFilter';
 import { calculateBonusFeatsFromFlaws, calculateTotalFeatSlots } from '../engine/stats';
+import {
+  buildCharacterPrereqContext,
+  evaluateFeatPrerequisitesWithContext
+} from '../engine/featPrereqs';
 
 interface FeatsTabProps {
   character: CharacterState;
   featsData: FeatData[];
   classesData?: ClassData[];
   racesData?: RaceData[];
+  templatesData?: TemplateData[];
+  traitsData?: TraitData[];
+  flawsData?: FlawData[];
   onChange: (updated: Partial<CharacterState>) => void;
 }
 
@@ -25,9 +40,19 @@ const PARAMETERIZED_FEAT_BASES = [
   'Weapon Finesse'
 ];
 
-export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, classesData = [], racesData = [], onChange }) => {
+export const FeatsTab: React.FC<FeatsTabProps> = ({
+  character,
+  featsData,
+  classesData = [],
+  racesData = [],
+  templatesData = [],
+  traitsData = [],
+  flawsData = [],
+  onChange
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [customFeatInput, setCustomFeatInput] = useState('');
+  const [onlyQualified, setOnlyQualified] = useState(false);
 
   // Parameter modal state
   const [paramModalFeat, setParamModalFeat] = useState<FeatData | null>(null);
@@ -37,6 +62,20 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, classe
   const selectedFlaws = character.selectedFlaws || [];
   const flawBonusFeatCount = calculateBonusFeatsFromFlaws(selectedFlaws);
   const featSlotInfo = calculateTotalFeatSlots(character, classesData, racesData);
+
+  // Build character prerequisite context once for high-performance batch validation
+  const prereqContext = useMemo(
+    () =>
+      buildCharacterPrereqContext(
+        character,
+        classesData,
+        racesData,
+        traitsData,
+        flawsData,
+        templatesData
+      ),
+    [character, classesData, racesData, traitsData, flawsData, templatesData]
+  );
 
   const sortedFeatsData = useMemo(
     () => sortDropdownItems(featsData, character.allowedSources),
@@ -58,9 +97,10 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, classe
 
   const handleSelectLibraryFeat = (feat: FeatData) => {
     // Check if feat is parameterized or has (choose) in name/description
-    const isParam = PARAMETERIZED_FEAT_BASES.some(base => feat.name.toLowerCase().includes(base.toLowerCase())) ||
-                    feat.name.includes('(') ||
-                    (feat.description && feat.description.toLowerCase().includes('choose a'));
+    const isParam =
+      PARAMETERIZED_FEAT_BASES.some(base => feat.name.toLowerCase().includes(base.toLowerCase())) ||
+      feat.name.includes('(') ||
+      (feat.description && feat.description.toLowerCase().includes('choose a'));
 
     if (isParam) {
       setParamModalFeat(feat);
@@ -92,13 +132,25 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, classe
     }
   };
 
-  const filtered = sortedFeatsData.filter(f => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return f.name.toLowerCase().includes(q) || 
-           (f.prerequisites && f.prerequisites.toLowerCase().includes(q)) || 
-           (f.description && f.description.toLowerCase().includes(q));
-  }).slice(0, 80);
+  const filtered = useMemo(() => {
+    return sortedFeatsData
+      .filter(f => {
+        // Qualified-only filter
+        if (onlyQualified) {
+          const validation = evaluateFeatPrerequisitesWithContext(f, prereqContext);
+          if (!validation.isQualified) return false;
+        }
+
+        if (!searchQuery) return true;
+        const q = searchQuery.toLowerCase();
+        return (
+          f.name.toLowerCase().includes(q) ||
+          (f.prerequisites && f.prerequisites.toLowerCase().includes(q)) ||
+          (f.description && f.description.toLowerCase().includes(q))
+        );
+      })
+      .slice(0, 100);
+  }, [sortedFeatsData, searchQuery, onlyQualified, prereqContext]);
 
   // Quick suggestions for parameter modal
   const weaponSuggestions = [
@@ -125,11 +177,13 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, classe
           <span className="flex items-center gap-2">
             <i className="fa-solid fa-award text-amber-500"></i> Active Feats ({selectedFeats.length} / {featSlotInfo.totalSlots})
           </span>
-          <span className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-bold border ${
-            selectedFeats.length <= featSlotInfo.totalSlots
-              ? 'bg-amber-500/10 text-amber-300 border-amber-500/30'
-              : 'bg-rose-950/80 text-rose-300 border-rose-500/40'
-          }`}>
+          <span
+            className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-bold border ${
+              selectedFeats.length <= featSlotInfo.totalSlots
+                ? 'bg-amber-500/10 text-amber-300 border-amber-500/30'
+                : 'bg-rose-950/80 text-rose-300 border-rose-500/40'
+            }`}
+          >
             {selectedFeats.length} / {featSlotInfo.totalSlots} Slots
           </span>
         </h2>
@@ -139,8 +193,12 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, classe
           <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-xs text-emerald-300 flex items-center gap-2 font-mono">
             <i className="fa-solid fa-circle-check text-emerald-400 text-sm shrink-0"></i>
             <div>
-              <span className="font-bold block">+{flawBonusFeatCount} Extra Feat Slot{flawBonusFeatCount > 1 ? 's' : ''} Active</span>
-              <span className="text-[10px] text-emerald-400/80">Granted by selected Flaw{flawBonusFeatCount > 1 ? 's' : ''}: {selectedFlaws.join(', ')}</span>
+              <span className="font-bold block">
+                +{flawBonusFeatCount} Extra Feat Slot{flawBonusFeatCount > 1 ? 's' : ''} Active
+              </span>
+              <span className="text-[10px] text-emerald-400/80">
+                Granted by selected Flaw{flawBonusFeatCount > 1 ? 's' : ''}: {selectedFlaws.join(', ')}
+              </span>
             </div>
           </div>
         )}
@@ -156,43 +214,73 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, classe
               placeholder="e.g. Weapon Focus (Nodachi)"
               className="input-field text-xs flex-1 font-semibold text-amber-300"
             />
-            <button
-              type="submit"
-              className="btn btn-primary text-xs shrink-0 px-3"
-            >
+            <button type="submit" className="btn btn-primary text-xs shrink-0 px-3">
               <i className="fa-solid fa-plus"></i> Add
             </button>
           </div>
-          <p className="text-[10px] text-slate-400">Type any feat name, e.g. <span className="font-mono text-amber-400">Weapon Focus (Nodachi)</span></p>
+          <p className="text-[10px] text-slate-400">
+            Type any feat name, e.g. <span className="font-mono text-amber-400">Weapon Focus (Nodachi)</span>
+          </p>
         </form>
 
         {/* Active Feats List */}
         <div className="space-y-3 pt-2 border-t border-slate-800">
           {selectedFeats.length === 0 ? (
-            <p className="text-xs text-slate-500 italic p-3 text-center bg-slate-950/40 rounded-xl">No feats selected yet. Add custom feats above or select from the library.</p>
+            <p className="text-xs text-slate-500 italic p-3 text-center bg-slate-950/40 rounded-xl">
+              No feats selected yet. Add custom feats above or select from the library.
+            </p>
           ) : (
             selectedFeats.map(featName => {
               // Try match base feat or exact
               const aliasMatch = featName.match(/^(.+?)\s*\((.+?)\)$/);
               const baseFeatName = aliasMatch ? aliasMatch[1].trim() : featName;
-              const featObj = featsData.find(f => f.name.toLowerCase() === baseFeatName.toLowerCase() || f.name.toLowerCase() === featName.toLowerCase()) || {
+              const featObj: FeatData = featsData.find(
+                f =>
+                  f.name.toLowerCase() === baseFeatName.toLowerCase() ||
+                  f.name.toLowerCase() === featName.toLowerCase()
+              ) || {
+                id: featName.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
                 name: featName,
                 description: aliasMatch ? `Specialized feat for ${aliasMatch[2]}.` : 'Active character feat.'
               };
 
+              const validation = evaluateFeatPrerequisitesWithContext(featObj, prereqContext);
+
               return (
-                <div key={featName} className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs gap-3">
-                  <div className="flex-1 min-w-0">
-                    <span className="font-bold text-amber-400 block truncate">{featName}</span>
-                    <p className="text-[11px] text-slate-400 truncate">{featObj.description || 'No description'}</p>
+                <div
+                  key={featName}
+                  className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-col gap-2 text-xs"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-amber-400 block truncate">{featName}</span>
+                      {featObj.prerequisites && (
+                        validation.isQualified ? (
+                          <span
+                            className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 flex items-center gap-1"
+                            title="Prerequisites met"
+                          >
+                            <i className="fa-solid fa-check text-emerald-400"></i> Qualified
+                          </span>
+                        ) : (
+                          <span
+                            className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-950/80 text-amber-300 border border-amber-500/40 flex items-center gap-1 cursor-help"
+                            title={`Missing prerequisites:\n• ${validation.unmetPrereqs.join('\n• ')}`}
+                          >
+                            <i className="fa-solid fa-triangle-exclamation text-amber-400"></i> Prereq Unmet
+                          </span>
+                        )
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleRemoveFeat(featName)}
+                      className="text-slate-500 hover:text-rose-400 p-1 transition-colors shrink-0"
+                      title="Remove Feat"
+                    >
+                      <i className="fa-solid fa-trash-can"></i>
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleRemoveFeat(featName)}
-                    className="text-slate-500 hover:text-rose-400 p-1 transition-colors"
-                    title="Remove Feat"
-                  >
-                    <i className="fa-solid fa-trash-can"></i>
-                  </button>
+                  <p className="text-[11px] text-slate-400 line-clamp-2">{featObj.description || 'No description'}</p>
                 </div>
               );
             })
@@ -210,80 +298,176 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, classe
             <p className="text-xs text-slate-400">Search by feat name, prerequisite, or description</p>
           </div>
 
-          <div className="relative min-w-[240px]">
-            <i className="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Search feats..."
-              className="input-field pl-8 text-xs"
-            />
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Qualified Only Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setOnlyQualified(!onlyQualified)}
+              className={`btn text-xs py-1.5 px-3 flex items-center gap-1.5 font-medium transition-all rounded-xl border ${
+                onlyQualified
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-sm shadow-emerald-950'
+                  : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-700'
+              }`}
+              title={
+                onlyQualified
+                  ? 'Showing only feats you currently qualify for (Click to show all feats)'
+                  : 'Filter list to only show feats you qualify for'
+              }
+            >
+              <i
+                className={`fa-solid ${
+                  onlyQualified ? 'fa-filter-circle-check text-emerald-400' : 'fa-filter text-slate-400'
+                }`}
+              ></i>
+              <span>Qualified Only</span>
+            </button>
+
+            <div className="relative min-w-[220px]">
+              <i className="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search feats..."
+                className="input-field pl-8 text-xs"
+              />
+            </div>
           </div>
         </div>
 
         <div className="max-h-[600px] overflow-y-auto space-y-3 pr-2 scrollbar-thin">
-          {filtered.map(feat => {
-            const isSelected = selectedFeats.some(sf => sf === feat.name || sf.startsWith(`${feat.name} (`));
-            const badge = getSourceBadgeInfo(feat.source, character.allowedSources);
+          {filtered.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 bg-slate-950/40 rounded-xl space-y-2">
+              <i className="fa-solid fa-book-open text-2xl text-slate-600 block"></i>
+              <p className="text-xs font-medium">No feats match your search criteria.</p>
+              {onlyQualified && (
+                <button
+                  type="button"
+                  onClick={() => setOnlyQualified(false)}
+                  className="btn btn-secondary text-xs mt-2"
+                >
+                  Turn off "Qualified Only" filter
+                </button>
+              )}
+            </div>
+          ) : (
+            filtered.map(feat => {
+              const isSelected = selectedFeats.some(
+                sf => sf === feat.name || sf.startsWith(`${feat.name} (`)
+              );
+              const badge = getSourceBadgeInfo(feat.source, character.allowedSources);
+              const validation = evaluateFeatPrerequisitesWithContext(feat, prereqContext);
 
-            return (
-              <div
-                key={feat.id || feat.name}
-                className={`p-4 rounded-xl border transition-all text-xs space-y-2 ${
-                  isSelected 
-                    ? 'bg-amber-500/10 border-amber-500/30' 
-                    : !badge.isAllowed
+              return (
+                <div
+                  key={feat.id || feat.name}
+                  className={`p-4 rounded-xl border transition-all text-xs space-y-2.5 ${
+                    isSelected
+                      ? 'bg-amber-500/10 border-amber-500/30'
+                      : !badge.isAllowed
                       ? 'bg-slate-950/40 border-rose-500/20 hover:border-rose-500/40'
                       : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-slate-100">{feat.name}</span>
-                    {!badge.isAllowed && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/40" title="Restricted Sourcebook">
-                        ⚠️ {badge.sourceCode}
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-sm text-slate-100">{feat.name}</span>
+
+                      {/* Qualification Status Badge */}
+                      {validation.isQualified ? (
+                        <span
+                          className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shadow-sm shadow-emerald-950/50"
+                          title="✓ Qualified: You meet all prerequisites for this feat"
+                        >
+                          <i className="fa-solid fa-check text-emerald-400"></i> Qualified
+                        </span>
+                      ) : (
+                        <span
+                          className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950/80 text-amber-300 border border-amber-500/40 flex items-center gap-1 cursor-help shadow-sm shadow-amber-950/50"
+                          title={`⚠️ Prerequisites Unmet:\n• ${validation.unmetPrereqs.join('\n• ')}`}
+                        >
+                          <i className="fa-solid fa-triangle-exclamation text-amber-400"></i> Prereq Unmet
+                        </span>
+                      )}
+
+                      {!badge.isAllowed && (
+                        <span
+                          className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/40"
+                          title="Restricted Sourcebook"
+                        >
+                          ⚠️ {badge.sourceCode}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`badge font-mono text-[10px] ${
+                          badge.isAllowed
+                            ? 'bg-slate-800 text-slate-400'
+                            : 'bg-rose-950/40 text-rose-400 border border-rose-500/20'
+                        }`}
+                      >
+                        {feat.source || 'PH'}
                       </span>
-                    )}
+                      <button
+                        onClick={() =>
+                          isSelected ? handleRemoveFeat(feat.name) : handleSelectLibraryFeat(feat)
+                        }
+                        className={`btn text-[11px] py-1 px-3 ${
+                          isSelected ? 'btn-secondary text-rose-400' : 'btn-primary'
+                        }`}
+                      >
+                        {isSelected ? (
+                          <>
+                            <i className="fa-solid fa-check"></i> Added
+                          </>
+                        ) : (
+                          <>
+                            <i className="fa-solid fa-plus"></i> Select
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`badge font-mono text-[10px] ${
-                      badge.isAllowed
-                        ? 'bg-slate-800 text-slate-400'
-                        : 'bg-rose-950/40 text-rose-400 border border-rose-500/20'
-                    }`}>
-                      {feat.source || 'PH'}
-                    </span>
-                    <button
-                      onClick={() => isSelected ? handleRemoveFeat(feat.name) : handleSelectLibraryFeat(feat)}
-                      className={`btn text-[11px] py-1 px-3 ${isSelected ? 'btn-secondary text-rose-400' : 'btn-primary'}`}
-                    >
-                      {isSelected ? <><i className="fa-solid fa-check"></i> Added</> : <><i className="fa-solid fa-plus"></i> Select</>}
-                    </button>
-                  </div>
+
+                  {/* Prerequisites Line with Unmet Details */}
+                  {feat.prerequisites && (
+                    <div className="space-y-1.5">
+                      <p className="text-amber-400/90 text-[11px]">
+                        <span className="font-bold">Prereq:</span> {feat.prerequisites}
+                      </p>
+                      {!validation.isQualified && validation.unmetPrereqs.length > 0 && (
+                        <div className="text-[10.5px] text-amber-300/90 bg-amber-950/40 border border-amber-500/30 rounded-lg px-2.5 py-1.5 flex items-start gap-2 font-mono">
+                          <i className="fa-solid fa-circle-exclamation text-amber-400 mt-0.5 shrink-0 text-xs"></i>
+                          <span>
+                            <span className="font-bold text-amber-200">Missing criteria:</span>{' '}
+                            {validation.unmetPrereqs.join(' • ')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <p className="text-slate-300 text-[11px] leading-relaxed">{feat.description}</p>
                 </div>
-                {feat.prerequisites && (
-                  <p className="text-amber-400/90 text-[11px]"><span className="font-bold">Prereq:</span> {feat.prerequisites}</p>
-                )}
-                <p className="text-slate-300 text-[11px] leading-relaxed">{feat.description}</p>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </div>
 
       {/* Modal: Parameterize Feat Target */}
       {paramModalFeat && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <form onSubmit={handleConfirmParamFeat} className="card bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-md w-full space-y-4">
+          <form
+            onSubmit={handleConfirmParamFeat}
+            className="card bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-md w-full space-y-4"
+          >
             <h3 className="text-base font-bold text-amber-400 flex items-center gap-2 border-b border-slate-800 pb-3">
               <i className="fa-solid fa-crosshairs"></i> Select Target for {paramModalFeat.name}
             </h3>
 
-            <p className="text-xs text-slate-300 leading-relaxed">
-              {paramModalFeat.description}
-            </p>
+            <p className="text-xs text-slate-300 leading-relaxed">{paramModalFeat.description}</p>
 
             <div>
               <label className="label-text">Specified Weapon / Target</label>
@@ -306,7 +490,11 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, classe
                     key={wSug}
                     type="button"
                     onClick={() => setParamTarget(wSug)}
-                    className={`btn text-[10px] py-0.5 px-2 font-mono ${paramTarget.toLowerCase() === wSug.toLowerCase() ? 'btn-primary' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
+                    className={`btn text-[10px] py-0.5 px-2 font-mono ${
+                      paramTarget.toLowerCase() === wSug.toLowerCase()
+                        ? 'btn-primary'
+                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                    }`}
                   >
                     {wSug}
                   </button>
@@ -322,10 +510,7 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({ character, featsData, classe
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="btn btn-primary text-xs"
-              >
+              <button type="submit" className="btn btn-primary text-xs">
                 Add Feat: {paramModalFeat.name} ({paramTarget || '...'})
               </button>
             </div>
