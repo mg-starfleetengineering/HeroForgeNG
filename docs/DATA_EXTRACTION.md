@@ -30,10 +30,13 @@ Outputs are automatically placed into:
 | `feats.json` | Feats Database | `name`, `type`, `prereqs`, `description`, `source`, `benefit` |
 | `weapons.json` | Weapons Table | `name`, `category`, `damage`, `critical`, `weight`, `type`, `rangeIncrement` |
 | `animal_companions.json` | 106 Base Companions | `name`, `minDruidLevel`, `str`, `dex`, `con`, `int`, `wis`, `cha`, `hd`, `naturalArmor`, `attacks` |
+| `wildshape_forms.json` | 100+ Wild Shape Forms | `name`, `type`, `size`, `str`, `dex`, `con`, `naturalArmor`, `landSpeed`, `flySpeed`, `swimSpeed`, `attacks`, `qualities` |
 | `familiars.json` | Standard & Improved Familiars | `name`, `masterBonus`, `type`, `str`, `dex`, `con`, `int`, `wis`, `cha`, `naturalArmor` |
 | `templates.json` | Racial Templates | `name`, `str`, `dex`, `con`, `int`, `wis`, `cha`, `levelAdjustment`, `naturalArmor`, `speedMod` |
 | `deities.json` | Deities List | `name`, `alignment`, `domains`, `pantheon`, `favoredWeapon` |
 | `domains.json` | Divine Domains | `name`, `grantedPower`, `spells` |
+| `spells.json` | 600+ Core 3.5e Spells | `name`, `level`, `classes`, `school`, `subSchool`, `descriptor`, `castingTime`, `range`, `duration`, `savingThrow`, `spellResistance`, `description` |
+| `supplemental_domain_spells.json` | Supplemental Domain Spells | Domain-specific granted spell definitions and descriptions |
 | `skill_tricks.json` | Skill Tricks | `name`, `category`, `prereqRanks`, `description` |
 | `traits.json` | Character Traits | `name`, `benefit`, `drawback` |
 | `flaws.json` | Character Flaws | `name`, `effect`, `bonusFeatGranted` |

@@ -171,50 +171,60 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
     },
     {
       id: 'feats-skills',
-      title: 'Feats, Skill Tricks & Traits',
+      title: 'Feats & Dependency Tree',
       icon: 'fa-award',
       content: (
         <div className="space-y-4">
-          <h3 className="text-lg font-bold text-amber-300 font-heading">Feats, Skill Tricks, Traits & Flaws</h3>
+          <h3 className="text-lg font-bold text-amber-300 font-heading">Feats, Prerequisite Engine & Dependency Tree</h3>
+          <p className="text-slate-300 text-sm leading-relaxed">
+            HeroForgeNG features a fully deduplicated D&D 3.5e feat catalog, multi-sourcebook badging, real-time prerequisite validation, and an interactive visual feat dependency tree modal.
+          </p>
 
           <div className="space-y-3">
             <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
               <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
-                <i className="fa-solid fa-award text-xs"></i> Feats Database & Prerequisites
+                <i className="fa-solid fa-code-fork text-xs"></i> Canonical Deduplication & Multi-Source Filtering
               </h4>
-              <p className="text-slate-300 text-xs leading-relaxed">
-                Filter hundreds of official 3.5e feats across Core, Complete Warrior/Divine/Arcane/Adventurer/Scoundrel, Races of..., and Campaign Settings.
-              </p>
-              <ul className="text-slate-400 text-xs list-disc list-inside space-y-0.5">
-                <li>Automatic tracking of available feat slots based on Level, Class bonus feats (Fighter, Monk, Wizard), and Human racial bonus feats.</li>
-                <li>Prerequisite indicators show whether your BAB, ability scores, or predecessor feats meet entry criteria.</li>
+              <ul className="text-slate-300 text-xs space-y-1 list-disc list-inside">
+                <li><strong>100% Deduplicated</strong>: All 103 historical dashed pointer records (<code>-- Feat Name --</code>) and 3.0e/variant aliases (<em>Ki Shout</em> &rarr; <em>Kiai Shout</em>, <em>Remain Conscious</em> &rarr; <em>Diehard</em>, <em>Superior Expertise</em> &rarr; <em>Improved Combat Expertise</em>) resolve into canonical records.</li>
+                <li><strong>Multi-Source Badges</strong>: Feats printed in multiple supplements (e.g. <em>PHB</em> and <em>MM4</em>) list all sources and are accessible if any cited sourcebook is enabled in Allowed Sources settings.</li>
+                <li><strong>Feat Slots Tracker</strong>: Automatically tracks general feats (1st, 3rd, 6th, etc.), class bonus feats (Fighter, Monk, Wizard), racial bonus feats (Human), and flaw bonus feats.</li>
               </ul>
             </div>
 
             <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
               <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
-                <i className="fa-solid fa-bolt text-xs"></i> Complete Scoundrel Skill Tricks
+                <i className="fa-solid fa-filter text-xs"></i> Live Prerequisite Validation Engine
               </h4>
               <p className="text-slate-300 text-xs leading-relaxed">
-                Unlock tactical maneuver tricks (such as <em>Collector of Stories</em>, <em>Nimble Stand</em>, or <em>Point it Out</em>) costing 2 skill points per trick with rank requirements.
+                Evaluates your character&apos;s live state across Base Attack Bonus, Base Saves (Fortitude, Reflex, Will directly from class progression), ability scores, class levels, skill ranks, and prerequisite feats:
               </p>
+              <ul className="text-slate-400 text-xs list-disc list-inside space-y-0.5">
+                <li>Filter catalog by <strong>Available / Qualified</strong> (meets all requirements) or <strong>Missing Prerequisites</strong>.</li>
+                <li>Clear visual badges: green checkmarks for met prerequisites and red warnings for unmet requirements.</li>
+              </ul>
             </div>
 
             <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
               <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
-                <i className="fa-solid fa-scale-unbalanced text-xs"></i> Unearthed Arcana Traits & Flaws
+                <i className="fa-solid fa-sitemap text-xs"></i> Interactive Feat Dependency Tree Modal
               </h4>
               <p className="text-slate-300 text-xs leading-relaxed">
-                Select character Traits (e.g. <em>Quick</em>, <em>Polite</em>, <em>Relentless</em>) and Flaws (e.g. <em>Shaky</em>, <em>Meager Fortitude</em>, <em>Inattentive</em>) that award extra feat slots while adjusting movement speed, saving throws, HP, or attack rolls.
+                Click the <strong>Feat Tree</strong> button in the Feats tab to launch the interactive dependency graph viewer:
               </p>
+              <ul className="text-slate-400 text-xs list-disc list-inside space-y-0.5">
+                <li>Directed dependency trees (e.g. <em>Power Attack</em> &rarr; <em>Cleave</em> &rarr; <em>Great Cleave</em>).</li>
+                <li>Status-coded nodes: <strong>Learned (Green)</strong>, <strong>Available (Blue)</strong>, and <strong>Locked (Amber/Red)</strong>.</li>
+                <li>Full interactive pan, zoom, search filtering, and slide-out prerequisite & benefit inspection drawer.</li>
+              </ul>
             </div>
 
             <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
               <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
-                <i className="fa-solid fa-hand-sparkles text-xs"></i> Skills & Synergy Bonuses
+                <i className="fa-solid fa-bolt text-xs"></i> Complete Scoundrel Skill Tricks & Traits/Flaws
               </h4>
               <p className="text-slate-300 text-xs leading-relaxed">
-                Distribute class skill ranks (1 point/rank) and cross-class ranks (2 points/rank). Synergy bonuses (e.g. 5+ ranks in Tumble granting +2 to Balance and Dodge AC during defensive fighting) auto-calculate.
+                Select Skill Tricks costing 2 skill points per trick with rank prerequisites, or assign Unearthed Arcana Traits and Flaws to award bonus feat slots.
               </p>
             </div>
           </div>
@@ -259,11 +269,30 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
     },
     {
       id: 'combat-dr',
-      title: 'Tactical Combat & Stances',
-      icon: 'fa-swords',
+      title: 'Combat, Vitals & Conditions',
+      icon: 'fa-heart-pulse',
       content: (
         <div className="space-y-4">
-          <h3 className="text-lg font-bold text-amber-300 font-heading">Tactical Combat Stances, Active Banner & Cause Breakdowns</h3>
+          <h3 className="text-lg font-bold text-amber-300 font-heading">Tactical Combat Stances, Vitals Tracker & Conditions</h3>
+
+          <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+            <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+              <i className="fa-solid fa-heart-pulse text-xs"></i> In-Play Vitals Tracker & Health Status
+            </h4>
+            <p className="text-slate-300 text-xs leading-relaxed">
+              Track real-time combat health with direct adjusters for <strong>Current HP</strong>, <strong>Temporary HP</strong>, and <strong>Nonlethal Damage</strong>:
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1 font-mono text-xs">
+              <div className="bg-emerald-950/40 border border-emerald-500/30 p-2 rounded text-emerald-300 text-center font-bold">Healthy (&gt;50%)</div>
+              <div className="bg-amber-950/40 border border-amber-500/30 p-2 rounded text-amber-300 text-center font-bold">Bloodied (&le;50%)</div>
+              <div className="bg-orange-950/40 border border-orange-500/30 p-2 rounded text-orange-300 text-center font-bold">Disabled (0 HP)</div>
+              <div className="bg-rose-950/40 border border-rose-500/30 p-2 rounded text-rose-300 text-center font-bold">Dying (-1 to -9)</div>
+              <div className="bg-red-950/60 border border-red-600/40 p-2 rounded text-red-400 text-center font-bold">Dead (&le;-10)</div>
+            </div>
+            <p className="text-slate-400 text-xs pt-1">
+              Nonlethal damage automatically triggers <em>Staggered</em> when equal to current HP, or <em>Unconscious</em> when exceeding it.
+            </p>
+          </div>
 
           <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
             <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
@@ -290,16 +319,11 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
 
           <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
             <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
-              <i className="fa-solid fa-tag text-xs"></i> Stat Cause Breakdowns Across Character Sheet
+              <i className="fa-solid fa-head-side-virus text-xs"></i> 19 Standard D&D 3.5e Conditions
             </h4>
             <p className="text-slate-300 text-xs leading-relaxed">
-              When stances or active buffs modify character statistics, explicit cause annotations display inline across the sheet:
+              Toggle conditions (<em>Shaken</em>, <em>Frightened</em>, <em>Panicked</em>, <em>Blinded</em>, <em>Entangled</em>, <em>Exhausted</em>, <em>Fatigued</em>, <em>Grappled</em>, <em>Helpless</em>, <em>Nauseated</em>, <em>Pinned</em>, <em>Prone</em>, <em>Sickened</em>, <em>Stunned</em>, <em>Unconscious</em>) with 1 click. Stat deductions automatically flow through to attacks, AC, saving throws, ability scores, and speeds with official fear non-stacking rules.
             </p>
-            <ul className="text-slate-400 text-xs list-disc list-inside space-y-1">
-              <li><strong>Ability Scores</strong>: Displays active modifier source next to score (e.g. <code>18 (+4 Frenzy)</code>, <code>18 (+4 Rage)</code>).</li>
-              <li><strong>Saving Throws</strong>: Dedicated <em>Tactical/Misc</em> column breaks down Fortitude, Reflex, and Will stance adjustments.</li>
-              <li><strong>Vitals & Attacks</strong>: Inline attack penalties, damage multipliers, AC dodge modifiers, and movement speed adjustments update dynamically.</li>
-            </ul>
           </div>
 
           <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
@@ -313,6 +337,209 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
               <li>Per standard 3.5e rules, DR values with identical bypass conditions do not stack (the highest value applies).</li>
               <li>Distinct bypass conditions (e.g. <code>DR 5/Magic</code> vs <code>DR 3/Adamantine</code> vs <code>DR 5/Evil</code>) are prioritized and summarized clearly in your header pill and combat summary block.</li>
             </ul>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'wildshape',
+      title: 'Wild Shape Manager',
+      icon: 'fa-paw',
+      content: (
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-amber-300 font-heading">Druid Wild Shape Form Manager</h3>
+          <p className="text-slate-300 text-sm leading-relaxed">
+            For characters with Druid levels, the Wild Shape Form Manager automates animal, plant, and elemental shapechanging with full mechanical stat transformation.
+          </p>
+
+          <div className="space-y-3">
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-clock-rotate-left text-xs"></i> Progression & Unlocks
+              </h4>
+              <ul className="text-slate-300 text-xs space-y-1 list-disc list-inside">
+                <li><strong>Uses per Day</strong>: 1/day at 5th level, +1 every 3 levels thereafter (up to 6/day at 18th), plus +2 uses per <em>Extra Wild Shape</em> feat. Duration equals Druid level in hours.</li>
+                <li><strong>Size Categories</strong>: Small & Medium at 5th, Large at 8th, Tiny at 11th, and Huge at 15th level.</li>
+                <li><strong>Form Types</strong>: Animal forms (5th), Plant forms (12th), Elemental forms (16th), and Huge Elemental forms (20th).</li>
+              </ul>
+            </div>
+
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-arrows-rotate text-xs"></i> Dynamic Stat Overrides & Natural Attacks
+              </h4>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                Activating any form immediately overrides your physical attributes on the character sheet:
+              </p>
+              <ul className="text-slate-400 text-xs list-disc list-inside space-y-1">
+                <li>Physical Ability Scores: STR, DEX, and CON are replaced by the form&apos;s scores. Hit points automatically recalculate from the new CON modifier.</li>
+                <li>Natural Armor bonuses, creature size categories, space/reach, and speeds (Land, Fly, Swim, Burrow) update instantly.</li>
+                <li><strong>Natural Attack Routines</strong>: Generates the full attack sequence, calculating BAB, primary full STR damage, and secondary attacks (-5 penalty or -2 with <em>Multiattack</em>, half STR damage).</li>
+              </ul>
+            </div>
+
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-plus text-xs"></i> 100+ Built-In Forms & Custom Form Creator
+              </h4>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                Filter over 100 official creature forms by size and type, or create custom homebrew forms with tailored stats, attacks, and movement modes.
+              </p>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'resources-rest',
+      title: 'Daily Resources & Rest',
+      icon: 'fa-hourglass-half',
+      content: (
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-amber-300 font-heading">Daily Class Resources & 8-Hour Long Rest</h3>
+          <p className="text-slate-300 text-sm leading-relaxed">
+            Manage consumable class features, point pools, and spell slots in real time during tabletop sessions.
+          </p>
+
+          <div className="space-y-3">
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-battery-half text-xs"></i> Automatic Class Resource Tracking
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <div className="bg-slate-950 p-2 rounded border border-slate-800 text-slate-300">
+                  <strong className="text-amber-300">Barbarian Rage / Frenzy</strong>: 1 + Lvl/4 uses (+2 per Extra Rage)
+                </div>
+                <div className="bg-slate-950 p-2 rounded border border-slate-800 text-slate-300">
+                  <strong className="text-cyan-300">Paladin Lay on Hands</strong>: Level &times; Cha Mod healing pool
+                </div>
+                <div className="bg-slate-950 p-2 rounded border border-slate-800 text-slate-300">
+                  <strong className="text-emerald-300">Paladin Smite Evil</strong>: 1 + (Lvl-1)/5 uses (+2 per Extra Smiting)
+                </div>
+                <div className="bg-slate-950 p-2 rounded border border-slate-800 text-slate-300">
+                  <strong className="text-yellow-300">Cleric Turn Undead</strong>: 3 + Cha Mod uses (+4 per Extra Turning)
+                </div>
+                <div className="bg-slate-950 p-2 rounded border border-slate-800 text-slate-300">
+                  <strong className="text-purple-300">Bardic Music</strong>: Level uses (+4 per Extra Music)
+                </div>
+                <div className="bg-slate-950 p-2 rounded border border-slate-800 text-slate-300">
+                  <strong className="text-pink-300">Monk Stunning Fist</strong>: Monk Level uses (+3 per Extra Stunning)
+                </div>
+              </div>
+              <p className="text-slate-400 text-xs pt-1">
+                Interactive usage bubbles <code>[●][●][○]</code> allow 1-click charge expenditure directly on the Character Sheet view.
+              </p>
+            </div>
+
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-bed text-xs"></i> 8-Hour Long Rest Automation
+              </h4>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                Clicking the <strong>Long Rest (8 Hours)</strong> button triggers a complete tabletop rest reset:
+              </p>
+              <ul className="text-slate-400 text-xs list-disc list-inside space-y-0.5">
+                <li>Restores Current HP to maximum capacity.</li>
+                <li>Clears all Nonlethal Damage and Temporary HP.</li>
+                <li>Refills all Daily Class Resource tracks and custom pools to maximum.</li>
+                <li>Restores all expended spell slots across all spell levels.</li>
+                <li>Re-arms all prepared spells (marks them ready for casting).</li>
+                <li>Clears temporary status conditions (Fatigued, Exhausted, Shaken).</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'spells-compendium',
+      title: 'Spells & Compendium',
+      icon: 'fa-hat-wizard',
+      content: (
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-amber-300 font-heading">Spells Database, Spellbook & Daily Preparation</h3>
+          <p className="text-slate-300 text-sm leading-relaxed">
+            HeroForgeNG features a searchable 600+ spell database, spellbook manager, daily preparation workshop, and live slot tracking bubbles.
+          </p>
+
+          <div className="space-y-3">
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-book text-xs"></i> 600+ Spell Compendium & Full-Text Search
+              </h4>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                Browse core 3.5e spells and supplemental domain spells. Filter by <strong>Class</strong>, <strong>Spell Level (0–9)</strong>, <strong>School</strong>, <strong>Casting Time</strong>, <strong>Saving Throw</strong>, and <strong>Spell Resistance</strong>.
+              </p>
+            </div>
+
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-scroll text-xs"></i> Live Spellbook & Preparation Workshop
+              </h4>
+              <ul className="text-slate-300 text-xs space-y-1 list-disc list-inside">
+                <li><strong>Known Spells</strong>: Add any spell from the compendium into your personal spellbook with 1 click.</li>
+                <li><strong>Slot Capacity Math</strong>: Computes base slots by class level plus high ability score bonus spells per PHB Table 1-1.</li>
+                <li><strong>Domain & Specialist Slots</strong>: Automatically adds domain bonus slots for Clerics and specialist school bonus slots for Wizards (+1 slot per spell level).</li>
+              </ul>
+            </div>
+
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-wand-magic-sparkles text-xs"></i> Live Slot Tracking Bubbles & Cast Buttons
+              </h4>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                Click <code>[Cast]</code> on prepared spells to expend slots and update interactive usage bubbles (<code>[●][●][○]</code>) in real time across the Spells tab and Sheet View combat HUD.
+              </p>
+            </div>
+
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-sun text-xs"></i> Active & Passive Auras
+              </h4>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                Manage aura emanations (Paladin <em>Aura of Courage</em>, Marshal Auras, Bardic Music, Draconic Auras, Devotion feats) with radius and target tracking.
+              </p>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'dice-tray',
+      title: 'Dice Roller & Tray HUD',
+      icon: 'fa-dice-d20',
+      content: (
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-amber-300 font-heading">Interactive Dice Engine & Dockable Dice Tray HUD</h3>
+          <p className="text-slate-300 text-sm leading-relaxed">
+            Roll tabletop dice with 1-click sheet targets, weapon threat evaluation, critical auto-confirmation, and a dockable floating dice tray widget.
+          </p>
+
+          <div className="space-y-3">
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-hand-pointer text-xs"></i> 1-Click Sheet Rolling
+              </h4>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                Click any roll target across the Character Sheet and Equipment views:
+              </p>
+              <ul className="text-slate-400 text-xs list-disc list-inside space-y-0.5">
+                <li><strong>Attacks & Full Attack</strong>: Rolls attack bonus, evaluates weapon threat range, and automatically triggers critical confirmation rolls.</li>
+                <li><strong>Damage Rolls</strong>: Rolls weapon damage dice, factoring STR modifiers, two-handed scaling, and active combat stances.</li>
+                <li><strong>Saves, Checks & Initiative</strong>: 1-click Fortitude, Reflex, Will, Initiative, Grapple, and Skill check rolls with detailed cause tooltips.</li>
+              </ul>
+            </div>
+
+            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
+              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
+                <i className="fa-solid fa-dice text-xs"></i> Dockable Dice Tray Widget
+              </h4>
+              <ul className="text-slate-300 text-xs space-y-1 list-disc list-inside">
+                <li><strong>Polyhedral Buttons</strong>: 1-click buttons for d4, d6, d8, d10, d12, d20, and d100.</li>
+                <li><strong>Custom Formula Bar</strong>: Type arbitrary dice expressions (e.g. <code>2d6+5</code>, <code>1d20+14</code>, <code>4d8-2</code>) and hit Enter.</li>
+                <li><strong>Roll History Log</strong>: Review timestamped rolls with natural 20 criticals, natural 1 fumbles, formula breakdowns, and 1-click clipboard copy.</li>
+              </ul>
+            </div>
           </div>
         </div>
       )
@@ -385,41 +612,6 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
                 <li>Master granting bonuses (e.g. +3 Alertness, +2 Fortitude saves, +3 Stealth ranks).</li>
                 <li>Deliver Touch Spells, Speak with Master, and Spell Resistance tracking.</li>
                 <li>Custom familiar entry.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    {
-      id: 'spells-auras',
-      title: 'Spells & Active Auras',
-      icon: 'fa-hat-wizard',
-      content: (
-        <div className="space-y-4">
-          <h3 className="text-lg font-bold text-amber-300 font-heading">Spells, Spellbook & Active Auras</h3>
-
-          <div className="space-y-3">
-            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
-              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
-                <i className="fa-solid fa-hat-wizard text-xs"></i> Spells Tab & Caster Progression
-              </h4>
-              <p className="text-slate-300 text-xs leading-relaxed">
-                Track spellcasting progression across spellcasting classes (Cleric, Druid, Wizard, Sorcerer, Bard, Paladin, Ranger). Select prepared spells per day, domain bonus spell slots, and spell saves DC math (10 + Spell Level + Key Ability Mod).
-              </p>
-            </div>
-
-            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl space-y-2">
-              <h4 className="text-amber-400 font-semibold text-sm flex items-center gap-2">
-                <i className="fa-solid fa-sun text-xs"></i> Active & Passive Auras Tab
-              </h4>
-              <p className="text-slate-300 text-xs leading-relaxed">
-                Manage aura emanations (Paladin <em>Aura of Courage</em>, Marshal Auras, Bardic Music, Draconic Auras, Devotion feats):
-              </p>
-              <ul className="text-slate-400 text-xs list-disc list-inside space-y-0.5">
-                <li>Toggle active vs passive aura states.</li>
-                <li>Set aura radius (e.g. 10 ft, 30 ft, 60 ft) and target types (Self, Allies, Enemies).</li>
-                <li>Create custom aura effects to share with party members.</li>
               </ul>
             </div>
           </div>
