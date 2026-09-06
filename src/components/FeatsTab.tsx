@@ -14,6 +14,7 @@ import {
   buildCharacterPrereqContext,
   evaluateFeatPrerequisitesWithContext
 } from '../engine/featPrereqs';
+import { FeatTreeModal } from './FeatTreeModal';
 
 interface FeatsTabProps {
   character: CharacterState;
@@ -53,6 +54,7 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [customFeatInput, setCustomFeatInput] = useState('');
   const [onlyQualified, setOnlyQualified] = useState(false);
+  const [isTreeModalOpen, setIsTreeModalOpen] = useState(false);
 
   // Parameter modal state
   const [paramModalFeat, setParamModalFeat] = useState<FeatData | null>(null);
@@ -298,7 +300,18 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
             <p className="text-xs text-slate-400">Search by feat name, prerequisite, or description</p>
           </div>
 
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            {/* Feat Tree Viewer Modal Trigger */}
+            <button
+              type="button"
+              onClick={() => setIsTreeModalOpen(true)}
+              className="btn btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 font-semibold rounded-xl border border-amber-500/40 text-amber-300 hover:bg-amber-500/15 hover:border-amber-400 transition-all shadow-sm shadow-amber-950/40"
+              title="Open Interactive Visual Feat Dependency Tree Viewer"
+            >
+              <i className="fa-solid fa-diagram-project text-amber-400"></i>
+              <span>Feat Tree Viewer</span>
+            </button>
+
             {/* Qualified Only Toggle Button */}
             <button
               type="button"
@@ -517,6 +530,20 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
           </form>
         </div>
       )}
+
+      {/* Interactive Feat Dependency Tree Modal */}
+      <FeatTreeModal
+        isOpen={isTreeModalOpen}
+        onClose={() => setIsTreeModalOpen(false)}
+        character={character}
+        featsData={featsData}
+        classesData={classesData}
+        racesData={racesData}
+        templatesData={templatesData}
+        traitsData={traitsData}
+        flawsData={flawsData}
+        onChange={onChange}
+      />
     </div>
   );
 };
