@@ -19,6 +19,11 @@ Prior to version 7.4.0.0, the difference between SOURCE and MINOR, and between M
 - **Multi-Sourcebook Feat Inclusions & Badging**: Feats existing in multiple sourcebooks (e.g. *MM4* and *PHB*) aggregate all sources (`sources: string[]`), qualify as Allowed if any source is enabled in Allowed Sources settings, and render multi-source badge indicators.
 - **Smart Description Merging**: Intelligently evaluates description variations to preserve specific tactical rules, timings (e.g. *Clinging Breath* extra damage 1 round later), action economy, and penalty mechanics (e.g. *Fling Enemy* -20 grapple check), while stripping generic pointer stubs.
 - **Base Save Prerequisite Validation**: Prerequisite engine natively parses and evaluates `Base Fortitude save bonus +X`, `Base Will save +X`, and `Base Reflex save +X` directly against calculated class progression base saves.
+- **Interactive Visual Feat Dependency Tree Modal**: Directed acyclic graph viewer visualizing complex feat trees (e.g. *Power Attack* -> *Cleave* -> *Great Cleave*) with color-coded Learned (Green), Available/Eligible (Blue), and Locked (Amber/Red) states, full-canvas pan/zoom, live search, and slide-out inspection drawer.
+- **Live Feat Prerequisite Validator Engine**: Multi-dimensional prerequisite evaluation checking BAB, base saves, ability scores, class levels, skill ranks, caster levels, and active feat lineages with "Available / Qualified" and "Missing Prerequisites" UI filters.
+- **Interactive Click-to-Roll Dice Engine**: Full tabletop dice mechanics supporting standard notation (`1d20+8`, `3d6+STR`), weapon critical threat ranges (e.g. 18-20/x2), automated critical confirmation rolls, and Natural 20 / Natural 1 detection.
+- **Dockable Dice Tray HUD Widget**: Virtual 3D/flat polyhedral dice tray dockable at the bottom of the screen with quick d4-d100 buttons, custom formula input, and timestamped roll history with 1-click clipboard copy and clear.
+- **Click-to-Roll Sheet Integration**: 1-click rolling across Character Sheet and Equipment views for attacks, damage, saves, ability checks, skill checks, initiative, and grapple.
 
 ### Fixed
 - **Search Bar Magnifying Glass Icon Overlap**: Corrected input field padding and icon absolute positioning across Feats, Feat Tree, Skills, and Traits/Flaws search bars to ensure typed text never overlaps search icons.
@@ -30,6 +35,10 @@ Prior to version 7.4.0.0, the difference between SOURCE and MINOR, and between M
 - **Daily Class Resources & Usage Tracking HUD**: Unified combat tracking section housing active ability usages (Rage, Lay on Hands, Smite, Turn Undead, Wild Shape, etc.), resource pools, and spell slots directly on the Character Sheet view.
 - **Prepared Spell Cast Synchronization**: Dedicated `[Cast]` / `[Expended]` buttons per prepared spell that automatically deduct and restore available slot capacity and usage bubbles in real-time.
 - **8-Hour Long Rest Automation**: Synchronized long rest action automatically restores character HP, daily class resource usages, point pools, expended spell slots, and marks all prepared spells ready.
+- **Live Spellbook & Daily Preparation Workshop**: Daily preparation workshop with class level slot formulas, bonus spells from high ability scores (PHB Table 1-1), domain bonus slots, and wizard specialist slots.
+- **3.5e Core Spells Database & Searchable Compendium**: 600+ official PHB/SRD spells searchable by school, level, casting time, and component with detailed spell inspector card.
+- **In-Play Vitals Tracker & Conditions Engine**: Dynamic current/max/temp HP tracker with nonlethal damage calculations, dynamic health status badges (Healthy, Bloodied, Disabled, Dying, Dead), and 19 standard D&D 3.5e conditions with automated stat penalties.
+- **Wild Shape Form Manager & Forms Dataset**: Full Druid Wild Shape engine featuring 100+ animal/plant/elemental forms, progression scaling (uses/day, sizes Small-Huge, elemental forms), physical ability score overrides, natural armor, speeds, and natural attack routines.
 - **Clean Static Printable Sheet View**: Separated live combat HUD from printable `#printable-character-sheet` layout, providing a clean non-interactive layout with paper-friendly checkboxes for PDF/print export.
 
 ## [1.4.0] - 2026-08-16

@@ -6,16 +6,19 @@ Welcome to the **HeroForgeNG User Guide**. HeroForgeNG is a modern, high-perform
 
 ## Table of Contents
 1. [Getting Started & Character Roster](#1-getting-started--character-roster)
-2. [Race, Class & Level Progression](#2-race-class--level-progression)
+2. [Race, Class, Templates & Wild Shape](#2-race-class-templates--wild-shape)
 3. [Ability Scores, SR & Derived Vitals](#3-ability-scores-sr--derived-vitals)
-4. [Feats, Skill Tricks & Traits/Flaws](#4-feats-skill-tricks--traitsflaws)
+4. [Feats, Prerequisite Engine & Feat Dependency Tree](#4-feats-prerequisite-engine--feat-dependency-tree)
 5. [Skills & Synergy Bonuses](#5-skills--synergy-bonuses)
 6. [Equipment, Magic Items & Encumbrance](#6-equipment-magic-items--encumbrance)
-7. [Tactical Combat Banner & Cause Breakdowns](#7-tactical-combat-banner--cause-breakdowns)
-8. [Animal Companions & Familiars](#8-animal-companions--familiars)
-9. [Spells & Active/Passive Auras](#9-spells--activepassive-auras)
-10. [Artwork Showcase, Backstory & Zen Writing Mode](#10-artwork-showcase-backstory--zen-writing-mode)
-11. [Character Sheet View, Printing & Roll20 Export](#11-character-sheet-view-printing--roll20-export)
+7. [Tactical Combat Banner, Vitals Tracker & Conditions](#7-tactical-combat-banner-vitals-tracker--conditions)
+8. [Daily Class Resources & 8-Hour Long Rest](#8-daily-class-resources--8-hour-long-rest)
+9. [Spells Compendium, Spellbook & Preparation Workshop](#9-spells-compendium-spellbook--preparation-workshop)
+10. [Click-to-Roll Dice Engine & Dockable Dice Tray HUD](#10-click-to-roll-dice-engine--dockable-dice-tray-hud)
+11. [Animal Companions & Familiars](#11-animal-companions--familiars)
+12. [Active & Passive Auras](#12-active--passive-auras)
+13. [Artwork Showcase, Backstory & Zen Writing Mode](#13-artwork-showcase-backstory--zen-writing-mode)
+14. [Character Sheet View, Printing & Roll20 Export](#14-character-sheet-view-printing--roll20-export)
 
 ---
 
@@ -37,7 +40,7 @@ HeroForgeNG stores all character sheets **100% locally** inside your web browser
 
 ---
 
-## 2. Race, Class & Level Progression
+## 2. Race, Class, Templates & Wild Shape
 
 Navigate to the **Race & Class** tab to configure your character's race, stacked templates, classes, and divine patron options.
 
@@ -56,6 +59,16 @@ Navigate to the **Race & Class** tab to configure your character's race, stacked
   - **Base Attack Bonus (BAB)** (Good +1/lvl, Average +0.75/lvl, Poor +0.5/lvl).
   - **Base Saving Throws** (Fortitude, Reflex, Will).
   - **Hit Points (HP)** per level with Constitution modifier scaling.
+
+### Wild Shape Form Manager (Druids)
+For characters with Druid levels (5th level and higher), the **Wild Shape Manager** unlocks comprehensive transformation controls directly on the Character Sheet and Daily Resources tracking panels:
+- **Form Browser & Filtering**: Browse over 100+ animal, plant, and elemental creature profiles filtered by size (Small, Medium, Large, Tiny, Huge) and creature type.
+- **Dynamic Stat Transformation**: Activating a wild shape instantly updates your character sheet:
+  - Physical ability scores (STR, DEX, CON) are replaced with the creature's scores while mental attributes (INT, WIS, CHA) are preserved.
+  - CON adjustments dynamically recompute maximum Hit Points and Fortitude saves.
+  - Natural Armor bonuses, creature size categories, space/reach, and speeds (Land, Fly, Swim, Burrow) override base statistics.
+- **Natural Attack Routine Generator**: Computes the creature's full natural attack sequence (e.g. Bite + Claws + Rake), applying proper primary ($1.0 \times \text{STR}$) and secondary ($\text{BAB} - 5$, $0.5 \times \text{STR}$, or $\text{BAB} - 2$ with *Multiattack*) attack penalties and damage formulas.
+- **Custom Form Creator**: Define homebrew or monstrous wild shape forms with tailored ability scores, natural armor, speeds, and multi-attack sets.
 
 ---
 
@@ -80,14 +93,30 @@ $$\text{Grapple Mod} = \text{BAB} + \text{STR Mod} + \text{Size Grapple Mod} + \
 
 ---
 
-## 4. Feats, Skill Tricks & Traits/Flaws
+## 4. Feats, Prerequisite Engine & Feat Dependency Tree
 
-Navigate to the **Feats** tab to select feats, skill tricks, traits, and flaws.
+Navigate to the **Feats** tab to configure your character's feats, inspect prerequisite chains, view the interactive feat tree, and manage skill tricks, traits, and flaws.
 
-### Feat Selection & Prerequisites
-- Search hundreds of feats across official sourcebooks (Player's Handbook, Complete Series, Races of..., etc.).
-- **Feat Slots Tracker**: Calculates available general feats (Level 1, 3, 6, 9, 12, 15, 18), class bonus feats (Fighter, Monk, Wizard), and racial bonus feats (Human).
-- **Prerequisite Validation**: Displays whether your character meets BAB, ability score, or predecessor feat entry requirements.
+### Canonical Feats Database & Deduplication
+- **Deduplicated & Canonical**: All 103 historical dashed pointer records (`-- Feat Name --`) and 3.0e/variant aliases (*Ki Shout* -> *Kiai Shout*, *Remain Conscious* -> *Diehard*, *Superior Expertise* -> *Improved Combat Expertise*) have been resolved into clean canonical records.
+- **Multi-Sourcebook Badging**: Feats existing in multiple sourcebooks (e.g. *MM4* and *PHB*) display badges for all citations. If any listed source is enabled in your Allowed Sources preferences, the feat is accessible.
+- **Feat Slots Tracker**: Real-time counter tracks and allocates general feat slots (1st, 3rd, 6th, 9th, 12th, 15th, 18th level), class bonus feats (Fighter, Monk, Wizard), racial bonus feats (Human bonus feat), and bonus feats granted by Flaws.
+
+### Live Prerequisite Validation Engine
+- The prerequisite validator evaluates your character's live stats, BAB, base saving throws (Base Fortitude, Reflex, and Will bonuses directly from class level tables), class levels, caster levels, and skill ranks:
+  - **Available / Qualified Filter**: Filter the feat catalog to show only feats your character currently qualifies to select.
+  - **Missing Prerequisites Filter**: View feats you do not yet qualify for, with specific unmet prerequisites highlighted in red.
+  - **Inline Prerequisite Badges**: Every feat card clearly indicates satisfied criteria with green checkmarks and missing criteria with red warning markers.
+
+### Interactive Feat Dependency Tree Modal
+Click the **Feat Tree** button in the Feats tab to open a full-screen, interactive visual dependency viewer:
+- **Directed Graph View**: Renders complex feat progression trees (e.g., *Power Attack* $\rightarrow$ *Cleave* $\rightarrow$ *Great Cleave*; *Point Blank Shot* $\rightarrow$ *Precise Shot* $\rightarrow$ *Shot on the Run*; *Dodge* $\rightarrow$ *Mobility* $\rightarrow$ *Spring Attack*).
+- **Interactive Navigation**: Drag to pan across large trees, mouse wheel to zoom in/out, and click any node to center and inspect.
+- **Status Coloring**:
+  - 🟢 **Green (Learned)**: Feats currently acquired on your character sheet.
+  - 🔵 **Blue (Available)**: Feats for which you meet all prerequisites and are eligible to pick.
+  - 🟠 **Amber / Red (Locked)**: Feats where one or more prerequisites are missing.
+- **Inspection Drawer**: Clicking any feat node opens a detailed sidebar displaying prerequisite breakdowns, rules benefits, normal restrictions, special notes, and sourcebooks.
 
 ### Complete Scoundrel Skill Tricks
 - Select Skill Tricks (e.g. *Collector of Stories*, *Nimble Stand*, *Point It Out*) costing 2 skill points per trick with rank requirements.
@@ -128,9 +157,9 @@ Navigate to the **Equipment** tab to equip armor, shields, weapons, and manage i
 
 ---
 
-## 7. Tactical Combat Banner & Cause Breakdowns
+## 7. Tactical Combat Banner, Vitals Tracker & Conditions
 
-The **Active Combat Modifiers Banner** provides interactive real-time combat toggles across Sheet View and Equipment tabs.
+The **Active Combat Modifiers Banner** and **Vitals Tracker** provide comprehensive, real-time tactical combat management across Sheet View and Equipment tabs.
 
 ### Real-Time Combat Stances
 - **Power Attack Slider**: Set your Power Attack penalty (-1 to -BAB). When wielding a two-handed primary weapon, Power Attack awards **+2 damage per -1 attack penalty**.
@@ -150,9 +179,93 @@ The **Active Combat Modifiers Banner** provides interactive real-time combat tog
   - **Saving Throws**: Dedicated *Tactical/Misc* column breaks down Fortitude, Reflex, and Will stance adjustments.
   - **Vitals & Attacks**: Attack penalties, damage multipliers, AC dodge bonuses, and speed changes update dynamically.
 
+### In-Play Vitals Tracker & Health States
+- **Hit Points Management**: Steppers and direct inputs for **Current HP**, **Temporary HP**, and **Nonlethal Damage**.
+- **Dynamic Health Status Badges**:
+  - 🟢 **Healthy**: Current HP $> 50\%$ Max HP.
+  - 🟡 **Bloodied**: Current HP $\le 50\%$ Max HP.
+  - 🟠 **Disabled**: Current HP $= 0$ (or nonlethal damage equals current HP).
+  - 🔴 **Dying**: Current HP between $-1$ and $-9$.
+  - ⚫ **Dead**: Current HP $\le -10$.
+
+### Active Conditions Engine
+Toggle standard D&D 3.5e conditions (*Shaken*, *Frightened*, *Panicked*, *Blinded*, *Entangled*, *Exhausted*, *Fatigued*, *Grappled*, *Helpless*, *Nauseated*, *Pinned*, *Prone*, *Sickened*, *Stunned*, *Unconscious*) with 1 click:
+- Automatically deducts attack penalties, AC dodge losses, DEX/STR reductions, saving throw penalties, and movement penalties across the character sheet.
+- Fear conditions follow official non-stacking hierarchy (only the highest fear penalty applies).
+
 ---
 
-## 8. Animal Companions & Familiars
+## 8. Daily Class Resources & 8-Hour Long Rest
+
+Manage consumable class powers and point pools directly on the Character Sheet view.
+
+### Daily Class Resources HUD
+- **Automatic Resource Tracking**:
+  - **Barbarian Rage / Whirling Frenzy**: Daily uses calculated from class level and *Extra Rage* feats.
+  - **Paladin Lay on Hands**: Pool capacity calculated from Paladin level $\times$ Charisma modifier.
+  - **Paladin Smite Evil**: Daily uses scaled by level and *Extra Smiting* feats.
+  - **Cleric Turn Undead**: Daily uses ($3 + \text{CHA Mod}$) scaled by *Extra Turning* feats.
+  - **Druid Wild Shape**: Daily uses and unlocked forms scaled by Druid level and *Extra Wild Shape*.
+  - **Bardic Music & Monk Stunning Fist**: Usages scaled by level and bonus feats.
+- **Interactive Usage Bubbles**: Click bubble indicators (`[●][●][○]`) or step buttons to spend and recover daily charges during encounters.
+- **Custom Resource Pools**: Create custom resource definitions (e.g., Ki Points, Action Points, Wand charges) with custom maximums and reset policies.
+
+### 8-Hour Long Rest Automation
+Click the **Long Rest (8 Hours)** button in the combat header to execute a complete rest reset:
+- Restores character HP to maximum capacity.
+- Clears all Nonlethal Damage and Temporary HP.
+- Refills all Daily Class Resource tracks and custom pools to full.
+- Restores all expended spell slots across all spell levels.
+- Re-arms all prepared spells (`[Cast]` $\rightarrow$ ready).
+- Automatically clears transient fatigue, exhaustion, and shaken conditions.
+
+---
+
+## 9. Spells Compendium, Spellbook & Preparation Workshop
+
+HeroForgeNG includes a 600+ spell database, searchable compendium, spellbook organizer, daily preparation workshop, and live slot tracker.
+
+### Searchable 3.5e Spell Compendium
+- Filter over 600 official spells by **Class**, **Spell Level (0–9)**, **School of Magic**, **Casting Time**, **Saving Throw**, and **Spell Resistance (Yes/No)**.
+- Full-text search across spell names and descriptive text.
+- Detailed spell inspection drawer displaying components, target/area/effect, duration, and complete rules descriptions.
+
+### Spellbook & Known Spells Manager
+- Add spells directly from the Compendium into your character's personal Spellbook or Known Spells list with 1 click.
+- Filter known spells by class and level for quick tabletop reference.
+
+### Daily Preparation Workshop
+- Computes daily spell slot maximums based on class level and high ability score bonus spells (PHB Table 1-1).
+- Integrates Cleric **Domain Bonus Slots** (+1 slot per spell level) and Wizard **Specialist School Bonus Slots** (+1 slot per spell level).
+- Assign prepared spells into designated spell slots for the adventuring day.
+
+### In-Play Spell Slot Cast Tracking
+- Interactive slot usage bubbles (`[●][●][○]`) displayed on both the Spells tab and Sheet View combat HUD.
+- Click `[Cast]` on any prepared spell to expend that slot; click `[Expended]` to restore it.
+- Long Rest automatically restores all slots and marks prepared spells ready.
+
+---
+
+## 10. Click-to-Roll Dice Engine & Dockable Dice Tray HUD
+
+Roll attacks, damage, saves, skills, and custom formulas with full tabletop physics logic.
+
+### 1-Click Sheet Rolling
+- **Attacks & Arsenal**: Click any weapon or unarmed strike on the Character Sheet or Equipment tab to roll your attack.
+- **Critical Threats & Auto-Confirmation**: If your attack roll falls within your weapon's threat range (e.g. 18–20 for Rapier), the dice engine automatically triggers and displays a critical confirmation roll.
+- **Damage Rolls**: Click to roll base weapon damage, factoring Strength modifiers, two-handed bonuses, and active stances (Power Attack, Frenzy).
+- **Saving Throws, Checks & Initiative**: Click Fortitude, Reflex, Will, Initiative, Grapple, or any Skill to instantly roll d20 + total modifier with cause breakdown tooltips.
+
+### Dockable Dice Tray HUD Widget
+- Located in the bottom corner of your screen, click the dice icon to expand the floating/docked **Dice Tray**:
+  - **Quick Polyhedral Dice Buttons**: Click `d4`, `d6`, `d8`, `d10`, `d12`, `d20`, or `d100` to roll single or multiple dice.
+  - **Custom Expression Bar**: Type arbitrary expressions such as `2d6+5`, `1d20+12`, or `4d8-2` and press Enter to roll.
+  - **Roll History Log**: Review a timestamped list of all recent rolls, natural 20 criticals, natural 1 fumbles, and itemized modifier breakdowns.
+  - **Copy & Clear**: Copy roll results to your clipboard or clear the log between encounters.
+
+---
+
+## 11. Animal Companions & Familiars
 
 HeroForgeNG includes dedicated tabs for Druid/Ranger Animal Companions and Wizard/Sorcerer Familiars.
 
@@ -168,18 +281,16 @@ HeroForgeNG includes dedicated tabs for Druid/Ranger Animal Companions and Wizar
 
 ---
 
-## 9. Spells & Active/Passive Auras
+## 12. Active & Passive Auras
 
-### Spells Tab
-- Manage spellcasting progression across spellcasting classes.
-- Track prepared spells per day, domain bonus slots, and spell save DCs ($10 + \text{Spell Level} + \text{Caster Ability Mod}$).
-
-### Active & Passive Auras Tab
-- Manage emanations (Paladin *Aura of Courage*, Marshal Auras, Bardic Music, Draconic Auras, Devotion feats).
+Manage emanations (Paladin *Aura of Courage*, Marshal Auras, Bardic Music, Draconic Auras, Devotion feats):
+- Toggle active vs passive aura states.
+- Set aura radius (e.g. 10 ft, 30 ft, 60 ft) and target types (Self, Allies, Enemies).
+- Create custom aura effects to share with party members.
 
 ---
 
-## 10. Artwork Showcase, Backstory & Zen Writing Mode
+## 13. Artwork Showcase, Backstory & Zen Writing Mode
 
 Navigate to the **Notes** tab to manage backstory, artwork, and session logs.
 
@@ -193,7 +304,7 @@ Navigate to the **Notes** tab to manage backstory, artwork, and session logs.
 
 ---
 
-## 11. Character Sheet View, Printing & Roll20 Export
+## 14. Character Sheet View, Printing & Roll20 Export
 
 ### Printable Character Sheet View & Auto-Expanding Inventory
 - Click **Sheet View** or **Print Sheet** in the top header bar.
@@ -201,3 +312,4 @@ Navigate to the **Notes** tab to manage backstory, artwork, and session logs.
 
 ### Roll20 VTT JSON Export
 - Open the **Export** dropdown in the header and select **Roll20 3.5e Sheet JSON**.
+
