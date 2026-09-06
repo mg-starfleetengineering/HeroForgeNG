@@ -72,6 +72,20 @@ export function isSourceAllowed(itemSource?: string, allowedSources?: string[]):
 }
 
 /**
+ * Checks whether an item with either a single source or multiple aggregated sources is allowed.
+ * Returns true if ANY of the item's sources is allowed.
+ */
+export function isItemSourceAllowed(
+  item: { source?: string; sources?: string[] },
+  allowedSources?: string[]
+): boolean {
+  if (item.sources && item.sources.length > 0) {
+    return item.sources.some(src => isSourceAllowed(src, allowedSources));
+  }
+  return isSourceAllowed(item.source, allowedSources);
+}
+
+/**
  * Get detailed source badge metadata for UI display
  */
 export function getSourceBadgeInfo(itemSource?: string, allowedSources?: string[]) {
@@ -88,18 +102,45 @@ export function getSourceBadgeInfo(itemSource?: string, allowedSources?: string[
 }
 
 /**
+ * Gets detailed badge info for all sources of an item (e.g. for reprinted/multi-source feats).
+ */
+export function getAllSourceBadges(
+  item: { source?: string; sources?: string[] },
+  allowedSources?: string[]
+) {
+  const rawList = item.sources && item.sources.length > 0 ? item.sources : [item.source || 'PHB'];
+  // Deduplicate normalized codes
+  const seen = new Set<string>();
+  const badges = [];
+
+  for (const src of rawList) {
+    const info = getSourceBadgeInfo(src, allowedSources);
+    if (!seen.has(info.sourceCode)) {
+      seen.add(info.sourceCode);
+      badges.push(info);
+    }
+  }
+
+  const isAllowed = badges.some(b => b.isAllowed);
+  return {
+    badges,
+    isAllowed
+  };
+}
+
+/**
  * Sorts an array of items (like races, classes, weapons, feats) alphabetically by name,
  * with items allowed by the current selected sources grouped at the top.
  */
-export function sortDropdownItems<T extends { name?: string; source?: string }>(
+export function sortDropdownItems<T extends { name?: string; source?: string; sources?: string[] }>(
   items: T[],
   allowedSources?: string[],
   getName?: (item: T) => string
 ): T[] {
   const getItemName = getName || ((item: T) => item.name || '');
   return [...items].sort((a, b) => {
-    const allowedA = isSourceAllowed(a.source, allowedSources);
-    const allowedB = isSourceAllowed(b.source, allowedSources);
+    const allowedA = isItemSourceAllowed(a, allowedSources);
+    const allowedB = isItemSourceAllowed(b, allowedSources);
 
     if (allowedA !== allowedB) {
       return allowedA ? -1 : 1; // Allowed items grouped at top
@@ -108,4 +149,5 @@ export function sortDropdownItems<T extends { name?: string; source?: string }>(
     return getItemName(a).localeCompare(getItemName(b), undefined, { sensitivity: 'base' });
   });
 }
+
 

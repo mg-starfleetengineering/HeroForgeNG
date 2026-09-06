@@ -246,13 +246,13 @@ export const SkillsTab: React.FC<SkillsTabProps> = ({
           </div>
 
           <div className="relative w-full sm:w-64">
-            <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
             <input
               type="text"
               placeholder="Search skill tricks..."
               value={trickSearch}
               onChange={e => setTrickSearch(e.target.value)}
-              className="input-field text-xs pl-8 py-1.5 w-full"
+              className="input-field text-xs !pl-9 py-1.5 w-full"
             />
           </div>
         </div>

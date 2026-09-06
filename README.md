@@ -1,4 +1,4 @@
-# HeroForgeNG (HeroForge-Anew Web Edition v2.0.0)
+# HeroForgeNG (HeroForge-Anew Web Edition v2.1.0)
 
 > **HeroForgeNG** is a modern, high-performance web application designed for **Dungeons & Dragons 3.5e** character creation, tactical combat management, and multi-character roster storage.
 
@@ -6,8 +6,9 @@ Built with **React 18**, **Vite**, **TypeScript**, and **Tailwind CSS**, HeroFor
 
 ---
 
-## 🌟 Key Features & Capabilities (v2.0.0)
+## 🌟 Key Features & Capabilities (v2.1.0)
 
+- 📜 **Complete Feat Deduplication & Multi-Source Filtering**: 100% resolution of dashed/pointer feats and 3.0e/variant aliases into canonical records, multi-sourcebook filtering (enabled if any sourcebook is allowed), smart gameplay description merging, and Base Save prerequisite evaluation.
 - ✨ **Active Spell Slot Cast Tracking & Long Rest Sync**: Dynamic active spell slot tracking engine with interactive usage bubbles `[●][●][○]`, 1-click `[Cast]` toggles, spend/restore steppers, and automated Long Rest sync.
 - ⚡ **Daily Class Resources & Usage Tracking HUD**: Unified combat tracking section housing active ability usages (Rage, Lay on Hands, Smite, Turn Undead, Wild Shape, etc.), resource pools, and spell slots directly on the Character Sheet view.
 

@@ -435,6 +435,7 @@ export interface FeatData {
   prerequisites?: string;
   description: string;
   source?: string;
+  sources?: string[];
 }
 
 export interface DomainData {

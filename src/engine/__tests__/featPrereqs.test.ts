@@ -4,8 +4,10 @@ import {
   buildCharacterPrereqContext,
   evaluateFeatPrerequisitesWithContext,
   splitPrerequisiteClauses,
-  normalizeFeatName
+  normalizeFeatName,
+  aggregateAndDeduplicateFeats
 } from '../featPrereqs';
+import { isItemSourceAllowed, getAllSourceBadges } from '../../utils/sourceFilter';
 import { CharacterState, FeatData, ClassData, RaceData } from '../../types/character';
 
 const MOCK_CLASSES: ClassData[] = [
@@ -443,4 +445,225 @@ describe('Feat Prerequisite Validator Engine', () => {
       expect(res.isQualified).toBe(true);
     });
   });
+
+  describe('Base Save Prerequisites', () => {
+    it('validates Base Fortitude save bonus +2 for Fighter 1 (base fort +2)', () => {
+      const ftr1 = createBaseCharacter({
+        levelProgression: [{ level: 1, primaryClass: 'Fighter', hpRoll: 10 }]
+      });
+      const improvedToughness: FeatData = {
+        id: 'improved_toughness',
+        name: 'Improved Toughness',
+        prerequisites: 'Base Fortitude save bonus +2.',
+        description: 'Gain hp equal to current HD'
+      };
+      const res = evaluateFeatPrerequisites(improvedToughness, ftr1, MOCK_CLASSES, MOCK_RACES);
+      expect(res.isQualified).toBe(true);
+      expect(res.unmetPrereqs).toHaveLength(0);
+    });
+
+    it('fails Base Fortitude save bonus +2 for Wizard 1 (base fort +0)', () => {
+      const wiz1 = createBaseCharacter({
+        levelProgression: [{ level: 1, primaryClass: 'Wizard', hpRoll: 4 }]
+      });
+      const improvedToughness: FeatData = {
+        id: 'improved_toughness',
+        name: 'Improved Toughness',
+        prerequisites: 'Base Fortitude save bonus +2.',
+        description: 'Gain hp equal to current HD'
+      };
+      const res = evaluateFeatPrerequisites(improvedToughness, wiz1, MOCK_CLASSES, MOCK_RACES);
+      expect(res.isQualified).toBe(false);
+      expect(res.unmetPrereqs[0]).toContain('Requires Base Fortitude save +2 (current: +0)');
+    });
+
+    it('validates base Will save +3 and Base Reflex save +3', () => {
+      // Wizard 3 (good Will save: 2 + floor(3/2) = +3)
+      const wiz3 = createBaseCharacter({
+        levelProgression: [
+          { level: 1, primaryClass: 'Wizard', hpRoll: 4 },
+          { level: 2, primaryClass: 'Wizard', hpRoll: 4 },
+          { level: 3, primaryClass: 'Wizard', hpRoll: 4 }
+        ]
+      });
+      const willFeat: FeatData = {
+        id: 'gestalt_anchor',
+        name: 'Gestalt Anchor',
+        prerequisites: 'base Will save +3',
+        description: 'Anchor'
+      };
+      const refFeat: FeatData = {
+        id: 'ref_feat',
+        name: 'Reflex Master',
+        prerequisites: 'Base Reflex save +3',
+        description: 'Reflex test'
+      };
+
+      const willRes = evaluateFeatPrerequisites(willFeat, wiz3, MOCK_CLASSES, MOCK_RACES);
+      expect(willRes.isQualified).toBe(true);
+
+      const refRes = evaluateFeatPrerequisites(refFeat, wiz3, MOCK_CLASSES, MOCK_RACES);
+      expect(refRes.isQualified).toBe(false);
+      expect(refRes.unmetPrereqs[0]).toContain('Requires Base Reflex save +3 (current: +1)');
+    });
+  });
+
+  describe('Feat Deduplication and Multi-Source Aggregation', () => {
+    it('merges cross-reference dashed pointer entries into the canonical feat', () => {
+      const rawFeats: FeatData[] = [
+        {
+          id: '--improved_toughness--',
+          name: '--Improved Toughness--',
+          prerequisites: '(See Monster Manual IV)',
+          description: ': Gain hp equal to your current HD.',
+          source: 'PH'
+        },
+        {
+          id: '--_improved_toughness_--',
+          name: '-- Improved Toughness --',
+          prerequisites: '(See Monster Manual 4)',
+          description: ': Gain hp equal to your current HD',
+          source: 'PH'
+        },
+        {
+          id: 'improved_toughness',
+          name: 'Improved Toughness',
+          prerequisites: 'Base Fortitude save bonus +2.',
+          description: ': Gain hp equal to your current HD.',
+          source: 'MM4'
+        }
+      ];
+
+      const deduped = aggregateAndDeduplicateFeats(rawFeats);
+      expect(deduped).toHaveLength(1);
+
+      const canonical = deduped[0];
+      expect(canonical.name).toBe('Improved Toughness');
+      expect(canonical.prerequisites).toBe('Base Fortitude save bonus +2.');
+      expect(canonical.sources).toEqual(expect.arrayContaining(['PH', 'MM4']));
+    });
+
+    it('allows a multi-source feat when ANY of its sources is allowed', () => {
+      const feat: FeatData = {
+        id: 'improved_toughness',
+        name: 'Improved Toughness',
+        source: 'MM4',
+        sources: ['PH', 'MM4'],
+        description: 'Gain hp equal to current HD'
+      };
+
+      // Allowed sources only contains PHB (Core)
+      const allowedSources = ['PHB', 'DMG', 'MM'];
+      expect(isItemSourceAllowed(feat, allowedSources)).toBe(true);
+
+      // Returns badge info for all sources
+      const badgeInfo = getAllSourceBadges(feat, allowedSources);
+      expect(badgeInfo.isAllowed).toBe(true);
+      expect(badgeInfo.badges).toHaveLength(2);
+
+      const phBadge = badgeInfo.badges.find(b => b.sourceCode === 'PHB');
+      const mm4Badge = badgeInfo.badges.find(b => b.sourceCode === 'MM4');
+      expect(phBadge?.isAllowed).toBe(true);
+      expect(mm4Badge?.isAllowed).toBe(false);
+    });
+
+    it('intelligently preserves the richer mechanical rules description for Clinging Breath and Fling Enemy', () => {
+      const clingingFeats: FeatData[] = [
+        {
+          id: '--_clinging_breath_--',
+          name: '-- Clinging Breath --',
+          prerequisites: '(See Monster Manual IV)',
+          description: ': Breath deals extra damage 1 round later',
+          source: 'PH'
+        },
+        {
+          id: 'clinging_breath',
+          name: 'Clinging Breath',
+          prerequisites: 'Con 13, Breath weapon (not verified)',
+          description: ': Your breath weapon continues to affect targets after you breathe.',
+          source: 'MM4'
+        }
+      ];
+
+      const dedupedClinging = aggregateAndDeduplicateFeats(clingingFeats);
+      expect(dedupedClinging).toHaveLength(1);
+      expect(dedupedClinging[0].prerequisites).toBe('Con 13, Breath weapon (not verified)');
+      expect(dedupedClinging[0].description).toContain('1 round later');
+
+      const flingFeats: FeatData[] = [
+        {
+          id: '--fling_enemy--',
+          name: '--Fling Enemy--',
+          prerequisites: '(see Races of Stone)',
+          description: ': You can make a grapple check at a -20 penalty against an opponent at least two size categories smaller than you. The range increment for the thrown creature is 120 feet.',
+          source: 'PH'
+        },
+        {
+          id: 'fling_enemy',
+          name: 'Fling Enemy',
+          prerequisites: 'Str 19, Rock Hurling or racial ability to throw rocks, size Large or larger (or Powerful Build)',
+          description: ': Throw an enemy you\'re grappling',
+          source: 'RoS'
+        }
+      ];
+
+      const dedupedFling = aggregateAndDeduplicateFeats(flingFeats);
+      expect(dedupedFling).toHaveLength(1);
+      expect(dedupedFling[0].prerequisites).toContain('Str 19, Rock Hurling');
+      expect(dedupedFling[0].description).toContain('-20 penalty');
+      expect(dedupedFling[0].description).toContain('120 feet');
+    });
+
+    it('merges 3.0e / variant edition aliases into canonical 3.5e records', () => {
+      const aliasFeats: FeatData[] = [
+        {
+          id: '--ki_shout--',
+          name: '-- Ki Shout --',
+          prerequisites: '(see Complete Warrior)',
+          description: ': Make a shout to panic foes',
+          source: 'OA'
+        },
+        {
+          id: 'kiai_shout',
+          name: 'Kiai Shout',
+          prerequisites: 'Cha 13, Base attack bonus +1',
+          description: ': Yell to make opponents within 30 ft. become shaken',
+          source: 'CW'
+        },
+        {
+          id: '--tunnel_fighter--',
+          name: '-- Tunnel Fighter --',
+          prerequisites: '(see Dungeonscape)',
+          description: ': Cause enemy to make melee attacks only against you.',
+          source: 'PH'
+        },
+        {
+          id: 'tunnel_fighting',
+          name: 'Tunnel Fighting',
+          prerequisites: 'Base attack bonus +1',
+          description: ': No penalty on attacks or to AC when squeezing.',
+          source: 'Ds'
+        }
+      ];
+
+      const deduped = aggregateAndDeduplicateFeats(aliasFeats);
+      expect(deduped).toHaveLength(2);
+
+      const kiai = deduped.find(f => f.name === 'Kiai Shout');
+      expect(kiai).toBeDefined();
+      expect(kiai?.id).toBe('kiai_shout');
+      expect(kiai?.prerequisites).toBe('Cha 13, Base attack bonus +1');
+      expect(kiai?.sources).toEqual(expect.arrayContaining(['OA', 'CW']));
+
+      const tunnel = deduped.find(f => f.name === 'Tunnel Fighting');
+      expect(tunnel).toBeDefined();
+      expect(tunnel?.id).toBe('tunnel_fighting');
+      expect(tunnel?.prerequisites).toBe('Base attack bonus +1');
+      expect(tunnel?.sources).toEqual(expect.arrayContaining(['PH', 'Ds']));
+      expect(tunnel?.description).toContain('squeezing');
+    });
+  });
 });
+
+
+

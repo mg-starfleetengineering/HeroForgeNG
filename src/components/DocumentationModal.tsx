@@ -25,7 +25,7 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
       icon: 'fa-rocket',
       content: (
         <div className="space-y-4">
-          <h3 className="text-lg font-bold text-amber-300 font-heading">Getting Started with HeroForgeNG v2.0.0</h3>
+          <h3 className="text-lg font-bold text-amber-300 font-heading">Getting Started with HeroForgeNG v2.1.0</h3>
           <p className="text-slate-300 text-sm leading-relaxed">
             HeroForgeNG is a high-performance web application designed for creating, customizing, and managing D&D 3.5e character sheets. All character data is saved <strong>100% locally in your browser</strong> using IndexedDB with automatic local storage fallback.
           </p>
@@ -544,7 +544,7 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({ isOpen, 
             </div>
             <div>
               <h2 className="text-lg font-bold font-heading text-amber-300">HeroForgeNG Documentation & User Guide</h2>
-              <p className="text-xs text-slate-400">Complete manual for features, capabilities, and character management (v2.0.0)</p>
+              <p className="text-xs text-slate-400">Complete manual for features, capabilities, and character management (v2.1.0)</p>
             </div>
           </div>
 
