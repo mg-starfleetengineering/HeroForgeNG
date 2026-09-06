@@ -473,7 +473,7 @@ export const App: React.FC = () => {
           {activeTab === 'stats' && <StatsTab character={character} racesData={racesData} onChange={updateCharacter} />}
           {activeTab === 'race-class' && <RaceClassTab character={character} racesData={racesData} classesData={classesData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} deitiesData={deitiesData} domainsData={domainsData} wildShapeFormsData={wildShapeFormsData} onChange={updateCharacter} />}
           {activeTab === 'skills' && <SkillsTab character={character} racesData={racesData} classesData={classesData} traitsData={traitsData} flawsData={flawsData} skillTricksData={skillTricksData} onChange={updateCharacter} />}
-          {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} classesData={classesData} racesData={racesData} onChange={updateCharacter} />}
+          {activeTab === 'feats' && <FeatsTab character={character} featsData={featsData} classesData={classesData} racesData={racesData} templatesData={templatesData} traitsData={traitsData} flawsData={flawsData} onChange={updateCharacter} />}
           {activeTab === 'equipment' && <EquipmentTab character={character} weaponsData={weaponsData} racesData={racesData} classesData={classesData} onChange={updateCharacter} />}
           {activeTab === 'spells' && <SpellsTab character={character} classesData={classesData} racesData={racesData} domainsData={domainsData} deitiesData={deitiesData} spellsData={spellsData} supplementalSpellsData={supplementalSpellsData} onChange={updateCharacter} />}
           {activeTab === 'familiar' && <FamiliarTab character={character} classesData={classesData} familiarsData={familiarsData} onChange={updateCharacter} />}
