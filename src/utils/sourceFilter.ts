@@ -37,8 +37,12 @@ export function normalizeSourceCode(rawSource?: string): string {
     'SW': 'Sto',
     'MIC': 'Mag',
     'FC2': 'FCII',
-    'CUST': 'PHB',
-    'CUST`': 'PHB',
+    'CUST': 'Custom',
+    'CUST`': 'Custom',
+    'CUSTOM': 'Custom',
+    'CUSTOM MAGIC': 'Custom',
+    'BACKPACK': 'Custom',
+    'INVENTORY': 'Custom',
     'SH': 'CS',
     'MAG': 'Mag',
     'RVL': 'RCS',
@@ -62,11 +66,11 @@ export function isSourceAllowed(itemSource?: string, allowedSources?: string[]):
   const currentAllowed = (allowedSources && allowedSources.length > 0) ? allowedSources : CORE_SOURCES;
   const normalized = normalizeSourceCode(itemSource);
   
+  // Custom, backpack, or non-tagged items default to allowed
+  if (!itemSource || itemSource === 'Custom' || itemSource === 'Core' || itemSource === 'Backpack' || itemSource === 'Inventory' || itemSource.toLowerCase().includes('custom') || normalized === 'Custom') return true;
+
   // If the normalized source is in the allowed list, return true
   if (currentAllowed.includes(normalized)) return true;
-
-  // Custom or non-tagged items default to allowed
-  if (!itemSource || itemSource === 'Custom' || itemSource === 'Core') return true;
 
   return false;
 }

@@ -204,6 +204,26 @@ export function collectSRSources(
     }
   }
 
+  // Armor / Shield Special Qualities with Spell Resistance
+  const armorQualities = [
+    ...(character.equipment?.armorQualities || []),
+    ...(character.equipment?.shieldQualities || [])
+  ];
+  armorQualities.forEach(qId => {
+    const qLower = qId.toLowerCase();
+    const match = qLower.match(/spell_resistance_(\d+)/i) || qLower.match(/spell resistance\s*\(?(\d+)\)?/i);
+    if (match) {
+      const val = parseInt(match[1], 10);
+      if (!isNaN(val)) {
+        sources.push({
+          name: `Armor Quality: Spell Resistance (${val})`,
+          category: 'equipment',
+          value: val
+        });
+      }
+    }
+  });
+
   // 5. Active Auras SR
   if (character.auras) {
     character.auras.filter(a => a.active && a.effect).forEach(aura => {

@@ -40,6 +40,15 @@ import {
   getActiveCombatModifiers,
   isTwoHandedWeapon
 } from '../engine/combat';
+import {
+  calculateKeenThreat,
+  hasKeenQuality,
+  hasSpeedQuality,
+  getWeaponSpecialDamage,
+  getArmorSkillBonus,
+  getFortificationSummary,
+  getQualityById
+} from '../engine/magicItems';
 import { calculateConditionPenalties, CONDITION_MAP } from '../engine/conditions';
 import { calculateTotalDR } from '../engine/dr';
 import { calculateTotalSR } from '../engine/sr';
@@ -204,6 +213,13 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const traitFlawSkillMods = calculateTraitFlawSkillMods(selectedTraits, selectedFlaws, traitsData, flawsData, usePathfinder);
   const activeSkills = getAvailableSkills(usePathfinder);
 
+  const armorObj = resolveArmor(eq.armor, customArmors);
+  const shieldObj = resolveShield(eq.shield, customArmors);
+  const armorEnhancement = eq.armorEnhancement ?? armorObj.enhancementBonus ?? 0;
+  const shieldEnhancement = eq.shieldEnhancement ?? shieldObj.enhancementBonus ?? 0;
+  const armorQualities = (eq.armorQualities && eq.armorQualities.length > 0) ? eq.armorQualities : (armorObj.specialQualities || []);
+  const shieldQualities = (eq.shieldQualities && eq.shieldQualities.length > 0) ? eq.shieldQualities : (shieldObj.specialQualities || []);
+
   const calculatedSkills = activeSkills.map(skill => {
     const isClass = isClassSkillForCharacter(skill.name, character.levelProgression, classesData);
     const ranks = (character.skillRanks || {})[skill.name] || 0;
@@ -217,10 +233,11 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     if (skill.name === 'Spot') skillSpecificPenalty += conditionPenalties.spotPenalty;
     if (skill.name === 'Listen') skillSpecificPenalty += conditionPenalties.listenPenalty;
 
-    let totalMod = Math.floor(ranks) + abMod + tfSkillMod + skillSpecificPenalty;
+    const armorSkillBonus = getArmorSkillBonus(armorQualities, shieldQualities, skill.name);
+    let totalMod = Math.floor(ranks) + abMod + tfSkillMod + skillSpecificPenalty + armorSkillBonus;
     if (skill.name === 'Perception') {
       const percStats = calculatePerceptionStats(character, classesData, abMod);
-      totalMod = percStats.totalBonus + tfSkillMod + skillSpecificPenalty;
+      totalMod = percStats.totalBonus + tfSkillMod + skillSpecificPenalty + armorSkillBonus;
     }
 
     return {
@@ -231,7 +248,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       totalMod,
       abMod,
       tfSkillMod,
-      skillSpecificPenalty
+      skillSpecificPenalty,
+      armorSkillBonus
     };
   });
 
@@ -239,16 +257,15 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const leftSkills = calculatedSkills.slice(0, halfIndex);
   const rightSkills = calculatedSkills.slice(halfIndex);
 
-  const armorObj = resolveArmor(eq.armor, customArmors);
-  const shieldObj = resolveShield(eq.shield, customArmors);
-
-  const armorAc = armorObj.acBonus + (eq.armorEnhancement || 0);
-  const shieldAc = shieldObj.acBonus + (eq.shieldEnhancement || 0);
+  const armorAc = armorObj.acBonus + armorEnhancement;
+  const shieldAc = shieldObj.acBonus + shieldEnhancement;
 
   const finalDexToAc = conditionPenalties.loseDexToAc ? Math.min(0, effectiveDexMod) : effectiveDexMod;
   const totalAc = 10 + armorAc + shieldAc + finalDexToAc + (eq.deflection || 0) + (eq.natural || 0) + wildShapeNatArmor + sizeAcMod + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.acNetMod + conditionPenalties.acPenalty;
   const touchAc = 10 + finalDexToAc + (eq.deflection || 0) + sizeAcMod + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.touchAcMod + conditionPenalties.acPenalty;
   const flatAc = 10 + armorAc + shieldAc + Math.min(0, effectiveDexMod) + (eq.deflection || 0) + (eq.natural || 0) + wildShapeNatArmor + sizeAcMod + traitFlawAcMod + generalTcMods.flatAcMod + conditionPenalties.acPenalty;
+
+  const fortificationSummary = getFortificationSummary(armorQualities, shieldQualities);
 
   // Weapon Resolutions & Feat Combat Bonuses
   const activeWeaponsList: Array<{
@@ -257,6 +274,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     attackBonus: number;
     fullSeq: string;
     damageStr: string;
+    damageFormula?: string;
     critStr: string;
     type: string;
     featAtkBonus: number;
@@ -281,19 +299,29 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   // 1. Primary Weapon
   if (eq.primaryWeapon) {
     const primaryWpn = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
+    const primaryQualities = (eq.primaryWeaponQualities && eq.primaryWeaponQualities.length > 0) ? eq.primaryWeaponQualities : (primaryWpn.specialQualities || []);
+    const primarySpecialDmg = getWeaponSpecialDamage(primaryQualities);
+    const primaryHasKeen = hasKeenQuality(primaryQualities);
+    const primaryHasSpeed = hasSpeedQuality(primaryQualities);
+    const primaryThreat = primaryHasKeen ? calculateKeenThreat(primaryWpn.threat) : primaryWpn.threat;
     const featBonuses = calculateFeatCombatBonuses(character, primaryWpn);
     const wMods = calculateTacticalCombatModifiers(tcState, primaryWpn, false, false);
-    const enh = eq.primaryWeaponEnhancement || 0;
+    const enh = eq.primaryWeaponEnhancement ?? primaryWpn.enhancementBonus ?? 0;
     const isMelee = !primaryWpn.category?.toLowerCase().includes('ranged');
     const netSmiteAtk = isMelee ? smiteAtkBonus : 0;
     const netSmiteDmg = isMelee ? smiteDmgBonus : 0;
     const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
     const totalAtk = bab + netAtkBonus;
-    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy);
+    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy, primaryHasSpeed);
     const dmgVal = effectiveStrMod + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty;
+    const baseDmgStr = `${primaryWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`;
+    const damageStr = `${baseDmgStr}${primarySpecialDmg.damageDiceString}`;
+    const damageFormula = `${baseDmgStr}${primarySpecialDmg.damageDiceFormula}`;
 
     const primaryNote = (() => {
       const notes: string[] = [];
+      if (primaryHasSpeed) { notes.push('Speed: +1 Extra Atk'); }
+      if (primarySpecialDmg.summaryLabels.length > 0) { notes.push(`Magic: ${primarySpecialDmg.summaryLabels.join(', ')}`); }
       if (tcState.whirlingFrenzy) { notes.push('Whirling Frenzy: +2 Str, -2 Flurry, +1 Extra Atk'); }
       else if (tcState.rage) { notes.push('Barbarian Rage: +2 Str'); }
       if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('Flurry: -2 Atk, +1 Extra Atk'); }
@@ -313,11 +341,12 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
     activeWeaponsList.push({
       label: 'Primary',
-      weapon: primaryWpn,
+      weapon: { ...primaryWpn, threat: primaryThreat },
       attackBonus: totalAtk,
       fullSeq,
-      damageStr: `${primaryWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`,
-      critStr: `${primaryWpn.threat < 20 ? `${primaryWpn.threat}-20` : '20'}/x${primaryWpn.critMultiplier || 2}`,
+      damageStr,
+      damageFormula,
+      critStr: `${primaryThreat < 20 ? `${primaryThreat}-20` : '20'}/x${primaryWpn.critMultiplier || 2}${primaryHasKeen ? ' (Keen)' : ''}`,
       type: primaryWpn.type || 'Slashing',
       featAtkBonus: featBonuses.attackBonus,
       featDmgBonus: featBonuses.damageBonus,
@@ -328,19 +357,29 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   // 2. Secondary Weapon
   if (eq.secondaryWeapon && eq.secondaryWeapon !== 'none') {
     const secWpn = resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData);
+    const secondaryQualities = (eq.secondaryWeaponQualities && eq.secondaryWeaponQualities.length > 0) ? eq.secondaryWeaponQualities : (secWpn.specialQualities || []);
+    const secondarySpecialDmg = getWeaponSpecialDamage(secondaryQualities);
+    const secondaryHasKeen = hasKeenQuality(secondaryQualities);
+    const secondaryHasSpeed = hasSpeedQuality(secondaryQualities);
+    const secThreat = secondaryHasKeen ? calculateKeenThreat(secWpn.threat) : secWpn.threat;
     const featBonuses = calculateFeatCombatBonuses(character, secWpn);
     const wMods = calculateTacticalCombatModifiers(tcState, secWpn, true, false);
-    const enh = eq.secondaryWeaponEnhancement || 0;
+    const enh = eq.secondaryWeaponEnhancement ?? secWpn.enhancementBonus ?? 0;
     const isMelee = !secWpn.category?.toLowerCase().includes('ranged');
     const netSmiteAtk = isMelee ? smiteAtkBonus : 0;
     const netSmiteDmg = isMelee ? smiteDmgBonus : 0;
     const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
     const totalAtk = bab + netAtkBonus;
-    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy);
+    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy, secondaryHasSpeed);
     const dmgVal = Math.floor(effectiveStrMod / 2) + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty;
+    const baseDmgStr = `${secWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`;
+    const damageStr = `${baseDmgStr}${secondarySpecialDmg.damageDiceString}`;
+    const damageFormula = `${baseDmgStr}${secondarySpecialDmg.damageDiceFormula}`;
 
     const secNote = (() => {
       const notes: string[] = [];
+      if (secondaryHasSpeed) { notes.push('Speed: +1 Extra Atk'); }
+      if (secondarySpecialDmg.summaryLabels.length > 0) { notes.push(`Magic: ${secondarySpecialDmg.summaryLabels.join(', ')}`); }
       if (tcState.whirlingFrenzy) { notes.push('Whirling Frenzy: +2 Str, -2 Flurry, +1 Extra Atk'); }
       else if (tcState.rage) { notes.push('Barbarian Rage: +2 Str'); }
       if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('Flurry: -2 Atk, +1 Extra Atk'); }
@@ -357,11 +396,12 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
     activeWeaponsList.push({
       label: 'Off-Hand',
-      weapon: secWpn,
+      weapon: { ...secWpn, threat: secThreat },
       attackBonus: totalAtk,
       fullSeq,
-      damageStr: `${secWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`,
-      critStr: `${secWpn.threat < 20 ? `${secWpn.threat}-20` : '20'}/x${secWpn.critMultiplier || 2}`,
+      damageStr,
+      damageFormula,
+      critStr: `${secThreat < 20 ? `${secThreat}-20` : '20'}/x${secWpn.critMultiplier || 2}${secondaryHasKeen ? ' (Keen)' : ''}`,
       type: secWpn.type || 'Slashing',
       featAtkBonus: featBonuses.attackBonus,
       featDmgBonus: featBonuses.damageBonus,
@@ -372,16 +412,26 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   // 3. Ranged Weapon
   if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
     const rngWpn = resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData);
+    const rangedQualities = (eq.rangedWeaponQualities && eq.rangedWeaponQualities.length > 0) ? eq.rangedWeaponQualities : (rngWpn.specialQualities || []);
+    const rangedSpecialDmg = getWeaponSpecialDamage(rangedQualities);
+    const rangedHasKeen = hasKeenQuality(rangedQualities);
+    const rangedHasSpeed = hasSpeedQuality(rangedQualities);
+    const rngThreat = rangedHasKeen ? calculateKeenThreat(rngWpn.threat) : rngWpn.threat;
     const featBonuses = calculateFeatCombatBonuses(character, rngWpn);
     const wMods = calculateTacticalCombatModifiers(tcState, rngWpn, false, true);
-    const enh = eq.rangedWeaponEnhancement || 0;
+    const enh = eq.rangedWeaponEnhancement ?? rngWpn.enhancementBonus ?? 0;
     const netAtkBonus = effectiveDexMod + enh + featBonuses.attackBonus + wMods.attackMod + conditionPenalties.attackPenalty + conditionPenalties.rangedAttackPenalty;
     const totalAtk = bab + netAtkBonus;
-    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy);
+    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy, rangedHasSpeed);
     const dmgVal = enh + wMods.damageMod + conditionPenalties.damagePenalty;
+    const baseDmgStr = `${rngWpn.damageM}${dmgVal > 0 ? `+${dmgVal}` : (dmgVal < 0 ? `${dmgVal}` : '')}`;
+    const damageStr = `${baseDmgStr}${rangedSpecialDmg.damageDiceString}`;
+    const damageFormula = `${baseDmgStr}${rangedSpecialDmg.damageDiceFormula}`;
 
     const rngNote = (() => {
       const notes: string[] = [];
+      if (rangedHasSpeed) { notes.push('Speed: +1 Extra Atk'); }
+      if (rangedSpecialDmg.summaryLabels.length > 0) { notes.push(`Magic: ${rangedSpecialDmg.summaryLabels.join(', ')}`); }
       if (tcState.whirlingFrenzy) { notes.push('Whirling Frenzy: -2 Flurry, +1 Extra Atk'); }
       if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('Flurry: -2 Atk, +1 Extra Atk'); }
       if (tcState.haste) { notes.push('Haste: +1 Atk, +1 Extra Atk'); }
@@ -393,11 +443,12 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
     activeWeaponsList.push({
       label: 'Ranged',
-      weapon: rngWpn,
+      weapon: { ...rngWpn, threat: rngThreat },
       attackBonus: totalAtk,
       fullSeq,
-      damageStr: `${rngWpn.damageM}${dmgVal > 0 ? `+${dmgVal}` : (dmgVal < 0 ? `${dmgVal}` : '')}`,
-      critStr: `${rngWpn.threat < 20 ? `${rngWpn.threat}-20` : '20'}/x${rngWpn.critMultiplier || 2}`,
+      damageStr,
+      damageFormula,
+      critStr: `${rngThreat < 20 ? `${rngThreat}-20` : '20'}/x${rngWpn.critMultiplier || 2}${rangedHasKeen ? ' (Keen)' : ''}`,
       type: rngWpn.type || 'Piercing',
       featAtkBonus: featBonuses.attackBonus,
       featDmgBonus: featBonuses.damageBonus,
@@ -792,9 +843,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                   <td className="py-1 text-center text-slate-800">
                     <div
                       onClick={() => {
-                        const formula = (item.damageStr || '').split(' ')[0];
-                        if (formula) {
-                          rollDamage(formula, `${item.weapon.name} Damage`);
+                        const rollFormula = item.damageFormula || (item.damageStr || '').split(' ')[0];
+                        if (rollFormula) {
+                          rollDamage(rollFormula, `${item.weapon.name} Damage`);
                         }
                       }}
                       className="cursor-pointer hover:bg-slate-200/80 px-1.5 py-0.5 rounded transition inline-block group"
@@ -821,26 +872,41 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
             <div className="space-y-1 text-xs font-mono print:text-[10px]">
               <div className="p-1.5 bg-white rounded border border-slate-200 space-y-0.5">
                 <span className="font-bold block text-slate-900">
-                  Armor: {armorObj.name} {eq.armorEnhancement ? `+${eq.armorEnhancement}` : ''}
+                  Armor: {armorObj.name} {armorEnhancement ? `+${armorEnhancement}` : ''}
+                  {armorQualities.length > 0 && (
+                    <span className="text-[10px] text-indigo-700 font-sans font-normal ml-1">
+                      ({armorQualities.map(q => getQualityById(q)?.name || q).join(', ')})
+                    </span>
+                  )}
                 </span>
                 <p className="text-slate-600 text-[11px] print:text-[9.5px]">AC: +{armorAc} | Max Dex: +{armorObj.maxDex} | Check: {armorObj.checkPenalty}</p>
               </div>
               <div className="p-1.5 bg-white rounded border border-slate-200 space-y-0.5">
                 <span className="font-bold block text-slate-900">
-                  Shield: {shieldObj.name} {eq.shieldEnhancement ? `+${eq.shieldEnhancement}` : ''}
+                  Shield: {shieldObj.name} {shieldEnhancement ? `+${shieldEnhancement}` : ''}
+                  {shieldQualities.length > 0 && (
+                    <span className="text-[10px] text-indigo-700 font-sans font-normal ml-1">
+                      ({shieldQualities.map(q => getQualityById(q)?.name || q).join(', ')})
+                    </span>
+                  )}
                 </span>
                 <p className="text-slate-600 text-[11px] print:text-[9.5px]">AC: +{shieldAc} | Check: {shieldObj.checkPenalty}</p>
               </div>
             </div>
           </div>
 
-          {/* Defenses & Resistances (DR / SR) */}
+          {/* Defenses & Resistances (DR / SR / Fortification) */}
           <div className="border border-slate-300 rounded-lg p-2.5 print:p-2 bg-slate-50 space-y-1.5 print:space-y-1">
             <div className="flex items-center justify-between border-b border-slate-300 pb-1 print:pb-0.5">
               <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-slate-800">
-                Defenses & Resistances (DR / SR)
+                Defenses & Resistances (DR / SR / Fort)
               </h3>
               <div className="flex items-center gap-1 font-mono text-[11px] print:text-[9.5px]">
+                {fortificationSummary.hasFortification && (
+                  <span className="font-bold px-1.5 py-0.2 rounded border text-amber-950 bg-amber-200 border-amber-400">
+                    Fort {fortificationSummary.percentage}%
+                  </span>
+                )}
                 <span className={`font-bold px-1.5 py-0.2 rounded border ${drSummary.hasDR ? 'text-amber-900 bg-amber-100 border-amber-300' : 'text-slate-600 bg-slate-200 border-slate-300'}`}>
                   {drSummary.hasDR ? drSummary.bestDRString : 'DR: None'}
                 </span>
@@ -849,8 +915,18 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                 </span>
               </div>
             </div>
-            {drSummary.hasDR || srSummary.hasSR ? (
+            {drSummary.hasDR || srSummary.hasSR || fortificationSummary.hasFortification ? (
               <div className="space-y-1 text-xs font-mono print:text-[10px]">
+                {fortificationSummary.hasFortification && (
+                  <div className="p-1.5 bg-white rounded border border-slate-200">
+                    <span className="text-[9.5px] font-sans font-bold text-amber-800 block uppercase">Fortification</span>
+                    <span className="font-bold text-slate-900">{fortificationSummary.percentage}% Chance to Negate Criticals & Sneak Attacks</span>
+                    <div className="text-[10px] print:text-[9px] text-slate-600 font-sans leading-tight mt-0.5">
+                      <span className="font-bold text-slate-700">Source: </span>
+                      {fortificationSummary.source}
+                    </div>
+                  </div>
+                )}
                 {drSummary.hasDR && (
                   <div className="p-1.5 bg-white rounded border border-slate-200">
                     <span className="text-[9.5px] font-sans font-bold text-amber-800 block uppercase">Damage Reduction</span>
@@ -875,13 +951,17 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                 )}
                 <div className="text-[10px] print:text-[9px] text-slate-600 font-sans leading-tight">
                   <span className="font-bold text-slate-700">Sources: </span>
-                  {[...drSummary.sources.map(s => `${s.name} (${s.value}/${s.bypass})`), ...srSummary.sources.map(s => `${s.name} (SR ${s.value})`)].join(', ')}
+                  {[
+                    ...(fortificationSummary.hasFortification ? [`${fortificationSummary.source} (${fortificationSummary.percentage}% Fortification)`] : []),
+                    ...drSummary.sources.map(s => `${s.name} (${s.value}/${s.bypass})`),
+                    ...srSummary.sources.map(s => `${s.name} (SR ${s.value})`)
+                  ].join(', ')}
                 </div>
               </div>
             ) : (
               <div className="p-3 print:p-2 bg-white rounded border border-slate-200 flex items-center justify-center min-h-[64px] print:min-h-[56px] text-center">
                 <p className="text-[11px] print:text-[9.5px] text-slate-500 italic font-mono">
-                  No active Damage Reduction (DR) or Spell Resistance (SR) sources detected.
+                  No active Damage Reduction (DR), Spell Resistance (SR), or Fortification defenses detected.
                 </p>
               </div>
             )}
@@ -1361,6 +1441,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                           ...(sk.ranks > 0 ? [{ label: 'Ranks', value: Math.floor(sk.ranks) }] : []),
                           { label: sk.keyAbility, value: sk.abMod },
                           ...(sk.tfSkillMod !== 0 ? [{ label: 'Trait/Flaw', value: sk.tfSkillMod }] : []),
+                          ...(sk.armorSkillBonus !== 0 ? [{ label: 'Armor Quality', value: sk.armorSkillBonus }] : []),
                           ...(sk.skillSpecificPenalty !== 0 ? [{ label: 'Penalty', value: sk.skillSpecificPenalty }] : [])
                         ]
                       })}
@@ -1410,6 +1491,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                           ...(sk.ranks > 0 ? [{ label: 'Ranks', value: Math.floor(sk.ranks) }] : []),
                           { label: sk.keyAbility, value: sk.abMod },
                           ...(sk.tfSkillMod !== 0 ? [{ label: 'Trait/Flaw', value: sk.tfSkillMod }] : []),
+                          ...(sk.armorSkillBonus !== 0 ? [{ label: 'Armor Quality', value: sk.armorSkillBonus }] : []),
                           ...(sk.skillSpecificPenalty !== 0 ? [{ label: 'Penalty', value: sk.skillSpecificPenalty }] : [])
                         ]
                       })}

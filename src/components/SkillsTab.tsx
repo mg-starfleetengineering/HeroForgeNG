@@ -12,6 +12,7 @@ import {
   validateSkillTrickPrerequisites
 } from '../engine/skills';
 import { calculateTotalScore, getAbilityMod, parseRaceMods, calculateTraitFlawStatMods, calculateTraitFlawSkillMods } from '../engine/stats';
+import { getArmorSkillBonus } from '../engine/magicItems';
 
 interface SkillsTabProps {
   character: CharacterState;
@@ -149,12 +150,13 @@ export const SkillsTab: React.FC<SkillsTabProps> = ({
                 const abMod = getAbilityMod(abilityScore);
                 const tfSkillMod = traitFlawSkillMods[skill.name] || 0;
 
-                let totalMod = Math.floor(ranks) + abMod + tfSkillMod;
+                const armorSkillBonus = getArmorSkillBonus(character.equipment?.armorQualities, character.equipment?.shieldQualities, skill.name);
+                let totalMod = Math.floor(ranks) + abMod + tfSkillMod + armorSkillBonus;
                 let featBonusText = '';
 
                 if (skill.name === 'Perception') {
                   const percStats = calculatePerceptionStats(character, classesData, abMod);
-                  totalMod = percStats.totalBonus + tfSkillMod;
+                  totalMod = percStats.totalBonus + tfSkillMod + armorSkillBonus;
                   if (percStats.alertnessBonus > 0) {
                     featBonusText = ` (includes +${percStats.alertnessBonus} Alertness)`;
                   }
@@ -173,6 +175,11 @@ export const SkillsTab: React.FC<SkillsTabProps> = ({
                     </td>
                     <td className="py-2 px-2 font-semibold text-slate-200">
                       {skill.name}
+                      {armorSkillBonus > 0 && (
+                        <span className="ml-2 text-[10px] text-indigo-400 font-normal font-mono">
+                          (+{armorSkillBonus} Magic Quality)
+                        </span>
+                      )}
                       {skill.name === 'Perception' && (
                         <span className="ml-2 text-[10px] text-amber-400/90 font-normal italic">
                           (Pathfinder: Merged Spot/Listen/Search &bull; Wisdom{featBonusText})

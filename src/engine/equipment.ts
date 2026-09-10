@@ -15,19 +15,44 @@ export const DEFAULT_WEAPON: WeaponData = {
 const STANDARD_ARMOR_MAP: Record<string, { name: string; acBonus: number; maxDex: number; checkPenalty: number }> = {
   none: { name: 'None', acBonus: 0, maxDex: 99, checkPenalty: 0 },
   padded: { name: 'Padded Armor', acBonus: 1, maxDex: 8, checkPenalty: 0 },
+  'padded armor': { name: 'Padded Armor', acBonus: 1, maxDex: 8, checkPenalty: 0 },
   leather: { name: 'Leather Armor', acBonus: 2, maxDex: 6, checkPenalty: 0 },
+  'leather armor': { name: 'Leather Armor', acBonus: 2, maxDex: 6, checkPenalty: 0 },
   studded: { name: 'Studded Leather Armor', acBonus: 3, maxDex: 5, checkPenalty: -1 },
+  'studded leather': { name: 'Studded Leather Armor', acBonus: 3, maxDex: 5, checkPenalty: -1 },
+  'studded leather armor': { name: 'Studded Leather Armor', acBonus: 3, maxDex: 5, checkPenalty: -1 },
   chainshirt: { name: 'Chain Shirt', acBonus: 4, maxDex: 4, checkPenalty: -2 },
+  'chain shirt': { name: 'Chain Shirt', acBonus: 4, maxDex: 4, checkPenalty: -2 },
   breastplate: { name: 'Breastplate', acBonus: 5, maxDex: 3, checkPenalty: -4 },
-  fullplate: { name: 'Full Plate', acBonus: 8, maxDex: 1, checkPenalty: -6 }
+  fullplate: { name: 'Full Plate', acBonus: 8, maxDex: 1, checkPenalty: -6 },
+  'full plate': { name: 'Full Plate', acBonus: 8, maxDex: 1, checkPenalty: -6 },
+  hide: { name: 'Hide Armor', acBonus: 3, maxDex: 4, checkPenalty: -3 },
+  'hide armor': { name: 'Hide Armor', acBonus: 3, maxDex: 4, checkPenalty: -3 },
+  scale_mail: { name: 'Scale Mail', acBonus: 4, maxDex: 3, checkPenalty: -4 },
+  'scale mail': { name: 'Scale Mail', acBonus: 4, maxDex: 3, checkPenalty: -4 },
+  chainmail: { name: 'Chainmail', acBonus: 5, maxDex: 2, checkPenalty: -5 },
+  banded_mail: { name: 'Banded Mail', acBonus: 6, maxDex: 1, checkPenalty: -6 },
+  'banded mail': { name: 'Banded Mail', acBonus: 6, maxDex: 1, checkPenalty: -6 },
+  splint_mail: { name: 'Splint Mail', acBonus: 6, maxDex: 0, checkPenalty: -7 },
+  'splint mail': { name: 'Splint Mail', acBonus: 6, maxDex: 0, checkPenalty: -7 },
+  half_plate: { name: 'Half-Plate', acBonus: 7, maxDex: 0, checkPenalty: -7 },
+  'half-plate': { name: 'Half-Plate', acBonus: 7, maxDex: 0, checkPenalty: -7 },
+  'half plate': { name: 'Half-Plate', acBonus: 7, maxDex: 0, checkPenalty: -7 }
 };
 
 const STANDARD_SHIELD_MAP: Record<string, { name: string; acBonus: number; checkPenalty: number }> = {
   none: { name: 'None', acBonus: 0, checkPenalty: 0 },
   buckler: { name: 'Buckler', acBonus: 1, checkPenalty: -1 },
   light_wooden: { name: 'Light Shield', acBonus: 1, checkPenalty: -1 },
+  'light shield': { name: 'Light Shield', acBonus: 1, checkPenalty: -1 },
+  'light wooden shield': { name: 'Light Shield', acBonus: 1, checkPenalty: -1 },
+  'light steel shield': { name: 'Light Shield', acBonus: 1, checkPenalty: -1 },
   heavy_shield: { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2 },
-  tower_shield: { name: 'Tower Shield', acBonus: 4, checkPenalty: -10 }
+  'heavy shield': { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2 },
+  'heavy steel shield': { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2 },
+  'heavy wooden shield': { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2 },
+  tower_shield: { name: 'Tower Shield', acBonus: 4, checkPenalty: -10 },
+  'tower shield': { name: 'Tower Shield', acBonus: 4, checkPenalty: -10 }
 };
 
 const DAMAGE_INDEX_MAP: Record<string, string> = {
@@ -53,9 +78,107 @@ const normalizeWeapon = (wpn: WeaponData): WeaponData => {
   return wpn;
 };
 
+export const THEMED_WEAPON_BASE_MAP: Record<string, string> = {
+  nodachi: 'greatsword',
+  katana: 'bastard sword',
+  wakizashi: 'short sword',
+  naginata: 'glaive',
+  broadsword: 'longsword',
+  saber: 'scimitar',
+  claymore: 'greatsword',
+  estoc: 'rapier',
+  gladius: 'short sword',
+  messer: 'scimitar'
+};
+
+export const THEMED_WEAPON_LIST: { name: string; baseName: string; displayName: string }[] = [
+  { name: 'Nodachi', baseName: 'Greatsword', displayName: 'Nodachi (Greatsword)' },
+  { name: 'Katana', baseName: 'Bastard Sword', displayName: 'Katana (Bastard Sword)' },
+  { name: 'Wakizashi', baseName: 'Short Sword', displayName: 'Wakizashi (Short Sword)' },
+  { name: 'Naginata', baseName: 'Glaive', displayName: 'Naginata (Glaive)' },
+  { name: 'Broadsword', baseName: 'Longsword', displayName: 'Broadsword (Longsword)' },
+  { name: 'Saber', baseName: 'Scimitar', displayName: 'Saber (Scimitar)' },
+  { name: 'Claymore', baseName: 'Greatsword', displayName: 'Claymore (Greatsword)' },
+  { name: 'Estoc', baseName: 'Rapier', displayName: 'Estoc (Rapier)' },
+  { name: 'Gladius', baseName: 'Short Sword', displayName: 'Gladius (Short Sword)' },
+  { name: 'Messer', baseName: 'Scimitar', displayName: 'Messer (Scimitar)' }
+];
+
+export const STANDARD_BASE_WEAPONS: Record<string, WeaponData> = {
+  greatsword: { id: 'greatsword', name: 'Greatsword', category: 'Martial', size: 'T', damageM: '2d6', threat: 19, critMultiplier: 2, weight: 8, type: 'Slashing', source: 'PHB' },
+  longsword: { id: 'longsword', name: 'Longsword', category: 'Martial', size: 'O', damageM: '1d8', threat: 19, critMultiplier: 2, weight: 4, type: 'Slashing', source: 'PHB' },
+  'bastard sword': { id: 'bastard_sword', name: 'Bastard Sword', category: 'Exotic', size: 'O', damageM: '1d10', threat: 19, critMultiplier: 2, weight: 6, type: 'Slashing', source: 'PHB' },
+  'short sword': { id: 'short_sword', name: 'Short Sword', category: 'Martial', size: 'L', damageM: '1d6', threat: 19, critMultiplier: 2, weight: 2, type: 'Piercing', source: 'PHB' },
+  dagger: { id: 'dagger', name: 'Dagger', category: 'Simple', size: 'L', damageM: '1d4', threat: 19, critMultiplier: 2, weight: 1, type: 'Piercing or Slashing', source: 'PHB' },
+  scimitar: { id: 'scimitar', name: 'Scimitar', category: 'Martial', size: 'O', damageM: '1d6', threat: 18, critMultiplier: 2, weight: 4, type: 'Slashing', source: 'PHB' },
+  rapier: { id: 'rapier', name: 'Rapier', category: 'Martial', size: 'O', damageM: '1d6', threat: 18, critMultiplier: 2, weight: 2, type: 'Piercing', source: 'PHB' },
+  falchion: { id: 'falchion', name: 'Falchion', category: 'Martial', size: 'T', damageM: '2d4', threat: 18, critMultiplier: 2, weight: 8, type: 'Slashing', source: 'PHB' },
+  glaive: { id: 'glaive', name: 'Glaive', category: 'Martial', size: 'T', damageM: '1d10', threat: 20, critMultiplier: 3, weight: 10, type: 'Slashing', source: 'PHB' },
+  halberd: { id: 'halberd', name: 'Halberd', category: 'Martial', size: 'T', damageM: '1d10', threat: 20, critMultiplier: 3, weight: 12, type: 'Piercing or Slashing', source: 'PHB' },
+  greataxe: { id: 'greataxe', name: 'Greataxe', category: 'Martial', size: 'T', damageM: '1d12', threat: 20, critMultiplier: 3, weight: 12, type: 'Slashing', source: 'PHB' },
+  battleaxe: { id: 'battleaxe', name: 'Battleaxe', category: 'Martial', size: 'O', damageM: '1d8', threat: 20, critMultiplier: 3, weight: 6, type: 'Slashing', source: 'PHB' },
+  handaxe: { id: 'handaxe', name: 'Handaxe', category: 'Martial', size: 'L', damageM: '1d6', threat: 20, critMultiplier: 3, weight: 3, type: 'Slashing', source: 'PHB' },
+  warhammer: { id: 'warhammer', name: 'Warhammer', category: 'Martial', size: 'O', damageM: '1d8', threat: 20, critMultiplier: 3, weight: 5, type: 'Bludgeoning', source: 'PHB' },
+  longbow: { id: 'longbow', name: 'Longbow', category: 'Martial', size: 'R', damageM: '1d8', threat: 20, critMultiplier: 3, weight: 3, type: 'Piercing', source: 'PHB' },
+  shortbow: { id: 'shortbow', name: 'Shortbow', category: 'Martial', size: 'R', damageM: '1d6', threat: 20, critMultiplier: 3, weight: 2, type: 'Piercing', source: 'PHB' }
+};
+
+/**
+ * Returns the base weapon name for a themed weapon or aliased weapon name, or null if none.
+ * e.g. "Nodachi" -> "greatsword", "Nodachi (Greatsword)" -> "greatsword".
+ * Excludes official weapons with parenthetical text (e.g. "Tangat, Talenta (Halfling)")
+ * and non-weapons (e.g. "Torches (5)", "Trail Rations (1 day)").
+ */
+export function getThemedWeaponBase(
+  name: string | undefined,
+  weaponsData?: WeaponData[]
+): string | null {
+  if (!name) return null;
+  const clean = name.toLowerCase().trim();
+
+  // 1. Direct match in well-known themed weapon map (e.g. "nodachi" -> "greatsword")
+  if (THEMED_WEAPON_BASE_MAP[clean]) {
+    return THEMED_WEAPON_BASE_MAP[clean];
+  }
+
+  // 2. Check alias pattern "Custom Name (Base Weapon)" e.g. "Nodachi (Greatsword)"
+  const aliasMatch = clean.match(/^(.+?)\s*\((.+?)\)$/);
+  if (aliasMatch) {
+    const prefix = aliasMatch[1].trim().toLowerCase();
+    const suffix = aliasMatch[2].trim().toLowerCase();
+
+    // If the prefix is a known themed weapon (e.g. "Nodachi (Greatsword)")
+    if (THEMED_WEAPON_BASE_MAP[prefix]) {
+      return THEMED_WEAPON_BASE_MAP[prefix];
+    }
+
+    // Exclude official weapons whose canonical name contains parentheses (e.g. "Tangat, Talenta (Halfling)")
+    if (clean === 'tangat, talenta (halfling)') {
+      return null;
+    }
+    if (weaponsData && weaponsData.some(w => w.name.toLowerCase() === clean)) {
+      return null;
+    }
+
+    // Check if the suffix is a recognized standard base weapon
+    if (STANDARD_BASE_WEAPONS[suffix] !== undefined) {
+      return suffix;
+    }
+    if (Object.values(THEMED_WEAPON_BASE_MAP).includes(suffix)) {
+      return suffix;
+    }
+    if (weaponsData && weaponsData.some(w => w.name.toLowerCase() === suffix)) {
+      return suffix;
+    }
+  }
+
+  return null;
+}
+
 /**
  * Resolves a weapon name to full WeaponData.
- * Supports format: "Custom Name (Base Model Name)" (e.g. "Nodachi (Greatsword)").
+ * Supports format: "Custom Name (Base Model Name)" (e.g. "Nodachi (Greatsword)")
+ * or well-known themed names (e.g. "Nodachi" -> Greatsword stats).
  */
 export function resolveWeapon(
   rawName: string | undefined,
@@ -78,30 +201,39 @@ export function resolveWeapon(
   const stdMatch = weaponsData.find(
     w => w.name.toLowerCase() === cleanName.toLowerCase()
   );
-  if (stdMatch) return normalizeWeapon(stdMatch);
+  if (stdMatch) return normalizeWeapon({ ...stdMatch, source: stdMatch.source || 'PHB' });
 
   // 3. Check aliased pattern: "Custom Name (Base Weapon)" e.g. "Nodachi (Greatsword)"
-  const aliasMatch = cleanName.match(/^(.+?)\s*\((.+?)\)$/);
-  let baseName = cleanName;
-  if (aliasMatch) {
-    baseName = aliasMatch[2].trim();
+  // or well-known themed weapon map: e.g. "Nodachi" -> "greatsword"
+  const themedBase = getThemedWeaponBase(cleanName, weaponsData);
+  let baseName: string | null = themedBase;
+  if (!baseName) {
+    const aliasMatch = cleanName.match(/^(.+?)\s*\((.+?)\)$/);
+    if (aliasMatch) {
+      const candidateBase = aliasMatch[2].trim().toLowerCase();
+      if (STANDARD_BASE_WEAPONS[candidateBase] || (weaponsData && weaponsData.some(w => w.name.toLowerCase() === candidateBase))) {
+        baseName = candidateBase;
+      }
+    }
   }
 
-  // Look for base model match in custom or standard weapons
-  const baseCustomMatch = customWeapons.find(
-    w => w.name.toLowerCase() === baseName.toLowerCase()
-  );
-  if (baseCustomMatch) {
-    return normalizeWeapon({ ...baseCustomMatch, name: cleanName });
-  }
+  if (baseName) {
+    // Look for base model match in custom or standard weapons
+    const baseCustomMatch = customWeapons.find(
+      w => w.name.toLowerCase() === baseName!.toLowerCase()
+    );
+    if (baseCustomMatch) {
+      return normalizeWeapon({ ...baseCustomMatch, name: cleanName, source: baseCustomMatch.source || 'PHB' });
+    }
 
-  const baseStdMatch = weaponsData.find(
-    w => w.name.toLowerCase() === baseName.toLowerCase() ||
-         w.name.toLowerCase().includes(baseName.toLowerCase()) ||
-         baseName.toLowerCase().includes(w.name.toLowerCase())
-  );
-  if (baseStdMatch) {
-    return normalizeWeapon({ ...baseStdMatch, name: cleanName });
+    const baseStdMatch = weaponsData.find(
+      w => w.name.toLowerCase() === baseName!.toLowerCase() ||
+           w.name.toLowerCase().includes(baseName!.toLowerCase()) ||
+           baseName!.toLowerCase().includes(w.name.toLowerCase())
+    ) || STANDARD_BASE_WEAPONS[baseName.toLowerCase()];
+    if (baseStdMatch) {
+      return normalizeWeapon({ ...baseStdMatch, name: cleanName, source: baseStdMatch.source || 'PHB' });
+    }
   }
 
   // 4. Default fallback with custom name
@@ -114,7 +246,8 @@ export function resolveWeapon(
     threat: 20,
     critMultiplier: 2,
     weight: 4,
-    type: 'Slashing'
+    type: 'Slashing',
+    source: 'Custom'
   });
 }
 
@@ -124,26 +257,41 @@ export function resolveWeapon(
 export function resolveArmor(
   armorKey: string | undefined,
   customArmors: CustomArmorData[] = []
-): { name: string; acBonus: number; maxDex: number; checkPenalty: number } {
+): { name: string; acBonus: number; maxDex: number; checkPenalty: number; enhancementBonus?: number; specialQualities?: string[] } {
   if (!armorKey) return STANDARD_ARMOR_MAP.none;
 
   const keyLower = armorKey.toLowerCase().trim();
 
+  // 1. Direct key match
   if (STANDARD_ARMOR_MAP[keyLower]) {
     return STANDARD_ARMOR_MAP[keyLower];
   }
 
+  // 2. Custom armor match
   const customMatch = customArmors.find(
-    a => a.name.toLowerCase() === keyLower || a.id.toLowerCase() === keyLower
+    a => (a.name.toLowerCase() === keyLower || a.id.toLowerCase() === keyLower) && a.type !== 'shield'
   );
   if (customMatch) {
     return {
       name: customMatch.name,
       acBonus: customMatch.acBonus,
       maxDex: customMatch.maxDex ?? 99,
-      checkPenalty: customMatch.armorCheckPenalty ?? 0
+      checkPenalty: customMatch.armorCheckPenalty ?? 0,
+      enhancementBonus: customMatch.enhancementBonus,
+      specialQualities: customMatch.specialQualities
     };
   }
+
+  // 3. Name or fuzzy key match in STANDARD_ARMOR_MAP
+  const stdMatch = Object.values(STANDARD_ARMOR_MAP).find(
+    a => a.name.toLowerCase() === keyLower ||
+         a.name.toLowerCase().replace(/ armor$/i, '') === keyLower ||
+         keyLower.replace(/ armor$/i, '') === a.name.toLowerCase()
+  );
+  if (stdMatch) return stdMatch;
+
+  const normKey = keyLower.replace(/[^a-z0-9]/g, '');
+  if (STANDARD_ARMOR_MAP[normKey]) return STANDARD_ARMOR_MAP[normKey];
 
   return { name: armorKey, acBonus: 0, maxDex: 99, checkPenalty: 0 };
 }
@@ -154,15 +302,17 @@ export function resolveArmor(
 export function resolveShield(
   shieldKey: string | undefined,
   customArmors: CustomArmorData[] = []
-): { name: string; acBonus: number; checkPenalty: number } {
+): { name: string; acBonus: number; checkPenalty: number; enhancementBonus?: number; specialQualities?: string[] } {
   if (!shieldKey) return STANDARD_SHIELD_MAP.none;
 
   const keyLower = shieldKey.toLowerCase().trim();
 
+  // 1. Direct key match
   if (STANDARD_SHIELD_MAP[keyLower]) {
     return STANDARD_SHIELD_MAP[keyLower];
   }
 
+  // 2. Custom shield match
   const customMatch = customArmors.find(
     a => (a.name.toLowerCase() === keyLower || a.id.toLowerCase() === keyLower) && a.type === 'shield'
   );
@@ -170,9 +320,22 @@ export function resolveShield(
     return {
       name: customMatch.name,
       acBonus: customMatch.acBonus,
-      checkPenalty: customMatch.armorCheckPenalty ?? 0
+      checkPenalty: customMatch.armorCheckPenalty ?? 0,
+      enhancementBonus: customMatch.enhancementBonus,
+      specialQualities: customMatch.specialQualities
     };
   }
+
+  // 3. Name or fuzzy key match in STANDARD_SHIELD_MAP
+  const stdMatch = Object.values(STANDARD_SHIELD_MAP).find(
+    s => s.name.toLowerCase() === keyLower ||
+         s.name.toLowerCase().replace(/ shield$/i, '') === keyLower ||
+         keyLower.replace(/ shield$/i, '') === s.name.toLowerCase()
+  );
+  if (stdMatch) return stdMatch;
+
+  const normKey = keyLower.replace(/[^a-z0-9]/g, '');
+  if (STANDARD_SHIELD_MAP[normKey]) return STANDARD_SHIELD_MAP[normKey];
 
   return { name: shieldKey, acBonus: 0, checkPenalty: 0 };
 }
@@ -285,11 +448,46 @@ export function calculateCarryingCapacity(strScore: number, sizeStr: string = 'M
 }
 
 export const ARMOR_WEIGHT_MAP: Record<string, number> = {
-  none: 0, padded: 10, leather: 15, studded: 20, chainshirt: 25, breastplate: 30, fullplate: 50
+  none: 0,
+  padded: 10,
+  'padded armor': 10,
+  leather: 15,
+  'leather armor': 15,
+  studded: 20,
+  'studded leather': 20,
+  'studded leather armor': 20,
+  chainshirt: 25,
+  'chain shirt': 25,
+  breastplate: 30,
+  fullplate: 50,
+  'full plate': 50,
+  hide: 25,
+  'hide armor': 25,
+  scale_mail: 30,
+  'scale mail': 30,
+  chainmail: 40,
+  banded_mail: 35,
+  'banded mail': 35,
+  splint_mail: 45,
+  'splint mail': 45,
+  half_plate: 50,
+  'half-plate': 50,
+  'half plate': 50
 };
 
 export const SHIELD_WEIGHT_MAP: Record<string, number> = {
-  none: 0, buckler: 5, light_wooden: 5, heavy_shield: 15, tower_shield: 45
+  none: 0,
+  buckler: 5,
+  light_wooden: 5,
+  'light shield': 5,
+  'light wooden shield': 5,
+  'light steel shield': 5,
+  heavy_shield: 15,
+  'heavy shield': 15,
+  'heavy steel shield': 15,
+  'heavy wooden shield': 15,
+  tower_shield: 45,
+  'tower shield': 45
 };
 
 /**
@@ -316,15 +514,42 @@ export function calculateTotalNetWorthGP(funds?: { cp: number; sp: number; gp: n
 }
 
 /**
+ * Helper to check if two item names match, ignoring case, optional parenthetical aliases,
+ * and canonical armor/shield key aliases (e.g. "studded" vs "Studded Leather Armor").
+ */
+export function matchesItemName(name1: string | undefined, name2: string | undefined): boolean {
+  if (!name1 || !name2) return false;
+  const n1 = name1.toLowerCase().trim();
+  const n2 = name2.toLowerCase().trim();
+  if (!n1 || !n2 || n1 === 'none' || n2 === 'none' || n1 === '__custom__' || n2 === '__custom__') return false;
+  if (n1 === n2) return true;
+  const stripped1 = n1.replace(/\s*\(.*?\)\s*/g, '').trim();
+  const stripped2 = n2.replace(/\s*\(.*?\)\s*/g, '').trim();
+  if (stripped1 !== '' && stripped1 === stripped2) return true;
+
+  // Check if both resolve to the exact same standard armor name
+  const arm1 = resolveArmor(n1);
+  const arm2 = resolveArmor(n2);
+  if (arm1.acBonus > 0 && arm2.acBonus > 0 && arm1.name.toLowerCase() === arm2.name.toLowerCase()) {
+    return true;
+  }
+
+  // Check if both resolve to the exact same standard shield name
+  const shd1 = resolveShield(n1);
+  const shd2 = resolveShield(n2);
+  if (shd1.acBonus > 0 && shd2.acBonus > 0 && shd1.name.toLowerCase() === shd2.name.toLowerCase()) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Helper to check if an item by name is present in inventory.
  */
 export function isItemInInventory(inventory: InventoryItem[] = [], name: string | undefined): boolean {
-  if (!name || !name.trim() || name.toLowerCase().trim() === 'none') return false;
-  const clean = name.toLowerCase().trim();
-  return inventory.some(i => {
-    const invName = i.name.toLowerCase().trim();
-    return invName === clean || invName.includes(clean) || clean.includes(invName);
-  });
+  if (!name || !name.trim() || name.toLowerCase().trim() === 'none' || name.trim() === '__CUSTOM__') return false;
+  return inventory.some(i => matchesItemName(i.name, name));
 }
 
 /**
@@ -335,13 +560,13 @@ export function ensureEquippedItemInInventory(
   inventory: InventoryItem[] = [],
   itemData: { name: string; weight: number; location?: string; value?: string; notes?: string }
 ): InventoryItem[] {
-  if (!itemData.name || !itemData.name.trim() || itemData.name.toLowerCase().trim() === 'none') {
+  if (!itemData.name || !itemData.name.trim() || itemData.name.toLowerCase().trim() === 'none' || itemData.name.trim() === '__CUSTOM__') {
     return inventory;
   }
   const cleanName = itemData.name.trim();
 
-  // Check if item already exists in inventory (case-insensitive)
-  const exists = inventory.some(i => i.name.toLowerCase().trim() === cleanName.toLowerCase());
+  // Check if item already exists in inventory (case-insensitive and alias-aware)
+  const exists = inventory.some(i => matchesItemName(i.name, cleanName));
   if (exists) return inventory;
 
   const newItem: InventoryItem = {
@@ -375,10 +600,16 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
   const customWeapons = character.customWeapons || [];
   let modified = false;
 
-  if (eq.armor && eq.armor !== 'none') {
+  const isValidEquippedName = (name: string | undefined): boolean => {
+    if (!name) return false;
+    const clean = name.trim();
+    return clean !== '' && clean.toLowerCase() !== 'none' && clean !== '__CUSTOM__';
+  };
+
+  if (isValidEquippedName(eq.armor)) {
     const arm = resolveArmor(eq.armor, customArmors);
     if (!isItemInInventory(currentInventory, arm.name) && !isItemInInventory(currentInventory, eq.armor)) {
-      const armorKey = eq.armor.toLowerCase().trim();
+      const armorKey = eq.armor!.toLowerCase().trim();
       const w = ARMOR_WEIGHT_MAP[armorKey] !== undefined ? ARMOR_WEIGHT_MAP[armorKey] : 20;
       const nextInv = ensureEquippedItemInInventory(currentInventory, { name: arm.name, weight: w });
       if (nextInv !== currentInventory) {
@@ -388,10 +619,10 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
     }
   }
 
-  if (eq.shield && eq.shield !== 'none') {
+  if (isValidEquippedName(eq.shield)) {
     const shd = resolveShield(eq.shield, customArmors);
     if (!isItemInInventory(currentInventory, shd.name) && !isItemInInventory(currentInventory, eq.shield)) {
-      const shieldKey = eq.shield.toLowerCase().trim();
+      const shieldKey = eq.shield!.toLowerCase().trim();
       const w = SHIELD_WEIGHT_MAP[shieldKey] !== undefined ? SHIELD_WEIGHT_MAP[shieldKey] : 10;
       const nextInv = ensureEquippedItemInInventory(currentInventory, { name: shd.name, weight: w });
       if (nextInv !== currentInventory) {
@@ -401,7 +632,7 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
     }
   }
 
-  if (eq.primaryWeapon && eq.primaryWeapon !== 'none') {
+  if (isValidEquippedName(eq.primaryWeapon)) {
     const wpn = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
     if (!isItemInInventory(currentInventory, wpn.name) && !isItemInInventory(currentInventory, eq.primaryWeapon)) {
       const nextInv = ensureEquippedItemInInventory(currentInventory, { name: wpn.name, weight: wpn.weight });
@@ -412,7 +643,7 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
     }
   }
 
-  if (eq.secondaryWeapon && eq.secondaryWeapon !== 'none') {
+  if (isValidEquippedName(eq.secondaryWeapon)) {
     const wpn = resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData);
     if (!isItemInInventory(currentInventory, wpn.name) && !isItemInInventory(currentInventory, eq.secondaryWeapon)) {
       const nextInv = ensureEquippedItemInInventory(currentInventory, { name: wpn.name, weight: wpn.weight });
@@ -423,7 +654,7 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
     }
   }
 
-  if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
+  if (isValidEquippedName(eq.rangedWeapon)) {
     const wpn = resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData);
     if (!isItemInInventory(currentInventory, wpn.name) && !isItemInInventory(currentInventory, eq.rangedWeapon)) {
       const nextInv = ensureEquippedItemInInventory(currentInventory, { name: wpn.name, weight: wpn.weight });

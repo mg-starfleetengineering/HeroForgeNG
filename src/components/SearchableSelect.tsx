@@ -5,6 +5,7 @@ export interface SearchableOption {
   value: string;
   label: string;
   badge?: string;
+  secondaryBadge?: string;
   isAllowed?: boolean;
   sublabel?: string;
 }
@@ -16,6 +17,7 @@ interface SearchableSelectProps {
   placeholder?: string;
   className?: string;
   disabled?: boolean;
+  showSublabelInTrigger?: boolean;
 }
 
 export const SearchableSelect: React.FC<SearchableSelectProps> = ({
@@ -24,7 +26,8 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   onChange,
   placeholder = 'Select option...',
   className = '',
-  disabled = false
+  disabled = false,
+  showSublabelInTrigger = true
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -34,8 +37,16 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Find currently selected option
-  const selectedOption = options.find(o => o.value === value);
+  // Find currently selected option (exact match or alias-aware match)
+  const selectedOption = options.find(o => 
+    o.value === value || 
+    (value && (
+      o.value.toLowerCase() === value.toLowerCase() ||
+      o.label.toLowerCase() === value.toLowerCase() ||
+      o.value.toLowerCase().startsWith(value.toLowerCase() + ' (') ||
+      value.toLowerCase().startsWith(o.value.toLowerCase() + ' (')
+    ))
+  );
 
   // Calculate & update dropdown popover fixed position
   const updatePosition = useCallback(() => {
@@ -151,6 +162,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       opt.label.toLowerCase().includes(q) ||
       (opt.sublabel && opt.sublabel.toLowerCase().includes(q)) ||
       (opt.badge && opt.badge.toLowerCase().includes(q)) ||
+      (opt.secondaryBadge && opt.secondaryBadge.toLowerCase().includes(q)) ||
       opt.value.toLowerCase().includes(q)
     );
   });
@@ -163,9 +175,10 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const getDisplayLabel = () => {
     if (selectedOption) {
       const allowedStr = selectedOption.isAllowed === false ? '⚠️ ' : '';
-      const sub = selectedOption.sublabel ? ` ${selectedOption.sublabel}` : '';
+      const sub = (showSublabelInTrigger && selectedOption.sublabel) ? ` ${selectedOption.sublabel}` : '';
+      const sec = selectedOption.secondaryBadge ? ` [${selectedOption.secondaryBadge}]` : '';
       const badge = selectedOption.badge ? ` [${selectedOption.badge}]` : '';
-      return `${allowedStr}${selectedOption.label}${sub}${badge}`;
+      return `${allowedStr}${selectedOption.label}${sub}${sec}${badge}`;
     }
     if (value && value !== 'none') return value;
     return placeholder;
@@ -238,20 +251,35 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                           : 'text-slate-200 hover:bg-slate-800/80 hover:text-amber-300'
                     }`}
                   >
-                    <div className="flex items-center gap-1.5 truncate">
-                      {isRestricted && <span className="text-rose-400 text-[11px]">⚠️</span>}
-                      <span className="truncate">{opt.label}</span>
-                      {opt.sublabel && <span className="text-[11px] text-slate-400 font-mono shrink-0">{opt.sublabel}</span>}
+                    <div className="flex flex-col min-w-0 flex-1 py-0.5">
+                      <div className="flex items-center gap-1.5">
+                        {isRestricted && <span className="text-rose-400 text-[11px] shrink-0">⚠️</span>}
+                        <span className="font-semibold truncate">{opt.label}</span>
+                      </div>
+                      {opt.sublabel && (
+                        <span className="text-[10.5px] text-slate-400 font-normal truncate mt-0.5 leading-tight">
+                          {opt.sublabel}
+                        </span>
+                      )}
                     </div>
 
-                    {opt.badge && (
-                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold shrink-0 ${
-                        isRestricted
-                          ? 'bg-rose-950/80 text-rose-300 border border-rose-500/40'
-                          : 'bg-slate-800 text-slate-400'
-                      }`}>
-                        {opt.badge}
-                      </span>
+                    {(opt.badge || opt.secondaryBadge) && (
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {opt.secondaryBadge && (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-sans font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                            {opt.secondaryBadge}
+                          </span>
+                        )}
+                        {opt.badge && (
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${
+                            isRestricted
+                              ? 'bg-rose-950/80 text-rose-300 border border-rose-500/40'
+                              : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                          }`}>
+                            {opt.badge}
+                          </span>
+                        )}
+                      </div>
                     )}
                   </div>
                 );
