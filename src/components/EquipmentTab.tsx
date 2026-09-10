@@ -35,8 +35,6 @@ import {
   calculateTotalItemCost,
   formatMagicItemName,
   parseMagicItemName,
-  createMagicWeaponData,
-  createMagicArmorData,
   MagicQuality,
   WEAPON_SPECIAL_QUALITIES,
   ARMOR_SHIELD_SPECIAL_QUALITIES
@@ -124,9 +122,6 @@ const QualitySelector: React.FC<{
   onRemove: (id: string) => void;
   enhancementBonus?: number;
   itemType?: 'weapon' | 'armor' | 'shield';
-  onSaveAsItem?: () => void;
-  isSavedItem?: boolean;
-  suggestedItemName?: string;
   onOpenGuide?: () => void;
 }> = ({
   title,
@@ -136,9 +131,6 @@ const QualitySelector: React.FC<{
   onRemove,
   enhancementBonus = 0,
   itemType = 'weapon',
-  onSaveAsItem,
-  isSavedItem = false,
-  suggestedItemName,
   onOpenGuide
 }) => {
   const costSummary = calculateTotalItemCost(0, enhancementBonus, qualities, itemType);
@@ -185,20 +177,14 @@ const QualitySelector: React.FC<{
               {costSummary.breakdown}
             </span>
           )}
-          {onSaveAsItem && (enhancementBonus > 0 || qualities.length > 0) && (
-            <button
-              type="button"
-              onClick={onSaveAsItem}
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10.5px] font-medium transition cursor-pointer border shrink-0 ${
-                isSavedItem
-                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/25'
-                  : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40 hover:bg-indigo-500/30'
-              }`}
-              title={isSavedItem ? "Update saved magic item properties in your arsenal" : `Save as permanent custom magic item: ${suggestedItemName || 'Custom Magic'}`}
+          {(enhancementBonus > 0 || qualities.length > 0) && (
+            <span
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 shrink-0"
+              title="Enhancements and special qualities are saved directly to this item in your inventory"
             >
-              <i className={`fa-solid ${isSavedItem ? 'fa-floppy-disk' : 'fa-bookmark'} text-[9px]`}></i>
-              <span>{isSavedItem ? 'Update in Arsenal' : (suggestedItemName ? `Save as ${suggestedItemName}` : 'Save to Arsenal')}</span>
-            </button>
+              <i className="fa-solid fa-check text-[9px]"></i>
+              <span>Saved in Inventory</span>
+            </span>
           )}
         </div>
       </div>
@@ -333,109 +319,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     let updatedCustoms = [...customWeapons];
     let updatedArmors = [...customArmors];
 
-    // Helper to auto-preserve outgoing weapon if customized
-    const preserveOutgoingWeapon = (
-      slotName: string | undefined,
-      enh: number | undefined,
-      qualities: string[] | undefined,
-      itemId?: string
-    ) => {
-      if (!slotName || slotName === 'none' || slotName === '__CUSTOM__') return;
-      const enhBonus = enh || 0;
-      const qList = qualities || [];
-      if (enhBonus <= 0 && qList.length === 0) return;
-
-      const alreadyCustom = updatedCustoms.some(w => w.name.toLowerCase() === slotName.toLowerCase());
-      if (!alreadyCustom) {
-        const resolved = resolveWeapon(slotName, updatedCustoms, weaponsData);
-        const baseName = resolved.baseWeaponId
-          ? (weaponsData.find(w => w.id === resolved.baseWeaponId)?.name || resolved.name)
-          : resolved.name;
-        const magicName = formatMagicItemName(baseName, enhBonus, qList);
-        const newCustom = createMagicWeaponData(resolved, enhBonus, qList, magicName);
-        updatedCustoms = [...updatedCustoms, newCustom];
-
-        // Update outgoing item in inventory with full magic item representation
-        if (itemId) {
-          updatedInv = updatedInv.map(i => {
-            if (i.id === itemId) {
-              return { ...i, name: magicName, enhancementBonus: enhBonus, specialQualities: [...qList] };
-            }
-            return i;
-          });
-        } else {
-          updatedInv = updatedInv.map(i => {
-            if (matchesItemName(i.name, slotName)) {
-              return { ...i, name: magicName, enhancementBonus: enhBonus, specialQualities: [...qList] };
-            }
-            return i;
-          });
-        }
-        if (!updatedInv.some(i => (itemId && i.id === itemId) || matchesItemName(i.name, magicName))) {
-          updatedInv = ensureEquippedItemInInventory(updatedInv, {
-            name: magicName,
-            weight: resolved.weight,
-            enhancementBonus: enhBonus,
-            specialQualities: [...qList]
-          });
-        }
-      }
-    };
-
-    // Helper to auto-preserve outgoing armor/shield if customized
-    const preserveOutgoingArmor = (
-      slotName: string | undefined,
-      enh: number | undefined,
-      qualities: string[] | undefined,
-      type: 'armor' | 'shield',
-      itemId?: string
-    ) => {
-      if (!slotName || slotName === 'none') return;
-      const enhBonus = enh || 0;
-      const qList = qualities || [];
-      if (enhBonus <= 0 && qList.length === 0) return;
-
-      const alreadyCustom = updatedArmors.some(a =>
-        a.name.toLowerCase() === slotName.toLowerCase() && (type === 'shield' ? a.type === 'shield' : a.type !== 'shield')
-      );
-      if (!alreadyCustom) {
-        const resolved = type === 'armor' ? resolveArmor(slotName, updatedArmors) : resolveShield(slotName, updatedArmors);
-        const baseName = (resolved as any).baseArmorId || resolved.name;
-        const magicName = formatMagicItemName(baseName, enhBonus, qList);
-        const newCustom = createMagicArmorData({ ...resolved, type: type === 'shield' ? 'shield' : 'medium' }, enhBonus, qList, magicName);
-        updatedArmors = [...updatedArmors, newCustom];
-
-        if (itemId) {
-          updatedInv = updatedInv.map(i => {
-            if (i.id === itemId) {
-              return { ...i, name: magicName, enhancementBonus: enhBonus, specialQualities: [...qList] };
-            }
-            return i;
-          });
-        } else {
-          updatedInv = updatedInv.map(i => {
-            if (matchesItemName(i.name, slotName)) {
-              return { ...i, name: magicName, enhancementBonus: enhBonus, specialQualities: [...qList] };
-            }
-            return i;
-          });
-        }
-        if (!updatedInv.some(i => (itemId && i.id === itemId) || matchesItemName(i.name, magicName))) {
-          const w = type === 'armor'
-            ? (ARMOR_WEIGHT_MAP[slotName.toLowerCase().trim()] ?? 20)
-            : (SHIELD_WEIGHT_MAP[slotName.toLowerCase().trim()] ?? 10);
-          updatedInv = ensureEquippedItemInInventory(updatedInv, {
-            name: magicName,
-            weight: w,
-            enhancementBonus: enhBonus,
-            specialQualities: [...qList]
-          });
-        }
-      }
-    };
-
     if (field === 'primaryWeapon') {
-      preserveOutgoingWeapon(eq.primaryWeapon, eq.primaryWeaponEnhancement, eq.primaryWeaponQualities, eq.primaryWeaponItemId);
       if (val === 'none') {
         newEq.primaryWeapon = 'none';
         newEq.primaryWeaponItemId = undefined;
@@ -475,14 +359,12 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
 
         if (isTwoHanded) {
           if (newEq.secondaryWeapon && newEq.secondaryWeapon !== 'none') {
-            preserveOutgoingWeapon(newEq.secondaryWeapon, newEq.secondaryWeaponEnhancement, newEq.secondaryWeaponQualities, newEq.secondaryWeaponItemId);
             newEq.secondaryWeapon = 'none';
             newEq.secondaryWeaponItemId = undefined;
             newEq.secondaryWeaponEnhancement = 0;
             newEq.secondaryWeaponQualities = [];
           }
           if (newEq.shield && newEq.shield !== 'none' && !newEq.shield.toLowerCase().includes('buckler')) {
-            preserveOutgoingArmor(newEq.shield, newEq.shieldEnhancement, newEq.shieldQualities, 'shield', newEq.shieldItemId);
             newEq.shield = 'none';
             newEq.shieldItemId = undefined;
             newEq.shieldEnhancement = 0;
@@ -491,7 +373,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         }
       }
     } else if (field === 'secondaryWeapon') {
-      preserveOutgoingWeapon(eq.secondaryWeapon, eq.secondaryWeaponEnhancement, eq.secondaryWeaponQualities, eq.secondaryWeaponItemId);
       if (val === 'none') {
         newEq.secondaryWeapon = 'none';
         newEq.secondaryWeaponItemId = undefined;
@@ -528,7 +409,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         if (newEq.primaryWeapon && newEq.primaryWeapon !== 'none') {
           const primaryObj = resolveEquippedWeapon({ ...character, equipment: newEq }, 'primaryWeapon', weaponsData, updatedCustoms);
           if (primaryObj.size === 'T' || primaryObj.category === 'Two-Handed') {
-            preserveOutgoingWeapon(newEq.primaryWeapon, newEq.primaryWeaponEnhancement, newEq.primaryWeaponQualities, newEq.primaryWeaponItemId);
             newEq.primaryWeapon = 'none';
             newEq.primaryWeaponItemId = undefined;
             newEq.primaryWeaponEnhancement = 0;
@@ -536,7 +416,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           }
         }
         if (newEq.shield && newEq.shield !== 'none' && !newEq.shield.toLowerCase().includes('buckler')) {
-          preserveOutgoingArmor(newEq.shield, newEq.shieldEnhancement, newEq.shieldQualities, 'shield', newEq.shieldItemId);
           newEq.shield = 'none';
           newEq.shieldItemId = undefined;
           newEq.shieldEnhancement = 0;
@@ -544,7 +423,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         }
       }
     } else if (field === 'rangedWeapon') {
-      preserveOutgoingWeapon(eq.rangedWeapon, eq.rangedWeaponEnhancement, eq.rangedWeaponQualities, eq.rangedWeaponItemId);
       if (val === 'none') {
         newEq.rangedWeapon = 'none';
         newEq.rangedWeaponItemId = undefined;
@@ -579,7 +457,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.rangedWeaponQualities = invItem.specialQualities ? [...invItem.specialQualities] : [];
       }
     } else if (field === 'armor') {
-      preserveOutgoingArmor(eq.armor, eq.armorEnhancement, eq.armorQualities, 'armor', eq.armorItemId);
       if (val === 'none') {
         newEq.armor = 'none';
         newEq.armorItemId = undefined;
@@ -621,7 +498,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.armorQualities = invItem.specialQualities ? [...invItem.specialQualities] : [];
       }
     } else if (field === 'shield') {
-      preserveOutgoingArmor(eq.shield, eq.shieldEnhancement, eq.shieldQualities, 'shield', eq.shieldItemId);
       if (val === 'none') {
         newEq.shield = 'none';
         newEq.shieldItemId = undefined;
@@ -666,7 +542,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           if (newEq.primaryWeapon && newEq.primaryWeapon !== 'none') {
             const primaryObj = resolveEquippedWeapon({ ...character, equipment: newEq }, 'primaryWeapon', weaponsData, updatedCustoms);
             if (primaryObj.size === 'T' || primaryObj.category === 'Two-Handed') {
-              preserveOutgoingWeapon(newEq.primaryWeapon, newEq.primaryWeaponEnhancement, newEq.primaryWeaponQualities, newEq.primaryWeaponItemId);
               newEq.primaryWeapon = 'none';
               newEq.primaryWeaponItemId = undefined;
               newEq.primaryWeaponEnhancement = 0;
@@ -674,7 +549,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             }
           }
           if (newEq.secondaryWeapon && newEq.secondaryWeapon !== 'none') {
-            preserveOutgoingWeapon(newEq.secondaryWeapon, newEq.secondaryWeaponEnhancement, newEq.secondaryWeaponQualities, newEq.secondaryWeaponItemId);
             newEq.secondaryWeapon = 'none';
             newEq.secondaryWeaponItemId = undefined;
             newEq.secondaryWeaponEnhancement = 0;
@@ -916,127 +790,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
 
   const handleFundsChange = (field: keyof Funds, val: number) => {
     onChange({ funds: { ...funds, [field]: Math.max(0, val || 0) } });
-  };
-
-  const handleSaveMagicWeapon = (slot: 'primaryWeapon' | 'secondaryWeapon' | 'rangedWeapon') => {
-    const currentName = eq[slot];
-    if (!currentName || currentName === 'none' || currentName === '__CUSTOM__') return;
-
-    const qualities = slot === 'primaryWeapon'
-      ? (eq.primaryWeaponQualities || [])
-      : (slot === 'secondaryWeapon' ? (eq.secondaryWeaponQualities || []) : (eq.rangedWeaponQualities || []));
-    const enhancement = slot === 'primaryWeapon'
-      ? (eq.primaryWeaponEnhancement || 0)
-      : (slot === 'secondaryWeapon' ? (eq.secondaryWeaponEnhancement || 0) : (eq.rangedWeaponEnhancement || 0));
-
-    const resolved = resolveWeapon(currentName, customWeapons, weaponsData);
-    const baseWpnName = resolved.baseWeaponId ? (weaponsData.find(w => w.id === resolved.baseWeaponId)?.name || resolved.name) : resolved.name;
-    const magicName = formatMagicItemName(baseWpnName, enhancement, qualities);
-
-    const existingIdx = customWeapons.findIndex(w => w.name.toLowerCase() === currentName.toLowerCase() || w.name.toLowerCase() === magicName.toLowerCase());
-    let updatedCustoms: WeaponData[];
-
-    if (existingIdx >= 0) {
-      const existing = customWeapons[existingIdx];
-      const updated = {
-        ...existing,
-        name: magicName,
-        enhancementBonus: enhancement,
-        specialQualities: [...qualities]
-      };
-      updatedCustoms = [...customWeapons];
-      updatedCustoms[existingIdx] = updated;
-    } else {
-      const newMagicWpn = createMagicWeaponData(resolved, enhancement, qualities, magicName);
-      updatedCustoms = [...customWeapons, newMagicWpn];
-    }
-
-    const oldName = currentName;
-    let updatedInv = inventory.map(item => {
-      if (item.name.toLowerCase() === oldName.toLowerCase()) {
-        return { ...item, name: magicName };
-      }
-      return item;
-    });
-    if (!updatedInv.some(i => i.name.toLowerCase() === magicName.toLowerCase())) {
-      updatedInv = ensureEquippedItemInInventory(updatedInv, { name: magicName, weight: resolved.weight });
-    }
-
-    const updatedEq = {
-      ...eq,
-      [slot]: magicName
-    };
-
-    onChange({
-      customWeapons: updatedCustoms,
-      equipment: updatedEq,
-      inventory: updatedInv
-    });
-  };
-
-  const handleSaveMagicArmor = (type: 'armor' | 'shield') => {
-    const currentKey = type === 'armor' ? eq.armor : eq.shield;
-    if (!currentKey || currentKey === 'none') return;
-
-    const qualities = type === 'armor' ? (eq.armorQualities || []) : (eq.shieldQualities || []);
-    const enhancement = type === 'armor' ? (eq.armorEnhancement || 0) : (eq.shieldEnhancement || 0);
-
-    const resolved = type === 'armor' ? resolveArmor(currentKey, customArmors) : resolveShield(currentKey, customArmors);
-    const magicName = formatMagicItemName(resolved.name, enhancement, qualities);
-
-    const existingIdx = customArmors.findIndex(a =>
-      (a.name.toLowerCase() === currentKey.toLowerCase() || a.name.toLowerCase() === magicName.toLowerCase()) &&
-      (type === 'shield' ? a.type === 'shield' : a.type !== 'shield')
-    );
-    let updatedArmors: CustomArmorData[];
-
-    if (existingIdx >= 0) {
-      const existing = customArmors[existingIdx];
-      const updated = {
-        ...existing,
-        name: magicName,
-        enhancementBonus: enhancement,
-        specialQualities: [...qualities]
-      };
-      updatedArmors = [...customArmors];
-      updatedArmors[existingIdx] = updated;
-    } else {
-      const armorKey = currentKey.toLowerCase().trim();
-      const w = type === 'shield'
-        ? (SHIELD_WEIGHT_MAP[armorKey] !== undefined ? SHIELD_WEIGHT_MAP[armorKey] : 10)
-        : (ARMOR_WEIGHT_MAP[armorKey] !== undefined ? ARMOR_WEIGHT_MAP[armorKey] : 20);
-      const newMagicArmor = createMagicArmorData({
-        name: resolved.name,
-        acBonus: resolved.acBonus,
-        maxDex: (resolved as any).maxDex ?? (type === 'shield' ? 99 : 8),
-        armorCheckPenalty: resolved.checkPenalty,
-        type: type === 'shield' ? 'shield' : 'medium',
-        weight: w
-      }, enhancement, qualities, magicName);
-      updatedArmors = [...customArmors, newMagicArmor];
-    }
-
-    const oldName = resolved.name;
-    let updatedInv = inventory.map(item => {
-      if (item.name.toLowerCase() === oldName.toLowerCase()) {
-        return { ...item, name: magicName };
-      }
-      return item;
-    });
-    if (!updatedInv.some(i => i.name.toLowerCase() === magicName.toLowerCase())) {
-      updatedInv = ensureEquippedItemInInventory(updatedInv, { name: magicName, weight: 10 });
-    }
-
-    const updatedEq = {
-      ...eq,
-      [type]: magicName
-    };
-
-    onChange({
-      customArmors: updatedArmors,
-      equipment: updatedEq,
-      inventory: updatedInv
-    });
   };
 
   const handleAddQuality = (
@@ -2035,9 +1788,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
               onRemove={q => handleRemoveQuality('armorQualities', q)}
               enhancementBonus={eq.armorEnhancement || 0}
               itemType="armor"
-              onSaveAsItem={() => handleSaveMagicArmor('armor')}
-              isSavedItem={customArmors.some(a => a.name.toLowerCase() === (eq.armor || '').toLowerCase() && a.type !== 'shield')}
-              suggestedItemName={formatMagicItemName(armorObj.name, eq.armorEnhancement || 0, armorQualities)}
               onOpenGuide={() => setShowQualitiesGuide(true)}
             />
           )}
@@ -2074,9 +1824,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
               onRemove={q => handleRemoveQuality('shieldQualities', q)}
               enhancementBonus={eq.shieldEnhancement || 0}
               itemType="shield"
-              onSaveAsItem={() => handleSaveMagicArmor('shield')}
-              isSavedItem={customArmors.some(a => a.name.toLowerCase() === (eq.shield || '').toLowerCase() && a.type === 'shield')}
-              suggestedItemName={formatMagicItemName(shieldObj.name, eq.shieldEnhancement || 0, shieldQualities)}
               onOpenGuide={() => setShowQualitiesGuide(true)}
             />
           )}
@@ -2229,9 +1976,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 onRemove={q => handleRemoveQuality('primaryWeaponQualities', q)}
                 enhancementBonus={primaryEnhancement}
                 itemType="weapon"
-                onSaveAsItem={() => handleSaveMagicWeapon('primaryWeapon')}
-                isSavedItem={customWeapons.some(w => w.name.toLowerCase() === (eq.primaryWeapon || '').toLowerCase())}
-                suggestedItemName={formatMagicItemName(primaryWpnObj?.name || eq.primaryWeapon || 'Weapon', primaryEnhancement, primaryQualities)}
                 onOpenGuide={() => setShowQualitiesGuide(true)}
               />
             )}
@@ -2353,9 +2097,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 onRemove={q => handleRemoveQuality('secondaryWeaponQualities', q)}
                 enhancementBonus={secondaryEnhancement}
                 itemType="weapon"
-                onSaveAsItem={() => handleSaveMagicWeapon('secondaryWeapon')}
-                isSavedItem={customWeapons.some(w => w.name.toLowerCase() === (eq.secondaryWeapon || '').toLowerCase())}
-                suggestedItemName={formatMagicItemName(secondaryWpnObj?.name || eq.secondaryWeapon || 'Weapon', secondaryEnhancement, secondaryQualities)}
                 onOpenGuide={() => setShowQualitiesGuide(true)}
               />
             )}
@@ -2445,9 +2186,6 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 onRemove={q => handleRemoveQuality('rangedWeaponQualities', q)}
                 enhancementBonus={rangedEnhancement}
                 itemType="weapon"
-                onSaveAsItem={() => handleSaveMagicWeapon('rangedWeapon')}
-                isSavedItem={customWeapons.some(w => w.name.toLowerCase() === (eq.rangedWeapon || '').toLowerCase())}
-                suggestedItemName={formatMagicItemName(rangedWpnObj?.name || eq.rangedWeapon || 'Weapon', rangedEnhancement, rangedQualities)}
                 onOpenGuide={() => setShowQualitiesGuide(true)}
               />
             )}
