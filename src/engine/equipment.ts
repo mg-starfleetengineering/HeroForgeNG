@@ -1,4 +1,5 @@
 import { WeaponData, CustomArmorData, CharacterState, InventoryItem } from '../types/character';
+import { parseMagicItemName } from './magicItems';
 
 export const DEFAULT_WEAPON: WeaponData = {
   id: 'unarmed',
@@ -236,7 +237,21 @@ export function resolveWeapon(
     }
   }
 
-  // 4. Default fallback with custom name
+  // 4. Check if cleanName is a magic weapon name e.g. "+1 Flaming Longsword" or "+2 Keen Nodachi"
+  const parsedMagicWpn = parseMagicItemName(cleanName);
+  if (parsedMagicWpn.enhancementBonus > 0 || parsedMagicWpn.qualities.length > 0) {
+    const baseWpn = resolveWeapon(parsedMagicWpn.baseName, customWeapons, weaponsData);
+    if (baseWpn && (baseWpn.id !== 'unarmed' || parsedMagicWpn.baseName.toLowerCase().includes('unarmed'))) {
+      return normalizeWeapon({
+        ...baseWpn,
+        name: cleanName,
+        enhancementBonus: parsedMagicWpn.enhancementBonus,
+        specialQualities: parsedMagicWpn.qualities
+      });
+    }
+  }
+
+  // 5. Default fallback with custom name
   return normalizeWeapon({
     id: cleanName.toLowerCase().replace(/\s+/g, '_'),
     name: cleanName,
@@ -293,6 +308,20 @@ export function resolveArmor(
   const normKey = keyLower.replace(/[^a-z0-9]/g, '');
   if (STANDARD_ARMOR_MAP[normKey]) return STANDARD_ARMOR_MAP[normKey];
 
+  // 4. Magic armor name e.g. "+1 Chain Shirt", "+2 Shadow Leather Armor"
+  const parsedMagicArmor = parseMagicItemName(armorKey);
+  if (parsedMagicArmor.enhancementBonus > 0 || parsedMagicArmor.qualities.length > 0) {
+    const baseArmor = resolveArmor(parsedMagicArmor.baseName, customArmors);
+    if (baseArmor && (baseArmor.name.toLowerCase() !== 'none' || parsedMagicArmor.baseName.toLowerCase() === 'none')) {
+      return {
+        ...baseArmor,
+        name: armorKey,
+        enhancementBonus: parsedMagicArmor.enhancementBonus,
+        specialQualities: parsedMagicArmor.qualities
+      };
+    }
+  }
+
   return { name: armorKey, acBonus: 0, maxDex: 99, checkPenalty: 0 };
 }
 
@@ -336,6 +365,20 @@ export function resolveShield(
 
   const normKey = keyLower.replace(/[^a-z0-9]/g, '');
   if (STANDARD_SHIELD_MAP[normKey]) return STANDARD_SHIELD_MAP[normKey];
+
+  // 4. Magic shield name e.g. "+1 Heavy Shield"
+  const parsedMagicShield = parseMagicItemName(shieldKey);
+  if (parsedMagicShield.enhancementBonus > 0 || parsedMagicShield.qualities.length > 0) {
+    const baseShield = resolveShield(parsedMagicShield.baseName, customArmors);
+    if (baseShield && (baseShield.name.toLowerCase() !== 'none' || parsedMagicShield.baseName.toLowerCase() === 'none')) {
+      return {
+        ...baseShield,
+        name: shieldKey,
+        enhancementBonus: parsedMagicShield.enhancementBonus,
+        specialQualities: parsedMagicShield.qualities
+      };
+    }
+  }
 
   return { name: shieldKey, acBonus: 0, checkPenalty: 0 };
 }
@@ -558,7 +601,16 @@ export function isItemInInventory(inventory: InventoryItem[] = [], name: string 
  */
 export function ensureEquippedItemInInventory(
   inventory: InventoryItem[] = [],
-  itemData: { name: string; weight: number; location?: string; value?: string; notes?: string }
+  itemData: {
+    name: string;
+    weight: number;
+    location?: string;
+    value?: string;
+    notes?: string;
+    enhancementBonus?: number;
+    specialQualities?: string[];
+    baseItemId?: string;
+  }
 ): InventoryItem[] {
   if (!itemData.name || !itemData.name.trim() || itemData.name.toLowerCase().trim() === 'none' || itemData.name.trim() === '__CUSTOM__') {
     return inventory;
@@ -566,8 +618,39 @@ export function ensureEquippedItemInInventory(
   const cleanName = itemData.name.trim();
 
   // Check if item already exists in inventory (case-insensitive and alias-aware)
-  const exists = inventory.some(i => matchesItemName(i.name, cleanName));
-  if (exists) return inventory;
+  const existingIdx = inventory.findIndex(i => matchesItemName(i.name, cleanName));
+  if (existingIdx >= 0) {
+    const existing = inventory[existingIdx];
+    let needsUpdate = false;
+    let newEnh = existing.enhancementBonus;
+    let newQualities = existing.specialQualities;
+    let newBaseId = existing.baseItemId;
+
+    if (itemData.enhancementBonus !== undefined && existing.enhancementBonus === undefined) {
+      newEnh = itemData.enhancementBonus;
+      needsUpdate = true;
+    }
+    if (itemData.specialQualities && itemData.specialQualities.length > 0 && (!existing.specialQualities || existing.specialQualities.length === 0)) {
+      newQualities = [...itemData.specialQualities];
+      needsUpdate = true;
+    }
+    if (itemData.baseItemId && !existing.baseItemId) {
+      newBaseId = itemData.baseItemId;
+      needsUpdate = true;
+    }
+
+    if (needsUpdate) {
+      const updated = [...inventory];
+      updated[existingIdx] = {
+        ...existing,
+        enhancementBonus: newEnh,
+        specialQualities: newQualities,
+        baseItemId: newBaseId
+      };
+      return updated;
+    }
+    return inventory;
+  }
 
   const newItem: InventoryItem = {
     id: `inv_eq_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
@@ -576,7 +659,10 @@ export function ensureEquippedItemInInventory(
     weight: Math.max(0, itemData.weight || 0),
     location: itemData.location || 'Carried',
     value: itemData.value || '',
-    notes: itemData.notes || ''
+    notes: itemData.notes || '',
+    enhancementBonus: itemData.enhancementBonus,
+    specialQualities: itemData.specialQualities ? [...itemData.specialQualities] : undefined,
+    baseItemId: itemData.baseItemId
   };
 
   return [...inventory, newItem];
@@ -611,7 +697,12 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
     if (!isItemInInventory(currentInventory, arm.name) && !isItemInInventory(currentInventory, eq.armor)) {
       const armorKey = eq.armor!.toLowerCase().trim();
       const w = ARMOR_WEIGHT_MAP[armorKey] !== undefined ? ARMOR_WEIGHT_MAP[armorKey] : 20;
-      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: arm.name, weight: w });
+      const nextInv = ensureEquippedItemInInventory(currentInventory, {
+        name: arm.name,
+        weight: w,
+        enhancementBonus: eq.armorEnhancement ?? arm.enhancementBonus,
+        specialQualities: eq.armorQualities ?? arm.specialQualities
+      });
       if (nextInv !== currentInventory) {
         currentInventory = nextInv;
         modified = true;
@@ -624,7 +715,12 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
     if (!isItemInInventory(currentInventory, shd.name) && !isItemInInventory(currentInventory, eq.shield)) {
       const shieldKey = eq.shield!.toLowerCase().trim();
       const w = SHIELD_WEIGHT_MAP[shieldKey] !== undefined ? SHIELD_WEIGHT_MAP[shieldKey] : 10;
-      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: shd.name, weight: w });
+      const nextInv = ensureEquippedItemInInventory(currentInventory, {
+        name: shd.name,
+        weight: w,
+        enhancementBonus: eq.shieldEnhancement ?? shd.enhancementBonus,
+        specialQualities: eq.shieldQualities ?? shd.specialQualities
+      });
       if (nextInv !== currentInventory) {
         currentInventory = nextInv;
         modified = true;
@@ -635,7 +731,12 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
   if (isValidEquippedName(eq.primaryWeapon)) {
     const wpn = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
     if (!isItemInInventory(currentInventory, wpn.name) && !isItemInInventory(currentInventory, eq.primaryWeapon)) {
-      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: wpn.name, weight: wpn.weight });
+      const nextInv = ensureEquippedItemInInventory(currentInventory, {
+        name: wpn.name,
+        weight: wpn.weight,
+        enhancementBonus: eq.primaryWeaponEnhancement ?? wpn.enhancementBonus,
+        specialQualities: eq.primaryWeaponQualities ?? wpn.specialQualities
+      });
       if (nextInv !== currentInventory) {
         currentInventory = nextInv;
         modified = true;
@@ -646,7 +747,12 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
   if (isValidEquippedName(eq.secondaryWeapon)) {
     const wpn = resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData);
     if (!isItemInInventory(currentInventory, wpn.name) && !isItemInInventory(currentInventory, eq.secondaryWeapon)) {
-      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: wpn.name, weight: wpn.weight });
+      const nextInv = ensureEquippedItemInInventory(currentInventory, {
+        name: wpn.name,
+        weight: wpn.weight,
+        enhancementBonus: eq.secondaryWeaponEnhancement ?? wpn.enhancementBonus,
+        specialQualities: eq.secondaryWeaponQualities ?? wpn.specialQualities
+      });
       if (nextInv !== currentInventory) {
         currentInventory = nextInv;
         modified = true;
@@ -657,7 +763,12 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
   if (isValidEquippedName(eq.rangedWeapon)) {
     const wpn = resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData);
     if (!isItemInInventory(currentInventory, wpn.name) && !isItemInInventory(currentInventory, eq.rangedWeapon)) {
-      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: wpn.name, weight: wpn.weight });
+      const nextInv = ensureEquippedItemInInventory(currentInventory, {
+        name: wpn.name,
+        weight: wpn.weight,
+        enhancementBonus: eq.rangedWeaponEnhancement ?? wpn.enhancementBonus,
+        specialQualities: eq.rangedWeaponQualities ?? wpn.specialQualities
+      });
       if (nextInv !== currentInventory) {
         currentInventory = nextInv;
         modified = true;

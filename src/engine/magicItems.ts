@@ -741,6 +741,82 @@ export function formatMagicItemName(
   return parts.join(' ').trim();
 }
 
+export interface ParsedMagicItem {
+  baseName: string;
+  enhancementBonus: number;
+  qualities: string[];
+}
+
+/**
+ * Parses a 3.5e magic item name to extract enhancement bonus, special qualities, and base item name.
+ * e.g.:
+ * - "+1 Flaming Longsword" -> { baseName: 'Longsword', enhancementBonus: 1, qualities: ['flaming'] }
+ * - "+2 Keen Falchion" -> { baseName: 'Falchion', enhancementBonus: 2, qualities: ['keen'] }
+ * - "Unholy Holy Dagger" -> { baseName: 'Dagger', enhancementBonus: 0, qualities: ['unholy', 'holy'] }
+ * - "Javelin" -> { baseName: 'Javelin', enhancementBonus: 0, qualities: [] }
+ */
+export function parseMagicItemName(fullName: string | undefined): ParsedMagicItem {
+  if (!fullName || !fullName.trim()) {
+    return { baseName: '', enhancementBonus: 0, qualities: [] };
+  }
+
+  let clean = fullName.trim();
+  let enhancementBonus = 0;
+
+  // Extract leading +X enhancement bonus (e.g. "+1 ", "+2 ")
+  const enhMatch = clean.match(/^\+(\d+)\s+(.+)$/);
+  if (enhMatch) {
+    enhancementBonus = parseInt(enhMatch[1], 10);
+    clean = enhMatch[2].trim();
+  }
+
+  const allQualities = [...WEAPON_SPECIAL_QUALITIES, ...ARMOR_SPECIAL_QUALITIES];
+  // Sort qualities by name length descending so multi-word qualities match before single-word subsets
+  const sortedQualities = [...allQualities].sort((a, b) => b.name.length - a.name.length);
+
+  const matchedQualities: string[] = [];
+
+  for (const q of sortedQualities) {
+    const escaped = q.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+    if (regex.test(clean)) {
+      if (!matchedQualities.includes(q.id)) {
+        matchedQualities.push(q.id);
+      }
+      clean = clean.replace(regex, ' ').trim();
+    }
+  }
+
+  // Also check special aliases like "Light Fortification", "Moderate Fortification", "Heavy Fortification", "SR 13", etc.
+  const fortificationAliases: [string, string][] = [
+    ['Heavy Fortification', 'fortification_heavy'],
+    ['Moderate Fortification', 'fortification_moderate'],
+    ['Light Fortification', 'fortification_light'],
+    ['SR 19', 'spell_resistance_19'],
+    ['SR 17', 'spell_resistance_17'],
+    ['SR 15', 'spell_resistance_15'],
+    ['SR 13', 'spell_resistance_13']
+  ];
+  for (const [alias, id] of fortificationAliases) {
+    const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+    if (regex.test(clean)) {
+      if (!matchedQualities.includes(id)) {
+        matchedQualities.push(id);
+      }
+      clean = clean.replace(regex, ' ').trim();
+    }
+  }
+
+  clean = clean.replace(/\s+/g, ' ').trim();
+
+  return {
+    baseName: clean || fullName.trim(),
+    enhancementBonus,
+    qualities: matchedQualities
+  };
+}
+
 /**
  * Creates a persistent custom WeaponData object with baked-in enhancement and special qualities.
  */

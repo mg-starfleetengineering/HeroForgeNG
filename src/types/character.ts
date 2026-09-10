@@ -69,6 +69,9 @@ export interface InventoryItem {
   location?: 'Carried' | 'Backpack' | 'Belt Pouch' | 'Haversack' | 'Mount' | 'Stash' | string;
   value?: string;
   notes?: string;
+  enhancementBonus?: number;
+  specialQualities?: string[];
+  baseItemId?: string;
 }
 
 export interface Funds {
