@@ -1,5 +1,5 @@
-import { WeaponData, CustomArmorData, CharacterState, InventoryItem } from '../types/character';
-import { parseMagicItemName } from './magicItems';
+import { WeaponData, CustomArmorData, CharacterState, InventoryItem, ItemArmorData, ItemWeaponData, Equipment } from '../types/character';
+import { parseMagicItemName, formatMagicItemName } from './magicItems';
 
 export const DEFAULT_WEAPON: WeaponData = {
   id: 'unarmed',
@@ -13,47 +13,67 @@ export const DEFAULT_WEAPON: WeaponData = {
   type: 'Bludgeoning'
 };
 
-const STANDARD_ARMOR_MAP: Record<string, { name: string; acBonus: number; maxDex: number; checkPenalty: number }> = {
-  none: { name: 'None', acBonus: 0, maxDex: 99, checkPenalty: 0 },
-  padded: { name: 'Padded Armor', acBonus: 1, maxDex: 8, checkPenalty: 0 },
-  'padded armor': { name: 'Padded Armor', acBonus: 1, maxDex: 8, checkPenalty: 0 },
-  leather: { name: 'Leather Armor', acBonus: 2, maxDex: 6, checkPenalty: 0 },
-  'leather armor': { name: 'Leather Armor', acBonus: 2, maxDex: 6, checkPenalty: 0 },
-  studded: { name: 'Studded Leather Armor', acBonus: 3, maxDex: 5, checkPenalty: -1 },
-  'studded leather': { name: 'Studded Leather Armor', acBonus: 3, maxDex: 5, checkPenalty: -1 },
-  'studded leather armor': { name: 'Studded Leather Armor', acBonus: 3, maxDex: 5, checkPenalty: -1 },
-  chainshirt: { name: 'Chain Shirt', acBonus: 4, maxDex: 4, checkPenalty: -2 },
-  'chain shirt': { name: 'Chain Shirt', acBonus: 4, maxDex: 4, checkPenalty: -2 },
-  breastplate: { name: 'Breastplate', acBonus: 5, maxDex: 3, checkPenalty: -4 },
-  fullplate: { name: 'Full Plate', acBonus: 8, maxDex: 1, checkPenalty: -6 },
-  'full plate': { name: 'Full Plate', acBonus: 8, maxDex: 1, checkPenalty: -6 },
-  hide: { name: 'Hide Armor', acBonus: 3, maxDex: 4, checkPenalty: -3 },
-  'hide armor': { name: 'Hide Armor', acBonus: 3, maxDex: 4, checkPenalty: -3 },
-  scale_mail: { name: 'Scale Mail', acBonus: 4, maxDex: 3, checkPenalty: -4 },
-  'scale mail': { name: 'Scale Mail', acBonus: 4, maxDex: 3, checkPenalty: -4 },
-  chainmail: { name: 'Chainmail', acBonus: 5, maxDex: 2, checkPenalty: -5 },
-  banded_mail: { name: 'Banded Mail', acBonus: 6, maxDex: 1, checkPenalty: -6 },
-  'banded mail': { name: 'Banded Mail', acBonus: 6, maxDex: 1, checkPenalty: -6 },
-  splint_mail: { name: 'Splint Mail', acBonus: 6, maxDex: 0, checkPenalty: -7 },
-  'splint mail': { name: 'Splint Mail', acBonus: 6, maxDex: 0, checkPenalty: -7 },
-  half_plate: { name: 'Half-Plate', acBonus: 7, maxDex: 0, checkPenalty: -7 },
-  'half-plate': { name: 'Half-Plate', acBonus: 7, maxDex: 0, checkPenalty: -7 },
-  'half plate': { name: 'Half-Plate', acBonus: 7, maxDex: 0, checkPenalty: -7 }
+export interface StandardArmorEntry {
+  name: string;
+  acBonus: number;
+  maxDex: number;
+  checkPenalty: number;
+  type: 'light' | 'medium' | 'heavy' | 'none';
+  weight: number;
+  spellFailure: number;
+  speedPenalty: boolean;
+}
+
+export interface StandardShieldEntry {
+  name: string;
+  acBonus: number;
+  checkPenalty: number;
+  type: 'shield';
+  weight: number;
+  spellFailure: number;
+}
+
+const STANDARD_ARMOR_MAP: Record<string, StandardArmorEntry> = {
+  none: { name: 'None', acBonus: 0, maxDex: 99, checkPenalty: 0, type: 'none', weight: 0, spellFailure: 0, speedPenalty: false },
+  padded: { name: 'Padded', acBonus: 1, maxDex: 8, checkPenalty: 0, type: 'light', weight: 10, spellFailure: 5, speedPenalty: false },
+  'padded armor': { name: 'Padded', acBonus: 1, maxDex: 8, checkPenalty: 0, type: 'light', weight: 10, spellFailure: 5, speedPenalty: false },
+  leather: { name: 'Leather', acBonus: 2, maxDex: 6, checkPenalty: 0, type: 'light', weight: 15, spellFailure: 10, speedPenalty: false },
+  'leather armor': { name: 'Leather', acBonus: 2, maxDex: 6, checkPenalty: 0, type: 'light', weight: 15, spellFailure: 10, speedPenalty: false },
+  studded: { name: 'Studded Leather', acBonus: 3, maxDex: 5, checkPenalty: -1, type: 'light', weight: 20, spellFailure: 15, speedPenalty: false },
+  'studded leather': { name: 'Studded Leather', acBonus: 3, maxDex: 5, checkPenalty: -1, type: 'light', weight: 20, spellFailure: 15, speedPenalty: false },
+  'studded leather armor': { name: 'Studded Leather', acBonus: 3, maxDex: 5, checkPenalty: -1, type: 'light', weight: 20, spellFailure: 15, speedPenalty: false },
+  chainshirt: { name: 'Chain Shirt', acBonus: 4, maxDex: 4, checkPenalty: -2, type: 'light', weight: 25, spellFailure: 20, speedPenalty: false },
+  'chain shirt': { name: 'Chain Shirt', acBonus: 4, maxDex: 4, checkPenalty: -2, type: 'light', weight: 25, spellFailure: 20, speedPenalty: false },
+  breastplate: { name: 'Breastplate', acBonus: 5, maxDex: 3, checkPenalty: -4, type: 'medium', weight: 30, spellFailure: 20, speedPenalty: true },
+  fullplate: { name: 'Full Plate', acBonus: 8, maxDex: 1, checkPenalty: -6, type: 'heavy', weight: 50, spellFailure: 35, speedPenalty: true },
+  'full plate': { name: 'Full Plate', acBonus: 8, maxDex: 1, checkPenalty: -6, type: 'heavy', weight: 50, spellFailure: 35, speedPenalty: true },
+  hide: { name: 'Hide', acBonus: 3, maxDex: 4, checkPenalty: -3, type: 'medium', weight: 25, spellFailure: 20, speedPenalty: true },
+  'hide armor': { name: 'Hide', acBonus: 3, maxDex: 4, checkPenalty: -3, type: 'medium', weight: 25, spellFailure: 20, speedPenalty: true },
+  scale_mail: { name: 'Scale Mail', acBonus: 4, maxDex: 3, checkPenalty: -4, type: 'medium', weight: 30, spellFailure: 25, speedPenalty: true },
+  'scale mail': { name: 'Scale Mail', acBonus: 4, maxDex: 3, checkPenalty: -4, type: 'medium', weight: 30, spellFailure: 25, speedPenalty: true },
+  chainmail: { name: 'Chainmail', acBonus: 5, maxDex: 2, checkPenalty: -5, type: 'medium', weight: 40, spellFailure: 30, speedPenalty: true },
+  banded_mail: { name: 'Banded Mail', acBonus: 6, maxDex: 1, checkPenalty: -6, type: 'heavy', weight: 35, spellFailure: 35, speedPenalty: true },
+  'banded mail': { name: 'Banded Mail', acBonus: 6, maxDex: 1, checkPenalty: -6, type: 'heavy', weight: 35, spellFailure: 35, speedPenalty: true },
+  splint_mail: { name: 'Splint Mail', acBonus: 6, maxDex: 0, checkPenalty: -7, type: 'heavy', weight: 45, spellFailure: 40, speedPenalty: true },
+  'splint mail': { name: 'Splint Mail', acBonus: 6, maxDex: 0, checkPenalty: -7, type: 'heavy', weight: 45, spellFailure: 40, speedPenalty: true },
+  half_plate: { name: 'Half-Plate', acBonus: 7, maxDex: 0, checkPenalty: -7, type: 'heavy', weight: 50, spellFailure: 40, speedPenalty: true },
+  'half-plate': { name: 'Half-Plate', acBonus: 7, maxDex: 0, checkPenalty: -7, type: 'heavy', weight: 50, spellFailure: 40, speedPenalty: true },
+  'half plate': { name: 'Half-Plate', acBonus: 7, maxDex: 0, checkPenalty: -7, type: 'heavy', weight: 50, spellFailure: 40, speedPenalty: true }
 };
 
-const STANDARD_SHIELD_MAP: Record<string, { name: string; acBonus: number; checkPenalty: number }> = {
-  none: { name: 'None', acBonus: 0, checkPenalty: 0 },
-  buckler: { name: 'Buckler', acBonus: 1, checkPenalty: -1 },
-  light_wooden: { name: 'Light Shield', acBonus: 1, checkPenalty: -1 },
-  'light shield': { name: 'Light Shield', acBonus: 1, checkPenalty: -1 },
-  'light wooden shield': { name: 'Light Shield', acBonus: 1, checkPenalty: -1 },
-  'light steel shield': { name: 'Light Shield', acBonus: 1, checkPenalty: -1 },
-  heavy_shield: { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2 },
-  'heavy shield': { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2 },
-  'heavy steel shield': { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2 },
-  'heavy wooden shield': { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2 },
-  tower_shield: { name: 'Tower Shield', acBonus: 4, checkPenalty: -10 },
-  'tower shield': { name: 'Tower Shield', acBonus: 4, checkPenalty: -10 }
+const STANDARD_SHIELD_MAP: Record<string, StandardShieldEntry> = {
+  none: { name: 'None', acBonus: 0, checkPenalty: 0, type: 'shield', weight: 0, spellFailure: 0 },
+  buckler: { name: 'Buckler', acBonus: 1, checkPenalty: -1, type: 'shield', weight: 5, spellFailure: 5 },
+  light_wooden: { name: 'Light Shield', acBonus: 1, checkPenalty: -1, type: 'shield', weight: 5, spellFailure: 5 },
+  'light shield': { name: 'Light Shield', acBonus: 1, checkPenalty: -1, type: 'shield', weight: 5, spellFailure: 5 },
+  'light wooden shield': { name: 'Light Shield', acBonus: 1, checkPenalty: -1, type: 'shield', weight: 5, spellFailure: 5 },
+  'light steel shield': { name: 'Light Shield', acBonus: 1, checkPenalty: -1, type: 'shield', weight: 5, spellFailure: 5 },
+  heavy_shield: { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2, type: 'shield', weight: 15, spellFailure: 15 },
+  'heavy shield': { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2, type: 'shield', weight: 15, spellFailure: 15 },
+  'heavy steel shield': { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2, type: 'shield', weight: 15, spellFailure: 15 },
+  'heavy wooden shield': { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2, type: 'shield', weight: 15, spellFailure: 15 },
+  tower_shield: { name: 'Tower Shield', acBonus: 4, checkPenalty: -10, type: 'shield', weight: 45, spellFailure: 50 },
+  'tower shield': { name: 'Tower Shield', acBonus: 4, checkPenalty: -10, type: 'shield', weight: 45, spellFailure: 50 }
 };
 
 const DAMAGE_INDEX_MAP: Record<string, string> = {
@@ -266,13 +286,39 @@ export function resolveWeapon(
   });
 }
 
+export interface ResolvedArmor {
+  name: string;
+  acBonus: number;
+  maxDex: number;
+  checkPenalty: number;
+  type?: 'light' | 'medium' | 'heavy' | 'shield' | 'none';
+  weight?: number;
+  spellFailure?: number;
+  speedPenalty?: boolean;
+  enhancementBonus?: number;
+  specialQualities?: string[];
+  baseArmorId?: string;
+}
+
+export interface ResolvedShield {
+  name: string;
+  acBonus: number;
+  checkPenalty: number;
+  type: 'shield';
+  weight?: number;
+  spellFailure?: number;
+  enhancementBonus?: number;
+  specialQualities?: string[];
+  baseArmorId?: string;
+}
+
 /**
  * Resolves an armor key/name to Armor stats.
  */
 export function resolveArmor(
   armorKey: string | undefined,
   customArmors: CustomArmorData[] = []
-): { name: string; acBonus: number; maxDex: number; checkPenalty: number; enhancementBonus?: number; specialQualities?: string[] } {
+): ResolvedArmor {
   if (!armorKey) return STANDARD_ARMOR_MAP.none;
 
   const keyLower = armorKey.toLowerCase().trim();
@@ -292,8 +338,13 @@ export function resolveArmor(
       acBonus: customMatch.acBonus,
       maxDex: customMatch.maxDex ?? 99,
       checkPenalty: customMatch.armorCheckPenalty ?? 0,
+      type: (customMatch.type as any) || 'medium',
+      weight: customMatch.weight ?? 20,
+      spellFailure: 20,
+      speedPenalty: customMatch.type === 'heavy' || customMatch.type === 'medium',
       enhancementBonus: customMatch.enhancementBonus,
-      specialQualities: customMatch.specialQualities
+      specialQualities: customMatch.specialQualities,
+      baseArmorId: customMatch.baseArmorId || customMatch.id
     };
   }
 
@@ -309,7 +360,7 @@ export function resolveArmor(
   if (STANDARD_ARMOR_MAP[normKey]) return STANDARD_ARMOR_MAP[normKey];
 
   // 4. Magic armor name e.g. "+1 Chain Shirt", "+2 Shadow Leather Armor"
-  const parsedMagicArmor = parseMagicItemName(armorKey);
+  const parsedMagicArmor = parseMagicItemName(armorKey, 'armor');
   if (parsedMagicArmor.enhancementBonus > 0 || parsedMagicArmor.qualities.length > 0) {
     const baseArmor = resolveArmor(parsedMagicArmor.baseName, customArmors);
     if (baseArmor && (baseArmor.name.toLowerCase() !== 'none' || parsedMagicArmor.baseName.toLowerCase() === 'none')) {
@@ -317,12 +368,13 @@ export function resolveArmor(
         ...baseArmor,
         name: armorKey,
         enhancementBonus: parsedMagicArmor.enhancementBonus,
-        specialQualities: parsedMagicArmor.qualities
+        specialQualities: parsedMagicArmor.qualities,
+        baseArmorId: baseArmor.baseArmorId || baseArmor.name
       };
     }
   }
 
-  return { name: armorKey, acBonus: 0, maxDex: 99, checkPenalty: 0 };
+  return { name: armorKey, acBonus: 0, maxDex: 99, checkPenalty: 0, type: 'none', weight: 0, spellFailure: 0, speedPenalty: false };
 }
 
 /**
@@ -331,7 +383,7 @@ export function resolveArmor(
 export function resolveShield(
   shieldKey: string | undefined,
   customArmors: CustomArmorData[] = []
-): { name: string; acBonus: number; checkPenalty: number; enhancementBonus?: number; specialQualities?: string[] } {
+): ResolvedShield {
   if (!shieldKey) return STANDARD_SHIELD_MAP.none;
 
   const keyLower = shieldKey.toLowerCase().trim();
@@ -350,8 +402,12 @@ export function resolveShield(
       name: customMatch.name,
       acBonus: customMatch.acBonus,
       checkPenalty: customMatch.armorCheckPenalty ?? 0,
+      type: 'shield',
+      weight: customMatch.weight ?? 10,
+      spellFailure: 15,
       enhancementBonus: customMatch.enhancementBonus,
-      specialQualities: customMatch.specialQualities
+      specialQualities: customMatch.specialQualities,
+      baseArmorId: customMatch.baseArmorId || customMatch.id
     };
   }
 
@@ -367,7 +423,7 @@ export function resolveShield(
   if (STANDARD_SHIELD_MAP[normKey]) return STANDARD_SHIELD_MAP[normKey];
 
   // 4. Magic shield name e.g. "+1 Heavy Shield"
-  const parsedMagicShield = parseMagicItemName(shieldKey);
+  const parsedMagicShield = parseMagicItemName(shieldKey, 'shield');
   if (parsedMagicShield.enhancementBonus > 0 || parsedMagicShield.qualities.length > 0) {
     const baseShield = resolveShield(parsedMagicShield.baseName, customArmors);
     if (baseShield && (baseShield.name.toLowerCase() !== 'none' || parsedMagicShield.baseName.toLowerCase() === 'none')) {
@@ -375,12 +431,13 @@ export function resolveShield(
         ...baseShield,
         name: shieldKey,
         enhancementBonus: parsedMagicShield.enhancementBonus,
-        specialQualities: parsedMagicShield.qualities
+        specialQualities: parsedMagicShield.qualities,
+        baseArmorId: baseShield.baseArmorId || baseShield.name
       };
     }
   }
 
-  return { name: shieldKey, acBonus: 0, checkPenalty: 0 };
+  return { name: shieldKey, acBonus: 0, checkPenalty: 0, type: 'shield', weight: 0, spellFailure: 0 };
 }
 
 /**
@@ -610,6 +667,9 @@ export function ensureEquippedItemInInventory(
     enhancementBonus?: number;
     specialQualities?: string[];
     baseItemId?: string;
+    itemType?: 'weapon' | 'armor' | 'shield' | 'wondrous' | 'gear' | 'consumable';
+    armorData?: ItemArmorData;
+    weaponData?: ItemWeaponData;
   }
 ): InventoryItem[] {
   if (!itemData.name || !itemData.name.trim() || itemData.name.toLowerCase().trim() === 'none' || itemData.name.trim() === '__CUSTOM__') {
@@ -625,6 +685,9 @@ export function ensureEquippedItemInInventory(
     let newEnh = existing.enhancementBonus;
     let newQualities = existing.specialQualities;
     let newBaseId = existing.baseItemId;
+    let newType = existing.itemType;
+    let newArmorData = existing.armorData;
+    let newWeaponData = existing.weaponData;
 
     if (itemData.enhancementBonus !== undefined && existing.enhancementBonus === undefined) {
       newEnh = itemData.enhancementBonus;
@@ -638,6 +701,18 @@ export function ensureEquippedItemInInventory(
       newBaseId = itemData.baseItemId;
       needsUpdate = true;
     }
+    if (itemData.itemType && !existing.itemType) {
+      newType = itemData.itemType;
+      needsUpdate = true;
+    }
+    if (itemData.armorData && !existing.armorData) {
+      newArmorData = { ...itemData.armorData };
+      needsUpdate = true;
+    }
+    if (itemData.weaponData && !existing.weaponData) {
+      newWeaponData = { ...itemData.weaponData };
+      needsUpdate = true;
+    }
 
     if (needsUpdate) {
       const updated = [...inventory];
@@ -645,7 +720,10 @@ export function ensureEquippedItemInInventory(
         ...existing,
         enhancementBonus: newEnh,
         specialQualities: newQualities,
-        baseItemId: newBaseId
+        baseItemId: newBaseId,
+        itemType: newType,
+        armorData: newArmorData,
+        weaponData: newWeaponData
       };
       return updated;
     }
@@ -662,17 +740,305 @@ export function ensureEquippedItemInInventory(
     notes: itemData.notes || '',
     enhancementBonus: itemData.enhancementBonus,
     specialQualities: itemData.specialQualities ? [...itemData.specialQualities] : undefined,
-    baseItemId: itemData.baseItemId
+    baseItemId: itemData.baseItemId,
+    itemType: itemData.itemType,
+    armorData: itemData.armorData,
+    weaponData: itemData.weaponData
   };
 
   return [...inventory, newItem];
 }
 
 /**
+ * Creates a fully populated InventoryItem for a weapon.
+ */
+export function createInventoryWeapon(
+  baseWeapon: WeaponData | string,
+  arg2?: WeaponData[] | {
+    id?: string;
+    name?: string;
+    quantity?: number;
+    enhancementBonus?: number;
+    specialQualities?: string[];
+    location?: string;
+  },
+  arg3?: WeaponData[] | {
+    id?: string;
+    name?: string;
+    quantity?: number;
+    enhancementBonus?: number;
+    specialQualities?: string[];
+    location?: string;
+  },
+  arg4?: {
+    id?: string;
+    name?: string;
+    quantity?: number;
+    enhancementBonus?: number;
+    specialQualities?: string[];
+    location?: string;
+  }
+): InventoryItem {
+  let resolved: WeaponData;
+  let options: {
+    id?: string;
+    name?: string;
+    quantity?: number;
+    enhancementBonus?: number;
+    specialQualities?: string[];
+    location?: string;
+  } | undefined;
+
+  if (typeof baseWeapon === 'string') {
+    const weaponsData = Array.isArray(arg2) ? arg2 : [];
+    const customWeapons = Array.isArray(arg3) ? arg3 : [];
+    resolved = resolveWeapon(baseWeapon, customWeapons, weaponsData);
+    options = (!Array.isArray(arg2) && typeof arg2 === 'object')
+      ? arg2
+      : ((!Array.isArray(arg3) && typeof arg3 === 'object') ? arg3 : arg4);
+  } else {
+    resolved = baseWeapon;
+    options = (!Array.isArray(arg2) && typeof arg2 === 'object') ? arg2 : undefined;
+  }
+
+  const enh = options?.enhancementBonus ?? resolved.enhancementBonus ?? 0;
+  const qualities = options?.specialQualities ?? resolved.specialQualities ?? [];
+  const name = options?.name || (enh > 0 || qualities.length > 0
+    ? formatMagicItemName(resolved.name, enh, qualities)
+    : resolved.name);
+
+  return {
+    id: options?.id || `inv_wpn_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+    name,
+    quantity: options?.quantity ?? 1,
+    weight: resolved.weight ?? 0,
+    location: options?.location || 'Carried',
+    itemType: 'weapon',
+    baseItemId: resolved.id,
+    enhancementBonus: enh,
+    specialQualities: qualities,
+    weaponData: {
+      category: resolved.category,
+      size: resolved.size,
+      damageM: resolved.damageM,
+      damageS: resolved.damageS,
+      threat: resolved.threat ?? 20,
+      critMultiplier: resolved.critMultiplier ?? 2,
+      damageType: resolved.type,
+      rangeIncrement: resolved.rangeIncrement,
+      isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged'
+    }
+  };
+}
+
+/**
+ * Creates a fully populated InventoryItem for armor.
+ */
+export function createInventoryArmor(
+  armorKey: string,
+  customArmors: CustomArmorData[] = [],
+  options?: {
+    id?: string;
+    name?: string;
+    quantity?: number;
+    enhancementBonus?: number;
+    specialQualities?: string[];
+    location?: string;
+  }
+): InventoryItem {
+  const resolved = resolveArmor(armorKey, customArmors);
+  const enh = options?.enhancementBonus ?? resolved.enhancementBonus ?? 0;
+  const qualities = options?.specialQualities ?? resolved.specialQualities ?? [];
+  const baseName = resolved.baseArmorId || resolved.name;
+  const name = options?.name || (enh > 0 || qualities.length > 0
+    ? formatMagicItemName(baseName, enh, qualities)
+    : resolved.name);
+
+  const stdWeight = resolved.weight ?? (ARMOR_WEIGHT_MAP[resolved.name.toLowerCase()] ?? 20);
+
+  return {
+    id: options?.id || `inv_arm_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+    name,
+    quantity: options?.quantity ?? 1,
+    weight: stdWeight,
+    location: options?.location || 'Carried',
+    itemType: 'armor',
+    baseItemId: resolved.baseArmorId || resolved.name.toLowerCase().replace(/\s+/g, '_'),
+    enhancementBonus: enh,
+    specialQualities: qualities,
+    armorData: {
+      type: (resolved.type as any) || 'medium',
+      acBonus: resolved.acBonus,
+      maxDex: resolved.maxDex ?? 99,
+      armorCheckPenalty: resolved.checkPenalty ?? 0,
+      spellFailure: resolved.spellFailure ?? 0,
+      speedPenalty: resolved.speedPenalty ?? (resolved.type === 'heavy' || resolved.type === 'medium')
+    }
+  };
+}
+
+/**
+ * Creates a fully populated InventoryItem for a shield.
+ */
+export function createInventoryShield(
+  shieldKey: string,
+  customArmors: CustomArmorData[] = [],
+  options?: {
+    id?: string;
+    name?: string;
+    quantity?: number;
+    enhancementBonus?: number;
+    specialQualities?: string[];
+    location?: string;
+  }
+): InventoryItem {
+  const resolved = resolveShield(shieldKey, customArmors);
+  const enh = options?.enhancementBonus ?? resolved.enhancementBonus ?? 0;
+  const qualities = options?.specialQualities ?? resolved.specialQualities ?? [];
+  const baseName = resolved.baseArmorId || resolved.name;
+  const name = options?.name || (enh > 0 || qualities.length > 0
+    ? formatMagicItemName(baseName, enh, qualities)
+    : resolved.name);
+
+  const stdWeight = resolved.weight ?? (SHIELD_WEIGHT_MAP[resolved.name.toLowerCase()] ?? 10);
+
+  return {
+    id: options?.id || `inv_shd_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+    name,
+    quantity: options?.quantity ?? 1,
+    weight: stdWeight,
+    location: options?.location || 'Carried',
+    itemType: 'shield',
+    baseItemId: resolved.baseArmorId || resolved.name.toLowerCase().replace(/\s+/g, '_'),
+    enhancementBonus: enh,
+    specialQualities: qualities,
+    armorData: {
+      type: 'shield',
+      acBonus: resolved.acBonus,
+      maxDex: 99,
+      armorCheckPenalty: resolved.checkPenalty ?? 0,
+      spellFailure: resolved.spellFailure ?? 0,
+      speedPenalty: false
+    }
+  };
+}
+
+export function getEquippedArmorItem(character: CharacterState): InventoryItem | undefined {
+  if (character.equipment?.armorItemId) {
+    return character.inventory?.find(i => i.id === character.equipment!.armorItemId);
+  }
+  return undefined;
+}
+
+export function getEquippedShieldItem(character: CharacterState): InventoryItem | undefined {
+  if (character.equipment?.shieldItemId) {
+    return character.inventory?.find(i => i.id === character.equipment!.shieldItemId);
+  }
+  return undefined;
+}
+
+export function getEquippedWeaponItem(
+  character: CharacterState,
+  slot: 'primaryWeapon' | 'secondaryWeapon' | 'rangedWeapon'
+): InventoryItem | undefined {
+  const idKey = `${slot}ItemId` as keyof Equipment;
+  const itemId = character.equipment?.[idKey] as string | undefined;
+  if (itemId) {
+    return character.inventory?.find(i => i.id === itemId);
+  }
+  return undefined;
+}
+
+export function resolveEquippedArmor(
+  character: CharacterState,
+  customArmors: CustomArmorData[] = []
+): ResolvedArmor {
+  const eq = character.equipment;
+  if (!eq || !eq.armor || eq.armor === 'none') return resolveArmor('none', customArmors);
+  if (eq.armorItemId && character.inventory) {
+    const item = character.inventory.find(i => i.id === eq.armorItemId);
+    if (item && item.armorData) {
+      return {
+        name: item.name,
+        acBonus: item.armorData.acBonus,
+        checkPenalty: item.armorData.armorCheckPenalty,
+        type: item.armorData.type,
+        maxDex: item.armorData.maxDex,
+        speedPenalty: item.armorData.speedPenalty,
+        spellFailure: item.armorData.spellFailure,
+        enhancementBonus: item.enhancementBonus || 0,
+        specialQualities: item.specialQualities ? [...item.specialQualities] : [],
+        baseArmorId: item.baseItemId
+      };
+    }
+  }
+  return resolveArmor(eq.armor, customArmors);
+}
+
+export function resolveEquippedShield(
+  character: CharacterState,
+  customArmors: CustomArmorData[] = []
+): ResolvedShield {
+  const eq = character.equipment;
+  if (!eq || !eq.shield || eq.shield === 'none') return resolveShield('none', customArmors);
+  if (eq.shieldItemId && character.inventory) {
+    const item = character.inventory.find(i => i.id === eq.shieldItemId);
+    if (item && item.armorData) {
+      return {
+        name: item.name,
+        acBonus: item.armorData.acBonus,
+        checkPenalty: item.armorData.armorCheckPenalty,
+        type: 'shield',
+        spellFailure: item.armorData.spellFailure,
+        enhancementBonus: item.enhancementBonus || 0,
+        specialQualities: item.specialQualities ? [...item.specialQualities] : [],
+        baseArmorId: item.baseItemId
+      };
+    }
+  }
+  return resolveShield(eq.shield, customArmors);
+}
+
+export function resolveEquippedWeapon(
+  character: CharacterState,
+  slot: 'primaryWeapon' | 'secondaryWeapon' | 'rangedWeapon',
+  weaponsData: WeaponData[] = [],
+  customWeapons: WeaponData[] = []
+): WeaponData {
+  const eq = character.equipment;
+  const slotName = eq?.[slot];
+  if (!slotName || slotName === 'none') {
+    return resolveWeapon('none', customWeapons, weaponsData);
+  }
+  const idKey = `${slot}ItemId` as keyof Equipment;
+  const itemId = eq[idKey] as string | undefined;
+  if (itemId && character.inventory) {
+    const item = character.inventory.find(i => i.id === itemId);
+    if (item && item.weaponData) {
+      return {
+        id: item.baseItemId || item.id,
+        name: item.name,
+        category: item.weaponData.category || 'Martial',
+        size: item.weaponData.size || 'M',
+        damageM: item.weaponData.damageM || '1d8',
+        threat: item.weaponData.threat ?? 20,
+        critMultiplier: item.weaponData.critMultiplier ?? 2,
+        weight: item.weight ?? 4,
+        type: item.weaponData.damageType || 'Slashing',
+        enhancementBonus: item.enhancementBonus || 0,
+        specialQualities: item.specialQualities ? [...item.specialQualities] : [],
+        source: 'Custom'
+      };
+    }
+  }
+  return resolveWeapon(slotName, customWeapons, weaponsData);
+}
+
+/**
  * Automatically inspects a CharacterState and ensures all currently equipped items
  * (armor, shield, primary weapon, secondary weapon, ranged weapon, wondrous items)
- * exist persistently in character.inventory.
- * Returns an updated CharacterState if missing items were added, or the original if unchanged.
+ * exist persistently in character.inventory and are linked via equipment.*ItemId.
+ * Returns an updated CharacterState if missing items were added or links established.
  */
 export function syncEquippedItemsToInventory<T extends CharacterState>(
   character: T,
@@ -681,9 +1047,10 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
   const eq = character.equipment;
   if (!eq) return character;
 
-  let currentInventory = character.inventory || [];
+  let currentInventory = character.inventory ? [...character.inventory] : [];
   const customArmors = character.customArmors || [];
   const customWeapons = character.customWeapons || [];
+  const updatedEq: Equipment = { ...eq };
   let modified = false;
 
   const isValidEquippedName = (name: string | undefined): boolean => {
@@ -692,93 +1059,336 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
     return clean !== '' && clean.toLowerCase() !== 'none' && clean !== '__CUSTOM__';
   };
 
-  if (isValidEquippedName(eq.armor)) {
-    const arm = resolveArmor(eq.armor, customArmors);
-    if (!isItemInInventory(currentInventory, arm.name) && !isItemInInventory(currentInventory, eq.armor)) {
-      const armorKey = eq.armor!.toLowerCase().trim();
-      const w = ARMOR_WEIGHT_MAP[armorKey] !== undefined ? ARMOR_WEIGHT_MAP[armorKey] : 20;
-      const nextInv = ensureEquippedItemInInventory(currentInventory, {
-        name: arm.name,
-        weight: w,
-        enhancementBonus: eq.armorEnhancement ?? arm.enhancementBonus,
-        specialQualities: eq.armorQualities ?? arm.specialQualities
-      });
-      if (nextInv !== currentInventory) {
-        currentInventory = nextInv;
+  // 1. Armor Sync & Migration
+  if (updatedEq.armorItemId) {
+    const existing = currentInventory.find(i => i.id === updatedEq.armorItemId);
+    if (existing) {
+      if (!existing.armorData) {
+        const resolved = resolveArmor(existing.name, customArmors);
+        existing.armorData = {
+          type: (resolved.type as any) || 'medium',
+          acBonus: resolved.acBonus,
+          maxDex: resolved.maxDex ?? 99,
+          armorCheckPenalty: resolved.checkPenalty ?? 0,
+          spellFailure: resolved.spellFailure ?? 0,
+          speedPenalty: resolved.speedPenalty ?? (resolved.type === 'heavy' || resolved.type === 'medium')
+        };
+        existing.itemType = 'armor';
         modified = true;
       }
+      if (updatedEq.armor !== existing.name || updatedEq.armorEnhancement !== (existing.enhancementBonus || 0)) {
+        updatedEq.armor = existing.name;
+        updatedEq.armorEnhancement = existing.enhancementBonus || 0;
+        updatedEq.armorQualities = existing.specialQualities || [];
+        modified = true;
+      }
+    } else {
+      updatedEq.armorItemId = null;
+      modified = true;
+    }
+  } else if (isValidEquippedName(updatedEq.armor)) {
+    const resolved = resolveArmor(updatedEq.armor, customArmors);
+    const existingMatch = currentInventory.find(i => matchesItemName(i.name, updatedEq.armor) || matchesItemName(i.name, resolved.name));
+    if (existingMatch) {
+      if (!existingMatch.armorData) {
+        existingMatch.armorData = {
+          type: (resolved.type as any) || 'medium',
+          acBonus: resolved.acBonus,
+          maxDex: resolved.maxDex ?? 99,
+          armorCheckPenalty: resolved.checkPenalty ?? 0,
+          spellFailure: resolved.spellFailure ?? 0,
+          speedPenalty: resolved.speedPenalty ?? (resolved.type === 'heavy' || resolved.type === 'medium')
+        };
+        existingMatch.itemType = 'armor';
+      }
+      if (existingMatch.enhancementBonus === undefined && updatedEq.armorEnhancement) {
+        existingMatch.enhancementBonus = updatedEq.armorEnhancement;
+      }
+      if ((!existingMatch.specialQualities || existingMatch.specialQualities.length === 0) && updatedEq.armorQualities) {
+        existingMatch.specialQualities = [...updatedEq.armorQualities];
+      }
+      updatedEq.armorItemId = existingMatch.id;
+      modified = true;
+    } else {
+      const newArm = createInventoryArmor(updatedEq.armor, customArmors, {
+        enhancementBonus: updatedEq.armorEnhancement,
+        specialQualities: updatedEq.armorQualities
+      });
+      currentInventory.push(newArm);
+      updatedEq.armorItemId = newArm.id;
+      modified = true;
     }
   }
 
-  if (isValidEquippedName(eq.shield)) {
-    const shd = resolveShield(eq.shield, customArmors);
-    if (!isItemInInventory(currentInventory, shd.name) && !isItemInInventory(currentInventory, eq.shield)) {
-      const shieldKey = eq.shield!.toLowerCase().trim();
-      const w = SHIELD_WEIGHT_MAP[shieldKey] !== undefined ? SHIELD_WEIGHT_MAP[shieldKey] : 10;
-      const nextInv = ensureEquippedItemInInventory(currentInventory, {
-        name: shd.name,
-        weight: w,
-        enhancementBonus: eq.shieldEnhancement ?? shd.enhancementBonus,
-        specialQualities: eq.shieldQualities ?? shd.specialQualities
-      });
-      if (nextInv !== currentInventory) {
-        currentInventory = nextInv;
+  // 2. Shield Sync & Migration
+  if (updatedEq.shieldItemId) {
+    const existing = currentInventory.find(i => i.id === updatedEq.shieldItemId);
+    if (existing) {
+      if (!existing.armorData) {
+        const resolved = resolveShield(existing.name, customArmors);
+        existing.armorData = {
+          type: 'shield',
+          acBonus: resolved.acBonus,
+          maxDex: 99,
+          armorCheckPenalty: resolved.checkPenalty ?? 0,
+          spellFailure: resolved.spellFailure ?? 0,
+          speedPenalty: false
+        };
+        existing.itemType = 'shield';
         modified = true;
       }
+      if (updatedEq.shield !== existing.name || updatedEq.shieldEnhancement !== (existing.enhancementBonus || 0)) {
+        updatedEq.shield = existing.name;
+        updatedEq.shieldEnhancement = existing.enhancementBonus || 0;
+        updatedEq.shieldQualities = existing.specialQualities || [];
+        modified = true;
+      }
+    } else {
+      updatedEq.shieldItemId = null;
+      modified = true;
+    }
+  } else if (isValidEquippedName(updatedEq.shield)) {
+    const resolved = resolveShield(updatedEq.shield, customArmors);
+    const existingMatch = currentInventory.find(i => matchesItemName(i.name, updatedEq.shield) || matchesItemName(i.name, resolved.name));
+    if (existingMatch) {
+      if (!existingMatch.armorData) {
+        existingMatch.armorData = {
+          type: 'shield',
+          acBonus: resolved.acBonus,
+          maxDex: 99,
+          armorCheckPenalty: resolved.checkPenalty ?? 0,
+          spellFailure: resolved.spellFailure ?? 0,
+          speedPenalty: false
+        };
+        existingMatch.itemType = 'shield';
+      }
+      if (existingMatch.enhancementBonus === undefined && updatedEq.shieldEnhancement) {
+        existingMatch.enhancementBonus = updatedEq.shieldEnhancement;
+      }
+      if ((!existingMatch.specialQualities || existingMatch.specialQualities.length === 0) && updatedEq.shieldQualities) {
+        existingMatch.specialQualities = [...updatedEq.shieldQualities];
+      }
+      updatedEq.shieldItemId = existingMatch.id;
+      modified = true;
+    } else {
+      const newShd = createInventoryShield(updatedEq.shield, customArmors, {
+        enhancementBonus: updatedEq.shieldEnhancement,
+        specialQualities: updatedEq.shieldQualities
+      });
+      currentInventory.push(newShd);
+      updatedEq.shieldItemId = newShd.id;
+      modified = true;
     }
   }
 
-  if (isValidEquippedName(eq.primaryWeapon)) {
-    const wpn = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
-    if (!isItemInInventory(currentInventory, wpn.name) && !isItemInInventory(currentInventory, eq.primaryWeapon)) {
-      const nextInv = ensureEquippedItemInInventory(currentInventory, {
-        name: wpn.name,
-        weight: wpn.weight,
-        enhancementBonus: eq.primaryWeaponEnhancement ?? wpn.enhancementBonus,
-        specialQualities: eq.primaryWeaponQualities ?? wpn.specialQualities
-      });
-      if (nextInv !== currentInventory) {
-        currentInventory = nextInv;
+  // 3. Primary Weapon Sync & Migration
+  if (updatedEq.primaryWeaponItemId) {
+    const existing = currentInventory.find(i => i.id === updatedEq.primaryWeaponItemId);
+    if (existing) {
+      if (!existing.weaponData) {
+        const resolved = resolveWeapon(existing.name, customWeapons, weaponsData);
+        existing.weaponData = {
+          category: resolved.category,
+          size: resolved.size,
+          damageM: resolved.damageM,
+          damageS: resolved.damageS,
+          threat: resolved.threat ?? 20,
+          critMultiplier: resolved.critMultiplier ?? 2,
+          damageType: resolved.type,
+          rangeIncrement: resolved.rangeIncrement,
+          isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged'
+        };
+        existing.itemType = 'weapon';
         modified = true;
       }
+      if (updatedEq.primaryWeapon !== existing.name || updatedEq.primaryWeaponEnhancement !== (existing.enhancementBonus || 0)) {
+        updatedEq.primaryWeapon = existing.name;
+        updatedEq.primaryWeaponEnhancement = existing.enhancementBonus || 0;
+        updatedEq.primaryWeaponQualities = existing.specialQualities || [];
+        modified = true;
+      }
+    } else {
+      updatedEq.primaryWeaponItemId = null;
+      modified = true;
+    }
+  } else if (isValidEquippedName(updatedEq.primaryWeapon)) {
+    const resolved = resolveWeapon(updatedEq.primaryWeapon, customWeapons, weaponsData);
+    const existingMatch = currentInventory.find(i => matchesItemName(i.name, updatedEq.primaryWeapon) || matchesItemName(i.name, resolved.name));
+    if (existingMatch) {
+      if (!existingMatch.weaponData) {
+        existingMatch.weaponData = {
+          category: resolved.category,
+          size: resolved.size,
+          damageM: resolved.damageM,
+          damageS: resolved.damageS,
+          threat: resolved.threat ?? 20,
+          critMultiplier: resolved.critMultiplier ?? 2,
+          damageType: resolved.type,
+          rangeIncrement: resolved.rangeIncrement,
+          isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged'
+        };
+        existingMatch.itemType = 'weapon';
+      }
+      if (existingMatch.enhancementBonus === undefined && updatedEq.primaryWeaponEnhancement) {
+        existingMatch.enhancementBonus = updatedEq.primaryWeaponEnhancement;
+      }
+      if ((!existingMatch.specialQualities || existingMatch.specialQualities.length === 0) && updatedEq.primaryWeaponQualities) {
+        existingMatch.specialQualities = [...updatedEq.primaryWeaponQualities];
+      }
+      updatedEq.primaryWeaponItemId = existingMatch.id;
+      modified = true;
+    } else {
+      const newWpn = createInventoryWeapon(resolved, {
+        name: updatedEq.primaryWeapon,
+        enhancementBonus: updatedEq.primaryWeaponEnhancement,
+        specialQualities: updatedEq.primaryWeaponQualities
+      });
+      currentInventory.push(newWpn);
+      updatedEq.primaryWeaponItemId = newWpn.id;
+      modified = true;
     }
   }
 
-  if (isValidEquippedName(eq.secondaryWeapon)) {
-    const wpn = resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData);
-    if (!isItemInInventory(currentInventory, wpn.name) && !isItemInInventory(currentInventory, eq.secondaryWeapon)) {
-      const nextInv = ensureEquippedItemInInventory(currentInventory, {
-        name: wpn.name,
-        weight: wpn.weight,
-        enhancementBonus: eq.secondaryWeaponEnhancement ?? wpn.enhancementBonus,
-        specialQualities: eq.secondaryWeaponQualities ?? wpn.specialQualities
-      });
-      if (nextInv !== currentInventory) {
-        currentInventory = nextInv;
+  // 4. Secondary Weapon Sync & Migration
+  if (updatedEq.secondaryWeaponItemId) {
+    const existing = currentInventory.find(i => i.id === updatedEq.secondaryWeaponItemId);
+    if (existing) {
+      if (!existing.weaponData) {
+        const resolved = resolveWeapon(existing.name, customWeapons, weaponsData);
+        existing.weaponData = {
+          category: resolved.category,
+          size: resolved.size,
+          damageM: resolved.damageM,
+          damageS: resolved.damageS,
+          threat: resolved.threat ?? 20,
+          critMultiplier: resolved.critMultiplier ?? 2,
+          damageType: resolved.type,
+          rangeIncrement: resolved.rangeIncrement,
+          isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged'
+        };
+        existing.itemType = 'weapon';
         modified = true;
       }
+      if (updatedEq.secondaryWeapon !== existing.name || updatedEq.secondaryWeaponEnhancement !== (existing.enhancementBonus || 0)) {
+        updatedEq.secondaryWeapon = existing.name;
+        updatedEq.secondaryWeaponEnhancement = existing.enhancementBonus || 0;
+        updatedEq.secondaryWeaponQualities = existing.specialQualities || [];
+        modified = true;
+      }
+    } else {
+      updatedEq.secondaryWeaponItemId = null;
+      modified = true;
+    }
+  } else if (isValidEquippedName(updatedEq.secondaryWeapon)) {
+    const resolved = resolveWeapon(updatedEq.secondaryWeapon, customWeapons, weaponsData);
+    const existingMatch = currentInventory.find(i => i.id !== updatedEq.primaryWeaponItemId && (matchesItemName(i.name, updatedEq.secondaryWeapon) || matchesItemName(i.name, resolved.name)));
+    if (existingMatch) {
+      if (!existingMatch.weaponData) {
+        existingMatch.weaponData = {
+          category: resolved.category,
+          size: resolved.size,
+          damageM: resolved.damageM,
+          damageS: resolved.damageS,
+          threat: resolved.threat ?? 20,
+          critMultiplier: resolved.critMultiplier ?? 2,
+          damageType: resolved.type,
+          rangeIncrement: resolved.rangeIncrement,
+          isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged'
+        };
+        existingMatch.itemType = 'weapon';
+      }
+      if (existingMatch.enhancementBonus === undefined && updatedEq.secondaryWeaponEnhancement) {
+        existingMatch.enhancementBonus = updatedEq.secondaryWeaponEnhancement;
+      }
+      if ((!existingMatch.specialQualities || existingMatch.specialQualities.length === 0) && updatedEq.secondaryWeaponQualities) {
+        existingMatch.specialQualities = [...updatedEq.secondaryWeaponQualities];
+      }
+      updatedEq.secondaryWeaponItemId = existingMatch.id;
+      modified = true;
+    } else {
+      const newWpn = createInventoryWeapon(resolved, {
+        name: updatedEq.secondaryWeapon,
+        enhancementBonus: updatedEq.secondaryWeaponEnhancement,
+        specialQualities: updatedEq.secondaryWeaponQualities
+      });
+      currentInventory.push(newWpn);
+      updatedEq.secondaryWeaponItemId = newWpn.id;
+      modified = true;
     }
   }
 
-  if (isValidEquippedName(eq.rangedWeapon)) {
-    const wpn = resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData);
-    if (!isItemInInventory(currentInventory, wpn.name) && !isItemInInventory(currentInventory, eq.rangedWeapon)) {
-      const nextInv = ensureEquippedItemInInventory(currentInventory, {
-        name: wpn.name,
-        weight: wpn.weight,
-        enhancementBonus: eq.rangedWeaponEnhancement ?? wpn.enhancementBonus,
-        specialQualities: eq.rangedWeaponQualities ?? wpn.specialQualities
-      });
-      if (nextInv !== currentInventory) {
-        currentInventory = nextInv;
+  // 5. Ranged Weapon Sync & Migration
+  if (updatedEq.rangedWeaponItemId) {
+    const existing = currentInventory.find(i => i.id === updatedEq.rangedWeaponItemId);
+    if (existing) {
+      if (!existing.weaponData) {
+        const resolved = resolveWeapon(existing.name, customWeapons, weaponsData);
+        existing.weaponData = {
+          category: resolved.category,
+          size: resolved.size,
+          damageM: resolved.damageM,
+          damageS: resolved.damageS,
+          threat: resolved.threat ?? 20,
+          critMultiplier: resolved.critMultiplier ?? 2,
+          damageType: resolved.type,
+          rangeIncrement: resolved.rangeIncrement,
+          isRanged: true
+        };
+        existing.itemType = 'weapon';
         modified = true;
       }
+      if (updatedEq.rangedWeapon !== existing.name || updatedEq.rangedWeaponEnhancement !== (existing.enhancementBonus || 0)) {
+        updatedEq.rangedWeapon = existing.name;
+        updatedEq.rangedWeaponEnhancement = existing.enhancementBonus || 0;
+        updatedEq.rangedWeaponQualities = existing.specialQualities || [];
+        modified = true;
+      }
+    } else {
+      updatedEq.rangedWeaponItemId = null;
+      modified = true;
+    }
+  } else if (isValidEquippedName(updatedEq.rangedWeapon)) {
+    const resolved = resolveWeapon(updatedEq.rangedWeapon, customWeapons, weaponsData);
+    const existingMatch = currentInventory.find(i => matchesItemName(i.name, updatedEq.rangedWeapon) || matchesItemName(i.name, resolved.name));
+    if (existingMatch) {
+      if (!existingMatch.weaponData) {
+        existingMatch.weaponData = {
+          category: resolved.category,
+          size: resolved.size,
+          damageM: resolved.damageM,
+          damageS: resolved.damageS,
+          threat: resolved.threat ?? 20,
+          critMultiplier: resolved.critMultiplier ?? 2,
+          damageType: resolved.type,
+          rangeIncrement: resolved.rangeIncrement,
+          isRanged: true
+        };
+        existingMatch.itemType = 'weapon';
+      }
+      if (existingMatch.enhancementBonus === undefined && updatedEq.rangedWeaponEnhancement) {
+        existingMatch.enhancementBonus = updatedEq.rangedWeaponEnhancement;
+      }
+      if ((!existingMatch.specialQualities || existingMatch.specialQualities.length === 0) && updatedEq.rangedWeaponQualities) {
+        existingMatch.specialQualities = [...updatedEq.rangedWeaponQualities];
+      }
+      updatedEq.rangedWeaponItemId = existingMatch.id;
+      modified = true;
+    } else {
+      const newWpn = createInventoryWeapon(resolved, {
+        name: updatedEq.rangedWeapon,
+        enhancementBonus: updatedEq.rangedWeaponEnhancement,
+        specialQualities: updatedEq.rangedWeaponQualities
+      });
+      currentInventory.push(newWpn);
+      updatedEq.rangedWeaponItemId = newWpn.id;
+      modified = true;
     }
   }
 
-  (eq.wondrousItems || []).forEach(w => {
+  // 6. Wondrous Items
+  (updatedEq.wondrousItems || []).forEach(w => {
     if (!isItemInInventory(currentInventory, w.name)) {
-      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: w.name, weight: w.weight || 0, notes: w.effect });
+      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: w.name, weight: w.weight || 0, notes: w.effect, itemType: 'wondrous' });
       if (nextInv !== currentInventory) {
         currentInventory = nextInv;
         modified = true;
@@ -786,7 +1396,7 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
     }
   });
 
-  return modified ? { ...character, inventory: currentInventory } : character;
+  return modified ? { ...character, inventory: currentInventory, equipment: updatedEq } : character;
 }
 
 /**

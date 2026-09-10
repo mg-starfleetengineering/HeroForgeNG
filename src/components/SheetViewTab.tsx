@@ -16,7 +16,8 @@ import { calculateBAB, calculateBaseSave, calculateTotalHP } from '../engine/cla
 import {
   resolveWeapon, resolveArmor, resolveShield, calculateFeatCombatBonuses,
   calculateCarryingCapacity, calculateCoinWeight, calculateTotalNetWorthGP,
-  calculateTotalCarriedWeight, getEncumbranceStatus
+  calculateTotalCarriedWeight, getEncumbranceStatus,
+  resolveEquippedArmor, resolveEquippedShield, resolveEquippedWeapon
 } from '../engine/equipment';
 import {
   getAvailableSkills,
@@ -213,8 +214,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const traitFlawSkillMods = calculateTraitFlawSkillMods(selectedTraits, selectedFlaws, traitsData, flawsData, usePathfinder);
   const activeSkills = getAvailableSkills(usePathfinder);
 
-  const armorObj = resolveArmor(eq.armor, customArmors);
-  const shieldObj = resolveShield(eq.shield, customArmors);
+  const armorObj = resolveEquippedArmor(character, customArmors);
+  const shieldObj = resolveEquippedShield(character, customArmors);
   const armorEnhancement = eq.armorEnhancement ?? armorObj.enhancementBonus ?? 0;
   const shieldEnhancement = eq.shieldEnhancement ?? shieldObj.enhancementBonus ?? 0;
   const armorQualities = (eq.armorQualities && eq.armorQualities.length > 0) ? eq.armorQualities : (armorObj.specialQualities || []);
@@ -298,7 +299,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
   // 1. Primary Weapon
   if (eq.primaryWeapon) {
-    const primaryWpn = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
+    const primaryWpn = resolveEquippedWeapon(character, 'primaryWeapon', weaponsData, customWeapons);
     const primaryQualities = (eq.primaryWeaponQualities && eq.primaryWeaponQualities.length > 0) ? eq.primaryWeaponQualities : (primaryWpn.specialQualities || []);
     const primarySpecialDmg = getWeaponSpecialDamage(primaryQualities);
     const primaryHasKeen = hasKeenQuality(primaryQualities);
@@ -356,7 +357,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
   // 2. Secondary Weapon
   if (eq.secondaryWeapon && eq.secondaryWeapon !== 'none') {
-    const secWpn = resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData);
+    const secWpn = resolveEquippedWeapon(character, 'secondaryWeapon', weaponsData, customWeapons);
     const secondaryQualities = (eq.secondaryWeaponQualities && eq.secondaryWeaponQualities.length > 0) ? eq.secondaryWeaponQualities : (secWpn.specialQualities || []);
     const secondarySpecialDmg = getWeaponSpecialDamage(secondaryQualities);
     const secondaryHasKeen = hasKeenQuality(secondaryQualities);
@@ -411,7 +412,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
   // 3. Ranged Weapon
   if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
-    const rngWpn = resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData);
+    const rngWpn = resolveEquippedWeapon(character, 'rangedWeapon', weaponsData, customWeapons);
     const rangedQualities = (eq.rangedWeaponQualities && eq.rangedWeaponQualities.length > 0) ? eq.rangedWeaponQualities : (rngWpn.specialQualities || []);
     const rangedSpecialDmg = getWeaponSpecialDamage(rangedQualities);
     const rangedHasKeen = hasKeenQuality(rangedQualities);

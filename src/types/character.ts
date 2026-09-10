@@ -39,6 +39,27 @@ export interface WondrousItem {
   weight?: number;
 }
 
+export interface ItemArmorData {
+  type: 'light' | 'medium' | 'heavy' | 'shield';
+  acBonus: number;
+  maxDex: number;
+  armorCheckPenalty: number;
+  spellFailure?: number;
+  speedPenalty?: boolean;
+}
+
+export interface ItemWeaponData {
+  category?: string;
+  size?: 'L' | 'M' | 'T' | string;
+  damageM?: string;
+  damageS?: string;
+  threat?: number;
+  critMultiplier?: number;
+  damageType?: string;
+  rangeIncrement?: number;
+  isRanged?: boolean;
+}
+
 export interface Equipment {
   armor: string;
   armorEnhancement: number;
@@ -59,6 +80,13 @@ export interface Equipment {
   armorQualities?: string[];
   shieldQualities?: string[];
   wondrousItems?: WondrousItem[];
+
+  // Entity item ID pointers into character.inventory
+  armorItemId?: string | null;
+  shieldItemId?: string | null;
+  primaryWeaponItemId?: string | null;
+  secondaryWeaponItemId?: string | null;
+  rangedWeaponItemId?: string | null;
 }
 
 export interface InventoryItem {
@@ -72,6 +100,10 @@ export interface InventoryItem {
   enhancementBonus?: number;
   specialQualities?: string[];
   baseItemId?: string;
+
+  itemType?: 'weapon' | 'armor' | 'shield' | 'wondrous' | 'gear' | 'consumable';
+  armorData?: ItemArmorData;
+  weaponData?: ItemWeaponData;
 }
 
 export interface Funds {
@@ -432,9 +464,11 @@ export interface WeaponData {
   category: string;
   size: string;
   damageM: string;
+  damageS?: string;
   threat: number;
   critMultiplier: number;
   range?: string;
+  rangeIncrement?: number;
   weight: number;
   type: string;
   special?: string;

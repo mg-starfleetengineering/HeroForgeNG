@@ -219,15 +219,17 @@ export const App: React.FC = () => {
   }, []);
 
   const updateCharacter = (updated: Partial<CharacterState>) => {
-    if (!character) return;
-    const updatedChar: CharacterSheetData = {
-      ...character,
-      ...updated,
-      updatedAt: Date.now()
-    };
-    setCharacter(updatedChar);
-    saveCharacter(updatedChar).then(() => {
-      refreshSummaries();
+    setCharacter(prev => {
+      if (!prev) return prev;
+      const updatedChar: CharacterSheetData = {
+        ...prev,
+        ...updated,
+        updatedAt: Date.now()
+      };
+      saveCharacter(updatedChar).then(() => {
+        refreshSummaries();
+      });
+      return updatedChar;
     });
   };
 
