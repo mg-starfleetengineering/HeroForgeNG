@@ -706,15 +706,15 @@ export function formatMagicItemName(
 ): string {
   if (!baseName || baseName.trim() === '' || baseName === 'none') return baseName;
 
-  // Strip any existing leading +X and known quality prefixes if re-formatting
-  let cleanBase = baseName.trim();
-  cleanBase = cleanBase.replace(/^\+\d+\s+/, '');
+  // Use parseMagicItemName to safely strip existing leading +X and qualities
+  const parsed = parseMagicItemName(baseName);
+  let cleanBase = parsed.baseName.trim();
 
-  for (const q of [...WEAPON_SPECIAL_QUALITIES, ...ARMOR_SPECIAL_QUALITIES]) {
-    const escaped = q.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const qNamePattern = new RegExp(`^${escaped}\\s+`, 'i');
-    cleanBase = cleanBase.replace(qNamePattern, '');
-  }
+  // Strip remaining known fortification / SR prefixes
+  cleanBase = cleanBase
+    .replace(/^(?:Light|Moderate|Heavy)\s+Fortification\s+/i, '')
+    .replace(/^SR\s+\d+\s+/i, '')
+    .trim();
 
   const parts: string[] = [];
   if (enhancementBonus > 0) {
@@ -755,7 +755,10 @@ export interface ParsedMagicItem {
  * - "Unholy Holy Dagger" -> { baseName: 'Dagger', enhancementBonus: 0, qualities: ['unholy', 'holy'] }
  * - "Javelin" -> { baseName: 'Javelin', enhancementBonus: 0, qualities: [] }
  */
-export function parseMagicItemName(fullName: string | undefined): ParsedMagicItem {
+export function parseMagicItemName(
+  fullName: string | undefined,
+  targetHint?: 'weapon' | 'armor' | 'shield'
+): ParsedMagicItem {
   if (!fullName || !fullName.trim()) {
     return { baseName: '', enhancementBonus: 0, qualities: [] };
   }
@@ -763,14 +766,24 @@ export function parseMagicItemName(fullName: string | undefined): ParsedMagicIte
   let clean = fullName.trim();
   let enhancementBonus = 0;
 
-  // Extract leading +X enhancement bonus (e.g. "+1 ", "+2 ")
-  const enhMatch = clean.match(/^\+(\d+)\s+(.+)$/);
-  if (enhMatch) {
-    enhancementBonus = parseInt(enhMatch[1], 10);
-    clean = enhMatch[2].trim();
+  // 1. Extract leading +X enhancement bonus (e.g. "+1 ", "+2 ")
+  const leadingEnh = clean.match(/^\+(\d+)\s+(.+)$/);
+  if (leadingEnh) {
+    enhancementBonus = parseInt(leadingEnh[1], 10);
+    clean = leadingEnh[2].trim();
+  } else {
+    // 2. Extract trailing +X enhancement bonus (e.g. "Longsword +1")
+    const trailingEnh = clean.match(/^(.+?)\s+\+(\d+)$/);
+    if (trailingEnh) {
+      enhancementBonus = parseInt(trailingEnh[2], 10);
+      clean = trailingEnh[1].trim();
+    }
   }
 
-  const allQualities = [...WEAPON_SPECIAL_QUALITIES, ...ARMOR_SPECIAL_QUALITIES];
+  const allQualities = targetHint === 'armor' || targetHint === 'shield'
+    ? [...ARMOR_SPECIAL_QUALITIES, ...WEAPON_SPECIAL_QUALITIES]
+    : [...WEAPON_SPECIAL_QUALITIES, ...ARMOR_SPECIAL_QUALITIES];
+
   // Sort qualities by name length descending so multi-word qualities match before single-word subsets
   const sortedQualities = [...allQualities].sort((a, b) => b.name.length - a.name.length);
 
@@ -778,7 +791,10 @@ export function parseMagicItemName(fullName: string | undefined): ParsedMagicIte
 
   for (const q of sortedQualities) {
     const escaped = q.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+    const pattern = /[a-zA-Z0-9_]$/.test(q.name)
+      ? `\\b${escaped}\\b`
+      : `(?:^|\\s)${escaped}(?:\\s|$)`;
+    const regex = new RegExp(pattern, 'i');
     if (regex.test(clean)) {
       if (!matchedQualities.includes(q.id)) {
         matchedQualities.push(q.id);
@@ -806,6 +822,11 @@ export function parseMagicItemName(fullName: string | undefined): ParsedMagicIte
       }
       clean = clean.replace(regex, ' ').trim();
     }
+  }
+
+  // Handle [Creature] Bane (e.g. "Dragon Bane Greatsword" -> strip "Dragon Bane")
+  if (matchedQualities.includes('bane')) {
+    clean = clean.replace(/^[a-zA-Z\s]+?\s+Bane\s+/i, '').replace(/\bBane\b/i, '').trim();
   }
 
   clean = clean.replace(/\s+/g, ' ').trim();

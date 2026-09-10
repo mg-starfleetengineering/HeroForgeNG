@@ -1,4 +1,5 @@
 import { BaseStats, RaceData, StatType, TraitData, FlawData, CharacterState, ClassData, TemplateData } from '../types/character';
+import { resolveArmor } from './equipment';
 
 export const ABILITY_NAMES: StatType[] = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 
@@ -388,9 +389,9 @@ export function calculateClassSpeedBonus(
   });
 
   const armorLower = (armorType || 'none').toLowerCase();
-  const isHeavyArmor = armorLower === 'fullplate' || armorLower.includes('heavy');
-  const isMediumArmor = armorLower === 'breastplate' || armorLower.includes('medium');
-  const isArmored = armorLower !== 'none';
+  const isHeavyArmor = armorLower === 'fullplate' || armorLower.includes('heavy') || armorLower === 'heavy';
+  const isMediumArmor = armorLower === 'breastplate' || armorLower.includes('medium') || armorLower === 'medium';
+  const isArmored = armorLower !== 'none' && armorLower !== '';
 
   for (const [clsName, count] of Object.entries(classCounts)) {
     const cLower = clsName.toLowerCase();
@@ -501,7 +502,17 @@ export function calculateTotalSpeed(
   const effSpeed = getEffectiveSpeed(raceObj, templateObj);
   const baseLand = parseVal(effSpeed.land, 30);
 
-  const armorKey = (character.equipment?.armor || 'none').toLowerCase();
+  const equippedArmor = character.equipment?.armorItemId
+    ? character.inventory?.find(i => i.id === character.equipment!.armorItemId)
+    : undefined;
+
+  let armorCategory = equippedArmor?.armorData?.type;
+  if (!armorCategory && character.equipment?.armor) {
+    const resolved = resolveArmor(character.equipment.armor, character.customArmors || []);
+    armorCategory = resolved.type as any;
+  }
+
+  const armorKey = armorCategory || (character.equipment?.armor || 'none').toLowerCase();
   const raceName = (character.selectedRace || '').toLowerCase();
   const isDwarf = raceName.includes('dwarf');
 
@@ -514,8 +525,8 @@ export function calculateTotalSpeed(
 
   let land = baseLand + classBonus + featBonus + traitFlawDelta;
 
-  const isHeavy = armorKey === 'fullplate' || armorKey.includes('heavy');
-  const isMedium = armorKey === 'breastplate' || armorKey.includes('medium');
+  const isHeavy = armorCategory === 'heavy' || armorKey === 'fullplate' || armorKey.includes('heavy');
+  const isMedium = armorCategory === 'medium' || armorKey === 'breastplate' || armorKey.includes('medium');
   if (!isDwarf && (isHeavy || isMedium)) {
     if (land >= 40) {
       land = Math.max(30, land - 10);
