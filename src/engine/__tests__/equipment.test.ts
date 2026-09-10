@@ -221,4 +221,77 @@ describe('equipment engine & inventory sync', () => {
     expect(matchesItemName('heavy_shield', 'Heavy Shield')).toBe(true);
     expect(matchesItemName('light_wooden', 'Light Shield')).toBe(true);
   });
+
+  it('resolves magic weapons, armors, and shields with enhancement bonuses and special qualities', () => {
+    // Magic weapons
+    const magicSword = resolveWeapon('+1 Flaming Longsword', [], [{
+      id: 'longsword',
+      name: 'Longsword',
+      category: 'Martial',
+      size: 'M',
+      damageM: '1d8',
+      threat: 19,
+      critMultiplier: 2,
+      weight: 4,
+      type: 'Slashing'
+    }]);
+    expect(magicSword.name).toBe('+1 Flaming Longsword');
+    expect(magicSword.enhancementBonus).toBe(1);
+    expect(magicSword.specialQualities).toEqual(['flaming']);
+    expect(magicSword.damageM).toBe('1d8');
+    expect(magicSword.threat).toBe(19);
+
+    const magicNodachi = resolveWeapon('+2 Keen Nodachi', [], []);
+    expect(magicNodachi.name).toBe('+2 Keen Nodachi');
+    expect(magicNodachi.enhancementBonus).toBe(2);
+    expect(magicNodachi.specialQualities).toEqual(['keen']);
+    expect(magicNodachi.damageM).toBe('2d6');
+
+    // Magic armor & shields
+    const magicArmor = resolveArmor('+1 Chain Shirt');
+    expect(magicArmor.name).toBe('+1 Chain Shirt');
+    expect(magicArmor.acBonus).toBe(4);
+    expect(magicArmor.enhancementBonus).toBe(1);
+
+    const shadowLeather = resolveArmor('+2 Shadow Leather Armor');
+    expect(shadowLeather.name).toBe('+2 Shadow Leather Armor');
+    expect(shadowLeather.acBonus).toBe(2);
+    expect(shadowLeather.enhancementBonus).toBe(2);
+    expect(shadowLeather.specialQualities).toEqual(['shadow']);
+
+    const magicShield = resolveShield('+1 Heavy Shield');
+    expect(magicShield.name).toBe('+1 Heavy Shield');
+    expect(magicShield.acBonus).toBe(2);
+    expect(magicShield.enhancementBonus).toBe(1);
+  });
+
+  it('persists enhancement bonus and special qualities on InventoryItem without losing customizations', () => {
+    const inv: InventoryItem[] = [
+      { id: '1', name: 'Nodachi', quantity: 1, weight: 8, location: 'Carried' }
+    ];
+
+    // Equipping/updating with qualities and enhancement updates existing item
+    const updated = ensureEquippedItemInInventory(inv, {
+      name: 'Nodachi',
+      weight: 8,
+      enhancementBonus: 1,
+      specialQualities: ['keen']
+    });
+    expect(updated).toHaveLength(1);
+    expect(updated[0].enhancementBonus).toBe(1);
+    expect(updated[0].specialQualities).toEqual(['keen']);
+
+    // Adding magic weapon directly to inventory stores properties
+    const withMagic = ensureEquippedItemInInventory(updated, {
+      name: '+1 Flaming Longsword',
+      weight: 4,
+      enhancementBonus: 1,
+      specialQualities: ['flaming']
+    });
+    expect(withMagic).toHaveLength(2);
+    const magicItem = withMagic.find(i => i.name === '+1 Flaming Longsword');
+    expect(magicItem?.enhancementBonus).toBe(1);
+    expect(magicItem?.specialQualities).toEqual(['flaming']);
+  });
 });
+
