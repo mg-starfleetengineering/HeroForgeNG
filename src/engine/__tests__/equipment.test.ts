@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { calculateTotalCarriedWeight, isItemInInventory, ensureEquippedItemInInventory, syncEquippedItemsToInventory } from '../equipment';
+import {
+  calculateTotalCarriedWeight, isItemInInventory, ensureEquippedItemInInventory,
+  syncEquippedItemsToInventory, matchesItemName, resolveWeapon, getThemedWeaponBase,
+  resolveArmor, resolveShield
+} from '../equipment';
 import { CharacterState, InventoryItem } from '../../types/character';
 
 describe('equipment engine & inventory sync', () => {
@@ -128,5 +132,93 @@ describe('equipment engine & inventory sync', () => {
 
     const totalWeight = calculateTotalCarriedWeight(testChar, []);
     expect(totalWeight).toBe(29);
+  });
+
+  it('matchesItemName handles exact matches, aliases, and parentheticals without false positives', () => {
+    expect(matchesItemName('Longsword', 'longsword')).toBe(true);
+    expect(matchesItemName('Nodachi (Greatsword)', 'Nodachi')).toBe(true);
+    expect(matchesItemName('Nodachi', 'Nodachi (Greatsword)')).toBe(true);
+    expect(matchesItemName('+1 Flaming Greatsword (Greatsword)', '+1 Flaming Greatsword')).toBe(true);
+    // False positive guards: substring words should NOT match
+    expect(matchesItemName('Sword', 'Longsword')).toBe(false);
+    expect(matchesItemName('Longsword', 'Sword')).toBe(false);
+    expect(matchesItemName('Bow', 'Shortbow')).toBe(false);
+    expect(matchesItemName('Dagger', 'Punching Dagger')).toBe(false);
+    expect(matchesItemName('none', 'Longsword')).toBe(false);
+    expect(matchesItemName('', 'Longsword')).toBe(false);
+  });
+
+  it('ensures equipping a new weapon does not duplicate existing inventory items or delete custom weapons', () => {
+    const inv: InventoryItem[] = [
+      { id: 'inv_1', name: 'Nodachi', quantity: 1, weight: 8, location: 'Carried' },
+      { id: 'inv_2', name: 'Unarmed Strike', quantity: 1, weight: 0, location: 'Carried' }
+    ];
+
+    // Equipping Unarmed Strike should NOT rename Nodachi or duplicate Unarmed Strike
+    const afterEquip = ensureEquippedItemInInventory(inv, { name: 'Unarmed Strike', weight: 0 });
+    expect(afterEquip).toHaveLength(2);
+    expect(afterEquip.filter(i => i.name === 'Unarmed Strike')).toHaveLength(1);
+    expect(afterEquip.find(i => i.name === 'Nodachi')).toBeDefined();
+
+    // Equipping Nodachi (Greatsword) when Nodachi is in inventory should not add duplicate
+    const afterAlias = ensureEquippedItemInInventory(afterEquip, { name: 'Nodachi (Greatsword)', weight: 8 });
+    expect(afterAlias).toHaveLength(2);
+  });
+
+  it('resolves themed weapon Nodachi to Greatsword base stats and inherits base source', () => {
+    const nodachi = resolveWeapon('Nodachi', [], []);
+    expect(nodachi.name).toBe('Nodachi');
+    expect(nodachi.damageM).toBe('2d6');
+    expect(nodachi.threat).toBe(19);
+    expect(nodachi.critMultiplier).toBe(2);
+    expect(nodachi.source).toBe('PHB');
+
+    expect(getThemedWeaponBase('Nodachi')).toBe('greatsword');
+    expect(getThemedWeaponBase('Nodachi (Greatsword)')).toBe('greatsword');
+    expect(getThemedWeaponBase('Katana')).toBe('bastard sword');
+    expect(getThemedWeaponBase('Longsword')).toBeNull();
+
+    // Rejection of non-weapon inventory items with parentheses
+    expect(getThemedWeaponBase('Torches (5)')).toBeNull();
+    expect(getThemedWeaponBase('Trail Rations (1 day)')).toBeNull();
+    expect(getThemedWeaponBase('Hempen Rope (50 ft)')).toBeNull();
+
+    // Rejection of canonical 3.5e weapons that contain parentheses
+    expect(getThemedWeaponBase('Tangat, Talenta (Halfling)')).toBeNull();
+  });
+
+  it('resolves armor and shield names accurately and matches aliases', () => {
+    // Canonical full names
+    const studded = resolveArmor('Studded Leather Armor');
+    expect(studded.name).toBe('Studded Leather Armor');
+    expect(studded.acBonus).toBe(3);
+
+    const chain = resolveArmor('Chain Shirt');
+    expect(chain.name).toBe('Chain Shirt');
+    expect(chain.acBonus).toBe(4);
+
+    const fullplate = resolveArmor('Full Plate');
+    expect(fullplate.name).toBe('Full Plate');
+    expect(fullplate.acBonus).toBe(8);
+
+    // Short keys
+    const studdedShort = resolveArmor('studded');
+    expect(studdedShort.name).toBe('Studded Leather Armor');
+    expect(studdedShort.acBonus).toBe(3);
+
+    // Shields
+    const buckler = resolveShield('Buckler');
+    expect(buckler.name).toBe('Buckler');
+    expect(buckler.acBonus).toBe(1);
+
+    const heavyShield = resolveShield('Heavy Shield');
+    expect(heavyShield.name).toBe('Heavy Shield');
+    expect(heavyShield.acBonus).toBe(2);
+
+    // matchesItemName cross-key matching
+    expect(matchesItemName('studded', 'Studded Leather Armor')).toBe(true);
+    expect(matchesItemName('chainshirt', 'Chain Shirt')).toBe(true);
+    expect(matchesItemName('heavy_shield', 'Heavy Shield')).toBe(true);
+    expect(matchesItemName('light_wooden', 'Light Shield')).toBe(true);
   });
 });

@@ -403,6 +403,22 @@ export function collectDRSources(
         abilityType: 'Ex'
       });
     }
+
+    // Armor / Shield Special Qualities DR (e.g. Invulnerability)
+    const armorQualities = [
+      ...(character.equipment.armorQualities || []),
+      ...(character.equipment.shieldQualities || [])
+    ];
+    if (armorQualities.some(q => q.toLowerCase() === 'invulnerability')) {
+      sources.push({
+        name: 'Armor Quality: Invulnerability (5/Magic)',
+        category: 'equipment',
+        value: 5,
+        bypass: 'Magic',
+        stacks: false,
+        abilityType: 'Su'
+      });
+    }
   }
 
   // Wondrous Items & Magic Gear DR

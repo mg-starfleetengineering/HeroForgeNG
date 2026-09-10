@@ -463,7 +463,8 @@ export function generateFullAttackSequence(
   netAttackBonus: number,
   hasHaste: boolean = false,
   hasFlurry: boolean = false,
-  hasWhirlingFrenzy: boolean = false
+  hasWhirlingFrenzy: boolean = false,
+  hasSpeed: boolean = false
 ): string {
   const baseBab = Math.max(1, bab);
 
@@ -474,7 +475,8 @@ export function generateFullAttackSequence(
   if (baseBab >= 16) attacks.push(baseBab - 15);
 
   // Extra attacks at highest BAB
-  if (hasHaste) {
+  // In D&D 3.5e, Speed grants 1 extra attack at highest BAB and does not stack with Haste
+  if (hasHaste || hasSpeed) {
     attacks.unshift(baseBab);
   }
   if (hasFlurry) {

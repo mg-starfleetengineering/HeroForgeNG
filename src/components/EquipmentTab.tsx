@@ -8,7 +8,9 @@ import {
   resolveWeapon, resolveArmor, resolveShield, calculateFeatCombatBonuses,
   calculateCarryingCapacity, calculateCoinWeight, calculateTotalNetWorthGP,
   calculateTotalCarriedWeight, getEncumbranceStatus, ARMOR_WEIGHT_MAP, SHIELD_WEIGHT_MAP,
-  ensureEquippedItemInInventory, isItemInInventory, syncEquippedItemsToInventory
+  ensureEquippedItemInInventory, isItemInInventory, syncEquippedItemsToInventory,
+  matchesItemName, THEMED_WEAPON_BASE_MAP, getThemedWeaponBase, THEMED_WEAPON_LIST,
+  STANDARD_BASE_WEAPONS
 } from '../engine/equipment';
 import {
   getTacticalCombatState,
@@ -17,6 +19,25 @@ import {
   getActiveCombatModifiers
 } from '../engine/combat';
 import { rollAttack, rollDamage } from '../engine/dice';
+import {
+  getAvailableWeaponQualities,
+  getAvailableArmorQualities,
+  getAvailableShieldQualities,
+  getQualityById,
+  calculateKeenThreat,
+  hasKeenQuality,
+  hasSpeedQuality,
+  getWeaponSpecialDamage,
+  getArmorSkillBonus,
+  getFortificationSummary,
+  calculateTotalItemCost,
+  formatMagicItemName,
+  createMagicWeaponData,
+  createMagicArmorData,
+  MagicQuality,
+  WEAPON_SPECIAL_QUALITIES,
+  ARMOR_SHIELD_SPECIAL_QUALITIES
+} from '../engine/magicItems';
 
 interface EquipmentTabProps {
   character: CharacterState;
@@ -53,6 +74,175 @@ const COMMON_ITEM_PRESETS = [
   { name: "Spyglass", weight: 1, location: 'Belt Pouch', value: '1,000 gp' }
 ].sort((a, b) => a.name.localeCompare(b.name));
 
+const CustomWeaponInput: React.FC<{
+  value: string;
+  onCommit: (val: string) => void;
+  placeholder?: string;
+  className?: string;
+}> = ({ value, onCommit, placeholder, className }) => {
+  const [localVal, setLocalVal] = useState(value === '__CUSTOM__' ? '' : value);
+
+  useEffect(() => {
+    setLocalVal(value === '__CUSTOM__' ? '' : value);
+  }, [value]);
+
+  const handleBlur = () => {
+    const trimmed = localVal.trim();
+    if (trimmed && trimmed !== value) {
+      onCommit(trimmed);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      (e.target as HTMLInputElement).blur();
+    }
+  };
+
+  return (
+    <input
+      type="text"
+      value={localVal}
+      onChange={e => setLocalVal(e.target.value)}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      placeholder={placeholder}
+      className={className}
+    />
+  );
+};
+
+const QualitySelector: React.FC<{
+  title: string;
+  qualities: string[];
+  available: MagicQuality[];
+  onAdd: (id: string) => void;
+  onRemove: (id: string) => void;
+  enhancementBonus?: number;
+  itemType?: 'weapon' | 'armor' | 'shield';
+  onSaveAsItem?: () => void;
+  isSavedItem?: boolean;
+  suggestedItemName?: string;
+  onOpenGuide?: () => void;
+}> = ({
+  title,
+  qualities,
+  available,
+  onAdd,
+  onRemove,
+  enhancementBonus = 0,
+  itemType = 'weapon',
+  onSaveAsItem,
+  isSavedItem = false,
+  suggestedItemName,
+  onOpenGuide
+}) => {
+  const costSummary = calculateTotalItemCost(0, enhancementBonus, qualities, itemType);
+
+  const qualitySelectOptions: SearchableOption[] = useMemo(() => {
+    return [
+      { value: '', label: '+ Add Special Quality...', isAllowed: true },
+      ...available.map(q => {
+        const isSelected = qualities.includes(q.id);
+        const costBadge = q.costType === 'bonus' ? `+${q.costValue}` : `+${q.costValue.toLocaleString()} gp`;
+        return {
+          value: q.id,
+          label: q.name,
+          sublabel: q.description,
+          badge: costBadge,
+          isAllowed: !isSelected
+        };
+      })
+    ];
+  }, [available, qualities]);
+
+  return (
+    <div className="space-y-1.5 pt-1.5 border-t border-slate-800/80">
+      <div className="flex flex-wrap items-center justify-between gap-1.5">
+        <div className="flex items-center gap-1.5">
+          <label className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+            <i className="fa-solid fa-sparkles text-amber-400 text-[10px]"></i>
+            {title}
+          </label>
+          {onOpenGuide && (
+            <button
+              type="button"
+              onClick={onOpenGuide}
+              className="text-slate-400 hover:text-amber-400 text-xs transition cursor-pointer p-0.5"
+              title="Open Magic Item Special Qualities Guide"
+            >
+              <i className="fa-solid fa-circle-question"></i>
+            </button>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {qualities.length > 0 && (
+            <span className="text-[10px] font-mono text-amber-300/90 font-medium bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+              {costSummary.breakdown}
+            </span>
+          )}
+          {onSaveAsItem && (enhancementBonus > 0 || qualities.length > 0) && (
+            <button
+              type="button"
+              onClick={onSaveAsItem}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10.5px] font-medium transition cursor-pointer border shrink-0 ${
+                isSavedItem
+                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/25'
+                  : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40 hover:bg-indigo-500/30'
+              }`}
+              title={isSavedItem ? "Update saved magic item properties in your arsenal" : `Save as permanent custom magic item: ${suggestedItemName || 'Custom Magic'}`}
+            >
+              <i className={`fa-solid ${isSavedItem ? 'fa-floppy-disk' : 'fa-bookmark'} text-[9px]`}></i>
+              <span>{isSavedItem ? 'Update in Arsenal' : (suggestedItemName ? `Save as ${suggestedItemName}` : 'Save to Arsenal')}</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1.5">
+        {qualities.map(qId => {
+          const q = getQualityById(qId);
+          if (!q) return null;
+          return (
+            <span
+              key={qId}
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-medium shadow-xs"
+              title={q.description}
+            >
+              <span>{q.name}</span>
+              <span className="text-[9px] font-mono opacity-75">
+                ({q.costType === 'bonus' ? `+${q.costValue}` : `${q.costValue.toLocaleString()} gp`})
+              </span>
+              <button
+                type="button"
+                onClick={() => onRemove(qId)}
+                className="hover:text-rose-400 text-slate-400 ml-0.5 text-xs transition cursor-pointer leading-none"
+                title={`Remove ${q.name}`}
+              >
+                &times;
+              </button>
+            </span>
+          );
+        })}
+
+        <div className="w-56 sm:w-64 max-w-full">
+          <SearchableSelect
+            value=""
+            options={qualitySelectOptions}
+            onChange={val => {
+              if (val) {
+                onAdd(val);
+              }
+            }}
+            placeholder="+ Add Special Quality..."
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   character,
   weaponsData,
@@ -64,6 +254,9 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const [showCustomArmorModal, setShowCustomArmorModal] = useState(false);
   const [showWondrousModal, setShowWondrousModal] = useState(false);
   const [showAddInventoryModal, setShowAddInventoryModal] = useState(false);
+  const [showQualitiesGuide, setShowQualitiesGuide] = useState(false);
+  const [qualitiesGuideFilter, setQualitiesGuideFilter] = useState<'all' | 'weapon' | 'armor'>('all');
+  const [qualitiesGuideSearch, setQualitiesGuideSearch] = useState('');
 
   useEffect(() => {
     const syncedChar = syncEquippedItemsToInventory(character, weaponsData);
@@ -101,6 +294,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const [invNotes, setInvNotes] = useState('');
   const [activeLocationFilter, setActiveLocationFilter] = useState<string>('All');
   const [includeEquippedInTable, setIncludeEquippedInTable] = useState<boolean>(true);
+  const [equipSlotPickerItemId, setEquipSlotPickerItemId] = useState<string | null>(null);
 
   const eq: Equipment = character.equipment || {
     armor: 'chainshirt',
@@ -112,10 +306,13 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     dodge: 0,
     primaryWeapon: 'Longsword',
     primaryWeaponEnhancement: 0,
+    primaryWeaponQualities: [],
     secondaryWeapon: 'none',
     secondaryWeaponEnhancement: 0,
+    secondaryWeaponQualities: [],
     rangedWeapon: 'none',
     rangedWeaponEnhancement: 0,
+    rangedWeaponQualities: [],
     wondrousItems: []
   };
 
@@ -131,20 +328,137 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     const newEq = { ...eq, [field]: val };
     let updatedInv = [...inventory];
 
-    if (val && val !== 'none' && val !== '__CUSTOM__') {
-      if (field === 'primaryWeapon' || field === 'secondaryWeapon' || field === 'rangedWeapon') {
-        const wpn = resolveWeapon(val, customWeapons, weaponsData);
+    if (field === 'primaryWeapon') {
+      if (val === 'none') {
+        newEq.primaryWeapon = 'none';
+        newEq.primaryWeaponEnhancement = 0;
+        newEq.primaryWeaponQualities = [];
+      } else if (val === '__CUSTOM__') {
+        newEq.primaryWeapon = '__CUSTOM__';
+      } else {
+        const clean = (val || '').trim();
+        if (!clean) return;
+        const wpn = resolveWeapon(clean, customWeapons, weaponsData);
+        newEq.primaryWeapon = wpn.name;
+        newEq.primaryWeaponEnhancement = wpn.enhancementBonus !== undefined ? wpn.enhancementBonus : (eq.primaryWeaponEnhancement || 0);
+        newEq.primaryWeaponQualities = wpn.specialQualities ? [...wpn.specialQualities] : (eq.primaryWeaponQualities || []);
         updatedInv = ensureEquippedItemInInventory(updatedInv, { name: wpn.name, weight: wpn.weight });
-      } else if (field === 'armor') {
+      }
+    } else if (field === 'secondaryWeapon') {
+      if (val === 'none') {
+        newEq.secondaryWeapon = 'none';
+        newEq.secondaryWeaponEnhancement = 0;
+        newEq.secondaryWeaponQualities = [];
+      } else if (val === '__CUSTOM__') {
+        newEq.secondaryWeapon = '__CUSTOM__';
+      } else {
+        const clean = (val || '').trim();
+        if (!clean) return;
+        const wpn = resolveWeapon(clean, customWeapons, weaponsData);
+        newEq.secondaryWeapon = wpn.name;
+        newEq.secondaryWeaponEnhancement = wpn.enhancementBonus !== undefined ? wpn.enhancementBonus : (eq.secondaryWeaponEnhancement || 0);
+        newEq.secondaryWeaponQualities = wpn.specialQualities ? [...wpn.specialQualities] : (eq.secondaryWeaponQualities || []);
+        updatedInv = ensureEquippedItemInInventory(updatedInv, { name: wpn.name, weight: wpn.weight });
+      }
+    } else if (field === 'rangedWeapon') {
+      if (val === 'none') {
+        newEq.rangedWeapon = 'none';
+        newEq.rangedWeaponEnhancement = 0;
+        newEq.rangedWeaponQualities = [];
+      } else if (val === '__CUSTOM__') {
+        newEq.rangedWeapon = '__CUSTOM__';
+      } else {
+        const clean = (val || '').trim();
+        if (!clean) return;
+        const wpn = resolveWeapon(clean, customWeapons, weaponsData);
+        newEq.rangedWeapon = wpn.name;
+        newEq.rangedWeaponEnhancement = wpn.enhancementBonus !== undefined ? wpn.enhancementBonus : (eq.rangedWeaponEnhancement || 0);
+        newEq.rangedWeaponQualities = wpn.specialQualities ? [...wpn.specialQualities] : (eq.rangedWeaponQualities || []);
+        updatedInv = ensureEquippedItemInInventory(updatedInv, { name: wpn.name, weight: wpn.weight });
+      }
+    } else if (field === 'armor') {
+      if (val === 'none') {
+        newEq.armor = 'none';
+        newEq.armorEnhancement = 0;
+        newEq.armorQualities = [];
+      } else {
         const arm = resolveArmor(val, customArmors);
         const armorKey = val.toLowerCase().trim();
         const w = ARMOR_WEIGHT_MAP[armorKey] !== undefined ? ARMOR_WEIGHT_MAP[armorKey] : 20;
+        newEq.armor = arm.name;
+        newEq.armorEnhancement = arm.enhancementBonus !== undefined ? arm.enhancementBonus : 0;
+        newEq.armorQualities = arm.specialQualities ? [...arm.specialQualities] : [];
         updatedInv = ensureEquippedItemInInventory(updatedInv, { name: arm.name, weight: w });
-      } else if (field === 'shield') {
+      }
+    } else if (field === 'shield') {
+      if (val === 'none') {
+        newEq.shield = 'none';
+        newEq.shieldEnhancement = 0;
+        newEq.shieldQualities = [];
+      } else {
         const shd = resolveShield(val, customArmors);
         const shieldKey = val.toLowerCase().trim();
         const w = SHIELD_WEIGHT_MAP[shieldKey] !== undefined ? SHIELD_WEIGHT_MAP[shieldKey] : 10;
+        newEq.shield = shd.name;
+        newEq.shieldEnhancement = shd.enhancementBonus !== undefined ? shd.enhancementBonus : 0;
+        newEq.shieldQualities = shd.specialQualities ? [...shd.specialQualities] : [];
         updatedInv = ensureEquippedItemInInventory(updatedInv, { name: shd.name, weight: w });
+      }
+    } else if (field === 'primaryWeaponEnhancement' || field === 'secondaryWeaponEnhancement' || field === 'rangedWeaponEnhancement') {
+      const slotKey = field === 'primaryWeaponEnhancement' ? 'primaryWeapon' : (field === 'secondaryWeaponEnhancement' ? 'secondaryWeapon' : 'rangedWeapon');
+      const qKey = field === 'primaryWeaponEnhancement' ? 'primaryWeaponQualities' : (field === 'secondaryWeaponEnhancement' ? 'secondaryWeaponQualities' : 'rangedWeaponQualities');
+      const currentName = eq[slotKey];
+      if (currentName && currentName !== 'none' && currentName !== '__CUSTOM__') {
+        const customIdx = customWeapons.findIndex(w => w.name.toLowerCase() === currentName.toLowerCase());
+        if (customIdx >= 0) {
+          const existing = customWeapons[customIdx];
+          const baseWpn = existing.baseWeaponId ? (weaponsData.find(w => w.id === existing.baseWeaponId) || existing) : existing;
+          const qualities = newEq[qKey] || [];
+          const newName = formatMagicItemName(baseWpn.name, val, qualities);
+          const updatedCustom = { ...existing, name: newName, enhancementBonus: val };
+          const updatedCustoms = [...customWeapons];
+          updatedCustoms[customIdx] = updatedCustom;
+          updatedInv = updatedInv.map(i => i.name.toLowerCase() === currentName.toLowerCase() ? { ...i, name: newName } : i);
+          newEq[slotKey] = newName;
+          onChange({ customWeapons: updatedCustoms, equipment: newEq, inventory: updatedInv });
+          return;
+        }
+      }
+    } else if (field === 'armorEnhancement') {
+      const currentName = eq.armor;
+      if (currentName && currentName !== 'none') {
+        const customIdx = customArmors.findIndex(a => a.name.toLowerCase() === currentName.toLowerCase() && a.type !== 'shield');
+        if (customIdx >= 0) {
+          const existing = customArmors[customIdx];
+          const baseName = existing.baseArmorId || existing.name;
+          const qualities = newEq.armorQualities || [];
+          const newName = formatMagicItemName(baseName, val, qualities);
+          const updatedCustom = { ...existing, name: newName, enhancementBonus: val };
+          const updatedArmors = [...customArmors];
+          updatedArmors[customIdx] = updatedCustom;
+          updatedInv = updatedInv.map(i => i.name.toLowerCase() === currentName.toLowerCase() ? { ...i, name: newName } : i);
+          newEq.armor = newName;
+          onChange({ customArmors: updatedArmors, equipment: newEq, inventory: updatedInv });
+          return;
+        }
+      }
+    } else if (field === 'shieldEnhancement') {
+      const currentName = eq.shield;
+      if (currentName && currentName !== 'none') {
+        const customIdx = customArmors.findIndex(a => a.name.toLowerCase() === currentName.toLowerCase() && a.type === 'shield');
+        if (customIdx >= 0) {
+          const existing = customArmors[customIdx];
+          const baseName = existing.baseArmorId || existing.name;
+          const qualities = newEq.shieldQualities || [];
+          const newName = formatMagicItemName(baseName, val, qualities);
+          const updatedCustom = { ...existing, name: newName, enhancementBonus: val };
+          const updatedArmors = [...customArmors];
+          updatedArmors[customIdx] = updatedCustom;
+          updatedInv = updatedInv.map(i => i.name.toLowerCase() === currentName.toLowerCase() ? { ...i, name: newName } : i);
+          newEq.shield = newName;
+          onChange({ customArmors: updatedArmors, equipment: newEq, inventory: updatedInv });
+          return;
+        }
       }
     }
 
@@ -153,6 +467,245 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
 
   const handleFundsChange = (field: keyof Funds, val: number) => {
     onChange({ funds: { ...funds, [field]: Math.max(0, val || 0) } });
+  };
+
+  const handleSaveMagicWeapon = (slot: 'primaryWeapon' | 'secondaryWeapon' | 'rangedWeapon') => {
+    const currentName = eq[slot];
+    if (!currentName || currentName === 'none' || currentName === '__CUSTOM__') return;
+
+    const qualities = slot === 'primaryWeapon'
+      ? (eq.primaryWeaponQualities || [])
+      : (slot === 'secondaryWeapon' ? (eq.secondaryWeaponQualities || []) : (eq.rangedWeaponQualities || []));
+    const enhancement = slot === 'primaryWeapon'
+      ? (eq.primaryWeaponEnhancement || 0)
+      : (slot === 'secondaryWeapon' ? (eq.secondaryWeaponEnhancement || 0) : (eq.rangedWeaponEnhancement || 0));
+
+    const resolved = resolveWeapon(currentName, customWeapons, weaponsData);
+    const baseWpnName = resolved.baseWeaponId ? (weaponsData.find(w => w.id === resolved.baseWeaponId)?.name || resolved.name) : resolved.name;
+    const magicName = formatMagicItemName(baseWpnName, enhancement, qualities);
+
+    const existingIdx = customWeapons.findIndex(w => w.name.toLowerCase() === currentName.toLowerCase() || w.name.toLowerCase() === magicName.toLowerCase());
+    let updatedCustoms: WeaponData[];
+
+    if (existingIdx >= 0) {
+      const existing = customWeapons[existingIdx];
+      const updated = {
+        ...existing,
+        name: magicName,
+        enhancementBonus: enhancement,
+        specialQualities: [...qualities]
+      };
+      updatedCustoms = [...customWeapons];
+      updatedCustoms[existingIdx] = updated;
+    } else {
+      const newMagicWpn = createMagicWeaponData(resolved, enhancement, qualities, magicName);
+      updatedCustoms = [...customWeapons, newMagicWpn];
+    }
+
+    const oldName = currentName;
+    let updatedInv = inventory.map(item => {
+      if (item.name.toLowerCase() === oldName.toLowerCase()) {
+        return { ...item, name: magicName };
+      }
+      return item;
+    });
+    if (!updatedInv.some(i => i.name.toLowerCase() === magicName.toLowerCase())) {
+      updatedInv = ensureEquippedItemInInventory(updatedInv, { name: magicName, weight: resolved.weight });
+    }
+
+    const updatedEq = {
+      ...eq,
+      [slot]: magicName
+    };
+
+    onChange({
+      customWeapons: updatedCustoms,
+      equipment: updatedEq,
+      inventory: updatedInv
+    });
+  };
+
+  const handleSaveMagicArmor = (type: 'armor' | 'shield') => {
+    const currentKey = type === 'armor' ? eq.armor : eq.shield;
+    if (!currentKey || currentKey === 'none') return;
+
+    const qualities = type === 'armor' ? (eq.armorQualities || []) : (eq.shieldQualities || []);
+    const enhancement = type === 'armor' ? (eq.armorEnhancement || 0) : (eq.shieldEnhancement || 0);
+
+    const resolved = type === 'armor' ? resolveArmor(currentKey, customArmors) : resolveShield(currentKey, customArmors);
+    const magicName = formatMagicItemName(resolved.name, enhancement, qualities);
+
+    const existingIdx = customArmors.findIndex(a =>
+      (a.name.toLowerCase() === currentKey.toLowerCase() || a.name.toLowerCase() === magicName.toLowerCase()) &&
+      (type === 'shield' ? a.type === 'shield' : a.type !== 'shield')
+    );
+    let updatedArmors: CustomArmorData[];
+
+    if (existingIdx >= 0) {
+      const existing = customArmors[existingIdx];
+      const updated = {
+        ...existing,
+        name: magicName,
+        enhancementBonus: enhancement,
+        specialQualities: [...qualities]
+      };
+      updatedArmors = [...customArmors];
+      updatedArmors[existingIdx] = updated;
+    } else {
+      const armorKey = currentKey.toLowerCase().trim();
+      const w = type === 'shield'
+        ? (SHIELD_WEIGHT_MAP[armorKey] !== undefined ? SHIELD_WEIGHT_MAP[armorKey] : 10)
+        : (ARMOR_WEIGHT_MAP[armorKey] !== undefined ? ARMOR_WEIGHT_MAP[armorKey] : 20);
+      const newMagicArmor = createMagicArmorData({
+        name: resolved.name,
+        acBonus: resolved.acBonus,
+        maxDex: (resolved as any).maxDex ?? (type === 'shield' ? 99 : 8),
+        armorCheckPenalty: resolved.checkPenalty,
+        type: type === 'shield' ? 'shield' : 'medium',
+        weight: w
+      }, enhancement, qualities, magicName);
+      updatedArmors = [...customArmors, newMagicArmor];
+    }
+
+    const oldName = resolved.name;
+    let updatedInv = inventory.map(item => {
+      if (item.name.toLowerCase() === oldName.toLowerCase()) {
+        return { ...item, name: magicName };
+      }
+      return item;
+    });
+    if (!updatedInv.some(i => i.name.toLowerCase() === magicName.toLowerCase())) {
+      updatedInv = ensureEquippedItemInInventory(updatedInv, { name: magicName, weight: 10 });
+    }
+
+    const updatedEq = {
+      ...eq,
+      [type]: magicName
+    };
+
+    onChange({
+      customArmors: updatedArmors,
+      equipment: updatedEq,
+      inventory: updatedInv
+    });
+  };
+
+  const handleAddQuality = (
+    field: 'primaryWeaponQualities' | 'secondaryWeaponQualities' | 'rangedWeaponQualities' | 'armorQualities' | 'shieldQualities',
+    qId: string
+  ) => {
+    const current = eq[field] || [];
+    if (!current.includes(qId)) {
+      const nextQualities = [...current, qId];
+
+      let slotKey: 'primaryWeapon' | 'secondaryWeapon' | 'rangedWeapon' | 'armor' | 'shield' | null = null;
+      let enhKey: 'primaryWeaponEnhancement' | 'secondaryWeaponEnhancement' | 'rangedWeaponEnhancement' | 'armorEnhancement' | 'shieldEnhancement' | null = null;
+      if (field === 'primaryWeaponQualities') { slotKey = 'primaryWeapon'; enhKey = 'primaryWeaponEnhancement'; }
+      else if (field === 'secondaryWeaponQualities') { slotKey = 'secondaryWeapon'; enhKey = 'secondaryWeaponEnhancement'; }
+      else if (field === 'rangedWeaponQualities') { slotKey = 'rangedWeapon'; enhKey = 'rangedWeaponEnhancement'; }
+      else if (field === 'armorQualities') { slotKey = 'armor'; enhKey = 'armorEnhancement'; }
+      else if (field === 'shieldQualities') { slotKey = 'shield'; enhKey = 'shieldEnhancement'; }
+
+      const itemName = slotKey ? eq[slotKey] : null;
+      const isCustomWeapon = slotKey && (slotKey === 'primaryWeapon' || slotKey === 'secondaryWeapon' || slotKey === 'rangedWeapon')
+        && customWeapons.some(w => w.name.toLowerCase() === (itemName || '').toLowerCase());
+      const isCustomArmor = slotKey && (slotKey === 'armor' || slotKey === 'shield')
+        && customArmors.some(a => a.name.toLowerCase() === (itemName || '').toLowerCase());
+
+      if (isCustomWeapon && itemName) {
+        const idx = customWeapons.findIndex(w => w.name.toLowerCase() === itemName.toLowerCase());
+        if (idx >= 0) {
+          const existing = customWeapons[idx];
+          const enh = enhKey ? (eq[enhKey] || 0) : 0;
+          const baseName = existing.baseWeaponId ? (weaponsData.find(w => w.id === existing.baseWeaponId)?.name || existing.name) : existing.name;
+          const newName = formatMagicItemName(baseName, enh, nextQualities);
+          const updatedCustom = { ...existing, name: newName, specialQualities: nextQualities };
+          const updatedCustoms = [...customWeapons];
+          updatedCustoms[idx] = updatedCustom;
+
+          const updatedInv = inventory.map(item => item.name.toLowerCase() === itemName.toLowerCase() ? { ...item, name: newName } : item);
+          const newEq = { ...eq, [field]: nextQualities, [slotKey]: newName };
+          onChange({ customWeapons: updatedCustoms, equipment: newEq, inventory: updatedInv });
+          return;
+        }
+      } else if (isCustomArmor && itemName) {
+        const idx = customArmors.findIndex(a => a.name.toLowerCase() === itemName.toLowerCase());
+        if (idx >= 0) {
+          const existing = customArmors[idx];
+          const enh = enhKey ? (eq[enhKey] || 0) : 0;
+          const baseName = existing.baseArmorId || existing.name;
+          const newName = formatMagicItemName(baseName, enh, nextQualities);
+          const updatedCustom = { ...existing, name: newName, specialQualities: nextQualities };
+          const updatedCustoms = [...customArmors];
+          updatedCustoms[idx] = updatedCustom;
+
+          const updatedInv = inventory.map(item => item.name.toLowerCase() === itemName.toLowerCase() ? { ...item, name: newName } : item);
+          const newEq = { ...eq, [field]: nextQualities, [slotKey]: newName };
+          onChange({ customArmors: updatedCustoms, equipment: newEq, inventory: updatedInv });
+          return;
+        }
+      }
+
+      handleEqChange(field, nextQualities);
+    }
+  };
+
+  const handleRemoveQuality = (
+    field: 'primaryWeaponQualities' | 'secondaryWeaponQualities' | 'rangedWeaponQualities' | 'armorQualities' | 'shieldQualities',
+    qId: string
+  ) => {
+    const current = eq[field] || [];
+    const nextQualities = current.filter(id => id !== qId);
+
+    let slotKey: 'primaryWeapon' | 'secondaryWeapon' | 'rangedWeapon' | 'armor' | 'shield' | null = null;
+    let enhKey: 'primaryWeaponEnhancement' | 'secondaryWeaponEnhancement' | 'rangedWeaponEnhancement' | 'armorEnhancement' | 'shieldEnhancement' | null = null;
+    if (field === 'primaryWeaponQualities') { slotKey = 'primaryWeapon'; enhKey = 'primaryWeaponEnhancement'; }
+    else if (field === 'secondaryWeaponQualities') { slotKey = 'secondaryWeapon'; enhKey = 'secondaryWeaponEnhancement'; }
+    else if (field === 'rangedWeaponQualities') { slotKey = 'rangedWeapon'; enhKey = 'rangedWeaponEnhancement'; }
+    else if (field === 'armorQualities') { slotKey = 'armor'; enhKey = 'armorEnhancement'; }
+    else if (field === 'shieldQualities') { slotKey = 'shield'; enhKey = 'shieldEnhancement'; }
+
+    const itemName = slotKey ? eq[slotKey] : null;
+    const isCustomWeapon = slotKey && (slotKey === 'primaryWeapon' || slotKey === 'secondaryWeapon' || slotKey === 'rangedWeapon')
+      && customWeapons.some(w => w.name.toLowerCase() === (itemName || '').toLowerCase());
+    const isCustomArmor = slotKey && (slotKey === 'armor' || slotKey === 'shield')
+      && customArmors.some(a => a.name.toLowerCase() === (itemName || '').toLowerCase());
+
+    if (isCustomWeapon && itemName) {
+      const idx = customWeapons.findIndex(w => w.name.toLowerCase() === itemName.toLowerCase());
+      if (idx >= 0) {
+        const existing = customWeapons[idx];
+        const enh = enhKey ? (eq[enhKey] || 0) : 0;
+        const baseName = existing.baseWeaponId ? (weaponsData.find(w => w.id === existing.baseWeaponId)?.name || existing.name) : existing.name;
+        const newName = formatMagicItemName(baseName, enh, nextQualities);
+        const updatedCustom = { ...existing, name: newName, specialQualities: nextQualities };
+        const updatedCustoms = [...customWeapons];
+        updatedCustoms[idx] = updatedCustom;
+
+        const updatedInv = inventory.map(item => item.name.toLowerCase() === itemName.toLowerCase() ? { ...item, name: newName } : item);
+        const newEq = { ...eq, [field]: nextQualities, [slotKey]: newName };
+        onChange({ customWeapons: updatedCustoms, equipment: newEq, inventory: updatedInv });
+        return;
+      }
+    } else if (isCustomArmor && itemName) {
+      const idx = customArmors.findIndex(a => a.name.toLowerCase() === itemName.toLowerCase());
+      if (idx >= 0) {
+        const existing = customArmors[idx];
+        const enh = enhKey ? (eq[enhKey] || 0) : 0;
+        const baseName = existing.baseArmorId || existing.name;
+        const newName = formatMagicItemName(baseName, enh, nextQualities);
+        const updatedCustom = { ...existing, name: newName, specialQualities: nextQualities };
+        const updatedCustoms = [...customArmors];
+        updatedCustoms[idx] = updatedCustom;
+
+        const updatedInv = inventory.map(item => item.name.toLowerCase() === itemName.toLowerCase() ? { ...item, name: newName } : item);
+        const newEq = { ...eq, [field]: nextQualities, [slotKey]: newName };
+        onChange({ customArmors: updatedCustoms, equipment: newEq, inventory: updatedInv });
+        return;
+      }
+    }
+
+    handleEqChange(field, nextQualities);
   };
 
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
@@ -176,11 +729,54 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const armorAc = armorObj.acBonus + (eq.armorEnhancement || 0);
   const shieldAc = shieldObj.acBonus + (eq.shieldEnhancement || 0);
 
-  // Combined weapons list for dropdowns (allowed sources grouped at top, sorted A-Z)
-  const availableWeapons = useMemo(
-    () => sortDropdownItems([...customWeapons, ...weaponsData], character.allowedSources),
-    [customWeapons, weaponsData, character.allowedSources]
-  );
+  // Combined weapons list for dropdowns (allowed sources grouped at top, sorted A-Z, plus carried inventory weapons and themed weapons)
+  const availableWeapons = useMemo(() => {
+    const knownNames = new Set([...customWeapons, ...weaponsData].map(w => w.name.toLowerCase().trim()));
+    const inventoryWeapons: WeaponData[] = [];
+    (character.inventory || []).forEach(item => {
+      const clean = (item.name || '').trim();
+      if (!clean || clean.toLowerCase() === 'none' || knownNames.has(clean.toLowerCase())) return;
+
+      // Check if it is genuinely a weapon:
+      // 1. Matches a standard weapon in weaponsData
+      const isKnown = weaponsData.some(w => w.name.toLowerCase() === clean.toLowerCase());
+      // 2. Is a known themed weapon (e.g. "Nodachi") or aliased weapon (e.g. "Nodachi (Greatsword)")
+      const themedBase = getThemedWeaponBase(clean, weaponsData);
+      const isThemed = themedBase !== null;
+      // 3. Or matches an alias pattern "Custom Name (BaseWeapon)" where BaseWeapon is recognized
+      const aliasMatch = clean.match(/^(.+?)\s*\((.+?)\)$/);
+      const isAliasedWeapon = aliasMatch
+        ? (STANDARD_BASE_WEAPONS[aliasMatch[2].trim().toLowerCase()] !== undefined ||
+           weaponsData.some(w => w.name.toLowerCase() === aliasMatch[2].trim().toLowerCase()))
+        : false;
+
+      if (isKnown || isThemed || isAliasedWeapon) {
+        const resolved = resolveWeapon(clean, customWeapons, weaponsData);
+        inventoryWeapons.push({
+          ...resolved,
+          name: clean,
+          source: resolved.source || 'PHB'
+        });
+        knownNames.add(clean.toLowerCase());
+      }
+    });
+
+    // Also include well-known themed weapons with their aliased base weapon (e.g. Nodachi (Greatsword))
+    const themedWeapons: WeaponData[] = THEMED_WEAPON_LIST
+      .filter(item => !knownNames.has(item.displayName.toLowerCase()) && !knownNames.has(item.name.toLowerCase()))
+      .map(item => {
+        const resolved = resolveWeapon(item.displayName, customWeapons, weaponsData);
+        knownNames.add(item.displayName.toLowerCase());
+        knownNames.add(item.name.toLowerCase());
+        return {
+          ...resolved,
+          name: item.displayName,
+          source: resolved.source || 'PHB'
+        };
+      });
+
+    return sortDropdownItems([...customWeapons, ...themedWeapons, ...inventoryWeapons, ...weaponsData], character.allowedSources);
+  }, [customWeapons, weaponsData, character.inventory, character.allowedSources]);
 
   const weaponOptions: SearchableOption[] = useMemo(() => {
     const options: SearchableOption[] = [
@@ -189,12 +785,36 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
 
     availableWeapons.forEach(w => {
       const badge = getSourceBadgeInfo(w.source, character.allowedSources);
+      const isCustomOrCarried = !w.source || w.source === 'Custom' || w.source === 'Backpack' || w.source.toLowerCase().includes('custom');
+      
+      const themedBase = getThemedWeaponBase(w.name, weaponsData);
+      const isThemed = !!themedBase;
+
+      // Display name includes aliased base weapon if it's a known themed weapon without parens
+      let label = w.name;
+      if (isThemed && !label.includes('(')) {
+        const capBase = themedBase.charAt(0).toUpperCase() + themedBase.slice(1);
+        label = `${w.name} (${capBase})`;
+      }
+
+      let sublabel = `(${w.damageM}, ${w.type})`;
+      if (themedBase) {
+        const capBase = themedBase.charAt(0).toUpperCase() + themedBase.slice(1);
+        sublabel = `as ${capBase} | (${w.damageM}, ${w.type})`;
+      }
+      if (w.enhancementBonus || (w.specialQualities && w.specialQualities.length > 0)) {
+        const qNames = (w.specialQualities || []).map(q => getQualityById(q)?.name || q).join(', ');
+        const basePrefix = themedBase ? `as ${themedBase.charAt(0).toUpperCase() + themedBase.slice(1)} | ` : '';
+        sublabel = `(+${w.enhancementBonus || 0}${qNames ? ` ${qNames}` : ''} | ${basePrefix}${w.damageM}, ${w.type})`;
+      }
+
       options.push({
-        value: w.name,
-        label: w.name,
-        sublabel: `(${w.damageM}, ${w.type})`,
+        value: label,
+        label: label,
+        sublabel,
         badge: badge.sourceCode,
-        isAllowed: badge.isAllowed
+        secondaryBadge: isThemed ? 'Themed' : undefined,
+        isAllowed: isCustomOrCarried || isThemed ? true : badge.isAllowed
       });
     });
 
@@ -214,6 +834,162 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     ];
   }, []);
 
+  const weaponEnhancementOptions: SearchableOption[] = useMemo(() => [
+    { value: '0', label: 'Enh: +0', sublabel: 'Non-magical / Masterwork', isAllowed: true },
+    { value: '1', label: 'Enh: +1', sublabel: '+1 Atk & Dmg bonus', isAllowed: true },
+    { value: '2', label: 'Enh: +2', sublabel: '+2 Atk & Dmg bonus', isAllowed: true },
+    { value: '3', label: 'Enh: +3', sublabel: '+3 Atk & Dmg bonus', isAllowed: true },
+    { value: '4', label: 'Enh: +4', sublabel: '+4 Atk & Dmg bonus', isAllowed: true },
+    { value: '5', label: 'Enh: +5', sublabel: '+5 Atk & Dmg bonus', isAllowed: true },
+  ], []);
+
+  const armorEnhancementOptions: SearchableOption[] = useMemo(() => [
+    { value: '0', label: '+0', sublabel: 'Standard (+0 AC)', isAllowed: true },
+    { value: '1', label: '+1', sublabel: '+1 AC bonus', isAllowed: true },
+    { value: '2', label: '+2', sublabel: '+2 AC bonus', isAllowed: true },
+    { value: '3', label: '+3', sublabel: '+3 AC bonus', isAllowed: true },
+    { value: '4', label: '+4', sublabel: '+4 AC bonus', isAllowed: true },
+    { value: '5', label: '+5', sublabel: '+5 AC bonus', isAllowed: true },
+  ], []);
+
+  const armorOptions: SearchableOption[] = useMemo(() => {
+    const options: SearchableOption[] = [
+      { value: 'none', label: 'None', sublabel: 'AC +0, Max Dex --, Check 0', isAllowed: true },
+      { value: 'padded', label: 'Padded', sublabel: '+1 AC, Max Dex +8, Check 0, 10 lbs', badge: 'PHB', isAllowed: true },
+      { value: 'leather', label: 'Leather', sublabel: '+2 AC, Max Dex +6, Check 0, 15 lbs', badge: 'PHB', isAllowed: true },
+      { value: 'studded', label: 'Studded Leather', sublabel: '+3 AC, Max Dex +5, Check -1, 20 lbs', badge: 'PHB', isAllowed: true },
+      { value: 'chainshirt', label: 'Chain Shirt', sublabel: '+4 AC, Max Dex +4, Check -2, 25 lbs', badge: 'PHB', isAllowed: true },
+      { value: 'breastplate', label: 'Breastplate', sublabel: '+5 AC, Max Dex +3, Check -4, 30 lbs', badge: 'PHB', isAllowed: true },
+      { value: 'fullplate', label: 'Full Plate', sublabel: '+8 AC, Max Dex +1, Check -6, 50 lbs', badge: 'PHB', isAllowed: true },
+    ];
+
+    customArmors.filter(a => a.type !== 'shield').forEach(ca => {
+      const qNames = (ca.specialQualities || []).map(q => getQualityById(q)?.name || q).join(', ');
+      const magicTag = ca.enhancementBonus || qNames ? `+${ca.enhancementBonus || 0}${qNames ? ` ${qNames}` : ''} | ` : '';
+      options.push({
+        value: ca.name,
+        label: ca.name,
+        sublabel: `(${magicTag}+${ca.acBonus} AC, Custom)`,
+        badge: 'CUSTOM',
+        isAllowed: true
+      });
+    });
+
+    (character.inventory || []).forEach(invItem => {
+      const clean = (invItem.name || '').trim();
+      if (!clean || clean.toLowerCase() === 'none') return;
+      if (options.some(o => o.value.toLowerCase() === clean.toLowerCase() || o.label.toLowerCase() === clean.toLowerCase())) return;
+      const resolved = resolveArmor(clean, customArmors);
+      if (resolved && resolved.acBonus > 0) {
+        options.push({
+          value: clean,
+          label: clean,
+          sublabel: `(+${resolved.acBonus} AC, Inventory)`,
+          badge: 'INV',
+          isAllowed: true
+        });
+      }
+    });
+
+    const cur = (eq.armor || 'chainshirt').trim();
+    if (cur && !options.some(o => o.value.toLowerCase() === cur.toLowerCase() || o.label.toLowerCase() === cur.toLowerCase())) {
+      options.push({
+        value: cur,
+        label: cur,
+        sublabel: 'Equipped Armor',
+        isAllowed: true
+      });
+    }
+
+    return options;
+  }, [customArmors, character.inventory, eq.armor]);
+
+  const selectedArmorValue = useMemo(() => {
+    const cur = (eq.armor || 'chainshirt').trim();
+    const match = armorOptions.find(o => o.value.toLowerCase() === cur.toLowerCase() || o.label.toLowerCase() === cur.toLowerCase());
+    return match ? match.value : cur;
+  }, [eq.armor, armorOptions]);
+
+  const shieldOptions: SearchableOption[] = useMemo(() => {
+    const options: SearchableOption[] = [
+      { value: 'none', label: 'None', sublabel: '+0 AC', isAllowed: true },
+      { value: 'buckler', label: 'Buckler', sublabel: '+1 AC, Check -1, 5 lbs', badge: 'PHB', isAllowed: true },
+      { value: 'light_wooden', label: 'Light Shield', sublabel: '+1 AC, Check -1, 5 lbs', badge: 'PHB', isAllowed: true },
+      { value: 'heavy_shield', label: 'Heavy Shield', sublabel: '+2 AC, Check -2, 15 lbs', badge: 'PHB', isAllowed: true },
+      { value: 'tower_shield', label: 'Tower Shield', sublabel: '+4 AC, Check -10, 45 lbs', badge: 'PHB', isAllowed: true },
+    ];
+
+    customArmors.filter(a => a.type === 'shield').forEach(ca => {
+      const qNames = (ca.specialQualities || []).map(q => getQualityById(q)?.name || q).join(', ');
+      const magicTag = ca.enhancementBonus || qNames ? `+${ca.enhancementBonus || 0}${qNames ? ` ${qNames}` : ''} | ` : '';
+      options.push({
+        value: ca.name,
+        label: ca.name,
+        sublabel: `(${magicTag}+${ca.acBonus} AC, Custom Shield)`,
+        badge: 'CUSTOM',
+        isAllowed: true
+      });
+    });
+
+    (character.inventory || []).forEach(invItem => {
+      const clean = (invItem.name || '').trim();
+      if (!clean || clean.toLowerCase() === 'none') return;
+      if (options.some(o => o.value.toLowerCase() === clean.toLowerCase() || o.label.toLowerCase() === clean.toLowerCase())) return;
+      const resolved = resolveShield(clean, customArmors);
+      if (resolved && resolved.acBonus > 0) {
+        options.push({
+          value: clean,
+          label: clean,
+          sublabel: `(+${resolved.acBonus} AC, Inventory Shield)`,
+          badge: 'INV',
+          isAllowed: true
+        });
+      }
+    });
+
+    const cur = (eq.shield || 'heavy_shield').trim();
+    if (cur && !options.some(o => o.value.toLowerCase() === cur.toLowerCase() || o.label.toLowerCase() === cur.toLowerCase())) {
+      options.push({
+        value: cur,
+        label: cur,
+        sublabel: 'Equipped Shield',
+        isAllowed: true
+      });
+    }
+
+    return options;
+  }, [customArmors, character.inventory, eq.shield]);
+
+  const selectedShieldValue = useMemo(() => {
+    const cur = (eq.shield || 'heavy_shield').trim();
+    const match = shieldOptions.find(o => o.value.toLowerCase() === cur.toLowerCase() || o.label.toLowerCase() === cur.toLowerCase());
+    return match ? match.value : cur;
+  }, [eq.shield, shieldOptions]);
+
+  const filteredGuideQualities = useMemo(() => {
+    let list: MagicQuality[] = [];
+    if (qualitiesGuideFilter === 'all') {
+      list = [...WEAPON_SPECIAL_QUALITIES, ...ARMOR_SHIELD_SPECIAL_QUALITIES];
+    } else if (qualitiesGuideFilter === 'weapon') {
+      list = [...WEAPON_SPECIAL_QUALITIES];
+    } else {
+      list = [...ARMOR_SHIELD_SPECIAL_QUALITIES];
+    }
+
+    if (qualitiesGuideSearch.trim()) {
+      const qLower = qualitiesGuideSearch.toLowerCase().trim();
+      list = list.filter(q =>
+        q.name.toLowerCase().includes(qLower) ||
+        q.description.toLowerCase().includes(qLower) ||
+        (q.damageBonus && (q.damageBonus.dice.toLowerCase().includes(qLower) || q.damageBonus.type.toLowerCase().includes(qLower))) ||
+        (q.costType === 'bonus' ? `+${q.costValue}`.includes(qLower) : `${q.costValue}`.includes(qLower)) ||
+        q.target.toLowerCase().includes(qLower)
+      );
+    }
+
+    return list;
+  }, [qualitiesGuideFilter, qualitiesGuideSearch]);
+
   // Tactical Combat Modifiers
   const tcState = getTacticalCombatState(character, bab);
   const generalTcMods = calculateTacticalCombatModifiers(tcState);
@@ -221,32 +997,72 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const effectiveStrScore = strScore + (generalTcMods.strBonus || 0);
   const effectiveStrMod = getAbilityMod(effectiveStrScore);
 
-  // Resolve Weapons
+  // Armor & Shield Special Qualities & Defenses
+  const armorQualities = eq.armorQualities || [];
+  const shieldQualities = eq.shieldQualities || [];
+  const combinedFortification = getFortificationSummary(armorQualities, shieldQualities);
+  const hideQualityBonus = getArmorSkillBonus(armorQualities, shieldQualities, 'Hide');
+  const moveSilentlyQualityBonus = getArmorSkillBonus(armorQualities, shieldQualities, 'Move Silently');
+
+  // Resolve Primary Weapon & Special Qualities
+  const primaryQualities = eq.primaryWeaponQualities || [];
+  const primarySpecialDmg = getWeaponSpecialDamage(primaryQualities);
+  const primaryHasKeen = hasKeenQuality(primaryQualities);
+  const primaryHasSpeed = hasSpeedQuality(primaryQualities);
   const primaryWpnObj = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
+  const primaryThreat = primaryHasKeen ? calculateKeenThreat(primaryWpnObj.threat) : primaryWpnObj.threat;
   const primaryTacticalMods = calculateTacticalCombatModifiers(tcState, primaryWpnObj, false, false);
   const primaryFeatBonuses = calculateFeatCombatBonuses(character, primaryWpnObj);
   const primaryEnhancement = eq.primaryWeaponEnhancement || 0;
   const primaryTotalAtk = bab + effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + primaryTacticalMods.attackMod;
   const primaryDmgVal = effectiveStrMod + primaryEnhancement + primaryFeatBonuses.damageBonus + primaryTacticalMods.damageMod;
   const primaryDmgStr = primaryDmgVal >= 0 ? `+${primaryDmgVal}` : `${primaryDmgVal}`;
-  const primaryFullAttackSeq = generateFullAttackSequence(bab, effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + primaryTacticalMods.attackMod, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy);
+  const primaryBaseDmgFormula = `${primaryWpnObj.damageM}${primaryDmgVal !== 0 ? primaryDmgStr : ''}`;
+  const primaryDamageDisplay = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceString}`;
+  const primaryRollDamageFormula = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceFormula}`;
+  const primaryFullAttackSeq = generateFullAttackSequence(
+    bab,
+    effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + primaryTacticalMods.attackMod,
+    tcState.haste,
+    tcState.flurryOfBlows,
+    tcState.whirlingFrenzy,
+    primaryHasSpeed
+  );
 
+  // Resolve Secondary Weapon & Special Qualities
   const hasSecondary = eq.secondaryWeapon && eq.secondaryWeapon !== 'none';
+  const secondaryQualities = eq.secondaryWeaponQualities || [];
+  const secondarySpecialDmg = getWeaponSpecialDamage(secondaryQualities);
+  const secondaryHasKeen = hasKeenQuality(secondaryQualities);
+  const secondaryHasSpeed = hasSpeedQuality(secondaryQualities);
   const secondaryWpnObj = hasSecondary ? resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData) : null;
+  const secondaryThreat = secondaryWpnObj ? (secondaryHasKeen ? calculateKeenThreat(secondaryWpnObj.threat) : secondaryWpnObj.threat) : 20;
   const secondaryTacticalMods = secondaryWpnObj ? calculateTacticalCombatModifiers(tcState, secondaryWpnObj, true, false) : null;
   const secondaryFeatBonuses = secondaryWpnObj ? calculateFeatCombatBonuses(character, secondaryWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const secondaryEnhancement = eq.secondaryWeaponEnhancement || 0;
   const secondaryTotalAtk = secondaryWpnObj ? (bab + effectiveStrMod + secondaryEnhancement + secondaryFeatBonuses.attackBonus + (secondaryTacticalMods?.attackMod || 0)) : 0;
   const secondaryDmgVal = secondaryWpnObj ? (Math.floor(effectiveStrMod / 2) + secondaryEnhancement + secondaryFeatBonuses.damageBonus + (secondaryTacticalMods?.damageMod || 0)) : 0;
+  const secondaryBaseDmgFormula = secondaryWpnObj ? `${secondaryWpnObj.damageM}${secondaryDmgVal >= 0 ? `+${secondaryDmgVal}` : secondaryDmgVal}` : '';
+  const secondaryDamageDisplay = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceString}`;
+  const secondaryRollDamageFormula = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceFormula}`;
 
+  // Resolve Ranged Weapon & Special Qualities
   const hasRanged = eq.rangedWeapon && eq.rangedWeapon !== 'none';
+  const rangedQualities = eq.rangedWeaponQualities || [];
+  const rangedSpecialDmg = getWeaponSpecialDamage(rangedQualities);
+  const rangedHasKeen = hasKeenQuality(rangedQualities);
+  const rangedHasSpeed = hasSpeedQuality(rangedQualities);
   const rangedWpnObj = hasRanged ? resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData) : null;
+  const rangedThreat = rangedWpnObj ? (rangedHasKeen ? calculateKeenThreat(rangedWpnObj.threat) : rangedWpnObj.threat) : 20;
   const rangedTacticalMods = rangedWpnObj ? calculateTacticalCombatModifiers(tcState, rangedWpnObj, false, true) : null;
   const rangedFeatBonuses = rangedWpnObj ? calculateFeatCombatBonuses(character, rangedWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const rangedEnhancement = eq.rangedWeaponEnhancement || 0;
   const rangedTotalAtk = rangedWpnObj ? (bab + dexMod + rangedEnhancement + rangedFeatBonuses.attackBonus + (rangedTacticalMods?.attackMod || 0)) : 0;
   const rangedDmgVal = rangedWpnObj ? (rangedEnhancement + rangedFeatBonuses.damageBonus + (rangedTacticalMods?.damageMod || 0)) : 0;
   const rangedDmgStr = rangedDmgVal > 0 ? `+${rangedDmgVal}` : (rangedDmgVal < 0 ? `${rangedDmgVal}` : '');
+  const rangedBaseDmgFormula = rangedWpnObj ? `${rangedWpnObj.damageM}${rangedDmgStr}` : '';
+  const rangedDamageDisplay = `${rangedBaseDmgFormula}${rangedSpecialDmg.damageDiceString}`;
+  const rangedRollDamageFormula = `${rangedBaseDmgFormula}${rangedSpecialDmg.damageDiceFormula}`;
 
   // Inventory Actions
   const handleAddInventoryItem = (e: React.FormEvent) => {
@@ -319,25 +1135,28 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     const newEq = { ...eq };
 
     if (itemToRemove) {
-      const cleanName = itemToRemove.name.toLowerCase().trim();
+      const cleanName = itemToRemove.name.trim();
+      const stillInInventory = newInventory.some(i => matchesItemName(i.name, cleanName));
 
-      if (eq.primaryWeapon && (resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData).name.toLowerCase().trim() === cleanName || eq.primaryWeapon.toLowerCase().trim() === cleanName)) {
-        newEq.primaryWeapon = 'none';
-      }
-      if (eq.secondaryWeapon && (resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData).name.toLowerCase().trim() === cleanName || eq.secondaryWeapon.toLowerCase().trim() === cleanName)) {
-        newEq.secondaryWeapon = 'none';
-      }
-      if (eq.rangedWeapon && (resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData).name.toLowerCase().trim() === cleanName || eq.rangedWeapon.toLowerCase().trim() === cleanName)) {
-        newEq.rangedWeapon = 'none';
-      }
-      if (eq.armor && (resolveArmor(eq.armor, customArmors).name.toLowerCase().trim() === cleanName || eq.armor.toLowerCase().trim() === cleanName)) {
-        newEq.armor = 'none';
-      }
-      if (eq.shield && (resolveShield(eq.shield, customArmors).name.toLowerCase().trim() === cleanName || eq.shield.toLowerCase().trim() === cleanName)) {
-        newEq.shield = 'none';
-      }
-      if (eq.wondrousItems && eq.wondrousItems.length > 0) {
-        newEq.wondrousItems = eq.wondrousItems.filter(w => w.name.toLowerCase().trim() !== cleanName);
+      if (!stillInInventory) {
+        if (eq.primaryWeapon && (matchesItemName(resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData).name, cleanName) || matchesItemName(eq.primaryWeapon, cleanName))) {
+          newEq.primaryWeapon = 'none';
+        }
+        if (eq.secondaryWeapon && (matchesItemName(resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData).name, cleanName) || matchesItemName(eq.secondaryWeapon, cleanName))) {
+          newEq.secondaryWeapon = 'none';
+        }
+        if (eq.rangedWeapon && (matchesItemName(resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData).name, cleanName) || matchesItemName(eq.rangedWeapon, cleanName))) {
+          newEq.rangedWeapon = 'none';
+        }
+        if (eq.armor && (matchesItemName(resolveArmor(eq.armor, customArmors).name, cleanName) || matchesItemName(eq.armor, cleanName))) {
+          newEq.armor = 'none';
+        }
+        if (eq.shield && (matchesItemName(resolveShield(eq.shield, customArmors).name, cleanName) || matchesItemName(eq.shield, cleanName))) {
+          newEq.shield = 'none';
+        }
+        if (eq.wondrousItems && eq.wondrousItems.length > 0) {
+          newEq.wondrousItems = eq.wondrousItems.filter(w => !matchesItemName(w.name, cleanName));
+        }
       }
     }
 
@@ -439,45 +1258,139 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
 
   const getEquippedSlotLabel = (itemName: string): string | null => {
     if (!itemName || !itemName.trim()) return null;
-    const clean = itemName.toLowerCase().trim();
+    const clean = itemName.trim();
 
     if (eq.primaryWeapon && eq.primaryWeapon !== 'none') {
       const wpnObj = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
-      if (wpnObj.name.toLowerCase().trim() === clean || eq.primaryWeapon.toLowerCase().trim() === clean) {
+      if (matchesItemName(wpnObj.name, clean) || matchesItemName(eq.primaryWeapon, clean)) {
         return 'Equipped (Primary)';
       }
     }
     if (eq.secondaryWeapon && eq.secondaryWeapon !== 'none') {
       const secObj = resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData);
-      if (secObj.name.toLowerCase().trim() === clean || eq.secondaryWeapon.toLowerCase().trim() === clean) {
+      if (matchesItemName(secObj.name, clean) || matchesItemName(eq.secondaryWeapon, clean)) {
         return 'Equipped (Off-Hand)';
       }
     }
     if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
       const rngObj = resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData);
-      if (rngObj.name.toLowerCase().trim() === clean || eq.rangedWeapon.toLowerCase().trim() === clean) {
+      if (matchesItemName(rngObj.name, clean) || matchesItemName(eq.rangedWeapon, clean)) {
         return 'Equipped (Ranged)';
       }
     }
     if (eq.armor && eq.armor !== 'none') {
       const armObj = resolveArmor(eq.armor, customArmors);
-      if (armObj.name.toLowerCase().trim() === clean || eq.armor.toLowerCase().trim() === clean) {
+      if (matchesItemName(armObj.name, clean) || matchesItemName(eq.armor, clean)) {
         return 'Equipped (Armor)';
       }
     }
     if (eq.shield && eq.shield !== 'none') {
       const shdObj = resolveShield(eq.shield, customArmors);
-      if (shdObj.name.toLowerCase().trim() === clean || eq.shield.toLowerCase().trim() === clean) {
+      if (matchesItemName(shdObj.name, clean) || matchesItemName(eq.shield, clean)) {
         return 'Equipped (Shield)';
       }
     }
     if (eq.wondrousItems && eq.wondrousItems.length > 0) {
-      const itemMatch = eq.wondrousItems.find(w => w.name.toLowerCase().trim() === clean);
+      const itemMatch = eq.wondrousItems.find(w => matchesItemName(w.name, clean));
       if (itemMatch) {
         return `Equipped (${itemMatch.slot})`;
       }
     }
     return null;
+  };
+
+  const getEquippableCategory = (itemName: string): 'weapon' | 'armor' | 'shield' | null => {
+    if (!itemName || !itemName.trim()) return null;
+    const clean = itemName.toLowerCase().trim();
+    if (customArmors.some(a => a.name.toLowerCase().trim() === clean && a.type === 'shield')) return 'shield';
+    if (customArmors.some(a => a.name.toLowerCase().trim() === clean && a.type !== 'shield')) return 'armor';
+    const armObj = resolveArmor(clean, customArmors);
+    if (armObj && armObj.acBonus > 0 && armObj.name.toLowerCase() !== 'none') return 'armor';
+    const shdObj = resolveShield(clean, customArmors);
+    if (shdObj && shdObj.acBonus > 0 && shdObj.name.toLowerCase() !== 'none') return 'shield';
+
+    // 1. Direct match in custom weapons or standard weapons database
+    if (customWeapons.some(w => w.name.toLowerCase().trim() === clean)) return 'weapon';
+    if (weaponsData.some(w => w.name.toLowerCase().trim() === clean)) return 'weapon';
+
+    // 2. Direct match in themed weapon map (e.g. "Nodachi") or validated themed alias
+    if (THEMED_WEAPON_BASE_MAP[clean] !== undefined) return 'weapon';
+    if (getThemedWeaponBase(clean, weaponsData) !== null) return 'weapon';
+
+    // 3. Check alias pattern "Custom Name (BaseWeapon)" where BaseWeapon is recognized
+    const aliasMatch = clean.match(/^(.+?)\s*\((.+?)\)$/);
+    if (aliasMatch) {
+      const suffix = aliasMatch[2].trim().toLowerCase();
+      if (STANDARD_BASE_WEAPONS[suffix] !== undefined || weaponsData.some(w => w.name.toLowerCase().trim() === suffix)) {
+        return 'weapon';
+      }
+    }
+
+    return null;
+  };
+
+  const handleQuickUnequipFromInventory = (itemName: string) => {
+    if (!itemName) return;
+    const clean = itemName.trim();
+    const newEq = { ...eq };
+    let changed = false;
+
+    if (eq.primaryWeapon && eq.primaryWeapon !== 'none') {
+      const wpn = resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData);
+      if (matchesItemName(wpn.name, clean) || matchesItemName(eq.primaryWeapon, clean)) {
+        newEq.primaryWeapon = 'none';
+        newEq.primaryWeaponEnhancement = 0;
+        newEq.primaryWeaponQualities = [];
+        changed = true;
+      }
+    }
+    if (eq.secondaryWeapon && eq.secondaryWeapon !== 'none') {
+      const wpn = resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData);
+      if (matchesItemName(wpn.name, clean) || matchesItemName(eq.secondaryWeapon, clean)) {
+        newEq.secondaryWeapon = 'none';
+        newEq.secondaryWeaponEnhancement = 0;
+        newEq.secondaryWeaponQualities = [];
+        changed = true;
+      }
+    }
+    if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
+      const wpn = resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData);
+      if (matchesItemName(wpn.name, clean) || matchesItemName(eq.rangedWeapon, clean)) {
+        newEq.rangedWeapon = 'none';
+        newEq.rangedWeaponEnhancement = 0;
+        newEq.rangedWeaponQualities = [];
+        changed = true;
+      }
+    }
+    if (eq.armor && eq.armor !== 'none') {
+      const arm = resolveArmor(eq.armor, customArmors);
+      if (matchesItemName(arm.name, clean) || matchesItemName(eq.armor, clean)) {
+        newEq.armor = 'none';
+        newEq.armorEnhancement = 0;
+        newEq.armorQualities = [];
+        changed = true;
+      }
+    }
+    if (eq.shield && eq.shield !== 'none') {
+      const shd = resolveShield(eq.shield, customArmors);
+      if (matchesItemName(shd.name, clean) || matchesItemName(eq.shield, clean)) {
+        newEq.shield = 'none';
+        newEq.shieldEnhancement = 0;
+        newEq.shieldQualities = [];
+        changed = true;
+      }
+    }
+    if (eq.wondrousItems && eq.wondrousItems.length > 0) {
+      const beforeLen = eq.wondrousItems.length;
+      newEq.wondrousItems = eq.wondrousItems.filter(w => !matchesItemName(w.name, clean));
+      if (newEq.wondrousItems.length !== beforeLen) {
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      onChange({ equipment: newEq, inventory: [...inventory] });
+    }
   };
 
   // Auto-sync any equipped items that are missing from inventory
@@ -659,6 +1572,13 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           >
             <i className="fa-solid fa-gem text-purple-400"></i> Add Wondrous Item
           </button>
+          <button
+            onClick={() => setShowQualitiesGuide(true)}
+            className="btn btn-secondary text-xs flex items-center gap-1.5 text-amber-300 border-amber-500/30 hover:bg-amber-500/10"
+            title="Open 3.5e Magic Item Special Qualities Guide"
+          >
+            <i className="fa-solid fa-book-sparkles text-amber-400"></i> Qualities Guide
+          </button>
         </div>
       </div>
 
@@ -673,68 +1593,104 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="label-text">Equipped Armor</label>
-              <select
-                value={eq.armor || 'chainshirt'}
-                onChange={e => handleEqChange('armor', e.target.value)}
-                className="input-field text-xs"
-              >
-                <option value="none">None (AC +0, Max Dex --, Check 0)</option>
-                <option value="padded">Padded (+1 AC, Max Dex +8, Check 0, 10 lbs)</option>
-                <option value="leather">Leather (+2 AC, Max Dex +6, Check 0, 15 lbs)</option>
-                <option value="studded">Studded Leather (+3 AC, Max Dex +5, Check -1, 20 lbs)</option>
-                <option value="chainshirt">Chain Shirt (+4 AC, Max Dex +4, Check -2, 25 lbs)</option>
-                <option value="breastplate">Breastplate (+5 AC, Max Dex +3, Check -4, 30 lbs)</option>
-                <option value="fullplate">Full Plate (+8 AC, Max Dex +1, Check -6, 50 lbs)</option>
-                {customArmors.filter(a => a.type !== 'shield').map(ca => (
-                  <option key={ca.id} value={ca.name}>{ca.name} (+{ca.acBonus} AC, Custom)</option>
-                ))}
-              </select>
+              <SearchableSelect
+                value={selectedArmorValue}
+                options={armorOptions}
+                onChange={val => handleEqChange('armor', val)}
+                placeholder="Select equipped armor..."
+              />
             </div>
             <div>
               <label className="label-text">Armor Enhancement</label>
-              <select
-                value={eq.armorEnhancement || 0}
-                onChange={e => handleEqChange('armorEnhancement', parseInt(e.target.value) || 0)}
-                className="input-field text-xs"
-              >
-                {[0, 1, 2, 3, 4, 5].map(v => (
-                  <option key={v} value={v}>+{v}</option>
-                ))}
-              </select>
+              <SearchableSelect
+                value={String(eq.armorEnhancement || 0)}
+                options={armorEnhancementOptions}
+                onChange={val => handleEqChange('armorEnhancement', parseInt(val) || 0)}
+                showSublabelInTrigger={false}
+                placeholder="Enh..."
+              />
             </div>
           </div>
+
+          {/* Armor Special Qualities */}
+          {eq.armor && eq.armor !== 'none' && (
+            <QualitySelector
+              title="Armor Special Qualities"
+              qualities={armorQualities}
+              available={getAvailableArmorQualities()}
+              onAdd={q => handleAddQuality('armorQualities', q)}
+              onRemove={q => handleRemoveQuality('armorQualities', q)}
+              enhancementBonus={eq.armorEnhancement || 0}
+              itemType="armor"
+              onSaveAsItem={() => handleSaveMagicArmor('armor')}
+              isSavedItem={customArmors.some(a => a.name.toLowerCase() === (eq.armor || '').toLowerCase() && a.type !== 'shield')}
+              suggestedItemName={formatMagicItemName(armorObj.name, eq.armorEnhancement || 0, armorQualities)}
+              onOpenGuide={() => setShowQualitiesGuide(true)}
+            />
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="label-text">Equipped Shield</label>
-              <select
-                value={eq.shield || 'heavy_shield'}
-                onChange={e => handleEqChange('shield', e.target.value)}
-                className="input-field text-xs"
-              >
-                <option value="none">None (+0 AC)</option>
-                <option value="buckler">Buckler (+1 AC, Check -1, 5 lbs)</option>
-                <option value="light_wooden">Light Shield (+1 AC, Check -1, 5 lbs)</option>
-                <option value="heavy_shield">Heavy Shield (+2 AC, Check -2, 15 lbs)</option>
-                <option value="tower_shield">Tower Shield (+4 AC, Check -10, 45 lbs)</option>
-                {customArmors.filter(a => a.type === 'shield').map(ca => (
-                  <option key={ca.id} value={ca.name}>{ca.name} (+{ca.acBonus} AC, Custom Shield)</option>
-                ))}
-              </select>
+              <SearchableSelect
+                value={selectedShieldValue}
+                options={shieldOptions}
+                onChange={val => handleEqChange('shield', val)}
+                placeholder="Select equipped shield..."
+              />
             </div>
             <div>
               <label className="label-text">Shield Enhancement</label>
-              <select
-                value={eq.shieldEnhancement || 0}
-                onChange={e => handleEqChange('shieldEnhancement', parseInt(e.target.value) || 0)}
-                className="input-field text-xs"
-              >
-                {[0, 1, 2, 3, 4, 5].map(v => (
-                  <option key={v} value={v}>+{v}</option>
-                ))}
-              </select>
+              <SearchableSelect
+                value={String(eq.shieldEnhancement || 0)}
+                options={armorEnhancementOptions}
+                onChange={val => handleEqChange('shieldEnhancement', parseInt(val) || 0)}
+                showSublabelInTrigger={false}
+                placeholder="Enh..."
+              />
             </div>
           </div>
+
+          {/* Shield Special Qualities */}
+          {eq.shield && eq.shield !== 'none' && (
+            <QualitySelector
+              title="Shield Special Qualities"
+              qualities={shieldQualities}
+              available={getAvailableShieldQualities()}
+              onAdd={q => handleAddQuality('shieldQualities', q)}
+              onRemove={q => handleRemoveQuality('shieldQualities', q)}
+              enhancementBonus={eq.shieldEnhancement || 0}
+              itemType="shield"
+              onSaveAsItem={() => handleSaveMagicArmor('shield')}
+              isSavedItem={customArmors.some(a => a.name.toLowerCase() === (eq.shield || '').toLowerCase() && a.type === 'shield')}
+              suggestedItemName={formatMagicItemName(shieldObj.name, eq.shieldEnhancement || 0, shieldQualities)}
+              onOpenGuide={() => setShowQualitiesGuide(true)}
+            />
+          )}
+
+          {/* Armor / Shield Defensive Benefits Badges */}
+          {(combinedFortification.hasFortification || hideQualityBonus > 0 || moveSilentlyQualityBonus > 0) && (
+            <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 text-xs font-mono">
+              {combinedFortification.hasFortification && (
+                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-bold">
+                  <i className="fa-solid fa-shield-halved text-amber-400"></i>
+                  Fortification: {combinedFortification.percent}% ({combinedFortification.label})
+                </span>
+              )}
+              {hideQualityBonus > 0 && (
+                <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-1 font-bold">
+                  <i className="fa-solid fa-eye-slash text-purple-400"></i>
+                  +{hideQualityBonus} Hide (Shadow)
+                </span>
+              )}
+              {moveSilentlyQualityBonus > 0 && (
+                <span className="px-2 py-0.5 rounded-md bg-teal-500/20 text-teal-300 border border-teal-500/30 flex items-center gap-1 font-bold">
+                  <i className="fa-solid fa-shoe-prints text-teal-400"></i>
+                  +{moveSilentlyQualityBonus} Move Silently
+                </span>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-3 gap-3">
             <div>
@@ -830,28 +1786,42 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 />
 
                 {/* Freeform input if custom or user wants to edit name */}
-                {(!availableWeapons.some(w => w.name === eq.primaryWeapon) || eq.primaryWeapon === '__CUSTOM__') && (
-                  <input
-                    type="text"
+                {((!availableWeapons.some(w => w.name === eq.primaryWeapon) && eq.primaryWeapon && eq.primaryWeapon !== 'none') || eq.primaryWeapon === '__CUSTOM__') && (
+                  <CustomWeaponInput
                     value={eq.primaryWeapon === '__CUSTOM__' ? '' : (eq.primaryWeapon || '')}
-                    onChange={e => handleEqChange('primaryWeapon', e.target.value)}
+                    onCommit={val => handleEqChange('primaryWeapon', val)}
                     placeholder="Type custom weapon name e.g. Nodachi (Greatsword)"
                     className="input-field text-xs font-semibold text-amber-300 border-amber-500/40"
                   />
                 )}
               </div>
               <div>
-                <select
-                  value={eq.primaryWeaponEnhancement || 0}
-                  onChange={e => handleEqChange('primaryWeaponEnhancement', parseInt(e.target.value) || 0)}
-                  className="input-field text-xs"
-                >
-                  {[0, 1, 2, 3, 4, 5].map(v => (
-                    <option key={v} value={v}>Enh: +{v}</option>
-                  ))}
-                </select>
+                <SearchableSelect
+                  value={String(eq.primaryWeaponEnhancement || 0)}
+                  options={weaponEnhancementOptions}
+                  onChange={val => handleEqChange('primaryWeaponEnhancement', parseInt(val) || 0)}
+                  showSublabelInTrigger={false}
+                  placeholder="Enh..."
+                />
               </div>
             </div>
+
+            {/* Primary Weapon Special Qualities */}
+            {eq.primaryWeapon && eq.primaryWeapon !== 'none' && (
+              <QualitySelector
+                title="Primary Weapon Special Qualities"
+                qualities={primaryQualities}
+                available={getAvailableWeaponQualities(false)}
+                onAdd={q => handleAddQuality('primaryWeaponQualities', q)}
+                onRemove={q => handleRemoveQuality('primaryWeaponQualities', q)}
+                enhancementBonus={primaryEnhancement}
+                itemType="weapon"
+                onSaveAsItem={() => handleSaveMagicWeapon('primaryWeapon')}
+                isSavedItem={customWeapons.some(w => w.name.toLowerCase() === (eq.primaryWeapon || '').toLowerCase())}
+                suggestedItemName={formatMagicItemName(primaryWpnObj?.name || eq.primaryWeapon || 'Weapon', primaryEnhancement, primaryQualities)}
+                onOpenGuide={() => setShowQualitiesGuide(true)}
+              />
+            )}
 
             {primaryWpnObj && (
               <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2 text-xs">
@@ -864,6 +1834,21 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                           Includes Feat Bonus (+{primaryFeatBonuses.attackBonus} Atk / +{primaryFeatBonuses.damageBonus} Dmg)
                         </span>
                       ) : null}
+                      {primarySpecialDmg.summaryLabels.length > 0 && (
+                        <span className="text-[10px] text-orange-300 font-semibold">
+                          • Magic: {primarySpecialDmg.summaryLabels.join(', ')}
+                        </span>
+                      )}
+                      {primaryHasSpeed && (
+                        <span className="text-[10px] text-cyan-300 font-semibold">
+                          • Speed (+1 Attack)
+                        </span>
+                      )}
+                      {primaryHasKeen && (
+                        <span className="text-[10px] text-amber-300 font-semibold">
+                          • Keen
+                        </span>
+                      )}
                       {activeCombatMods.length > 0 && (
                         <span className="text-[10px] text-amber-300 font-mono">
                           • Tactical ({activeCombatMods.map(m => m.name).join(', ')})
@@ -872,7 +1857,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                     </div>
                   </div>
                   <button
-                    onClick={() => rollAttack(primaryTotalAtk, `${primaryWpnObj.name} Attack`, primaryWpnObj)}
+                    onClick={() => rollAttack(primaryTotalAtk, `${primaryWpnObj.name} Attack`, { ...primaryWpnObj, threat: primaryThreat })}
                     className="font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/30 font-bold text-sm transition flex items-center gap-1.5 cursor-pointer shadow-xs"
                     title={`Click to roll ${primaryWpnObj.name} Attack`}
                   >
@@ -882,18 +1867,21 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 </div>
                 <div className="grid grid-cols-3 text-center gap-2 py-1 font-mono text-slate-300 bg-slate-900/60 rounded border border-slate-800">
                   <div
-                    onClick={() => rollDamage(primaryWpnObj.damageM + (primaryDmgVal !== 0 ? primaryDmgStr : ''), `${primaryWpnObj.name} Damage`)}
+                    onClick={() => rollDamage(primaryRollDamageFormula, `${primaryWpnObj.name} Damage${primarySpecialDmg.summaryLabels.length > 0 ? ` (${primarySpecialDmg.summaryLabels.join(', ')})` : ''}`)}
                     className="cursor-pointer hover:bg-slate-800/80 rounded p-0.5 transition group"
-                    title={`Click to roll ${primaryWpnObj.name} Damage`}
+                    title={`Click to roll ${primaryWpnObj.name} Damage (${primaryRollDamageFormula})`}
                   >
                     <span className="text-[10px] text-slate-400 block uppercase group-hover:text-amber-400 flex items-center justify-center gap-1">
                       Damage <i className="fa-solid fa-dice-d6 text-[9px] opacity-0 group-hover:opacity-100 text-amber-400"></i>
                     </span>
-                    <span className="group-hover:text-amber-300 font-bold">{primaryWpnObj.damageM}{primaryDmgVal !== 0 ? primaryDmgStr : ''}</span>
+                    <span className="group-hover:text-amber-300 font-bold">{primaryDamageDisplay}</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 block uppercase">Critical</span>
-                    <span>{primaryWpnObj.threat < 20 ? `${primaryWpnObj.threat}-20` : '20'}/x{primaryWpnObj.critMultiplier || 2}</span>
+                    <span className={primaryHasKeen ? 'text-amber-300 font-bold' : ''}>
+                      {primaryThreat < 20 ? `${primaryThreat}-20` : '20'}/x{primaryWpnObj.critMultiplier || 2}
+                      {primaryHasKeen ? ' (Keen)' : ''}
+                    </span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 block uppercase">Type</span>
@@ -922,34 +1910,61 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                   placeholder="Select secondary weapon..."
                 />
 
-                {(!availableWeapons.some(w => w.name === eq.secondaryWeapon) && eq.secondaryWeapon && eq.secondaryWeapon !== 'none') && (
-                  <input
-                    type="text"
+                {((!availableWeapons.some(w => w.name === eq.secondaryWeapon) && eq.secondaryWeapon && eq.secondaryWeapon !== 'none') || eq.secondaryWeapon === '__CUSTOM__') && (
+                  <CustomWeaponInput
                     value={eq.secondaryWeapon === '__CUSTOM__' ? '' : (eq.secondaryWeapon || '')}
-                    onChange={e => handleEqChange('secondaryWeapon', e.target.value)}
+                    onCommit={val => handleEqChange('secondaryWeapon', val)}
                     placeholder="Type custom secondary weapon name"
                     className="input-field text-xs font-semibold text-amber-300 border-amber-500/40"
                   />
                 )}
               </div>
               <div>
-                <select
-                  value={eq.secondaryWeaponEnhancement || 0}
-                  onChange={e => handleEqChange('secondaryWeaponEnhancement', parseInt(e.target.value) || 0)}
-                  className="input-field text-xs"
-                >
-                  {[0, 1, 2, 3, 4, 5].map(v => (
-                    <option key={v} value={v}>Enh: +{v}</option>
-                  ))}
-                </select>
+                <SearchableSelect
+                  value={String(eq.secondaryWeaponEnhancement || 0)}
+                  options={weaponEnhancementOptions}
+                  onChange={val => handleEqChange('secondaryWeaponEnhancement', parseInt(val) || 0)}
+                  showSublabelInTrigger={false}
+                  placeholder="Enh..."
+                />
               </div>
             </div>
+
+            {/* Secondary Weapon Special Qualities */}
+            {hasSecondary && (
+              <QualitySelector
+                title="Secondary Weapon Special Qualities"
+                qualities={secondaryQualities}
+                available={getAvailableWeaponQualities(false)}
+                onAdd={q => handleAddQuality('secondaryWeaponQualities', q)}
+                onRemove={q => handleRemoveQuality('secondaryWeaponQualities', q)}
+                enhancementBonus={secondaryEnhancement}
+                itemType="weapon"
+                onSaveAsItem={() => handleSaveMagicWeapon('secondaryWeapon')}
+                isSavedItem={customWeapons.some(w => w.name.toLowerCase() === (eq.secondaryWeapon || '').toLowerCase())}
+                suggestedItemName={formatMagicItemName(secondaryWpnObj?.name || eq.secondaryWeapon || 'Weapon', secondaryEnhancement, secondaryQualities)}
+                onOpenGuide={() => setShowQualitiesGuide(true)}
+              />
+            )}
+
             {secondaryWpnObj && (
               <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex justify-between items-center text-xs">
-                <span className="font-bold text-slate-300">{secondaryWpnObj.name}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-slate-300">{secondaryWpnObj.name}</span>
+                  {secondarySpecialDmg.summaryLabels.length > 0 && (
+                    <span className="text-[10px] text-orange-300 font-semibold">
+                      ({secondarySpecialDmg.summaryLabels.join(', ')})
+                    </span>
+                  )}
+                  {secondaryHasKeen && (
+                    <span className="text-[10px] text-amber-300 font-semibold">
+                      (Keen {secondaryThreat}-20)
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => rollAttack(secondaryTotalAtk, `${secondaryWpnObj.name} Off-Hand Attack`, secondaryWpnObj)}
+                    onClick={() => rollAttack(secondaryTotalAtk, `${secondaryWpnObj.name} Off-Hand Attack`, { ...secondaryWpnObj, threat: secondaryThreat })}
                     className="font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
                     title={`Click to roll ${secondaryWpnObj.name} Off-Hand Attack`}
                   >
@@ -957,12 +1972,12 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                     <span>{secondaryTotalAtk >= 0 ? '+' : ''}{secondaryTotalAtk} Atk</span>
                   </button>
                   <button
-                    onClick={() => rollDamage(`${secondaryWpnObj.damageM}${secondaryDmgVal >= 0 ? `+${secondaryDmgVal}` : secondaryDmgVal}`, `${secondaryWpnObj.name} Damage`)}
+                    onClick={() => rollDamage(secondaryRollDamageFormula, `${secondaryWpnObj.name} Damage${secondarySpecialDmg.summaryLabels.length > 0 ? ` (${secondarySpecialDmg.summaryLabels.join(', ')})` : ''}`)}
                     className="font-mono text-amber-300 hover:text-amber-200 hover:bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
-                    title={`Click to roll ${secondaryWpnObj.name} Damage`}
+                    title={`Click to roll ${secondaryWpnObj.name} Damage (${secondaryRollDamageFormula})`}
                   >
                     <i className="fa-solid fa-dice-d6 text-[10px]"></i>
-                    <span>{secondaryWpnObj.damageM}{secondaryDmgVal >= 0 ? `+${secondaryDmgVal}` : secondaryDmgVal}</span>
+                    <span>{secondaryDamageDisplay}</span>
                   </button>
                 </div>
               </div>
@@ -987,34 +2002,61 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                   placeholder="Select ranged weapon..."
                 />
 
-                {(!availableWeapons.some(w => w.name === eq.rangedWeapon) && eq.rangedWeapon && eq.rangedWeapon !== 'none') && (
-                  <input
-                    type="text"
+                {((!availableWeapons.some(w => w.name === eq.rangedWeapon) && eq.rangedWeapon && eq.rangedWeapon !== 'none') || eq.rangedWeapon === '__CUSTOM__') && (
+                  <CustomWeaponInput
                     value={eq.rangedWeapon === '__CUSTOM__' ? '' : (eq.rangedWeapon || '')}
-                    onChange={e => handleEqChange('rangedWeapon', e.target.value)}
+                    onCommit={val => handleEqChange('rangedWeapon', val)}
                     placeholder="Type custom ranged weapon name"
                     className="input-field text-xs font-semibold text-amber-300 border-amber-500/40"
                   />
                 )}
               </div>
               <div>
-                <select
-                  value={eq.rangedWeaponEnhancement || 0}
-                  onChange={e => handleEqChange('rangedWeaponEnhancement', parseInt(e.target.value) || 0)}
-                  className="input-field text-xs"
-                >
-                  {[0, 1, 2, 3, 4, 5].map(v => (
-                    <option key={v} value={v}>Enh: +{v}</option>
-                  ))}
-                </select>
+                <SearchableSelect
+                  value={String(eq.rangedWeaponEnhancement || 0)}
+                  options={weaponEnhancementOptions}
+                  onChange={val => handleEqChange('rangedWeaponEnhancement', parseInt(val) || 0)}
+                  showSublabelInTrigger={false}
+                  placeholder="Enh..."
+                />
               </div>
             </div>
+
+            {/* Ranged Weapon Special Qualities */}
+            {hasRanged && (
+              <QualitySelector
+                title="Ranged Weapon Special Qualities"
+                qualities={rangedQualities}
+                available={getAvailableWeaponQualities(true)}
+                onAdd={q => handleAddQuality('rangedWeaponQualities', q)}
+                onRemove={q => handleRemoveQuality('rangedWeaponQualities', q)}
+                enhancementBonus={rangedEnhancement}
+                itemType="weapon"
+                onSaveAsItem={() => handleSaveMagicWeapon('rangedWeapon')}
+                isSavedItem={customWeapons.some(w => w.name.toLowerCase() === (eq.rangedWeapon || '').toLowerCase())}
+                suggestedItemName={formatMagicItemName(rangedWpnObj?.name || eq.rangedWeapon || 'Weapon', rangedEnhancement, rangedQualities)}
+                onOpenGuide={() => setShowQualitiesGuide(true)}
+              />
+            )}
+
             {rangedWpnObj && (
               <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex justify-between items-center text-xs">
-                <span className="font-bold text-slate-300">{rangedWpnObj.name}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-slate-300">{rangedWpnObj.name}</span>
+                  {rangedSpecialDmg.summaryLabels.length > 0 && (
+                    <span className="text-[10px] text-orange-300 font-semibold">
+                      ({rangedSpecialDmg.summaryLabels.join(', ')})
+                    </span>
+                  )}
+                  {rangedHasKeen && (
+                    <span className="text-[10px] text-amber-300 font-semibold">
+                      (Keen {rangedThreat}-20)
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => rollAttack(rangedTotalAtk, `${rangedWpnObj.name} Ranged Attack`, rangedWpnObj)}
+                    onClick={() => rollAttack(rangedTotalAtk, `${rangedWpnObj.name} Ranged Attack`, { ...rangedWpnObj, threat: rangedThreat })}
                     className="font-mono text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/20 px-2 py-0.5 rounded border border-cyan-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
                     title={`Click to roll ${rangedWpnObj.name} Ranged Attack`}
                   >
@@ -1022,12 +2064,12 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                     <span>{rangedTotalAtk >= 0 ? '+' : ''}{rangedTotalAtk} Ranged</span>
                   </button>
                   <button
-                    onClick={() => rollDamage(`${rangedWpnObj.damageM}${rangedDmgVal > 0 ? `+${rangedDmgVal}` : (rangedDmgVal < 0 ? `${rangedDmgVal}` : '')}`, `${rangedWpnObj.name} Damage`)}
+                    onClick={() => rollDamage(rangedRollDamageFormula, `${rangedWpnObj.name} Damage${rangedSpecialDmg.summaryLabels.length > 0 ? ` (${rangedSpecialDmg.summaryLabels.join(', ')})` : ''}`)}
                     className="font-mono text-amber-300 hover:text-amber-200 hover:bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
-                    title={`Click to roll ${rangedWpnObj.name} Damage`}
+                    title={`Click to roll ${rangedWpnObj.name} Damage (${rangedRollDamageFormula})`}
                   >
                     <i className="fa-solid fa-dice-d6 text-[10px]"></i>
-                    <span>{rangedWpnObj.damageM}{rangedDmgVal > 0 ? `+${rangedDmgVal}` : (rangedDmgVal < 0 ? `${rangedDmgVal}` : '')}</span>
+                    <span>{rangedDamageDisplay}</span>
                   </button>
                 </div>
               </div>
@@ -1374,13 +2416,97 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                       <td className="py-2.5 px-3 text-center text-slate-400">{item.value || '-'}</td>
                       <td className="py-2.5 px-3 text-right">
                         {!isCurrency ? (
-                          <button
-                            onClick={() => handleRemoveInventoryItem(item.id)}
-                            className="text-slate-500 hover:text-rose-400 p-1 text-xs"
-                            title="Delete Item"
-                          >
-                            <i className="fa-solid fa-trash-can"></i>
-                          </button>
+                          <div className="flex items-center justify-end gap-1">
+                            {isEquippedGear ? (
+                              <button
+                                onClick={() => handleQuickUnequipFromInventory(item.name)}
+                                className="text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 px-2 py-0.5 rounded text-[10px] font-sans font-semibold border border-slate-700 hover:border-rose-500/40 transition inline-flex items-center gap-1 cursor-pointer shadow-xs"
+                                title={`Unequip ${item.name} (keeps item in inventory)`}
+                              >
+                                <i className="fa-solid fa-xmark"></i> Unequip
+                              </button>
+                            ) : (
+                              <>
+                                {getEquippableCategory(item.name) === 'weapon' && (
+                                  equipSlotPickerItemId === item.id ? (
+                                    <div className="inline-flex items-center gap-1 bg-slate-900 border border-amber-500/50 rounded-md p-1 shadow-lg z-20">
+                                      <span className="text-[9px] uppercase font-bold text-amber-400 px-0.5">Slot:</span>
+                                      <button
+                                        onClick={() => {
+                                          handleEqChange('primaryWeapon', item.name);
+                                          setEquipSlotPickerItemId(null);
+                                        }}
+                                        className="text-slate-200 hover:text-amber-300 bg-slate-800 hover:bg-amber-500/20 px-1.5 py-0.5 rounded text-[10px] font-sans font-bold border border-slate-700 transition cursor-pointer"
+                                        title={eq.primaryWeapon && eq.primaryWeapon !== 'none' ? `Equip Primary (replaces ${eq.primaryWeapon}, keeping it in inventory)` : 'Equip as Primary Weapon'}
+                                      >
+                                        Primary
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          handleEqChange('secondaryWeapon', item.name);
+                                          setEquipSlotPickerItemId(null);
+                                        }}
+                                        className="text-slate-200 hover:text-amber-300 bg-slate-800 hover:bg-amber-500/20 px-1.5 py-0.5 rounded text-[10px] font-sans font-bold border border-slate-700 transition cursor-pointer"
+                                        title={eq.secondaryWeapon && eq.secondaryWeapon !== 'none' ? `Equip Off-Hand (replaces ${eq.secondaryWeapon}, keeping it in inventory)` : 'Equip as Off-Hand Weapon'}
+                                      >
+                                        Off-Hand
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          handleEqChange('rangedWeapon', item.name);
+                                          setEquipSlotPickerItemId(null);
+                                        }}
+                                        className="text-slate-200 hover:text-amber-300 bg-slate-800 hover:bg-amber-500/20 px-1.5 py-0.5 rounded text-[10px] font-sans font-bold border border-slate-700 transition cursor-pointer"
+                                        title={eq.rangedWeapon && eq.rangedWeapon !== 'none' ? `Equip Ranged (replaces ${eq.rangedWeapon}, keeping it in inventory)` : 'Equip as Ranged Weapon'}
+                                      >
+                                        Ranged
+                                      </button>
+                                      <button
+                                        onClick={() => setEquipSlotPickerItemId(null)}
+                                        className="text-slate-400 hover:text-slate-200 px-1 text-xs cursor-pointer"
+                                        title="Cancel"
+                                      >
+                                        <i className="fa-solid fa-xmark"></i>
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => setEquipSlotPickerItemId(item.id)}
+                                      className="text-amber-400 hover:text-amber-300 hover:bg-amber-500/20 px-2 py-0.5 rounded text-[10px] font-sans font-bold border border-amber-500/30 transition inline-flex items-center gap-1 cursor-pointer shadow-xs"
+                                      title={`Choose slot to equip ${item.name}`}
+                                    >
+                                      <i className="fa-solid fa-hand-holding"></i> Equip <i className="fa-solid fa-chevron-down text-[8px] opacity-70"></i>
+                                    </button>
+                                  )
+                                )}
+                                {getEquippableCategory(item.name) === 'armor' && (
+                                  <button
+                                    onClick={() => handleEqChange('armor', item.name)}
+                                    className="text-amber-400 hover:text-amber-300 hover:bg-amber-500/20 px-2 py-0.5 rounded text-[10px] font-sans font-bold border border-amber-500/30 transition inline-flex items-center gap-1 cursor-pointer shadow-xs"
+                                    title={eq.armor && eq.armor !== 'none' ? `Equip Armor (replaces ${eq.armor}, keeping it in inventory)` : `Equip ${item.name} as Armor`}
+                                  >
+                                    <i className="fa-solid fa-shield-halved"></i> Equip
+                                  </button>
+                                )}
+                                {getEquippableCategory(item.name) === 'shield' && (
+                                  <button
+                                    onClick={() => handleEqChange('shield', item.name)}
+                                    className="text-amber-400 hover:text-amber-300 hover:bg-amber-500/20 px-2 py-0.5 rounded text-[10px] font-sans font-bold border border-amber-500/30 transition inline-flex items-center gap-1 cursor-pointer shadow-xs"
+                                    title={eq.shield && eq.shield !== 'none' ? `Equip Shield (replaces ${eq.shield}, keeping it in inventory)` : `Equip ${item.name} as Shield`}
+                                  >
+                                    <i className="fa-solid fa-shield"></i> Equip
+                                  </button>
+                                )}
+                              </>
+                            )}
+                            <button
+                              onClick={() => handleRemoveInventoryItem(item.id)}
+                              className="text-slate-500 hover:text-rose-400 p-1 text-xs cursor-pointer"
+                              title="Delete Item"
+                            >
+                              <i className="fa-solid fa-trash-can"></i>
+                            </button>
+                          </div>
                         ) : (
                           <span className="text-[10px] text-slate-500 font-sans italic">Coins</span>
                         )}
@@ -1760,6 +2886,207 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* 3.5e Magic Item Special Qualities Guide Modal */}
+      {showQualitiesGuide && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                  <i className="fa-solid fa-wand-magic-sparkles text-sm"></i>
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-100 font-heading">
+                    3.5e Magic Item Special Qualities Guide
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Reference compendium for weapon, armor, and shield enchantments (DMG Chapter 7).
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowQualitiesGuide(false)}
+                className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition cursor-pointer"
+                title="Close Guide"
+              >
+                <i className="fa-solid fa-xmark text-base"></i>
+              </button>
+            </div>
+
+            {/* Filter and Search Bar */}
+            <div className="p-4 border-b border-slate-800 bg-slate-900/90 flex flex-wrap items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-1.5 p-1 bg-slate-950/80 rounded-xl border border-slate-800 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setQualitiesGuideFilter('all')}
+                  className={`px-3 py-1.5 rounded-lg font-medium transition cursor-pointer ${
+                    qualitiesGuideFilter === 'all'
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-xs'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  All Qualities ({WEAPON_SPECIAL_QUALITIES.length + ARMOR_SHIELD_SPECIAL_QUALITIES.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQualitiesGuideFilter('weapon')}
+                  className={`px-3 py-1.5 rounded-lg font-medium transition cursor-pointer ${
+                    qualitiesGuideFilter === 'weapon'
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-xs'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Weapons ({WEAPON_SPECIAL_QUALITIES.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQualitiesGuideFilter('armor')}
+                  className={`px-3 py-1.5 rounded-lg font-medium transition cursor-pointer ${
+                    qualitiesGuideFilter === 'armor'
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-xs'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Armor & Shields ({ARMOR_SHIELD_SPECIAL_QUALITIES.length})
+                </button>
+              </div>
+
+              <div className="relative flex-1 min-w-[200px] max-w-xs">
+                <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                <input
+                  type="text"
+                  value={qualitiesGuideSearch}
+                  onChange={e => setQualitiesGuideSearch(e.target.value)}
+                  placeholder="Search name, effect, cost, damage..."
+                  className="input-field text-xs pl-8 pr-7 py-1.5 w-full bg-slate-950/90 text-amber-300 placeholder-slate-500 font-medium"
+                />
+                {qualitiesGuideSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setQualitiesGuideSearch('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs"
+                  >
+                    &times;
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Qualities Grid Body */}
+            <div className="p-5 overflow-y-auto space-y-3 flex-1 scrollbar-thin">
+              {filteredGuideQualities.length === 0 ? (
+                <div className="text-center py-12 text-slate-400">
+                  <i className="fa-solid fa-ban text-2xl mb-2 text-slate-600 block"></i>
+                  <p className="text-sm font-medium">No matching special qualities found.</p>
+                  <p className="text-xs text-slate-500 mt-1">Try broadening your search term or filter category.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {filteredGuideQualities.map(q => {
+                    const costBadge = q.costType === 'bonus' ? `+${q.costValue} Bonus Equiv` : `+${q.costValue.toLocaleString()} gp`;
+                    let targetLabel = 'Weapon';
+                    let targetIcon = 'fa-wand-magic-sparkles';
+                    if (q.target === 'melee') { targetLabel = 'Melee Only'; targetIcon = 'fa-burst'; }
+                    else if (q.target === 'ranged') { targetLabel = 'Ranged Only'; targetIcon = 'fa-crosshairs'; }
+                    else if (q.target === 'armor') { targetLabel = 'Armor Only'; targetIcon = 'fa-shield'; }
+                    else if (q.target === 'shield') { targetLabel = 'Shield Only'; targetIcon = 'fa-shield-halved'; }
+                    else if (q.target === 'armor_or_shield') { targetLabel = 'Armor or Shield'; targetIcon = 'fa-shield-halved'; }
+
+                    return (
+                      <div
+                        key={q.id}
+                        className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 transition flex flex-col justify-between space-y-2.5 group"
+                      >
+                        <div>
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <h4 className="font-bold text-slate-100 group-hover:text-amber-300 transition text-sm flex items-center gap-1.5">
+                                <span>{q.name}</span>
+                              </h4>
+                              <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                                  {costBadge}
+                                </span>
+                                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700/60 flex items-center gap-1">
+                                  <i className={`fa-solid ${targetIcon} text-[9px] text-slate-400`}></i>
+                                  {targetLabel}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <p className="text-xs text-slate-300 leading-relaxed mt-2.5">
+                            {q.description}
+                          </p>
+                        </div>
+
+                        {/* Special tags / mechanics badges */}
+                        <div className="flex flex-wrap items-center gap-1 pt-2 border-t border-slate-900 text-[10px] font-mono">
+                          {q.damageBonus && (
+                            <span className="px-1.5 py-0.5 rounded bg-orange-500/15 text-orange-300 border border-orange-500/30">
+                              +{q.damageBonus.dice} {q.damageBonus.type}
+                            </span>
+                          )}
+                          {q.threatMultiplier && (
+                            <span className="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                              Double Threat Range (Keen)
+                            </span>
+                          )}
+                          {q.extraAttacks && (
+                            <span className="px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                              +{q.extraAttacks} Full-Attack Attack
+                            </span>
+                          )}
+                          {q.fortificationPercent && (
+                            <span className="px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                              {q.fortificationPercent}% Negate Sneak/Crit
+                            </span>
+                          )}
+                          {q.skillBonus && (
+                            <span className="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                              +{q.skillBonus.bonus} {q.skillBonus.skill}
+                            </span>
+                          )}
+                          {q.drGrant && (
+                            <span className="px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                              DR {q.drGrant.value}/{q.drGrant.bypass}
+                            </span>
+                          )}
+                          {q.srGrant && (
+                            <span className="px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">
+                              SR {q.srGrant}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-slate-800 bg-slate-950/80 flex flex-wrap items-center justify-between gap-3 text-xs shrink-0">
+              <div className="flex items-center gap-2 text-slate-400">
+                <i className="fa-solid fa-circle-info text-amber-400 text-xs"></i>
+                <span>
+                  <strong>3.5e Crafting Rule:</strong> Items must have at least a +1 enhancement bonus before special qualities can be added. Pre-epic maximum effective bonus is +10.
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowQualitiesGuide(false)}
+                className="btn btn-secondary text-xs px-4"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

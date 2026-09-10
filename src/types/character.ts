@@ -25,6 +25,10 @@ export interface CustomArmorData {
   type: 'light' | 'medium' | 'heavy' | 'shield' | 'other';
   weight?: number;
   description?: string;
+  enhancementBonus?: number;
+  specialQualities?: string[];
+  baseArmorId?: string;
+  cost?: string;
 }
 
 export interface WondrousItem {
@@ -45,10 +49,15 @@ export interface Equipment {
   dodge: number;
   primaryWeapon: string;
   primaryWeaponEnhancement?: number;
+  primaryWeaponQualities?: string[];
   secondaryWeapon?: string;
   secondaryWeaponEnhancement?: number;
+  secondaryWeaponQualities?: string[];
   rangedWeapon?: string;
   rangedWeaponEnhancement?: number;
+  rangedWeaponQualities?: string[];
+  armorQualities?: string[];
+  shieldQualities?: string[];
   wondrousItems?: WondrousItem[];
 }
 
@@ -427,6 +436,10 @@ export interface WeaponData {
   type: string;
   special?: string;
   source?: string;
+  enhancementBonus?: number;
+  specialQualities?: string[];
+  baseWeaponId?: string;
+  cost?: string;
 }
 
 export interface FeatData {
