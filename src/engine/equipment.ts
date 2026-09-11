@@ -359,6 +359,19 @@ export function resolveArmor(
   const normKey = keyLower.replace(/[^a-z0-9]/g, '');
   if (STANDARD_ARMOR_MAP[normKey]) return STANDARD_ARMOR_MAP[normKey];
 
+  // 3b. Material prefixes e.g. "Adamantine Full Plate", "Mithral Chain Shirt"
+  const cleanMaterialKey = keyLower.replace(/^(adamantine|mithral|mithril|dragonhide|darkwood)\s+/i, '');
+  if (cleanMaterialKey !== keyLower) {
+    const baseResolved = resolveArmor(cleanMaterialKey, customArmors);
+    if (baseResolved && baseResolved.type !== 'none') {
+      return {
+        ...baseResolved,
+        name: armorKey,
+        baseArmorId: baseResolved.baseArmorId || baseResolved.name
+      };
+    }
+  }
+
   // 4. Magic armor name e.g. "+1 Chain Shirt", "+2 Shadow Leather Armor"
   const parsedMagicArmor = parseMagicItemName(armorKey, 'armor');
   if (parsedMagicArmor.enhancementBonus > 0 || parsedMagicArmor.qualities.length > 0) {
@@ -421,6 +434,19 @@ export function resolveShield(
 
   const normKey = keyLower.replace(/[^a-z0-9]/g, '');
   if (STANDARD_SHIELD_MAP[normKey]) return STANDARD_SHIELD_MAP[normKey];
+
+  // 3b. Material prefixes e.g. "Mithral Heavy Shield", "Darkwood Buckler"
+  const cleanMaterialKey = keyLower.replace(/^(adamantine|mithral|mithril|dragonhide|darkwood)\s+/i, '');
+  if (cleanMaterialKey !== keyLower) {
+    const baseResolved = resolveShield(cleanMaterialKey, customArmors);
+    if (baseResolved && baseResolved.name.toLowerCase() !== 'none') {
+      return {
+        ...baseResolved,
+        name: shieldKey,
+        baseArmorId: baseResolved.baseArmorId || baseResolved.name
+      };
+    }
+  }
 
   // 4. Magic shield name e.g. "+1 Heavy Shield"
   const parsedMagicShield = parseMagicItemName(shieldKey, 'shield');

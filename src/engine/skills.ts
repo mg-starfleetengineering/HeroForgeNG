@@ -137,18 +137,19 @@ export function isClassSkillForCharacter(
   });
 
   for (const clsName of activeClasses) {
-    const clsObj = classDatabase.find(c => c.name.toLowerCase() === clsName);
+    const clsObj = classDatabase.find(c => (c.id && c.id.toLowerCase() === clsName) || c.name.toLowerCase() === clsName);
     if (clsObj && clsObj.classSkills) {
       const match = clsObj.classSkills.some(s => {
         const sClean = s.toLowerCase().trim();
         const targetClean = skillName.toLowerCase().trim();
         if (sClean === targetClean) return true;
 
-        // Group skills
+        // Group skills: only when the class grants the entire group (e.g. "Knowledge", "Knowledge (all)", "Knowledge (any)")
         const groups = ['craft', 'knowledge', 'perform', 'profession'];
         for (const group of groups) {
-          if (sClean === group && targetClean.startsWith(group)) return true;
-          if (sClean.startsWith(group) && targetClean.startsWith(group)) return true;
+          if ((sClean === group || sClean === `${group} (all)` || sClean === `${group} (any)`) && targetClean.startsWith(group)) {
+            return true;
+          }
         }
 
         // Compare after stripping punctuation and whitespace
