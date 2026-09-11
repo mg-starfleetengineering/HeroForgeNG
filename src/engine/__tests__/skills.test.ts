@@ -60,6 +60,38 @@ const mockClasses: ClassData[] = [
       lightArmor: true, mediumArmor: true, heavyArmor: true, shield: true, towerShield: true, simpleWeapons: true, martialWeapons: true
     },
     classSkills: ['Climb', 'Handle Animal', 'Intimidate', 'Jump', 'Ride', 'Swim']
+  },
+  {
+    id: 'sorcerer',
+    name: 'Sorcerer',
+    abbr: 'Sor',
+    maxLevels: 20,
+    hitDie: 4,
+    skillPoints: 2,
+    babFactor: 0.5,
+    fortFactor: 0.33,
+    refFactor: 0.33,
+    willFactor: 0.5,
+    proficiencies: {
+      lightArmor: false, mediumArmor: false, heavyArmor: false, shield: false, towerShield: false, simpleWeapons: true, martialWeapons: false
+    },
+    classSkills: ['Bluff', 'Concentration', 'Craft', 'Knowledge (arcana)', 'Profession', 'Spellcraft']
+  },
+  {
+    id: 'wizard',
+    name: 'Wizard',
+    abbr: 'Wiz',
+    maxLevels: 20,
+    hitDie: 4,
+    skillPoints: 2,
+    babFactor: 0.5,
+    fortFactor: 0.33,
+    refFactor: 0.33,
+    willFactor: 0.5,
+    proficiencies: {
+      lightArmor: false, mediumArmor: false, heavyArmor: false, shield: false, towerShield: false, simpleWeapons: false, martialWeapons: false
+    },
+    classSkills: ['Concentration', 'Craft', 'Decipher Script', 'Knowledge', 'Profession', 'Spellcraft']
   }
 ];
 
@@ -295,5 +327,35 @@ describe('Pathfinder Perception Skill Logic', () => {
       expect(result.valid).toBe(true);
     });
   });
+
+  describe('Knowledge & Group Skill Isolation', () => {
+    it('isolates specific Knowledge skills without leaking to all Knowledge sub-skills', () => {
+      // Sorcerer only has Knowledge (arcana) as a class skill
+      const sorcProgression = [{ level: 1, primaryClass: 'Sorcerer', hpRoll: 4 }];
+
+      expect(isClassSkillForCharacter('Knowledge (arcana)', sorcProgression, mockClasses)).toBe(true);
+      expect(isClassSkillForCharacter('Knowledge (religion)', sorcProgression, mockClasses)).toBe(false);
+      expect(isClassSkillForCharacter('Knowledge (nature)', sorcProgression, mockClasses)).toBe(false);
+      expect(isClassSkillForCharacter('Knowledge (the planes)', sorcProgression, mockClasses)).toBe(false);
+    });
+
+    it('grants all Knowledge sub-skills to classes with the general Knowledge group skill', () => {
+      // Wizard has general 'Knowledge' in classSkills
+      const wizProgression = [{ level: 1, primaryClass: 'Wizard', hpRoll: 4 }];
+
+      expect(isClassSkillForCharacter('Knowledge (arcana)', wizProgression, mockClasses)).toBe(true);
+      expect(isClassSkillForCharacter('Knowledge (religion)', wizProgression, mockClasses)).toBe(true);
+      expect(isClassSkillForCharacter('Knowledge (nature)', wizProgression, mockClasses)).toBe(true);
+      expect(isClassSkillForCharacter('Knowledge (history)', wizProgression, mockClasses)).toBe(true);
+    });
+
+    it('matches classes case-insensitively and by slug ID', () => {
+      // Lowercase slug 'sorcerer'
+      const slugProgression = [{ level: 1, primaryClass: 'sorcerer', hpRoll: 4 }];
+      expect(isClassSkillForCharacter('Knowledge (arcana)', slugProgression, mockClasses)).toBe(true);
+      expect(isClassSkillForCharacter('Knowledge (religion)', slugProgression, mockClasses)).toBe(false);
+    });
+  });
 });
+
 

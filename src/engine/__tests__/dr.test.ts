@@ -147,5 +147,92 @@ describe('Damage Reduction (DR) Engine', () => {
       // 10/Magic + 2 (Thick-skinned) = DR 12/Magic
       expect(summary.bestDRString).toBe('DR 12/Magic');
     });
+
+    it('correctly calculates Adamantine Armor DR based on armor category', () => {
+      // 1. Heavy Armor: Adamantine Full Plate -> DR 3/-
+      const fullPlateChar: Partial<CharacterState> = {
+        selectedRace: 'Human',
+        levelProgression: [{ level: 1, primaryClass: 'Fighter', hpRoll: 10 }],
+        selectedFeats: [],
+        equipment: {
+          armor: 'Adamantine Full Plate', armorEnhancement: 0, shield: 'none', shieldEnhancement: 0,
+          deflection: 0, natural: 0, dodge: 0, primaryWeapon: 'none'
+        }
+      };
+      expect(calculateTotalDR(fullPlateChar as CharacterState).bestDRString).toBe('DR 3/-');
+
+      // 2. Heavy Armor: Adamantine Splint Mail -> DR 3/- (not misclassified as light!)
+      const splintMailChar: Partial<CharacterState> = {
+        selectedRace: 'Human',
+        levelProgression: [{ level: 1, primaryClass: 'Fighter', hpRoll: 10 }],
+        selectedFeats: [],
+        equipment: {
+          armor: 'Adamantine Splint Mail', armorEnhancement: 0, shield: 'none', shieldEnhancement: 0,
+          deflection: 0, natural: 0, dodge: 0, primaryWeapon: 'none'
+        }
+      };
+      expect(calculateTotalDR(splintMailChar as CharacterState).bestDRString).toBe('DR 3/-');
+
+      // 3. Medium Armor: Adamantine Chainmail -> DR 2/- (not misclassified as light!)
+      const chainmailChar: Partial<CharacterState> = {
+        selectedRace: 'Human',
+        levelProgression: [{ level: 1, primaryClass: 'Fighter', hpRoll: 10 }],
+        selectedFeats: [],
+        equipment: {
+          armor: 'Adamantine Chainmail', armorEnhancement: 0, shield: 'none', shieldEnhancement: 0,
+          deflection: 0, natural: 0, dodge: 0, primaryWeapon: 'none'
+        }
+      };
+      expect(calculateTotalDR(chainmailChar as CharacterState).bestDRString).toBe('DR 2/-');
+
+      // 4. Medium Armor: Adamantine Breastplate -> DR 2/-
+      const breastplateChar: Partial<CharacterState> = {
+        selectedRace: 'Human',
+        levelProgression: [{ level: 1, primaryClass: 'Fighter', hpRoll: 10 }],
+        selectedFeats: [],
+        equipment: {
+          armor: 'Adamantine Breastplate', armorEnhancement: 0, shield: 'none', shieldEnhancement: 0,
+          deflection: 0, natural: 0, dodge: 0, primaryWeapon: 'none'
+        }
+      };
+      expect(calculateTotalDR(breastplateChar as CharacterState).bestDRString).toBe('DR 2/-');
+
+      // 5. Light Armor: Adamantine Chain Shirt -> DR 1/-
+      const chainShirtChar: Partial<CharacterState> = {
+        selectedRace: 'Human',
+        levelProgression: [{ level: 1, primaryClass: 'Fighter', hpRoll: 10 }],
+        selectedFeats: [],
+        equipment: {
+          armor: 'Adamantine Chain Shirt', armorEnhancement: 0, shield: 'none', shieldEnhancement: 0,
+          deflection: 0, natural: 0, dodge: 0, primaryWeapon: 'none'
+        }
+      };
+      expect(calculateTotalDR(chainShirtChar as CharacterState).bestDRString).toBe('DR 1/-');
+
+      // 6. Armor with armorItemId and structured armorData
+      const entityArmorChar: Partial<CharacterState> = {
+        selectedRace: 'Human',
+        levelProgression: [{ level: 1, primaryClass: 'Fighter', hpRoll: 10 }],
+        selectedFeats: [],
+        equipment: {
+          armor: 'Adamantine Warplate', armorItemId: 'inv_item_999', armorEnhancement: 0, shield: 'none',
+          shieldEnhancement: 0, deflection: 0, natural: 0, dodge: 0, primaryWeapon: 'none'
+        },
+        inventory: [{
+          id: 'inv_item_999',
+          name: 'Adamantine Warplate',
+          quantity: 1,
+          weight: 60,
+          itemType: 'armor',
+          armorData: {
+            type: 'heavy',
+            acBonus: 9,
+            maxDex: 1,
+            armorCheckPenalty: -7
+          }
+        }]
+      };
+      expect(calculateTotalDR(entityArmorChar as CharacterState).bestDRString).toBe('DR 3/-');
+    });
   });
 });

@@ -1,17 +1,23 @@
 import { ClassData, LevelProgression } from '../types/character';
 
+export function findClassInDatabase(classNameOrId: string | undefined, classDatabase: ClassData[]): ClassData | undefined {
+  if (!classNameOrId) return undefined;
+  const clean = classNameOrId.trim().toLowerCase();
+  return classDatabase.find(c => (c.id && c.id.toLowerCase() === clean) || c.name.toLowerCase() === clean);
+}
+
 export function calculateBAB(levelProgression: LevelProgression[], classDatabase: ClassData[]): number {
   let babAcc = 0;
 
   for (const lvl of levelProgression) {
     if (!lvl.primaryClass) continue;
-    const primaryClassObj = classDatabase.find(c => c.name === lvl.primaryClass);
+    const primaryClassObj = findClassInDatabase(lvl.primaryClass, classDatabase);
     const factorPrimary = primaryClassObj ? primaryClassObj.babFactor : 0.5;
 
     let levelFactor = factorPrimary;
 
     if (lvl.secondaryClass) {
-      const secondaryClassObj = classDatabase.find(c => c.name === lvl.secondaryClass);
+      const secondaryClassObj = findClassInDatabase(lvl.secondaryClass, classDatabase);
       const factorSecondary = secondaryClassObj ? secondaryClassObj.babFactor : 0.5;
       levelFactor = Math.max(factorPrimary, factorSecondary);
     }
@@ -31,17 +37,21 @@ export function calculateBaseSave(
 
   for (const lvl of levelProgression) {
     if (lvl.primaryClass) {
-      classCountMap[lvl.primaryClass] = (classCountMap[lvl.primaryClass] || 0) + 1;
+      const cls = findClassInDatabase(lvl.primaryClass, classDatabase);
+      const key = cls ? cls.name : lvl.primaryClass.trim().toLowerCase();
+      classCountMap[key] = (classCountMap[key] || 0) + 1;
     }
     if (lvl.secondaryClass) {
-      classCountMap[lvl.secondaryClass] = (classCountMap[lvl.secondaryClass] || 0) + 1;
+      const cls = findClassInDatabase(lvl.secondaryClass, classDatabase);
+      const key = cls ? cls.name : lvl.secondaryClass.trim().toLowerCase();
+      classCountMap[key] = (classCountMap[key] || 0) + 1;
     }
   }
 
   let totalSave = 0;
 
   for (const [className, count] of Object.entries(classCountMap)) {
-    const classObj = classDatabase.find(c => c.name === className);
+    const classObj = findClassInDatabase(className, classDatabase);
     if (!classObj) continue;
 
     const factorKey = `${saveType}Factor` as keyof ClassData;
@@ -67,11 +77,11 @@ export function calculateTotalHP(
 
   levelProgression.forEach((lvl, idx) => {
     if (!lvl.primaryClass) return;
-    const clsObj = classDatabase.find(c => c.name === lvl.primaryClass);
+    const clsObj = findClassInDatabase(lvl.primaryClass, classDatabase);
     let hd = clsObj ? clsObj.hitDie : 6;
 
     if (lvl.secondaryClass) {
-      const cls2Obj = classDatabase.find(c => c.name === lvl.secondaryClass);
+      const cls2Obj = findClassInDatabase(lvl.secondaryClass, classDatabase);
       if (cls2Obj) hd = Math.max(hd, cls2Obj.hitDie);
     }
 

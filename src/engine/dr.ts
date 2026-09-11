@@ -376,22 +376,33 @@ export function collectDRSources(
   }
 
   // 5. Equipment DR (e.g. Adamantine Armor)
-  if (character.equipment?.armor) {
+  const equippedArmorItem = character.equipment?.armorItemId
+    ? (character.inventory || []).find(i => i.id === character.equipment!.armorItemId)
+    : undefined;
+
+  if (character.equipment?.armor && character.equipment.armor !== 'none') {
     const customArmors = character.customArmors || [];
     const armorObj = resolveArmor(character.equipment.armor, customArmors);
-    const armorName = (armorObj.name || '').toLowerCase();
+    const armorName = (equippedArmorItem?.name || armorObj.name || '').toLowerCase();
     const armorKey = (character.equipment.armor || '').toLowerCase();
     const customArmor = customArmors.find(a => a.id === character.equipment.armor || a.name.toLowerCase() === armorKey || a.id.toLowerCase() === armorKey);
-    const armorType = (customArmor?.type || '').toLowerCase();
+
+    const detectedType = (
+      equippedArmorItem?.armorData?.type ||
+      customArmor?.type ||
+      armorObj.type ||
+      ''
+    ).toLowerCase();
 
     const isAdamantine = armorName.includes('adamantine') || armorKey.includes('adamantine') ||
-      Boolean(customArmor && customArmor.name.toLowerCase().includes('adamantine'));
+      Boolean(customArmor && customArmor.name.toLowerCase().includes('adamantine')) ||
+      Boolean(equippedArmorItem?.specialQualities?.some(q => q.toLowerCase().includes('adamantine')));
 
     if (isAdamantine) {
-      let adamantineVal = 1; // Light armor
-      if (armorType === 'heavy' || armorName.includes('full plate') || armorName.includes('plate') || armorKey.includes('fullplate')) {
+      let adamantineVal = 1; // Light armor fallback
+      if (detectedType === 'heavy') {
         adamantineVal = 3;
-      } else if (armorType === 'medium' || armorName.includes('breastplate') || armorKey.includes('breastplate')) {
+      } else if (detectedType === 'medium') {
         adamantineVal = 2;
       }
       sources.push({
