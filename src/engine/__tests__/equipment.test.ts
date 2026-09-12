@@ -3,7 +3,7 @@ import {
   calculateTotalCarriedWeight, isItemInInventory, ensureEquippedItemInInventory,
   syncEquippedItemsToInventory, matchesItemName, resolveWeapon, getThemedWeaponBase,
   resolveArmor, resolveShield, createInventoryWeapon, createInventoryArmor, createInventoryShield,
-  calculateFeatCombatBonuses
+  calculateFeatCombatBonuses, resolveEquippedWeapon, DEFAULT_WEAPON
 } from '../equipment';
 import { CharacterState, InventoryItem, CharacterFeat } from '../../types/character';
 
@@ -252,6 +252,26 @@ describe('equipment engine & inventory sync', () => {
     expect(magicNodachi.enhancementBonus).toBe(2);
     expect(magicNodachi.specialQualities).toEqual(['keen']);
     expect(magicNodachi.damageM).toBe('2d6');
+
+    // 'none' and empty weapons should resolve to DEFAULT_WEAPON, never a phantom "none" custom weapon
+    const noneWeapon = resolveWeapon('none', [], []);
+    expect(noneWeapon.name).toBe(DEFAULT_WEAPON.name);
+    expect(noneWeapon.id).toBe(DEFAULT_WEAPON.id);
+    expect(noneWeapon.name).not.toBe('none');
+
+    const emptyWeapon = resolveWeapon('', [], []);
+    expect(emptyWeapon.name).toBe(DEFAULT_WEAPON.name);
+
+    const testChar: any = {
+      equipment: {
+        primaryWeapon: 'none',
+        secondaryWeapon: 'Dagger',
+        rangedWeapon: 'none'
+      }
+    };
+    const equippedPrimary = resolveEquippedWeapon(testChar, 'primaryWeapon', [], []);
+    expect(equippedPrimary.name).toBe(DEFAULT_WEAPON.name);
+    expect(equippedPrimary.name).not.toBe('none');
 
     // Magic armor & shields
     const magicArmor = resolveArmor('+1 Chain Shirt');

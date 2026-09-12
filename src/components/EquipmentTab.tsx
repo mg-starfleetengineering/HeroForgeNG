@@ -1266,29 +1266,30 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const moveSilentlyQualityBonus = getArmorSkillBonus(armorQualities, shieldQualities, 'Move Silently');
 
   // Resolve Primary Weapon & Special Qualities
+  const hasPrimary = Boolean(eq.primaryWeapon && eq.primaryWeapon !== 'none');
   const primaryQualities = eq.primaryWeaponQualities || [];
   const primarySpecialDmg = getWeaponSpecialDamage(primaryQualities);
   const primaryHasKeen = hasKeenQuality(primaryQualities);
   const primaryHasSpeed = hasSpeedQuality(primaryQualities);
-  const primaryWpnObj = resolveEquippedWeapon(character, 'primaryWeapon', weaponsData, customWeapons);
-  const primaryThreat = primaryHasKeen ? calculateKeenThreat(primaryWpnObj.threat) : primaryWpnObj.threat;
-  const primaryTacticalMods = calculateTacticalCombatModifiers(tcState, primaryWpnObj, false, false);
-  const primaryFeatBonuses = calculateFeatCombatBonuses(character, primaryWpnObj);
+  const primaryWpnObj = hasPrimary ? resolveEquippedWeapon(character, 'primaryWeapon', weaponsData, customWeapons) : null;
+  const primaryThreat = primaryWpnObj ? (primaryHasKeen ? calculateKeenThreat(primaryWpnObj.threat) : primaryWpnObj.threat) : 20;
+  const primaryTacticalMods = primaryWpnObj ? calculateTacticalCombatModifiers(tcState, primaryWpnObj, false, false) : null;
+  const primaryFeatBonuses = primaryWpnObj ? calculateFeatCombatBonuses(character, primaryWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const primaryEnhancement = eq.primaryWeaponEnhancement || 0;
-  const primaryTotalAtk = bab + effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + primaryTacticalMods.attackMod;
-  const primaryDmgVal = effectiveStrMod + primaryEnhancement + primaryFeatBonuses.damageBonus + primaryTacticalMods.damageMod;
+  const primaryTotalAtk = primaryWpnObj ? (bab + effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + (primaryTacticalMods?.attackMod || 0)) : 0;
+  const primaryDmgVal = primaryWpnObj ? (effectiveStrMod + primaryEnhancement + primaryFeatBonuses.damageBonus + (primaryTacticalMods?.damageMod || 0)) : 0;
   const primaryDmgStr = primaryDmgVal >= 0 ? `+${primaryDmgVal}` : `${primaryDmgVal}`;
-  const primaryBaseDmgFormula = `${primaryWpnObj.damageM}${primaryDmgVal !== 0 ? primaryDmgStr : ''}`;
+  const primaryBaseDmgFormula = primaryWpnObj ? `${primaryWpnObj.damageM}${primaryDmgVal !== 0 ? primaryDmgStr : ''}` : '';
   const primaryDamageDisplay = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceString}`;
   const primaryRollDamageFormula = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceFormula}`;
-  const primaryFullAttackSeq = generateFullAttackSequence(
+  const primaryFullAttackSeq = primaryWpnObj ? generateFullAttackSequence(
     bab,
-    effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + primaryTacticalMods.attackMod,
+    effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + (primaryTacticalMods?.attackMod || 0),
     tcState.haste,
     tcState.flurryOfBlows,
     tcState.whirlingFrenzy,
     primaryHasSpeed
-  );
+  ) : [];
 
   // Resolve Secondary Weapon & Special Qualities
   const hasSecondary = eq.secondaryWeapon && eq.secondaryWeapon !== 'none';
@@ -2119,7 +2120,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             </div>
 
             {/* Primary Weapon Special Qualities */}
-            {eq.primaryWeapon && eq.primaryWeapon !== 'none' && (
+            {hasPrimary && (
               <QualitySelector
                 title="Primary Weapon Special Qualities"
                 qualities={primaryQualities}
@@ -2132,7 +2133,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
               />
             )}
 
-            {primaryWpnObj && (
+            {hasPrimary && primaryWpnObj && (
               <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2 text-xs">
                 <div className="flex justify-between items-center">
                   <div>
