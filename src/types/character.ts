@@ -37,6 +37,7 @@ export interface WondrousItem {
   slot: 'head' | 'headband' | 'neck' | 'shoulders' | 'chest' | 'body' | 'armor' | 'hands' | 'arms' | 'waist' | 'feet' | 'ring1' | 'ring2' | 'slotless';
   effect: string;
   weight?: number;
+  inventoryItemId?: string;
 }
 
 export interface ItemArmorData {

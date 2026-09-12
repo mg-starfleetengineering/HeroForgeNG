@@ -422,5 +422,59 @@ describe('equipment engine & inventory sync', () => {
     expect(testChar.inventory.find(i => i.id === 'dagger_mundane')?.enhancementBonus).toBeUndefined();
     expect(testChar.inventory.find(i => i.id === 'dagger_magic')?.enhancementBonus).toBe(1);
   });
+
+  it('links wondrous items to inventory via inventoryItemId and avoids duplicates', () => {
+    const charWithWondrous = {
+      name: 'Mage',
+      equipment: {
+        armor: 'none',
+        shield: 'none',
+        primaryWeapon: 'none',
+        wondrousItems: [
+          { id: 'w_1', name: 'Cloak of Resistance +2', slot: 'shoulders', effect: '+2 to all saves', weight: 1 }
+        ]
+      },
+      inventory: []
+    } as unknown as CharacterState;
+
+    const synced = syncEquippedItemsToInventory(charWithWondrous, []);
+    expect(synced.inventory).toHaveLength(1);
+    expect(synced.inventory[0].name).toBe('Cloak of Resistance +2');
+    expect(synced.inventory[0].itemType).toBe('wondrous');
+    expect(synced.equipment.wondrousItems![0].inventoryItemId).toBe(synced.inventory[0].id);
+
+    // Syncing a second time should not duplicate the item
+    const syncedAgain = syncEquippedItemsToInventory(synced, []);
+    expect(syncedAgain.inventory).toHaveLength(1);
+    expect(syncedAgain.equipment.wondrousItems![0].inventoryItemId).toBe(synced.inventory[0].id);
+  });
+
+  it('calculates total carried weight using ID pointers without duplicate weights', () => {
+    const charWithIds = {
+      name: 'Knight',
+      equipment: {
+        armor: 'Full Plate',
+        armorItemId: 'armor_inv_1',
+        shield: 'Heavy Shield',
+        shieldItemId: 'shield_inv_1',
+        primaryWeapon: 'Longsword',
+        primaryWeaponItemId: 'weapon_inv_1',
+        wondrousItems: [
+          { id: 'w_1', inventoryItemId: 'wondrous_inv_1', name: 'Boots of Speed', slot: 'feet', effect: 'Haste', weight: 1 }
+        ]
+      },
+      inventory: [
+        { id: 'armor_inv_1', name: 'Full Plate', quantity: 1, weight: 50, location: 'Carried' },
+        { id: 'shield_inv_1', name: 'Heavy Shield', quantity: 1, weight: 15, location: 'Carried' },
+        { id: 'weapon_inv_1', name: 'Longsword', quantity: 1, weight: 4, location: 'Carried' },
+        { id: 'wondrous_inv_1', name: 'Boots of Speed', quantity: 1, weight: 1, location: 'Carried' }
+      ]
+    } as unknown as CharacterState;
+
+    // Weight should be exactly 50 + 15 + 4 + 1 = 70 lbs, not 140 lbs
+    const weight = calculateTotalCarriedWeight(charWithIds, []);
+    expect(weight).toBe(70);
+  });
 });
+
 

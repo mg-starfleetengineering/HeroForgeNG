@@ -73,6 +73,70 @@ describe('Tactical Combat Engine', () => {
     expect(isTwoHandedWeapon(dummyLongsword)).toBe(false);
     expect(isLightWeapon(dummyDagger)).toBe(true);
     expect(isLightWeapon(dummyLongsword)).toBe(false);
+
+    // Test structured size: 'T' (Two-Handed) for weapons without "great" in name
+    const spikedChain: WeaponData = {
+      id: 'spiked_chain',
+      name: 'Spiked Chain',
+      category: 'Exotic',
+      size: 'T',
+      damageM: '2d4',
+      threat: 20,
+      critMultiplier: 2,
+      weight: 10,
+      type: 'Piercing'
+    };
+    const longspear: WeaponData = {
+      id: 'longspear',
+      name: 'Longspear',
+      category: 'Simple',
+      size: 'T',
+      damageM: '1d8',
+      threat: 20,
+      critMultiplier: 3,
+      weight: 9,
+      type: 'Piercing'
+    };
+    expect(isTwoHandedWeapon(spikedChain)).toBe(true);
+    expect(isTwoHandedWeapon(longspear)).toBe(true);
+
+    // Test structured size: 'L' (Light) and 'U' (Unarmed)
+    const lightPick: WeaponData = {
+      id: 'light_pick',
+      name: 'Light Pick',
+      category: 'Martial',
+      size: 'L',
+      damageM: '1d4',
+      threat: 20,
+      critMultiplier: 4,
+      weight: 3,
+      type: 'Piercing'
+    };
+    const kama: WeaponData = {
+      id: 'kama',
+      name: 'Kama',
+      category: 'Exotic',
+      size: 'L',
+      damageM: '1d6',
+      threat: 20,
+      critMultiplier: 2,
+      weight: 2,
+      type: 'Slashing'
+    };
+    const unarmed: WeaponData = {
+      id: 'unarmed_strike',
+      name: 'Unarmed Strike',
+      category: 'Simple',
+      size: 'U',
+      damageM: '1d3',
+      threat: 20,
+      critMultiplier: 2,
+      weight: 0,
+      type: 'Bludgeoning'
+    };
+    expect(isLightWeapon(lightPick)).toBe(true);
+    expect(isLightWeapon(kama)).toBe(true);
+    expect(isLightWeapon(unarmed)).toBe(true);
   });
 
   it('calculates Power Attack damage scaling (2x for 2H, 1x for 1H, 0 for Light)', () => {
@@ -85,6 +149,20 @@ describe('Tactical Combat Engine', () => {
     expect(greatswordMods.attackMod).toBe(-3);
     expect(greatswordMods.damageMod).toBe(6); // 3 * 2
 
+    const spikedChain: WeaponData = {
+      id: 'spiked_chain',
+      name: 'Spiked Chain',
+      category: 'Exotic',
+      size: 'T',
+      damageM: '2d4',
+      threat: 20,
+      critMultiplier: 2,
+      weight: 10,
+      type: 'Piercing'
+    };
+    const spikedChainMods = calculateTacticalCombatModifiers(tcState, spikedChain);
+    expect(spikedChainMods.damageMod).toBe(6); // 3 * 2 for two-handed exotic weapon
+
     const longswordMods = calculateTacticalCombatModifiers(tcState, dummyLongsword);
     expect(longswordMods.attackMod).toBe(-3);
     expect(longswordMods.damageMod).toBe(3); // 3 * 1
@@ -92,6 +170,20 @@ describe('Tactical Combat Engine', () => {
     const daggerMods = calculateTacticalCombatModifiers(tcState, dummyDagger);
     expect(daggerMods.attackMod).toBe(-3);
     expect(daggerMods.damageMod).toBe(0); // light weapon
+
+    const lightPick: WeaponData = {
+      id: 'light_pick',
+      name: 'Light Pick',
+      category: 'Martial',
+      size: 'L',
+      damageM: '1d4',
+      threat: 20,
+      critMultiplier: 4,
+      weight: 3,
+      type: 'Piercing'
+    };
+    const lightPickMods = calculateTacticalCombatModifiers(tcState, lightPick);
+    expect(lightPickMods.damageMod).toBe(0); // light weapon receives 0 Power Attack bonus
   });
 
   it('calculates Fighting Defensively & Combat Expertise Dodge AC bonuses', () => {
