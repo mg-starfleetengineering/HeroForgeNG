@@ -4,8 +4,10 @@ import {
   getRollHistory,
   clearRollHistory,
   subscribeRolls,
-  rollDice
+  rollDice,
+  DamagePoolResult
 } from '../engine/dice';
+import { calculateCritDamagePools } from '../engine/magicItems';
 
 const QUICK_DICE = [
   { label: 'd4', sides: 4, icon: 'fa-solid fa-dice-d6' },
@@ -77,8 +79,107 @@ export const DiceTrayWidget: React.FC = () => {
       threatMin: roll.threatMin,
       critMultiplier: roll.critMultiplier,
       rollType: roll.rollType,
-      components: roll.components
+      components: roll.components,
+      weapon: roll.weapon,
+      damagePools: roll.damagePools?.map(p => ({
+        label: p.label,
+        damageType: p.damageType,
+        formula: p.dice,
+        condition: p.condition,
+        isRecoil: p.isRecoil,
+        isNonlethal: p.isNonlethal
+      })),
+      isNonlethal: roll.isNonlethal
     });
+  };
+
+  const handleRollCritDamageFromAttack = (roll: RollResult) => {
+    if (!roll.weapon) return;
+    const w = roll.weapon;
+    const critInfo = calculateCritDamagePools(w, 0, w.specialQualities || []);
+    rollDice(critInfo.rollFormula, `${w.name || 'Weapon'} Crit Damage (Confirmed)`, {
+      rollType: 'damage',
+      weapon: w,
+      critMultiplier: w.critMultiplier || 2,
+      damagePools: critInfo.damagePools
+    });
+  };
+
+  const renderDamagePoolPill = (pool: DamagePoolResult, index: number) => {
+    if (pool.isRecoil) {
+      return (
+        <span
+          key={index}
+          className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-rose-950/70 text-rose-300 border border-rose-500/50 flex items-center gap-1 shadow-xs"
+          title="Recoil damage suffered by wielder"
+        >
+          <i className="fa-solid fa-droplet text-rose-400"></i>
+          <span>Recoil: <strong className="text-rose-200">{pool.total}</strong> ({pool.dice})</span>
+        </span>
+      );
+    }
+
+    const dt = (pool.damageType || '').toLowerCase();
+    let colorClass = 'bg-slate-800 text-slate-200 border-slate-700';
+    let icon = 'fa-solid fa-shield text-slate-400';
+
+    if (dt.includes('holy')) {
+      colorClass = 'bg-amber-500/20 text-amber-200 border-amber-500/40';
+      icon = 'fa-solid fa-sun text-amber-300';
+    } else if (dt.includes('unholy')) {
+      colorClass = 'bg-purple-500/20 text-purple-200 border-purple-500/40';
+      icon = 'fa-solid fa-skull text-purple-300';
+    } else if (dt.includes('law') || dt.includes('axiomatic')) {
+      colorClass = 'bg-indigo-500/20 text-indigo-200 border-indigo-500/40';
+      icon = 'fa-solid fa-scale-balanced text-indigo-300';
+    } else if (dt.includes('chao') || dt.includes('anarchic')) {
+      colorClass = 'bg-rose-500/20 text-rose-200 border-rose-500/40';
+      icon = 'fa-solid fa-tornado text-rose-300';
+    } else if (dt.includes('bane')) {
+      colorClass = 'bg-red-500/20 text-red-200 border-red-500/40';
+      icon = 'fa-solid fa-bullseye text-red-300';
+    } else if (dt.includes('vicious')) {
+      colorClass = 'bg-rose-900/30 text-rose-200 border-rose-500/40';
+      icon = 'fa-solid fa-droplet text-rose-400';
+    } else if (dt.includes('fire')) {
+      colorClass = 'bg-orange-500/20 text-orange-200 border-orange-500/40';
+      icon = 'fa-solid fa-fire text-orange-400';
+    } else if (dt.includes('cold')) {
+      colorClass = 'bg-cyan-500/20 text-cyan-200 border-cyan-500/40';
+      icon = 'fa-solid fa-snowflake text-cyan-300';
+    } else if (dt.includes('elec')) {
+      colorClass = 'bg-yellow-500/20 text-yellow-200 border-yellow-500/40';
+      icon = 'fa-solid fa-bolt text-yellow-300';
+    } else if (dt.includes('acid')) {
+      colorClass = 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40';
+      icon = 'fa-solid fa-flask text-emerald-300';
+    } else if (dt.includes('sonic')) {
+      colorClass = 'bg-violet-500/20 text-violet-200 border-violet-500/40';
+      icon = 'fa-solid fa-volume-high text-violet-300';
+    } else if (dt.includes('nonlethal')) {
+      colorClass = 'bg-teal-500/20 text-teal-200 border-teal-500/40';
+      icon = 'fa-solid fa-dove text-teal-300';
+    } else {
+      colorClass = 'bg-slate-800/80 text-slate-300 border-slate-700';
+      icon = 'fa-solid fa-gavel text-slate-400';
+    }
+
+    const conditionText = pool.condition ? ` • ${pool.condition}` : '';
+    const rollDetails = pool.results && pool.results.length > 0 ? ` [${pool.results.join(', ')}]` : '';
+
+    return (
+      <span
+        key={index}
+        className={`text-[11px] font-mono px-2 py-0.5 rounded-md border flex items-center gap-1.5 shadow-xs ${colorClass}`}
+        title={`${pool.label} (${pool.damageType}${conditionText})`}
+      >
+        <i className={icon}></i>
+        <span>
+          {pool.label}: <strong className="font-bold text-white">+{pool.total}</strong>
+          <span className="text-[10px] opacity-75 font-sans ml-1">({pool.dice}{rollDetails}{conditionText})</span>
+        </span>
+      </span>
+    );
   };
 
   const formatTimestamp = (ts: number) => {
@@ -204,52 +305,89 @@ export const DiceTrayWidget: React.FC = () => {
                     </div>
 
                     {/* Middle Row: Big Total & Math Breakdown */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                      <div className="flex items-baseline gap-3">
-                        <span
-                          className={`text-2xl font-black font-mono tracking-tight ${
-                            roll.status === 'nat20'
-                              ? 'text-amber-300'
-                              : roll.status === 'crit_threat'
-                              ? 'text-amber-400'
-                              : roll.status === 'nat1'
-                              ? 'text-rose-400'
-                              : 'text-slate-100'
-                          }`}
-                        >
-                          {roll.total}
-                        </span>
+                    <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800/80 space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-baseline gap-3">
+                          {roll.recoilTotal !== undefined && roll.recoilTotal > 0 ? (
+                            <div className="flex items-baseline gap-2 flex-wrap">
+                              <div className="flex items-baseline gap-1.5">
+                                <span className="text-xs font-mono font-bold uppercase text-slate-400">Target:</span>
+                                <span className="text-2xl font-black font-mono tracking-tight text-amber-300">
+                                  {roll.total}
+                                </span>
+                              </div>
+                              <span className="text-slate-600 font-mono">|</span>
+                              <div className="flex items-baseline gap-1.5 px-2 py-0.5 rounded bg-rose-950/60 border border-rose-500/40 text-rose-300">
+                                <span className="text-[10px] font-mono font-bold uppercase">⚠️ Wielder Recoil:</span>
+                                <span className="text-lg font-black font-mono tracking-tight text-rose-200">
+                                  {roll.recoilTotal}
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            <span
+                              className={`text-2xl font-black font-mono tracking-tight ${
+                                roll.status === 'nat20'
+                                  ? 'text-amber-300'
+                                  : roll.status === 'crit_threat'
+                                  ? 'text-amber-400'
+                                  : roll.status === 'nat1'
+                                  ? 'text-rose-400'
+                                  : 'text-slate-100'
+                              }`}
+                            >
+                              {roll.total}
+                            </span>
+                          )}
 
-                        {/* Breakdown String */}
-                        <span className="text-xs font-mono text-slate-300 break-all">
-                          {roll.detailedBreakdown || roll.breakdown}
-                        </span>
+                          {/* Breakdown String */}
+                          <span className="text-xs font-mono text-slate-300 break-all">
+                            {roll.detailedBreakdown || roll.breakdown}
+                          </span>
+                        </div>
+
+                        {/* Status Badges */}
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {roll.isNonlethal && (
+                            <span className="text-xs font-bold font-sans px-2 py-0.5 rounded-md bg-teal-500/20 text-teal-300 border border-teal-500/40 flex items-center gap-1">
+                              🕊️ NONLETHAL
+                            </span>
+                          )}
+                          {roll.status === 'nat20' && (
+                            <span className="text-xs font-bold font-sans px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
+                              💥 NATURAL 20!
+                            </span>
+                          )}
+                          {roll.status === 'crit_threat' && (
+                            <span className="text-xs font-bold font-sans px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center gap-1">
+                              ⚡ CRITICAL THREAT ({roll.threatMin < 20 ? `${roll.threatMin}-20` : '20'})!
+                            </span>
+                          )}
+                          {roll.status === 'nat1' && (
+                            <span className="text-xs font-bold font-sans px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1">
+                              💀 NATURAL 1 (Fumble!)
+                            </span>
+                          )}
+                        </div>
                       </div>
 
-                      {/* Status Badges */}
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {roll.status === 'nat20' && (
-                          <span className="text-xs font-bold font-sans px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
-                            💥 NATURAL 20!
+                      {/* Segregated Damage Pools */}
+                      {roll.damagePools && roll.damagePools.length > 0 && (
+                        <div className="pt-2 border-t border-slate-800/80 space-y-1">
+                          <span className="text-[9.5px] font-sans uppercase font-bold text-slate-400 block tracking-wider">
+                            Damage Pools Breakdown:
                           </span>
-                        )}
-                        {roll.status === 'crit_threat' && (
-                          <span className="text-xs font-bold font-sans px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center gap-1">
-                            ⚡ CRITICAL THREAT ({roll.threatMin < 20 ? `${roll.threatMin}-20` : '20'})!
-                          </span>
-                        )}
-                        {roll.status === 'nat1' && (
-                          <span className="text-xs font-bold font-sans px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1">
-                            💀 NATURAL 1 (Fumble!)
-                          </span>
-                        )}
-                      </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {roll.damagePools.map((pool, pIdx) => renderDamagePoolPill(pool, pIdx))}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Automatic Critical Confirmation Roll Card (if present) */}
                     {roll.confirmationRoll && (
                       <div className="mt-1.5 ml-3 pl-3 border-l-2 border-amber-500/60 bg-amber-950/20 rounded-r-lg p-2 text-xs font-mono flex flex-wrap items-center justify-between gap-2 border border-amber-500/30">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-bold text-amber-300 flex items-center gap-1">
                             <i className="fa-solid fa-shield-halved text-amber-400"></i> Crit Confirmation:
                           </span>
@@ -259,16 +397,27 @@ export const DiceTrayWidget: React.FC = () => {
                           </span>
                         </div>
 
-                        {roll.confirmationRoll.status === 'nat20' && (
-                          <span className="text-[10px] font-bold text-amber-300 bg-amber-500/20 px-1.5 py-0.2 rounded border border-amber-500/40">
-                            💥 Nat 20 Confirmed!
-                          </span>
-                        )}
-                        {roll.confirmationRoll.status === 'nat1' && (
-                          <span className="text-[10px] font-bold text-rose-300 bg-rose-500/20 px-1.5 py-0.2 rounded border border-rose-500/40">
-                            💀 Nat 1 Confirmation
-                          </span>
-                        )}
+                        <div className="flex items-center gap-1.5">
+                          {roll.confirmationRoll.status === 'nat20' && (
+                            <span className="text-[10px] font-bold text-amber-300 bg-amber-500/20 px-1.5 py-0.2 rounded border border-amber-500/40">
+                              💥 Nat 20 Confirmed!
+                            </span>
+                          )}
+                          {roll.confirmationRoll.status === 'nat1' && (
+                            <span className="text-[10px] font-bold text-rose-300 bg-rose-500/20 px-1.5 py-0.2 rounded border border-rose-500/40">
+                              💀 Nat 1 Confirmation
+                            </span>
+                          )}
+                          {roll.weapon && (
+                            <button
+                              onClick={() => handleRollCritDamageFromAttack(roll)}
+                              className="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold border border-amber-500/40 flex items-center gap-1 transition cursor-pointer shadow-xs"
+                              title="Roll critical damage with multiplied base and burst pool"
+                            >
+                              <i className="fa-solid fa-burst text-amber-400"></i> Roll Crit Damage
+                            </button>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -327,6 +476,8 @@ export const DiceTrayWidget: React.FC = () => {
             >
               <span className="font-bold text-sm text-slate-100">{lastRoll.total}</span>
               <span className="text-slate-400 text-[11px] truncate max-w-[180px]">{lastRoll.detailedBreakdown || lastRoll.breakdown}</span>
+              {lastRoll.isNonlethal && <span className="font-bold text-[10px] text-teal-300">🕊️ NONLETHAL</span>}
+              {lastRoll.recoilTotal !== undefined && lastRoll.recoilTotal > 0 && <span className="font-bold text-[10px] text-rose-400">⚠️ RECOIL {lastRoll.recoilTotal}</span>}
               {lastRoll.status === 'nat20' && <span className="font-bold text-[10px] text-amber-300">💥 NAT 20</span>}
               {lastRoll.status === 'crit_threat' && <span className="font-bold text-[10px] text-amber-400">⚡ THREAT</span>}
               {lastRoll.status === 'nat1' && <span className="font-bold text-[10px] text-rose-400">💀 FUMBLE</span>}

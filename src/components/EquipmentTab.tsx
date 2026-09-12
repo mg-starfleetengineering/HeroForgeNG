@@ -30,6 +30,10 @@ import {
   hasKeenQuality,
   hasSpeedQuality,
   getWeaponSpecialDamage,
+  getWeaponRollOptions,
+  calculateCritDamagePools,
+  getBaneAttackOption,
+  WeaponRollOption,
   getArmorSkillBonus,
   getFortificationSummary,
   calculateTotalItemCost,
@@ -1282,6 +1286,9 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const primaryBaseDmgFormula = primaryWpnObj ? `${primaryWpnObj.damageM}${primaryDmgVal !== 0 ? primaryDmgStr : ''}` : '';
   const primaryDamageDisplay = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceString}`;
   const primaryRollDamageFormula = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceFormula}`;
+  const primaryRollOptions = primaryWpnObj ? getWeaponRollOptions(primaryWpnObj, primaryBaseDmgFormula, primaryDmgVal, primaryTotalAtk, primaryQualities) : [];
+  const primaryBaneAtk = primarySpecialDmg.hasBane && primaryWpnObj ? getBaneAttackOption(primaryTotalAtk, primaryWpnObj.name) : null;
+  const primaryCritInfo = primaryWpnObj ? calculateCritDamagePools(primaryWpnObj, primaryDmgVal, primaryQualities) : null;
   const primaryFullAttackSeq = primaryWpnObj ? generateFullAttackSequence(
     bab,
     effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + (primaryTacticalMods?.attackMod || 0),
@@ -1307,6 +1314,9 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const secondaryBaseDmgFormula = secondaryWpnObj ? `${secondaryWpnObj.damageM}${secondaryDmgVal >= 0 ? `+${secondaryDmgVal}` : secondaryDmgVal}` : '';
   const secondaryDamageDisplay = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceString}`;
   const secondaryRollDamageFormula = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceFormula}`;
+  const secondaryRollOptions = secondaryWpnObj ? getWeaponRollOptions(secondaryWpnObj, secondaryBaseDmgFormula, secondaryDmgVal, secondaryTotalAtk, secondaryQualities) : [];
+  const secondaryBaneAtk = secondarySpecialDmg.hasBane && secondaryWpnObj ? getBaneAttackOption(secondaryTotalAtk, secondaryWpnObj.name) : null;
+  const secondaryCritInfo = secondaryWpnObj ? calculateCritDamagePools(secondaryWpnObj, secondaryDmgVal, secondaryQualities) : null;
 
   // Resolve Ranged Weapon & Special Qualities
   const hasRanged = eq.rangedWeapon && eq.rangedWeapon !== 'none';
@@ -1325,6 +1335,9 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const rangedBaseDmgFormula = rangedWpnObj ? `${rangedWpnObj.damageM}${rangedDmgStr}` : '';
   const rangedDamageDisplay = `${rangedBaseDmgFormula}${rangedSpecialDmg.damageDiceString}`;
   const rangedRollDamageFormula = `${rangedBaseDmgFormula}${rangedSpecialDmg.damageDiceFormula}`;
+  const rangedRollOptions = rangedWpnObj ? getWeaponRollOptions(rangedWpnObj, rangedBaseDmgFormula, rangedDmgVal, rangedTotalAtk, rangedQualities) : [];
+  const rangedBaneAtk = rangedSpecialDmg.hasBane && rangedWpnObj ? getBaneAttackOption(rangedTotalAtk, rangedWpnObj.name) : null;
+  const rangedCritInfo = rangedWpnObj ? calculateCritDamagePools(rangedWpnObj, rangedDmgVal, rangedQualities) : null;
 
   // Inventory Actions
   const handleAddInventoryItem = (e: React.FormEvent) => {
@@ -2166,36 +2179,91 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                       )}
                     </div>
                   </div>
-                  <button
-                    onClick={() => rollAttack(primaryTotalAtk, `${primaryWpnObj.name} Attack`, { ...primaryWpnObj, threat: primaryThreat })}
-                    className="font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/30 font-bold text-sm transition flex items-center gap-1.5 cursor-pointer shadow-xs"
-                    title={`Click to roll ${primaryWpnObj.name} Attack`}
-                  >
-                    <i className="fa-solid fa-dice-d20 text-xs"></i>
-                    <span>{primaryTotalAtk >= 0 ? '+' : ''}{primaryTotalAtk} Melee</span>
-                  </button>
+                  <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                    <button
+                      onClick={() => rollAttack(primaryTotalAtk, `${primaryWpnObj.name} Attack`, primaryWpnObj, { threatMin: primaryThreat })}
+                      className="font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/30 font-bold text-sm transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                      title={`Click to roll ${primaryWpnObj.name} Attack`}
+                    >
+                      <i className="fa-solid fa-dice-d20 text-xs"></i>
+                      <span>{primaryTotalAtk >= 0 ? '+' : ''}{primaryTotalAtk} Melee</span>
+                    </button>
+                    {primaryBaneAtk && (
+                      <button
+                        onClick={() => rollAttack(primaryBaneAtk.atkBonus, primaryBaneAtk.label, primaryWpnObj, { threatMin: primaryThreat })}
+                        className="font-mono text-red-400 hover:text-red-300 hover:bg-red-500/20 px-2 py-1 rounded-lg border border-red-500/30 font-bold text-xs transition flex items-center gap-1 cursor-pointer shadow-xs"
+                        title={`Click to roll ${primaryBaneAtk.label}`}
+                      >
+                        <i className="fa-solid fa-bullseye text-xs text-red-400"></i>
+                        <span>{primaryBaneAtk.atkBonus >= 0 ? '+' : ''}{primaryBaneAtk.atkBonus} Melee (vs Foe)</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="grid grid-cols-3 text-center gap-2 py-1 font-mono text-slate-300 bg-slate-900/60 rounded border border-slate-800">
-                  <div
-                    onClick={() => rollDamage(primaryRollDamageFormula, `${primaryWpnObj.name} Damage${primarySpecialDmg.summaryLabels.length > 0 ? ` (${primarySpecialDmg.summaryLabels.join(', ')})` : ''}`)}
-                    className="cursor-pointer hover:bg-slate-800/80 rounded p-0.5 transition group"
-                    title={`Click to roll ${primaryWpnObj.name} Damage (${primaryRollDamageFormula})`}
-                  >
-                    <span className="text-[10px] text-slate-400 block uppercase group-hover:text-amber-400 flex items-center justify-center gap-1">
-                      Damage <i className="fa-solid fa-dice-d6 text-[9px] opacity-0 group-hover:opacity-100 text-amber-400"></i>
-                    </span>
-                    <span className="group-hover:text-amber-300 font-bold">{primaryDamageDisplay}</span>
+                <div className="space-y-2 py-1.5 px-2.5 bg-slate-900/60 rounded-lg border border-slate-800">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-1.5 text-xs font-mono">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Damage:</span>
+                      <span className="font-bold text-amber-300">{primaryDamageDisplay}</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-slate-300">
+                      <div
+                        onClick={() => {
+                          if (primaryCritInfo) {
+                            rollDamage(primaryCritInfo.rollFormula, primaryCritInfo.label, {
+                              rollType: 'damage',
+                              weapon: primaryWpnObj,
+                              critMultiplier: primaryWpnObj.critMultiplier || 2,
+                              damagePools: primaryCritInfo.damagePools
+                            });
+                          }
+                        }}
+                        className="cursor-pointer hover:text-amber-300 transition flex items-center gap-1 group"
+                        title="Click to roll Critical Damage (multiplied base + burst pools)"
+                      >
+                        <span className="text-[10px] text-slate-400 uppercase">Crit:</span>
+                        <span className={primaryHasKeen ? 'text-amber-300 font-bold group-hover:underline' : 'group-hover:underline'}>
+                          {primaryThreat < 20 ? `${primaryThreat}-20` : '20'}/x{primaryWpnObj.critMultiplier || 2}
+                          {primaryHasKeen ? ' (Keen)' : ''}
+                        </span>
+                        <i className="fa-solid fa-burst text-[10px] text-amber-400 opacity-0 group-hover:opacity-100 transition"></i>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 uppercase mr-1">Type:</span>
+                        <span>{primaryWpnObj.type || 'Slashing'}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 block uppercase">Critical</span>
-                    <span className={primaryHasKeen ? 'text-amber-300 font-bold' : ''}>
-                      {primaryThreat < 20 ? `${primaryThreat}-20` : '20'}/x{primaryWpnObj.critMultiplier || 2}
-                      {primaryHasKeen ? ' (Keen)' : ''}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 block uppercase">Type</span>
-                    <span>{primaryWpnObj.type || 'Slashing'}</span>
+
+                  {/* Interactive Multi-Button Damage Roll Chips */}
+                  <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                    {primaryRollOptions.map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => rollDamage(opt.rollFormula, `${primaryWpnObj.name} ${opt.label}`, {
+                          weapon: primaryWpnObj,
+                          damagePools: opt.damagePools,
+                          isNonlethal: opt.isNonlethal
+                        })}
+                        className={`px-2 py-1 rounded-lg text-xs font-mono font-bold border transition flex items-center gap-1.5 cursor-pointer shadow-xs ${
+                          opt.type === 'merciful'
+                            ? 'bg-teal-500/15 hover:bg-teal-500/25 text-teal-300 border-teal-500/40'
+                            : opt.type === 'base'
+                            ? 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40'
+                            : opt.type === 'bane'
+                            ? 'bg-red-500/15 hover:bg-red-500/25 text-red-300 border-red-500/40'
+                            : opt.type === 'vicious'
+                            ? 'bg-rose-900/25 hover:bg-rose-900/35 text-rose-300 border-rose-500/40'
+                            : opt.type === 'alignment'
+                            ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border-amber-500/40'
+                            : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700'
+                        }`}
+                        title={opt.buttonTitle || `Roll ${opt.label}`}
+                      >
+                        {opt.icon && <i className={`${opt.icon} text-[11px]`}></i>}
+                        <span>{opt.label}</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -2251,37 +2319,88 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             )}
 
             {secondaryWpnObj && (
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex justify-between items-center text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-slate-300">{secondaryWpnObj.name}</span>
-                  {secondarySpecialDmg.summaryLabels.length > 0 && (
-                    <span className="text-[10px] text-orange-300 font-semibold">
-                      ({secondarySpecialDmg.summaryLabels.join(', ')})
-                    </span>
-                  )}
-                  {secondaryHasKeen && (
-                    <span className="text-[10px] text-amber-300 font-semibold">
-                      (Keen {secondaryThreat}-20)
-                    </span>
-                  )}
+              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2 text-xs">
+                <div className="flex justify-between items-center flex-wrap gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-slate-300">{secondaryWpnObj.name}</span>
+                    {secondarySpecialDmg.summaryLabels.length > 0 && (
+                      <span className="text-[10px] text-orange-300 font-semibold">
+                        ({secondarySpecialDmg.summaryLabels.join(', ')})
+                      </span>
+                    )}
+                    {secondaryHasKeen && (
+                      <span className="text-[10px] text-amber-300 font-semibold">
+                        (Keen {secondaryThreat}-20)
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <button
+                      onClick={() => rollAttack(secondaryTotalAtk, `${secondaryWpnObj.name} Off-Hand Attack`, secondaryWpnObj, { threatMin: secondaryThreat })}
+                      className="font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
+                      title={`Click to roll ${secondaryWpnObj.name} Off-Hand Attack`}
+                    >
+                      <i className="fa-solid fa-dice-d20 text-[10px]"></i>
+                      <span>{secondaryTotalAtk >= 0 ? '+' : ''}{secondaryTotalAtk} Atk</span>
+                    </button>
+                    {secondaryBaneAtk && (
+                      <button
+                        onClick={() => rollAttack(secondaryBaneAtk.atkBonus, secondaryBaneAtk.label, secondaryWpnObj, { threatMin: secondaryThreat })}
+                        className="font-mono text-red-400 hover:text-red-300 hover:bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30 font-bold text-[11px] transition flex items-center gap-1 cursor-pointer"
+                        title={`Click to roll ${secondaryBaneAtk.label}`}
+                      >
+                        <i className="fa-solid fa-bullseye text-[10px] text-red-400"></i>
+                        <span>{secondaryBaneAtk.atkBonus >= 0 ? '+' : ''}{secondaryBaneAtk.atkBonus} Atk (vs Foe)</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => rollAttack(secondaryTotalAtk, `${secondaryWpnObj.name} Off-Hand Attack`, { ...secondaryWpnObj, threat: secondaryThreat })}
-                    className="font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
-                    title={`Click to roll ${secondaryWpnObj.name} Off-Hand Attack`}
-                  >
-                    <i className="fa-solid fa-dice-d20 text-[10px]"></i>
-                    <span>{secondaryTotalAtk >= 0 ? '+' : ''}{secondaryTotalAtk} Atk</span>
-                  </button>
-                  <button
-                    onClick={() => rollDamage(secondaryRollDamageFormula, `${secondaryWpnObj.name} Damage${secondarySpecialDmg.summaryLabels.length > 0 ? ` (${secondarySpecialDmg.summaryLabels.join(', ')})` : ''}`)}
-                    className="font-mono text-amber-300 hover:text-amber-200 hover:bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
-                    title={`Click to roll ${secondaryWpnObj.name} Damage (${secondaryRollDamageFormula})`}
-                  >
-                    <i className="fa-solid fa-dice-d6 text-[10px]"></i>
-                    <span>{secondaryDamageDisplay}</span>
-                  </button>
+
+                <div className="flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-slate-800/80">
+                  {secondaryRollOptions.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => rollDamage(opt.rollFormula, `${secondaryWpnObj.name} ${opt.label}`, {
+                        weapon: secondaryWpnObj,
+                        damagePools: opt.damagePools,
+                        isNonlethal: opt.isNonlethal
+                      })}
+                      className={`px-2 py-0.5 rounded text-xs font-mono font-bold border transition flex items-center gap-1 cursor-pointer shadow-xs ${
+                        opt.type === 'merciful'
+                          ? 'bg-teal-500/15 hover:bg-teal-500/25 text-teal-300 border-teal-500/40'
+                          : opt.type === 'base'
+                          ? 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40'
+                          : opt.type === 'bane'
+                          ? 'bg-red-500/15 hover:bg-red-500/25 text-red-300 border-red-500/40'
+                          : opt.type === 'vicious'
+                          ? 'bg-rose-900/25 hover:bg-rose-900/35 text-rose-300 border-rose-500/40'
+                          : opt.type === 'alignment'
+                          ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border-amber-500/40'
+                          : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700'
+                      }`}
+                      title={opt.buttonTitle || `Roll ${opt.label}`}
+                    >
+                      {opt.icon && <i className={`${opt.icon} text-[10px]`}></i>}
+                      <span>{opt.label}</span>
+                    </button>
+                  ))}
+                  {secondaryCritInfo && (
+                    <button
+                      onClick={() => {
+                        rollDamage(secondaryCritInfo.rollFormula, secondaryCritInfo.label, {
+                          rollType: 'damage',
+                          weapon: secondaryWpnObj,
+                          critMultiplier: secondaryWpnObj.critMultiplier || 2,
+                          damagePools: secondaryCritInfo.damagePools
+                        });
+                      }}
+                      className="px-2 py-0.5 rounded text-[11px] font-mono text-slate-400 hover:text-amber-300 hover:bg-slate-800 border border-slate-800 transition flex items-center gap-1 cursor-pointer"
+                      title="Roll Critical Damage"
+                    >
+                      <i className="fa-solid fa-burst text-[10px] text-amber-400"></i>
+                      <span>Crit ({secondaryThreat < 20 ? `${secondaryThreat}-20` : '20'}/x{secondaryWpnObj.critMultiplier || 2})</span>
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -2336,37 +2455,88 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             )}
 
             {rangedWpnObj && (
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex justify-between items-center text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-slate-300">{rangedWpnObj.name}</span>
-                  {rangedSpecialDmg.summaryLabels.length > 0 && (
-                    <span className="text-[10px] text-orange-300 font-semibold">
-                      ({rangedSpecialDmg.summaryLabels.join(', ')})
-                    </span>
-                  )}
-                  {rangedHasKeen && (
-                    <span className="text-[10px] text-amber-300 font-semibold">
-                      (Keen {rangedThreat}-20)
-                    </span>
-                  )}
+              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2 text-xs">
+                <div className="flex justify-between items-center flex-wrap gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-slate-300">{rangedWpnObj.name}</span>
+                    {rangedSpecialDmg.summaryLabels.length > 0 && (
+                      <span className="text-[10px] text-orange-300 font-semibold">
+                        ({rangedSpecialDmg.summaryLabels.join(', ')})
+                      </span>
+                    )}
+                    {rangedHasKeen && (
+                      <span className="text-[10px] text-amber-300 font-semibold">
+                        (Keen {rangedThreat}-20)
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <button
+                      onClick={() => rollAttack(rangedTotalAtk, `${rangedWpnObj.name} Ranged Attack`, rangedWpnObj, { threatMin: rangedThreat })}
+                      className="font-mono text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/20 px-2 py-0.5 rounded border border-cyan-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
+                      title={`Click to roll ${rangedWpnObj.name} Ranged Attack`}
+                    >
+                      <i className="fa-solid fa-dice-d20 text-[10px]"></i>
+                      <span>{rangedTotalAtk >= 0 ? '+' : ''}{rangedTotalAtk} Ranged</span>
+                    </button>
+                    {rangedBaneAtk && (
+                      <button
+                        onClick={() => rollAttack(rangedBaneAtk.atkBonus, rangedBaneAtk.label, rangedWpnObj, { threatMin: rangedThreat })}
+                        className="font-mono text-red-400 hover:text-red-300 hover:bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30 font-bold text-[11px] transition flex items-center gap-1 cursor-pointer"
+                        title={`Click to roll ${rangedBaneAtk.label}`}
+                      >
+                        <i className="fa-solid fa-bullseye text-[10px] text-red-400"></i>
+                        <span>{rangedBaneAtk.atkBonus >= 0 ? '+' : ''}{rangedBaneAtk.atkBonus} Ranged (vs Foe)</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => rollAttack(rangedTotalAtk, `${rangedWpnObj.name} Ranged Attack`, { ...rangedWpnObj, threat: rangedThreat })}
-                    className="font-mono text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/20 px-2 py-0.5 rounded border border-cyan-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
-                    title={`Click to roll ${rangedWpnObj.name} Ranged Attack`}
-                  >
-                    <i className="fa-solid fa-dice-d20 text-[10px]"></i>
-                    <span>{rangedTotalAtk >= 0 ? '+' : ''}{rangedTotalAtk} Ranged</span>
-                  </button>
-                  <button
-                    onClick={() => rollDamage(rangedRollDamageFormula, `${rangedWpnObj.name} Damage${rangedSpecialDmg.summaryLabels.length > 0 ? ` (${rangedSpecialDmg.summaryLabels.join(', ')})` : ''}`)}
-                    className="font-mono text-amber-300 hover:text-amber-200 hover:bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
-                    title={`Click to roll ${rangedWpnObj.name} Damage (${rangedRollDamageFormula})`}
-                  >
-                    <i className="fa-solid fa-dice-d6 text-[10px]"></i>
-                    <span>{rangedDamageDisplay}</span>
-                  </button>
+
+                <div className="flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-slate-800/80">
+                  {rangedRollOptions.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => rollDamage(opt.rollFormula, `${rangedWpnObj.name} ${opt.label}`, {
+                        weapon: rangedWpnObj,
+                        damagePools: opt.damagePools,
+                        isNonlethal: opt.isNonlethal
+                      })}
+                      className={`px-2 py-0.5 rounded text-xs font-mono font-bold border transition flex items-center gap-1 cursor-pointer shadow-xs ${
+                        opt.type === 'merciful'
+                          ? 'bg-teal-500/15 hover:bg-teal-500/25 text-teal-300 border-teal-500/40'
+                          : opt.type === 'base'
+                          ? 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40'
+                          : opt.type === 'bane'
+                          ? 'bg-red-500/15 hover:bg-red-500/25 text-red-300 border-red-500/40'
+                          : opt.type === 'vicious'
+                          ? 'bg-rose-900/25 hover:bg-rose-900/35 text-rose-300 border-rose-500/40'
+                          : opt.type === 'alignment'
+                          ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border-amber-500/40'
+                          : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700'
+                      }`}
+                      title={opt.buttonTitle || `Roll ${opt.label}`}
+                    >
+                      {opt.icon && <i className={`${opt.icon} text-[10px]`}></i>}
+                      <span>{opt.label}</span>
+                    </button>
+                  ))}
+                  {rangedCritInfo && (
+                    <button
+                      onClick={() => {
+                        rollDamage(rangedCritInfo.rollFormula, rangedCritInfo.label, {
+                          rollType: 'damage',
+                          weapon: rangedWpnObj,
+                          critMultiplier: rangedWpnObj.critMultiplier || 2,
+                          damagePools: rangedCritInfo.damagePools
+                        });
+                      }}
+                      className="px-2 py-0.5 rounded text-[11px] font-mono text-slate-400 hover:text-amber-300 hover:bg-slate-800 border border-slate-800 transition flex items-center gap-1 cursor-pointer"
+                      title="Roll Critical Damage"
+                    >
+                      <i className="fa-solid fa-burst text-[10px] text-amber-400"></i>
+                      <span>Crit ({rangedThreat < 20 ? `${rangedThreat}-20` : '20'}/x{rangedWpnObj.critMultiplier || 2})</span>
+                    </button>
+                  )}
                 </div>
               </div>
             )}

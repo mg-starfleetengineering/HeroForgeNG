@@ -35,6 +35,26 @@ export interface RollComponent {
   value: number;
 }
 
+export interface DamagePoolInput {
+  label: string;
+  damageType: string;
+  formula: string; // e.g. "1d8+3", "2d6", "1d6"
+  condition?: string; // e.g. "vs Evil", "vs Designated Foe"
+  isRecoil?: boolean; // true for Vicious recoil to wielder
+  isNonlethal?: boolean; // true for Merciful
+}
+
+export interface DamagePoolResult {
+  label: string;
+  damageType: string;
+  dice: string;
+  total: number;
+  results?: number[];
+  isRecoil?: boolean;
+  condition?: string;
+  isNonlethal?: boolean;
+}
+
 export interface RollOptions {
   threatMin?: number; // Minimum roll on d20 to trigger critical threat (e.g. 19 for 19-20, 18 for 18-20, default 20)
   critMultiplier?: number; // Critical damage multiplier (e.g. 2 for x2, 3 for x3, default 2)
@@ -46,6 +66,8 @@ export interface RollOptions {
   components?: RollComponent[]; // Itemized modifier components (e.g. BAB: 5, Str: 3, Enh: 1)
   detailedBreakdown?: string;
   metadata?: Record<string, unknown>;
+  damagePools?: DamagePoolInput[];
+  isNonlethal?: boolean;
 }
 
 export interface RollResult {
@@ -69,6 +91,11 @@ export interface RollResult {
   summary: string;
   components?: RollComponent[];
   notes?: string[];
+  damagePools?: DamagePoolResult[];
+  recoilTotal?: number;
+  targetDamageTotal?: number;
+  isNonlethal?: boolean;
+  weapon?: Partial<WeaponData>;
 }
 
 /**
@@ -245,50 +272,132 @@ export function rollDice(
   options: RollOptions = {}
 ): RollResult {
   const rng = options.customRng || defaultRng;
-  const parsed = parseDiceFormula(formula);
-
   const evaluatedTerms: ParsedTerm[] = [];
   let total = 0;
   let primaryD20Result: number | undefined = undefined;
+  let evaluatedPools: DamagePoolResult[] | undefined = undefined;
+  let recoilTotal: number | undefined = undefined;
+  let targetDamageTotal: number | undefined = undefined;
 
-  for (const term of parsed) {
-    if (term.type === 'dice') {
-      const count = term.count || 1;
-      const sides = term.sides || 20;
-      const results: number[] = [];
-      let subtotal = 0;
+  if (options.damagePools && options.damagePools.length > 0) {
+    evaluatedPools = [];
+    let recSum = 0;
+    let targetSum = 0;
+    let hasRecoil = false;
 
-      for (let i = 0; i < count; i++) {
-        const roll = Math.max(1, Math.min(sides, rng(sides)));
-        results.push(roll);
-        subtotal += roll;
+    for (const poolInput of options.damagePools) {
+      const poolParsed = parseDiceFormula(poolInput.formula);
+      let poolSubtotal = 0;
+      const poolResults: number[] = [];
+      const poolTerms: ParsedTerm[] = [];
+
+      for (const term of poolParsed) {
+        if (term.type === 'dice') {
+          const count = term.count || 1;
+          const sides = term.sides || 20;
+          const results: number[] = [];
+          let subtotal = 0;
+
+          for (let i = 0; i < count; i++) {
+            const roll = Math.max(1, Math.min(sides, rng(sides)));
+            results.push(roll);
+            poolResults.push(roll);
+            subtotal += roll;
+          }
+
+          const signedSubtotal = term.sign === '-' ? -subtotal : subtotal;
+          poolSubtotal += signedSubtotal;
+
+          poolTerms.push({
+            type: 'dice',
+            count,
+            sides,
+            results,
+            subtotal,
+            sign: term.sign
+          });
+        } else if (term.type === 'modifier') {
+          const val = term.value || 0;
+          const signedVal = term.sign === '-' ? -val : val;
+          poolSubtotal += signedVal;
+
+          poolTerms.push({
+            type: 'modifier',
+            value: val,
+            sign: term.sign
+          });
+        }
       }
 
-      if (sides === 20 && primaryD20Result === undefined && results.length > 0) {
-        primaryD20Result = results[0];
+      const poolResult: DamagePoolResult = {
+        label: poolInput.label,
+        damageType: poolInput.damageType,
+        dice: poolInput.formula,
+        total: poolSubtotal,
+        results: poolResults,
+        isRecoil: poolInput.isRecoil,
+        condition: poolInput.condition,
+        isNonlethal: poolInput.isNonlethal ?? options.isNonlethal
+      };
+
+      evaluatedPools.push(poolResult);
+
+      if (poolInput.isRecoil) {
+        hasRecoil = true;
+        recSum += poolSubtotal;
+      } else {
+        targetSum += poolSubtotal;
+        evaluatedTerms.push(...poolTerms);
       }
+    }
 
-      const signedSubtotal = term.sign === '-' ? -subtotal : subtotal;
-      total += signedSubtotal;
+    total = targetSum;
+    targetDamageTotal = targetSum;
+    if (hasRecoil) {
+      recoilTotal = recSum;
+    }
+  } else {
+    const parsed = parseDiceFormula(formula);
 
-      evaluatedTerms.push({
-        type: 'dice',
-        count,
-        sides,
-        results,
-        subtotal,
-        sign: term.sign
-      });
-    } else if (term.type === 'modifier') {
-      const val = term.value || 0;
-      const signedVal = term.sign === '-' ? -val : val;
-      total += signedVal;
+    for (const term of parsed) {
+      if (term.type === 'dice') {
+        const count = term.count || 1;
+        const sides = term.sides || 20;
+        const results: number[] = [];
+        let subtotal = 0;
 
-      evaluatedTerms.push({
-        type: 'modifier',
-        value: val,
-        sign: term.sign
-      });
+        for (let i = 0; i < count; i++) {
+          const roll = Math.max(1, Math.min(sides, rng(sides)));
+          results.push(roll);
+          subtotal += roll;
+        }
+
+        if (sides === 20 && primaryD20Result === undefined && results.length > 0) {
+          primaryD20Result = results[0];
+        }
+
+        const signedSubtotal = term.sign === '-' ? -subtotal : subtotal;
+        total += signedSubtotal;
+
+        evaluatedTerms.push({
+          type: 'dice',
+          count,
+          sides,
+          results,
+          subtotal,
+          sign: term.sign
+        });
+      } else if (term.type === 'modifier') {
+        const val = term.value || 0;
+        const signedVal = term.sign === '-' ? -val : val;
+        total += signedVal;
+
+        evaluatedTerms.push({
+          type: 'modifier',
+          value: val,
+          sign: term.sign
+        });
+      }
     }
   }
 
@@ -316,9 +425,25 @@ export function rollDice(
   }
 
   const breakdown = formatBreakdown(evaluatedTerms, total);
-  const detailedBreakdown =
-    options.detailedBreakdown ||
-    formatDetailedBreakdown(evaluatedTerms, total, options.components, primaryD20Result);
+
+  let detailedBreakdown = options.detailedBreakdown;
+  if (!detailedBreakdown) {
+    if (evaluatedPools && evaluatedPools.length > 0) {
+      const targetPools = evaluatedPools.filter(p => !p.isRecoil);
+      const recPools = evaluatedPools.filter(p => p.isRecoil);
+      const targetParts = targetPools.map(p => {
+        const resStr = p.results && p.results.length > 0 ? ` (${p.results.join(' + ')})` : '';
+        return `${p.label} [${p.total}${resStr}]`;
+      });
+      let poolBreakdown = `${targetParts.join(' + ')} = ${total}`;
+      if (recoilTotal !== undefined) {
+        poolBreakdown += ` | ⚠️ Wielder Takes: ${recoilTotal} (${recPools.map(p => p.dice).join(', ')})`;
+      }
+      detailedBreakdown = poolBreakdown;
+    } else {
+      detailedBreakdown = formatDetailedBreakdown(evaluatedTerms, total, options.components, primaryD20Result);
+    }
+  }
 
   // Automatic Critical Confirmation Roll on Threat
   let confirmationRoll: RollResult | undefined = undefined;
@@ -351,6 +476,13 @@ export function rollDice(
     }
   }
 
+  if (options.isNonlethal) {
+    summary += ' 🕊️ [NONLETHAL]';
+  }
+  if (recoilTotal !== undefined) {
+    summary += ` [Wielder Recoil: ${recoilTotal}]`;
+  }
+
   const result: RollResult = {
     id: generateRollId(),
     timestamp: Date.now(),
@@ -370,7 +502,12 @@ export function rollDice(
     rollType,
     status,
     summary,
-    components: options.components
+    components: options.components,
+    damagePools: evaluatedPools,
+    recoilTotal,
+    targetDamageTotal,
+    isNonlethal: options.isNonlethal,
+    weapon: options.weapon
   };
 
   // Add to in-memory history
