@@ -5,7 +5,7 @@ import {
   resolveArmor, resolveShield, createInventoryWeapon, createInventoryArmor, createInventoryShield,
   calculateFeatCombatBonuses
 } from '../equipment';
-import { CharacterState, InventoryItem } from '../../types/character';
+import { CharacterState, InventoryItem, CharacterFeat } from '../../types/character';
 
 describe('equipment engine & inventory sync', () => {
   it('identifies if item is in inventory case-insensitively', () => {
@@ -551,6 +551,59 @@ describe('equipment engine & inventory sync', () => {
       const crossbow = { name: 'Heavy Crossbow' } as any;
       const xbowBonuses = calculateFeatCombatBonuses(char, crossbow);
       expect(xbowBonuses.attackBonus).toBe(0);
+    });
+
+    it('evaluates combat bonuses using structured selectedFeatEntities', () => {
+      const char = {
+        selectedFeatEntities: [
+          { id: '1', featId: 'weapon_focus', targetId: 'longsword', targetType: 'weapon' },
+          { id: '2', featId: 'weapon_specialization', targetId: 'longsword', targetType: 'weapon' },
+          { id: '3', featId: 'greater_weapon_focus', targetId: 'greatsword', targetType: 'weapon' },
+          { id: '4', featId: 'greater_weapon_specialization', targetId: 'greatsword', targetType: 'weapon' },
+          { id: '5', featId: 'weapon_focus', targetId: 'longbow', targetType: 'weapon' }
+        ]
+      } as unknown as CharacterState;
+
+      // Exact weapon match
+      const longsword = { name: 'Longsword' } as any;
+      const lsBonuses = calculateFeatCombatBonuses(char, longsword);
+      expect(lsBonuses.attackBonus).toBe(1);
+      expect(lsBonuses.damageBonus).toBe(2);
+
+      // Themed alias matching base model (Nodachi -> Greatsword)
+      const nodachi = { name: 'Nodachi (Greatsword)' } as any;
+      const nodachiBonuses = calculateFeatCombatBonuses(char, nodachi);
+      expect(nodachiBonuses.attackBonus).toBe(1); // Greater Weapon Focus
+      expect(nodachiBonuses.damageBonus).toBe(2); // Greater Weapon Specialization
+
+      // Composite bow equivalence
+      const compLongbow = { name: 'Composite Longbow' } as any;
+      const bowBonuses = calculateFeatCombatBonuses(char, compLongbow);
+      expect(bowBonuses.attackBonus).toBe(1);
+
+      // Non-matching weapon
+      const dagger = { name: 'Dagger' } as any;
+      const daggerBonuses = calculateFeatCombatBonuses(char, dagger);
+      expect(daggerBonuses.attackBonus).toBe(0);
+      expect(daggerBonuses.damageBonus).toBe(0);
+    });
+
+    it('prioritizes selectedFeatEntities over legacy selectedFeats to prevent duplicate stacking', () => {
+      const char = {
+        selectedFeatEntities: [
+          { id: '1', featId: 'weapon_focus', targetId: 'longsword', targetType: 'weapon' }
+        ],
+        selectedFeats: [
+          'Weapon Focus (Longsword)',
+          'Weapon Specialization (Longsword)'
+        ]
+      } as unknown as CharacterState;
+
+      const longsword = { name: 'Longsword' } as any;
+      const bonuses = calculateFeatCombatBonuses(char, longsword);
+      // Only the selectedFeatEntities (Weapon Focus) should be evaluated: +1 attack, 0 damage (not +2 attack, +2 damage)
+      expect(bonuses.attackBonus).toBe(1);
+      expect(bonuses.damageBonus).toBe(0);
     });
   });
 });

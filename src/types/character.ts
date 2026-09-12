@@ -272,6 +272,7 @@ export interface CharacterState {
   levelProgression: LevelProgression[];
   skillRanks: Record<string, number>;
   selectedFeats: string[];
+  selectedFeatEntities?: CharacterFeat[];
   equipment: Equipment;
   inventory?: InventoryItem[];
   funds?: Funds;
@@ -487,6 +488,195 @@ export interface FeatData {
   description: string;
   source?: string;
   sources?: string[];
+  compiledPrerequisites?: CompiledFeatPrerequisites;
+}
+
+export type FeatPrereqRuleType =
+  | 'ability_score'
+  | 'bab'
+  | 'base_save'
+  | 'character_level'
+  | 'first_level_only'
+  | 'class_level'
+  | 'caster_level'
+  | 'manifester_level'
+  | 'spell_level'
+  | 'spellcasting_type'
+  | 'skill_rank'
+  | 'feat'
+  | 'proficiency'
+  | 'race'
+  | 'subtype'
+  | 'alignment'
+  | 'size'
+  | 'special_feature'
+  | 'metamagic_count'
+  | 'item_creation_count'
+  | 'editorial';
+
+export interface FeatPrereqRule {
+  type: FeatPrereqRuleType;
+  stat?: StatType;
+  minValue?: number;
+  saveType?: 'fort' | 'ref' | 'will';
+  className?: string;
+  spellType?: 'arcane' | 'divine' | 'psionic' | 'any';
+  skillName?: string;
+  featId?: string;
+  targetId?: string;
+  targetCandidates?: string[];
+  requiresSameTarget?: boolean;
+  proficiencyType?: string;
+  raceName?: string;
+  subtypeName?: string;
+  alignmentValue?: string;
+  sizeValue?: string;
+  featureName?: string;
+  rawText: string;
+}
+
+export interface FeatPrereqClauseAST {
+  operator: 'AND' | 'OR';
+  rules: FeatPrereqRule[];
+  rawClause: string;
+}
+
+export interface CompiledFeatPrerequisites {
+  clauses: FeatPrereqClauseAST[];
+  raw: string;
+}
+
+export interface CharacterFeat {
+  id: string;
+  featId: string;
+  targetId?: string;
+  targetType?: 'weapon' | 'school' | 'skill' | 'energy';
+  notes?: string;
+}
+
+const KNOWN_SPELL_SCHOOLS = new Set([
+  'abjuration',
+  'conjuration',
+  'divination',
+  'enchantment',
+  'evocation',
+  'illusion',
+  'necromancy',
+  'transmutation',
+  'universal'
+]);
+
+const KNOWN_ENERGY_TYPES = new Set([
+  'acid',
+  'cold',
+  'electricity',
+  'fire',
+  'sonic'
+]);
+
+/**
+ * Parses a legacy feat string (e.g. "Weapon Focus (Longsword)", "Spell Focus: Evocation") into a structured CharacterFeat.
+ */
+export function parseLegacyFeatString(featStr: string, index = 0): CharacterFeat | null {
+  const clean = featStr.trim();
+  if (!clean) return null;
+
+  // Match parameterized feats: "Feat Name (Target)" or "Feat Name: Target"
+  const match = clean.match(/^(.+?)(?:\s*[\(:])\s*(.+?)\)?$/);
+  if (match) {
+    const rawBase = match[1].trim();
+    const rawTarget = match[2].trim();
+    const lowerBase = rawBase.toLowerCase();
+    const lowerTarget = rawTarget.toLowerCase();
+
+    // Special case for Armor Proficiency (Light / Medium / Heavy)
+    if (lowerBase === 'armor proficiency') {
+      const featId = `armor_proficiency_${lowerTarget.replace(/[^a-z0-9]+/g, '_')}`;
+      return {
+        id: `${featId}_${index}`,
+        featId
+      };
+    }
+
+    const featId = lowerBase.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    const targetId = lowerTarget;
+
+    let targetType: 'weapon' | 'school' | 'skill' | 'energy' = 'weapon';
+    if (lowerBase.includes('spell') || KNOWN_SPELL_SCHOOLS.has(lowerTarget)) {
+      targetType = 'school';
+    } else if (lowerBase.includes('energy') || KNOWN_ENERGY_TYPES.has(lowerTarget)) {
+      targetType = 'energy';
+    } else if (lowerBase.includes('skill')) {
+      targetType = 'skill';
+    } else if (lowerBase.includes('weapon') || lowerBase.includes('critical') || lowerBase.includes('proficiency')) {
+      targetType = 'weapon';
+    }
+
+    const cleanTargetSlug = targetId.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    return {
+      id: `${featId}_${cleanTargetSlug || index}`,
+      featId,
+      targetId,
+      targetType
+    };
+  }
+
+  // Non-parameterized feat (e.g. "Power Attack", "Cleave")
+  const featId = clean.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  return {
+    id: featId || `feat_${index}`,
+    featId
+  };
+}
+
+/**
+ * Automated migration helper to parse legacy feat strings into structured CharacterFeat entities.
+ * Supports Partial<CharacterState> or string[].
+ */
+export function migrateLegacyFeatStrings(
+  characterOrFeats: Partial<CharacterState> | string[]
+): CharacterFeat[] {
+  if (Array.isArray(characterOrFeats)) {
+    const seenIds = new Set<string>();
+    return characterOrFeats
+      .map((str, idx) => parseLegacyFeatString(str, idx))
+      .filter((f): f is CharacterFeat => f !== null)
+      .map(entity => {
+        let finalId = entity.id;
+        let counter = 1;
+        while (seenIds.has(finalId)) {
+          finalId = `${entity.id}_${counter++}`;
+        }
+        seenIds.add(finalId);
+        return { ...entity, id: finalId };
+      });
+  }
+
+  const char = characterOrFeats || {};
+  const existingEntities = Array.isArray(char.selectedFeatEntities) ? [...char.selectedFeatEntities] : [];
+  const legacyStrings = Array.isArray(char.selectedFeats) ? char.selectedFeats : [];
+
+  if (existingEntities.length > 0 && legacyStrings.length === 0) {
+    return existingEntities;
+  }
+
+  const migratedFromStrings = migrateLegacyFeatStrings(legacyStrings);
+  const seenKeys = new Set(existingEntities.map(e => `${e.featId}::${e.targetId || ''}`));
+  const combined = [...existingEntities];
+
+  for (const entity of migratedFromStrings) {
+    const key = `${entity.featId}::${entity.targetId || ''}`;
+    if (!seenKeys.has(key)) {
+      seenKeys.add(key);
+      combined.push(entity);
+    }
+  }
+
+  if (char && typeof char === 'object') {
+    char.selectedFeatEntities = combined;
+  }
+
+  return combined;
 }
 
 export interface DomainData {
