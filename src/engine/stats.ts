@@ -1,5 +1,6 @@
-import { BaseStats, RaceData, StatType, TraitData, FlawData, CharacterState, ClassData, TemplateData } from '../types/character';
+import { BaseStats, RaceData, StatType, TraitData, FlawData, CharacterState, ClassData, TemplateData, ActiveCombatBuff } from '../types/character';
 import { resolveArmor } from './equipment';
+export { calculateCombatStats, calculateTacticalCombat, aggregateBuffBonuses, resolveActiveBuffs, migrateCharacterBuffs, STANDARD_SRD_BUFFS } from './combat';
 
 export const ABILITY_NAMES: StatType[] = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 
@@ -576,5 +577,45 @@ export function calculateTotalScore(
   const tf = parseVal(traitFlawMods?.[attribute], 0);
 
   return base + race + tmpl + bumpCount + enh + tf;
+}
+
+/**
+ * Aggregates net ability score modifiers granted by active combat buffs.
+ */
+export function calculateBuffAbilityBonuses(activeBuffs: ActiveCombatBuff[] = []): BaseStats {
+  const result: BaseStats = { str: 0, dex: 0, con: 0, int: 0, wis: 0, cha: 0 };
+  if (!activeBuffs || !Array.isArray(activeBuffs)) return result;
+
+  const active = activeBuffs.filter(b => b.active);
+  const typeMap: Record<StatType, { untyped: number; byType: Record<string, number> }> = {
+    str: { untyped: 0, byType: {} },
+    dex: { untyped: 0, byType: {} },
+    con: { untyped: 0, byType: {} },
+    int: { untyped: 0, byType: {} },
+    wis: { untyped: 0, byType: {} },
+    cha: { untyped: 0, byType: {} }
+  };
+
+  for (const b of active) {
+    if (!b.abilityBonuses) continue;
+    for (const [statUpper, val] of Object.entries(b.abilityBonuses)) {
+      const statLower = statUpper.toLowerCase() as StatType;
+      if (typeMap[statLower] && typeof val === 'number') {
+        const bType = b.bonusType || 'untyped';
+        if (bType === 'untyped') {
+          typeMap[statLower].untyped += val;
+        } else {
+          typeMap[statLower].byType[bType] = Math.max(typeMap[statLower].byType[bType] || 0, val);
+        }
+      }
+    }
+  }
+
+  for (const stat of ABILITY_NAMES) {
+    const namedSum = Object.values(typeMap[stat].byType).reduce((a, b) => a + b, 0);
+    result[stat] = typeMap[stat].untyped + namedSum;
+  }
+
+  return result;
 }
 

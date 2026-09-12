@@ -1,4 +1,404 @@
-import { CharacterState, TacticalCombatState, WeaponData, RaceData, TemplateData } from '../types/character';
+import { CharacterState, TacticalCombatState, ActiveCombatBuff, WeaponData, RaceData, TemplateData } from '../types/character';
+
+export const STANDARD_SRD_BUFFS: ActiveCombatBuff[] = [
+  {
+    id: 'haste',
+    name: 'Haste',
+    category: 'spell',
+    active: false,
+    attackBonus: 1,
+    acBonus: { value: 1, type: 'dodge' },
+    saveBonuses: { ref: 1, type: 'dodge' },
+    speedBonus: 30,
+    extraAttacks: 1,
+    notes: '+1 attack, +1 dodge AC/Reflex, +30ft speed, +1 extra attack on full attack'
+  },
+  {
+    id: 'rage',
+    name: 'Barbarian Rage',
+    category: 'class_feature',
+    active: false,
+    abilityBonuses: { STR: 4, CON: 4 },
+    acBonus: { value: -2, type: 'untyped' },
+    saveBonuses: { will: 2, type: 'morale' },
+    notes: '+4 Str, +4 Con (+2 HP/lvl, +2 Fort), +2 morale Will, -2 AC'
+  },
+  {
+    id: 'whirling_frenzy',
+    name: 'Whirling Frenzy',
+    category: 'stance',
+    active: false,
+    abilityBonuses: { STR: 4 },
+    attackBonus: -2,
+    acBonus: { value: 2, type: 'dodge' },
+    saveBonuses: { ref: 2, type: 'dodge' },
+    extraAttacks: 1,
+    notes: '+4 Str, +2 dodge AC/Reflex, -2 penalty to attacks, +1 extra attack'
+  },
+  {
+    id: 'righteous_might',
+    name: 'Righteous Might',
+    category: 'spell',
+    active: false,
+    abilityBonuses: { STR: 4, CON: 2 },
+    attackBonus: -1,
+    damageBonus: 2,
+    acBonus: { value: 1, type: 'untyped' },
+    notes: 'Grow 1 size category: +4 size Str, +2 size Con, +2 natural armor, -1 size Atk/AC, +2 weapon damage, DR 3 or 5/evil'
+  },
+  {
+    id: 'divine_favor',
+    name: 'Divine Favor',
+    category: 'spell',
+    active: false,
+    bonusType: 'luck',
+    attackBonus: 2,
+    damageBonus: 2,
+    notes: '+1 to +3 (default +2) luck bonus on attack and weapon damage rolls'
+  },
+  {
+    id: 'inspire_courage',
+    name: 'Inspire Courage',
+    category: 'class_feature',
+    active: false,
+    bonusType: 'morale',
+    attackBonus: 1,
+    damageBonus: 1,
+    saveBonuses: { will: 1, type: 'morale' },
+    notes: '+1 morale bonus on attack rolls, weapon damage rolls, and saves vs fear/charm'
+  },
+  {
+    id: 'bulls_strength',
+    name: "Bull's Strength",
+    category: 'spell',
+    active: false,
+    bonusType: 'enhancement',
+    abilityBonuses: { STR: 4 },
+    notes: '+4 enhancement bonus to Strength (+2 attack, damage, grapple)'
+  },
+  {
+    id: 'cats_grace',
+    name: "Cat's Grace",
+    category: 'spell',
+    active: false,
+    bonusType: 'enhancement',
+    abilityBonuses: { DEX: 4 },
+    notes: '+4 enhancement bonus to Dexterity (+2 Dex mod, Ref saves, initiative, ranged atk)'
+  },
+  {
+    id: 'bears_endurance',
+    name: "Bear's Endurance",
+    category: 'spell',
+    active: false,
+    bonusType: 'enhancement',
+    abilityBonuses: { CON: 4 },
+    notes: '+4 enhancement bonus to Constitution (+2 Con mod, Fort saves, +2 HP/level)'
+  },
+  {
+    id: 'shield',
+    name: 'Shield',
+    category: 'spell',
+    active: false,
+    acBonus: { value: 4, type: 'untyped' },
+    notes: '+4 shield bonus to AC, negates magic missiles'
+  },
+  {
+    id: 'shield_of_faith',
+    name: 'Shield of Faith',
+    category: 'spell',
+    active: false,
+    acBonus: { value: 2, type: 'deflection' },
+    notes: '+2 (+1 per 6 levels, max +5) deflection bonus to AC'
+  },
+  {
+    id: 'prayer',
+    name: 'Prayer',
+    category: 'spell',
+    active: false,
+    bonusType: 'luck',
+    attackBonus: 1,
+    damageBonus: 1,
+    saveBonuses: { all: 1, type: 'luck' },
+    notes: '+1 luck bonus on attack rolls, damage rolls, saves, and skill checks'
+  },
+  {
+    id: 'bless',
+    name: 'Bless',
+    category: 'spell',
+    active: false,
+    bonusType: 'morale',
+    attackBonus: 1,
+    saveBonuses: { will: 1, type: 'morale' },
+    notes: '+1 morale bonus on attack rolls and saves vs fear'
+  }
+];
+
+export interface AggregatedBuffBonuses {
+  abilityBonuses: {
+    str: number;
+    dex: number;
+    con: number;
+    int: number;
+    wis: number;
+    cha: number;
+  };
+  attackBonus: number;
+  damageBonus: number;
+  acDodgeBonus: number;
+  acUntypedBonus: number;
+  acDeflectionMax: number;
+  acMoraleMax: number;
+  acInsightMax: number;
+  acSacredMax: number;
+  acNetBonus: number;
+  touchAcBonus: number;
+  flatAcBonus: number;
+  saveBonuses: {
+    fort: number;
+    ref: number;
+    will: number;
+  };
+  speedBonus: number;
+  extraAttacks: number;
+}
+
+/**
+ * Aggregates active combat buffs according to official D&D 3.5e bonus stacking rules:
+ * - Dodge bonuses always stack with other dodge bonuses.
+ * - Untyped bonuses (and penalties) always stack.
+ * - Named bonus types (deflection, morale, insight, sacred, enhancement, luck, size) take highest per type.
+ */
+export function aggregateBuffBonuses(buffs: ActiveCombatBuff[] = []): AggregatedBuffBonuses {
+  const active = (buffs || []).filter(b => b.active);
+
+  const abilityTypeMap: Record<string, { untyped: number; byType: Record<string, number> }> = {
+    str: { untyped: 0, byType: {} },
+    dex: { untyped: 0, byType: {} },
+    con: { untyped: 0, byType: {} },
+    int: { untyped: 0, byType: {} },
+    wis: { untyped: 0, byType: {} },
+    cha: { untyped: 0, byType: {} }
+  };
+
+  let untypedAttack = 0;
+  const attackByType: Record<string, number> = {};
+
+  let untypedDamage = 0;
+  const damageByType: Record<string, number> = {};
+
+  let acDodgeBonus = 0;
+  let acUntypedBonus = 0;
+  let acDeflectionMax = 0;
+  let acMoraleMax = 0;
+  let acInsightMax = 0;
+  let acSacredMax = 0;
+
+  let untypedFort = 0;
+  let untypedRef = 0;
+  let untypedWill = 0;
+  const fortByType: Record<string, number> = {};
+  const refByType: Record<string, number> = {};
+  const willByType: Record<string, number> = {};
+
+  let speedBonus = 0;
+  let extraAttacks = 0;
+
+  for (const b of active) {
+    const bType = b.bonusType || 'untyped';
+
+    // 1. Ability bonuses
+    if (b.abilityBonuses) {
+      for (const [statUpper, val] of Object.entries(b.abilityBonuses)) {
+        const statKey = statUpper.toLowerCase();
+        if (abilityTypeMap[statKey] && typeof val === 'number') {
+          if (bType === 'untyped') {
+            abilityTypeMap[statKey].untyped += val;
+          } else {
+            abilityTypeMap[statKey].byType[bType] = Math.max(abilityTypeMap[statKey].byType[bType] || 0, val);
+          }
+        }
+      }
+    }
+
+    // 2. Attack bonus
+    if (typeof b.attackBonus === 'number' && b.attackBonus !== 0) {
+      if (bType === 'untyped' || bType === 'dodge') {
+        untypedAttack += b.attackBonus;
+      } else {
+        if (b.attackBonus > 0) {
+          attackByType[bType] = Math.max(attackByType[bType] || 0, b.attackBonus);
+        } else {
+          untypedAttack += b.attackBonus;
+        }
+      }
+    }
+
+    // 3. Damage bonus
+    if (typeof b.damageBonus === 'number' && b.damageBonus !== 0) {
+      if (bType === 'untyped') {
+        untypedDamage += b.damageBonus;
+      } else {
+        if (b.damageBonus > 0) {
+          damageByType[bType] = Math.max(damageByType[bType] || 0, b.damageBonus);
+        } else {
+          untypedDamage += b.damageBonus;
+        }
+      }
+    }
+
+    // 4. AC bonus
+    if (b.acBonus && typeof b.acBonus.value === 'number') {
+      const acType = b.acBonus.type;
+      const acVal = b.acBonus.value;
+
+      if (acType === 'dodge') {
+        acDodgeBonus += acVal;
+      } else if (acType === 'untyped') {
+        acUntypedBonus += acVal;
+      } else if (acType === 'deflection') {
+        acDeflectionMax = Math.max(acDeflectionMax, acVal);
+      } else if (acType === 'morale') {
+        acMoraleMax = Math.max(acMoraleMax, acVal);
+      } else if (acType === 'insight') {
+        acInsightMax = Math.max(acInsightMax, acVal);
+      } else if (acType === 'sacred') {
+        acSacredMax = Math.max(acSacredMax, acVal);
+      }
+    }
+
+    // 5. Saves bonuses
+    if (b.saveBonuses) {
+      const sType = b.saveBonuses.type || bType;
+      const allVal = b.saveBonuses.all || 0;
+      const fortVal = (b.saveBonuses.fort || 0) + allVal;
+      const refVal = (b.saveBonuses.ref || 0) + allVal;
+      const willVal = (b.saveBonuses.will || 0) + allVal;
+
+      if (sType === 'untyped' || sType === 'dodge') {
+        untypedFort += fortVal;
+        untypedRef += refVal;
+        untypedWill += willVal;
+      } else {
+        if (fortVal > 0) fortByType[sType] = Math.max(fortByType[sType] || 0, fortVal);
+        else untypedFort += fortVal;
+
+        if (refVal > 0) refByType[sType] = Math.max(refByType[sType] || 0, refVal);
+        else untypedRef += refVal;
+
+        if (willVal > 0) willByType[sType] = Math.max(willByType[sType] || 0, willVal);
+        else untypedWill += willVal;
+      }
+    }
+
+    // 6. Speed & Extra Attacks
+    if (typeof b.speedBonus === 'number') {
+      speedBonus += b.speedBonus;
+    }
+    if (typeof b.extraAttacks === 'number') {
+      extraAttacks += b.extraAttacks;
+    }
+  }
+
+  const abilityBonuses = {
+    str: abilityTypeMap.str.untyped + Object.values(abilityTypeMap.str.byType).reduce((a, b) => a + b, 0),
+    dex: abilityTypeMap.dex.untyped + Object.values(abilityTypeMap.dex.byType).reduce((a, b) => a + b, 0),
+    con: abilityTypeMap.con.untyped + Object.values(abilityTypeMap.con.byType).reduce((a, b) => a + b, 0),
+    int: abilityTypeMap.int.untyped + Object.values(abilityTypeMap.int.byType).reduce((a, b) => a + b, 0),
+    wis: abilityTypeMap.wis.untyped + Object.values(abilityTypeMap.wis.byType).reduce((a, b) => a + b, 0),
+    cha: abilityTypeMap.cha.untyped + Object.values(abilityTypeMap.cha.byType).reduce((a, b) => a + b, 0)
+  };
+
+  const attackBonus = untypedAttack + Object.values(attackByType).reduce((a, b) => a + b, 0);
+  const damageBonus = untypedDamage + Object.values(damageByType).reduce((a, b) => a + b, 0);
+
+  const namedAcTotal = acDeflectionMax + acMoraleMax + acInsightMax + acSacredMax;
+  const acNetBonus = acDodgeBonus + acUntypedBonus + namedAcTotal;
+  const touchAcBonus = acDodgeBonus + acUntypedBonus + namedAcTotal;
+  const flatAcBonus = acUntypedBonus + namedAcTotal;
+
+  const saveBonuses = {
+    fort: untypedFort + Object.values(fortByType).reduce((a, b) => a + b, 0),
+    ref: untypedRef + Object.values(refByType).reduce((a, b) => a + b, 0),
+    will: untypedWill + Object.values(willByType).reduce((a, b) => a + b, 0)
+  };
+
+  return {
+    abilityBonuses,
+    attackBonus,
+    damageBonus,
+    acDodgeBonus,
+    acUntypedBonus,
+    acDeflectionMax,
+    acMoraleMax,
+    acInsightMax,
+    acSacredMax,
+    acNetBonus,
+    touchAcBonus,
+    flatAcBonus,
+    saveBonuses,
+    speedBonus,
+    extraAttacks
+  };
+}
+
+/**
+ * Bridges legacy boolean flags (haste, rage, whirlingFrenzy) into ActiveCombatBuff array,
+ * ensuring no double counting and full backwards compatibility.
+ */
+export function resolveActiveBuffs(
+  tcState?: TacticalCombatState,
+  activeBuffs?: ActiveCombatBuff[]
+): ActiveCombatBuff[] {
+  const result: ActiveCombatBuff[] = (activeBuffs || []).map(b => ({ ...b }));
+  if (!tcState) return result;
+
+  const hasHasteBuff = result.some(b => b.id === 'haste' && b.active);
+  if (tcState.haste && !hasHasteBuff) {
+    const existingIdx = result.findIndex(b => b.id === 'haste');
+    if (existingIdx >= 0) {
+      result[existingIdx] = { ...result[existingIdx], active: true };
+    } else {
+      const hasteDef = STANDARD_SRD_BUFFS.find(b => b.id === 'haste');
+      if (hasteDef) result.push({ ...hasteDef, active: true });
+    }
+  }
+
+  const hasRageBuff = result.some(b => b.id === 'rage' && b.active);
+  if (tcState.rage && !hasRageBuff) {
+    const existingIdx = result.findIndex(b => b.id === 'rage');
+    if (existingIdx >= 0) {
+      result[existingIdx] = { ...result[existingIdx], active: true };
+    } else {
+      const rageDef = STANDARD_SRD_BUFFS.find(b => b.id === 'rage');
+      if (rageDef) result.push({ ...rageDef, active: true });
+    }
+  }
+
+  const hasFrenzyBuff = result.some(b => b.id === 'whirling_frenzy' && b.active);
+  if (tcState.whirlingFrenzy && !hasFrenzyBuff) {
+    const existingIdx = result.findIndex(b => b.id === 'whirling_frenzy');
+    if (existingIdx >= 0) {
+      result[existingIdx] = { ...result[existingIdx], active: true };
+    } else {
+      const frenzyDef = STANDARD_SRD_BUFFS.find(b => b.id === 'whirling_frenzy');
+      if (frenzyDef) result.push({ ...frenzyDef, active: true });
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Migrates a character state ensuring activeBuffs is defined and legacy combat flags are populated.
+ */
+export function migrateCharacterBuffs(character: CharacterState): CharacterState {
+  if (!character) return character;
+  const activeBuffs = resolveActiveBuffs(character.tacticalCombat, character.activeBuffs || []);
+  return {
+    ...character,
+    activeBuffs
+  };
+}
 
 export const DEFAULT_TACTICAL_COMBAT: TacticalCombatState = {
   powerAttack: 0,
@@ -135,10 +535,17 @@ export interface ActiveCombatModifier {
  * Returns a list of all currently active tactical combat modifiers and stances
  * with detailed descriptions of what each applies to stats, AC, saves, and attacks.
  */
-export function getActiveCombatModifiers(tcState: TacticalCombatState, totalLevel: number = 1): ActiveCombatModifier[] {
+export function getActiveCombatModifiers(
+  tcState: TacticalCombatState,
+  totalLevel: number = 1,
+  activeBuffs?: ActiveCombatBuff[]
+): ActiveCombatModifier[] {
   const active: ActiveCombatModifier[] = [];
+  const effectiveBuffs = resolveActiveBuffs(tcState, activeBuffs);
 
-  if (tcState.whirlingFrenzy) {
+  // 1. Whirling Frenzy
+  const hasFrenzy = tcState.whirlingFrenzy || effectiveBuffs.some(b => b.id === 'whirling_frenzy' && b.active);
+  if (hasFrenzy) {
     active.push({
       id: 'whirlingFrenzy',
       name: 'Whirling Frenzy',
@@ -168,7 +575,9 @@ export function getActiveCombatModifiers(tcState: TacticalCombatState, totalLeve
     });
   }
 
-  if (tcState.rage) {
+  // 2. Barbarian Rage
+  const hasRage = tcState.rage || effectiveBuffs.some(b => b.id === 'rage' && b.active);
+  if (hasRage) {
     active.push({
       id: 'rage',
       name: 'Barbarian Rage',
@@ -200,7 +609,9 @@ export function getActiveCombatModifiers(tcState: TacticalCombatState, totalLeve
     });
   }
 
-  if (tcState.haste) {
+  // 3. Haste
+  const hasHaste = tcState.haste || effectiveBuffs.some(b => b.id === 'haste' && b.active);
+  if (hasHaste) {
     active.push({
       id: 'haste',
       name: 'Haste',
@@ -229,6 +640,7 @@ export function getActiveCombatModifiers(tcState: TacticalCombatState, totalLeve
     });
   }
 
+  // 4. Power Attack
   if (tcState.powerAttack > 0) {
     active.push({
       id: 'powerAttack',
@@ -252,6 +664,7 @@ export function getActiveCombatModifiers(tcState: TacticalCombatState, totalLeve
     });
   }
 
+  // 5. Combat Expertise
   if (tcState.combatExpertise > 0) {
     active.push({
       id: 'combatExpertise',
@@ -276,6 +689,7 @@ export function getActiveCombatModifiers(tcState: TacticalCombatState, totalLeve
     });
   }
 
+  // 6. Fighting Defensively
   if (tcState.fightingDefensively) {
     active.push({
       id: 'fightingDefensively',
@@ -300,6 +714,7 @@ export function getActiveCombatModifiers(tcState: TacticalCombatState, totalLeve
     });
   }
 
+  // 7. Flurry of Blows
   if (tcState.flurryOfBlows) {
     active.push({
       id: 'flurryOfBlows',
@@ -323,6 +738,7 @@ export function getActiveCombatModifiers(tcState: TacticalCombatState, totalLeve
     });
   }
 
+  // 8. Smite Evil
   if (tcState.smiteEvil) {
     active.push({
       id: 'smiteEvil',
@@ -343,6 +759,7 @@ export function getActiveCombatModifiers(tcState: TacticalCombatState, totalLeve
     });
   }
 
+  // 9. Stunning Fist
   if (tcState.stunningFist) {
     active.push({
       id: 'stunningFist',
@@ -362,6 +779,92 @@ export function getActiveCombatModifiers(tcState: TacticalCombatState, totalLeve
     });
   }
 
+  // 10. Any other active combat buffs from activeBuffs
+  for (const b of effectiveBuffs) {
+    if (!b.active) continue;
+    if (b.id === 'haste' || b.id === 'rage' || b.id === 'whirling_frenzy') continue;
+
+    const effects: string[] = [];
+    if (b.abilityBonuses) {
+      for (const [stat, val] of Object.entries(b.abilityBonuses)) {
+        if (val) effects.push(`+${val} ${stat.toUpperCase()}`);
+      }
+    }
+    if (b.attackBonus) effects.push(`${b.attackBonus > 0 ? '+' : ''}${b.attackBonus} Attack`);
+    if (b.damageBonus) effects.push(`${b.damageBonus > 0 ? '+' : ''}${b.damageBonus} Damage`);
+    if (b.acBonus) effects.push(`${b.acBonus.value > 0 ? '+' : ''}${b.acBonus.value} AC (${b.acBonus.type})`);
+    if (b.saveBonuses) {
+      if (b.saveBonuses.all) effects.push(`+${b.saveBonuses.all} All Saves`);
+      if (b.saveBonuses.fort) effects.push(`+${b.saveBonuses.fort} Fort`);
+      if (b.saveBonuses.ref) effects.push(`+${b.saveBonuses.ref} Ref`);
+      if (b.saveBonuses.will) effects.push(`+${b.saveBonuses.will} Will`);
+    }
+    if (b.speedBonus) effects.push(`+${b.speedBonus} ft Speed`);
+    if (b.extraAttacks) effects.push(`+${b.extraAttacks} Extra Attack`);
+    if (b.notes) effects.push(b.notes);
+
+    const icon =
+      b.category === 'spell'
+        ? 'fa-solid fa-wand-magic-sparkles'
+        : b.category === 'stance'
+        ? 'fa-solid fa-shield-halved'
+        : b.category === 'class_feature'
+        ? 'fa-solid fa-crown'
+        : b.category === 'item'
+        ? 'fa-solid fa-ring'
+        : 'fa-solid fa-sparkles';
+
+    const colorClass =
+      b.category === 'spell'
+        ? {
+            bg: 'bg-purple-500/10',
+            text: 'text-purple-300',
+            border: 'border-purple-500/30',
+            badge: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+          }
+        : b.category === 'stance'
+        ? {
+            bg: 'bg-teal-500/10',
+            text: 'text-teal-300',
+            border: 'border-teal-500/30',
+            badge: 'bg-teal-500/20 text-teal-300 border-teal-500/30'
+          }
+        : b.category === 'class_feature'
+        ? {
+            bg: 'bg-amber-500/10',
+            text: 'text-amber-300',
+            border: 'border-amber-500/30',
+            badge: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+          }
+        : {
+            bg: 'bg-blue-500/10',
+            text: 'text-blue-300',
+            border: 'border-blue-500/30',
+            badge: 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+          };
+
+    active.push({
+      id: b.id,
+      name: b.name,
+      icon,
+      colorClass,
+      summary: effects.slice(0, 3).join(', ') || b.name,
+      effects,
+      affectedStats: {
+        str: b.abilityBonuses?.STR,
+        con: b.abilityBonuses?.CON,
+        attack: b.attackBonus,
+        damage: b.damageBonus ? `+${b.damageBonus}` : undefined,
+        ac: b.acBonus?.value,
+        fort: b.saveBonuses?.fort || b.saveBonuses?.all,
+        ref: b.saveBonuses?.ref || b.saveBonuses?.all,
+        will: b.saveBonuses?.will || b.saveBonuses?.all,
+        speed: b.speedBonus,
+        extraAttacks: b.extraAttacks
+      }
+    });
+  }
+
   return active;
 }
 
@@ -378,26 +881,38 @@ export interface TacticalCombatModifiers {
   willSaveMod: number;
   strBonus: number;
   conBonus: number;
+  dexBonus?: number;
+  intBonus?: number;
+  wisBonus?: number;
+  chaBonus?: number;
   hpBonusPerLevel: number;
+  extraAttacks?: number;
 }
 
 /**
- * Calculates net tactical combat modifiers based on active combat states.
+ * Calculates net tactical combat modifiers based on active combat states and buffs.
  */
 export function calculateTacticalCombatModifiers(
   tcState: TacticalCombatState,
   weapon?: WeaponData,
   isOffhand: boolean = false,
-  isRanged: boolean = false
+  isRanged: boolean = false,
+  activeBuffs?: ActiveCombatBuff[]
 ): TacticalCombatModifiers {
+  const effectiveBuffs = resolveActiveBuffs(tcState, activeBuffs);
+  const buffAgg = aggregateBuffBonuses(effectiveBuffs);
+
+  const isRageActive = tcState.rage || effectiveBuffs.some(b => b.id === 'rage' && b.active);
+  const isWhirlingFrenzyActive = tcState.whirlingFrenzy || effectiveBuffs.some(b => b.id === 'whirling_frenzy' && b.active);
+
   // 1. Attack roll stance modifier (penalties & direct stance attack bonuses)
   let attackMod = 0;
-  if (tcState.haste) attackMod += 1;
   if (tcState.fightingDefensively) attackMod -= 4;
   attackMod -= tcState.powerAttack;
   attackMod -= tcState.combatExpertise;
   if (tcState.flurryOfBlows) attackMod -= 2;
-  if (tcState.whirlingFrenzy) attackMod -= 2; // -2 flurry penalty on all attacks
+
+  attackMod += buffAgg.attackBonus;
 
   // 2. Damage modifier
   let damageMod = 0;
@@ -414,8 +929,8 @@ export function calculateTacticalCombatModifiers(
       }
     }
 
-    // Barbarian Rage Strength bonus to damage (+4 Str = +2 Str mod)
-    if (tcState.rage) {
+    // Barbarian Rage / Frenzy Strength bonus to damage (+4 Str = +2 Str mod)
+    if (isRageActive) {
       if (is2H) {
         damageMod += 3; // 1.5x Str mod (+2 * 1.5 = +3)
       } else if (isOffhand) {
@@ -423,10 +938,7 @@ export function calculateTacticalCombatModifiers(
       } else {
         damageMod += 2; // 1.0x Str mod
       }
-    }
-
-    // Whirling Frenzy Strength bonus to damage (+4 Str = +2 Str mod)
-    if (tcState.whirlingFrenzy) {
+    } else if (isWhirlingFrenzyActive) {
       if (is2H) {
         damageMod += 3;
       } else if (isOffhand) {
@@ -435,28 +947,40 @@ export function calculateTacticalCombatModifiers(
         damageMod += 2;
       }
     }
+
+    damageMod += buffAgg.damageBonus;
+  } else {
+    damageMod += buffAgg.damageBonus;
   }
 
   // 3. AC Modifiers
-  let acDodgeMod = 0;
-  if (tcState.haste) acDodgeMod += 1;
-  if (tcState.fightingDefensively) acDodgeMod += 2;
-  acDodgeMod += tcState.combatExpertise;
-  if (tcState.whirlingFrenzy) acDodgeMod += 2; // +2 Dodge AC in Whirling Frenzy
+  let stanceDodge = 0;
+  if (tcState.fightingDefensively) stanceDodge += 2;
+  stanceDodge += tcState.combatExpertise;
 
-  const acPenalty = tcState.rage ? 2 : 0;
-  const acNetMod = acDodgeMod - acPenalty;
-  const touchAcMod = acDodgeMod - acPenalty;
-  const flatAcMod = acPenalty > 0 ? -acPenalty : 0; // Dodge bonuses do not apply when flat-footed
+  const acDodgeMod = stanceDodge + buffAgg.acDodgeBonus;
+  const acNetMod = stanceDodge + buffAgg.acNetBonus;
+  const touchAcMod = stanceDodge + buffAgg.touchAcBonus;
+  const flatAcMod = buffAgg.flatAcBonus;
 
   // 4. Speed & Save Modifiers
-  const speedMod = tcState.haste ? 30 : 0;
-  const fortSaveMod = tcState.rage ? 2 : 0; // +4 Con -> +2 Fort
-  const refSaveMod = (tcState.haste ? 1 : 0) + (tcState.whirlingFrenzy ? 2 : 0);
-  const willSaveMod = tcState.rage ? 2 : 0; // Morale bonus
+  const speedMod = buffAgg.speedBonus;
 
-  const totalStrBonus = (tcState.rage ? 4 : 0) + (tcState.whirlingFrenzy ? 4 : 0);
-  const totalConBonus = tcState.rage ? 4 : 0;
+  const conBonusMod = Math.floor(buffAgg.abilityBonuses.con / 2);
+  const fortSaveMod = conBonusMod + buffAgg.saveBonuses.fort;
+
+  const dexBonusMod = Math.floor(buffAgg.abilityBonuses.dex / 2);
+  const refSaveMod = dexBonusMod + buffAgg.saveBonuses.ref;
+
+  const wisBonusMod = Math.floor(buffAgg.abilityBonuses.wis / 2);
+  const willSaveMod = wisBonusMod + buffAgg.saveBonuses.will;
+
+  let totalExtraAttacks = buffAgg.extraAttacks;
+  if (tcState.flurryOfBlows && !isWhirlingFrenzyActive) {
+    totalExtraAttacks += 1;
+  }
+
+  const hpBonusPerLevel = Math.floor(buffAgg.abilityBonuses.con / 2);
 
   return {
     attackMod,
@@ -469,9 +993,76 @@ export function calculateTacticalCombatModifiers(
     fortSaveMod,
     refSaveMod,
     willSaveMod,
-    strBonus: totalStrBonus,
-    conBonus: totalConBonus,
-    hpBonusPerLevel: tcState.rage ? 2 : 0
+    strBonus: buffAgg.abilityBonuses.str,
+    conBonus: buffAgg.abilityBonuses.con,
+    dexBonus: buffAgg.abilityBonuses.dex,
+    intBonus: buffAgg.abilityBonuses.int,
+    wisBonus: buffAgg.abilityBonuses.wis,
+    chaBonus: buffAgg.abilityBonuses.cha,
+    hpBonusPerLevel,
+    extraAttacks: totalExtraAttacks
+  };
+}
+
+/**
+ * Calculates tactical combat modifiers combining tactical stances and active buffs.
+ */
+export function calculateTacticalCombat(
+  tcState: TacticalCombatState,
+  activeBuffs?: ActiveCombatBuff[],
+  weapon?: WeaponData,
+  isOffhand: boolean = false,
+  isRanged: boolean = false
+): TacticalCombatModifiers {
+  return calculateTacticalCombatModifiers(tcState, weapon, isOffhand, isRanged, activeBuffs);
+}
+
+export interface FullCombatStats extends TacticalCombatModifiers {
+  netAttackBonus: number;
+  netDamageBonus: number;
+  fullAttackSequence: string;
+  activeBuffCount: number;
+}
+
+/**
+ * High-level helper to calculate full combat stats for a character with given weapon and buffs.
+ */
+export function calculateCombatStats(
+  character: CharacterState,
+  weapon?: WeaponData,
+  options: { isOffhand?: boolean; isRanged?: boolean; bab?: number } = {}
+): FullCombatStats {
+  const bab = options.bab !== undefined ? options.bab : 0;
+  const tcState = getTacticalCombatState(character, bab);
+  const activeBuffs = character.activeBuffs || [];
+  const mods = calculateTacticalCombatModifiers(
+    tcState,
+    weapon,
+    options.isOffhand || false,
+    options.isRanged || false,
+    activeBuffs
+  );
+
+  const netAttack = mods.attackMod;
+  const netDamage = mods.damageMod;
+  const hasHaste = tcState.haste || activeBuffs.some(b => b.active && b.id === 'haste');
+  const hasFlurry = tcState.flurryOfBlows;
+  const hasWhirlingFrenzy = tcState.whirlingFrenzy || activeBuffs.some(b => b.active && b.id === 'whirling_frenzy');
+
+  const fullAttackSequence = generateFullAttackSequence(
+    bab,
+    netAttack,
+    hasHaste,
+    hasFlurry,
+    hasWhirlingFrenzy
+  );
+
+  return {
+    ...mods,
+    netAttackBonus: netAttack,
+    netDamageBonus: netDamage,
+    fullAttackSequence,
+    activeBuffCount: activeBuffs.filter(b => b.active).length
   };
 }
 

@@ -1,4 +1,5 @@
 import { CharacterSheetData, CharacterState, CharacterSummary, LevelProgression } from '../types/character';
+import { migrateCharacterBuffs } from '../engine/combat';
 
 const DB_NAME = 'HeroForgeDB';
 const DB_VERSION = 1;
@@ -155,7 +156,8 @@ export async function getCharacter(id: string): Promise<CharacterSheetData | nul
       const request = store.get(id);
 
       request.onsuccess = () => {
-        resolve(request.result || null);
+        const char = request.result || null;
+        resolve(char ? (migrateCharacterBuffs(char) as CharacterSheetData) : null);
       };
 
       request.onerror = () => {
@@ -164,7 +166,8 @@ export async function getCharacter(id: string): Promise<CharacterSheetData | nul
     });
   } catch {
     const fallback = getFallbackStore();
-    return fallback[id] || null;
+    const char = fallback[id] || null;
+    return char ? (migrateCharacterBuffs(char) as CharacterSheetData) : null;
   }
 }
 
@@ -351,9 +354,10 @@ export async function importRosterPackage(parsed: any): Promise<{ importedCount:
 
   for (const item of characterArray) {
     if (item && typeof item === 'object' && (item.name || item.levelProgression)) {
+      const migrated = migrateCharacterBuffs(item);
       const charToSave: CharacterSheetData = {
-        ...item,
-        id: item.id || generateCharacterId(),
+        ...migrated,
+        id: migrated.id || generateCharacterId(),
         updatedAt: Date.now()
       };
       const saved = await saveCharacter(charToSave);

@@ -147,32 +147,41 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   // Substitute physical ability scores with form's base stats when Wild Shape is active
   const strScore = activeWildShape ? activeWildShape.str : baseStrScore;
   const dexScore = activeWildShape ? activeWildShape.dex : baseDexScore;
-  const conScore = activeWildShape ? activeWildShape.con : baseConScore;
-
-  const strMod = getAbilityMod(strScore);
-  const dexMod = getAbilityMod(dexScore);
-  const conMod = getAbilityMod(conScore);
-  const intMod = getAbilityMod(intScore);
-  const wisMod = getAbilityMod(wisScore);
-  const chaMod = getAbilityMod(chaScore);
-
+  const conScore = baseConScore;
   const bab = calculateBAB(character.levelProgression, classesData);
   const tcState = getTacticalCombatState(character, bab);
-  const generalTcMods = calculateTacticalCombatModifiers(tcState);
-  const activeCombatMods = getActiveCombatModifiers(tcState, totalLevel);
+  const generalTcMods = calculateTacticalCombatModifiers(tcState, undefined, false, false, character.activeBuffs);
+  const activeCombatMods = getActiveCombatModifiers(tcState, totalLevel, character.activeBuffs);
 
   // Apply Tactical Modifiers & Condition Penalties to Effective Stats
   const rawEffectiveStr = strScore + (generalTcMods.strBonus || 0) + conditionPenalties.strPenalty;
   const effectiveStrScore = conditionPenalties.strPenalty === -99 ? 0 : Math.max(0, rawEffectiveStr);
 
-  const rawEffectiveDex = dexScore + conditionPenalties.dexPenalty;
+  const rawEffectiveDex = dexScore + (generalTcMods.dexBonus || 0) + conditionPenalties.dexPenalty;
   const effectiveDexScore = conditionPenalties.dexPenalty === -99 ? 0 : Math.max(0, rawEffectiveDex);
 
   const effectiveConScore = conScore + (generalTcMods.conBonus || 0);
+  const effectiveIntScore = intScore + (generalTcMods.intBonus || 0);
+  const effectiveWisScore = wisScore + (generalTcMods.wisBonus || 0);
+  const effectiveChaScore = chaScore + (generalTcMods.chaBonus || 0);
+
+  const strMod = getAbilityMod(strScore);
+  const dexMod = getAbilityMod(dexScore);
+  const conMod = getAbilityMod(conScore);
+  const baseIntMod = getAbilityMod(intScore);
+  const baseWisMod = getAbilityMod(wisScore);
+  const baseChaMod = getAbilityMod(chaScore);
 
   const effectiveStrMod = getAbilityMod(effectiveStrScore);
   const effectiveDexMod = getAbilityMod(effectiveDexScore);
   const effectiveConMod = getAbilityMod(effectiveConScore);
+  const effectiveIntMod = getAbilityMod(effectiveIntScore);
+  const effectiveWisMod = getAbilityMod(effectiveWisScore);
+  const effectiveChaMod = getAbilityMod(effectiveChaScore);
+
+  const intMod = effectiveIntMod;
+  const wisMod = effectiveWisMod;
+  const chaMod = effectiveChaMod;
 
   // HP retains character's base Constitution modifier + Rage bonus
   const baseConMod = getAbilityMod(baseConScore);
@@ -185,9 +194,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const baseRef = calculateBaseSave('ref', character.levelProgression, classesData);
   const baseWill = calculateBaseSave('will', character.levelProgression, classesData);
 
-  const totalFort = baseFort + effectiveConMod + traitFlawSaveMods.fort + generalTcMods.fortSaveMod + conditionPenalties.fortPenalty;
-  const totalRef = baseRef + effectiveDexMod + traitFlawSaveMods.ref + generalTcMods.refSaveMod + conditionPenalties.refPenalty;
-  const totalWill = baseWill + wisMod + traitFlawSaveMods.will + generalTcMods.willSaveMod + conditionPenalties.willPenalty;
+  const totalFort = baseFort + conMod + traitFlawSaveMods.fort + generalTcMods.fortSaveMod + conditionPenalties.fortPenalty;
+  const totalRef = baseRef + dexMod + traitFlawSaveMods.ref + generalTcMods.refSaveMod + conditionPenalties.refPenalty;
+  const totalWill = baseWill + baseWisMod + traitFlawSaveMods.will + generalTcMods.willSaveMod + conditionPenalties.willPenalty;
 
   const totalInitiative = effectiveDexMod + traitFlawInitMod + conditionPenalties.initiativePenalty;
 
@@ -226,12 +235,19 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const armorQualities = (eq.armorQualities && eq.armorQualities.length > 0) ? eq.armorQualities : (armorObj.specialQualities || []);
   const shieldQualities = (eq.shieldQualities && eq.shieldQualities.length > 0) ? eq.shieldQualities : (shieldObj.specialQualities || []);
 
+  const effectiveAbilityMods: Record<string, number> = {
+    str: effectiveStrMod,
+    dex: effectiveDexMod,
+    con: effectiveConMod,
+    int: effectiveIntMod,
+    wis: effectiveWisMod,
+    cha: effectiveChaMod
+  };
+
   const calculatedSkills = activeSkills.map(skill => {
     const isClass = isClassSkillForCharacter(skill.name, character.levelProgression, classesData);
     const ranks = (character.skillRanks || {})[skill.name] || 0;
-    const abilityScore = calculateTotalScore(skill.keyAbility, character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
-    const condStatPen = skill.keyAbility === 'str' ? conditionPenalties.strPenalty : (skill.keyAbility === 'dex' ? conditionPenalties.dexPenalty : 0);
-    const abMod = getAbilityMod(Math.max(0, abilityScore + condStatPen)) + (skill.keyAbility === 'str' ? Math.floor(generalTcMods.strBonus / 2) : (skill.keyAbility === 'con' ? Math.floor(generalTcMods.conBonus / 2) : 0));
+    const abMod = effectiveAbilityMods[skill.keyAbility.toLowerCase()] ?? 0;
     const tfSkillMod = traitFlawSkillMods[skill.name] || 0;
 
     let skillSpecificPenalty = conditionPenalties.skillCheckPenalty;
@@ -315,14 +331,14 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const primaryHasSpeed = hasSpeedQuality(primaryQualities);
     const primaryThreat = primaryHasKeen ? calculateKeenThreat(primaryWpn.threat) : primaryWpn.threat;
     const featBonuses = calculateFeatCombatBonuses(character, primaryWpn);
-    const wMods = calculateTacticalCombatModifiers(tcState, primaryWpn, false, false);
+    const wMods = calculateTacticalCombatModifiers(tcState, primaryWpn, false, false, character.activeBuffs);
     const enh = eq.primaryWeaponEnhancement ?? primaryWpn.enhancementBonus ?? 0;
     const isMelee = !primaryWpn.category?.toLowerCase().includes('ranged');
     const netSmiteAtk = isMelee ? smiteAtkBonus : 0;
     const netSmiteDmg = isMelee ? smiteDmgBonus : 0;
     const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
     const totalAtk = bab + netAtkBonus;
-    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy, primaryHasSpeed);
+    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste || (generalTcMods.extraAttacks || 0) > 0, tcState.flurryOfBlows, tcState.whirlingFrenzy, primaryHasSpeed);
     const dmgVal = effectiveStrMod + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty;
     const baseDmgStr = `${primaryWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`;
     const damageStr = `${baseDmgStr}${primarySpecialDmg.damageDiceString}`;
@@ -381,14 +397,14 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const secondaryHasSpeed = hasSpeedQuality(secondaryQualities);
     const secThreat = secondaryHasKeen ? calculateKeenThreat(secWpn.threat) : secWpn.threat;
     const featBonuses = calculateFeatCombatBonuses(character, secWpn);
-    const wMods = calculateTacticalCombatModifiers(tcState, secWpn, true, false);
+    const wMods = calculateTacticalCombatModifiers(tcState, secWpn, true, false, character.activeBuffs);
     const enh = eq.secondaryWeaponEnhancement ?? secWpn.enhancementBonus ?? 0;
     const isMelee = !secWpn.category?.toLowerCase().includes('ranged');
     const netSmiteAtk = isMelee ? smiteAtkBonus : 0;
     const netSmiteDmg = isMelee ? smiteDmgBonus : 0;
     const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
     const totalAtk = bab + netAtkBonus;
-    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy, secondaryHasSpeed);
+    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste || (generalTcMods.extraAttacks || 0) > 0, tcState.flurryOfBlows, tcState.whirlingFrenzy, secondaryHasSpeed);
     const dmgVal = Math.floor(effectiveStrMod / 2) + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty;
     const baseDmgStr = `${secWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`;
     const damageStr = `${baseDmgStr}${secondarySpecialDmg.damageDiceString}`;
@@ -444,11 +460,11 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const rangedHasSpeed = hasSpeedQuality(rangedQualities);
     const rngThreat = rangedHasKeen ? calculateKeenThreat(rngWpn.threat) : rngWpn.threat;
     const featBonuses = calculateFeatCombatBonuses(character, rngWpn);
-    const wMods = calculateTacticalCombatModifiers(tcState, rngWpn, false, true);
+    const wMods = calculateTacticalCombatModifiers(tcState, rngWpn, false, true, character.activeBuffs);
     const enh = eq.rangedWeaponEnhancement ?? rngWpn.enhancementBonus ?? 0;
     const netAtkBonus = effectiveDexMod + enh + featBonuses.attackBonus + wMods.attackMod + conditionPenalties.attackPenalty + conditionPenalties.rangedAttackPenalty;
     const totalAtk = bab + netAtkBonus;
-    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste, tcState.flurryOfBlows, tcState.whirlingFrenzy, rangedHasSpeed);
+    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste || (generalTcMods.extraAttacks || 0) > 0, tcState.flurryOfBlows, tcState.whirlingFrenzy, rangedHasSpeed);
     const dmgVal = enh + wMods.damageMod + conditionPenalties.damagePenalty;
     const baseDmgStr = `${rngWpn.damageM}${dmgVal > 0 ? `+${dmgVal}` : (dmgVal < 0 ? `${dmgVal}` : '')}`;
     const damageStr = `${baseDmgStr}${rangedSpecialDmg.damageDiceString}`;
@@ -1135,8 +1151,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                     </td>
                   </tr>
                   <tr
-                    onClick={() => rollAbilityCheck(dexMod, 'Dexterity')}
-                    className={`cursor-pointer hover:bg-slate-200/80 transition-colors group ${activeWildShape ? 'bg-emerald-50' : ''}`}
+                    onClick={() => rollAbilityCheck(effectiveDexMod, 'Dexterity')}
+                    className={`cursor-pointer hover:bg-slate-200/80 transition-colors group ${activeWildShape ? 'bg-emerald-50' : ((generalTcMods.dexBonus || 0) > 0 ? 'bg-amber-100/80' : '')}`}
                     title="Click to roll Dexterity check (1d20 + Dex)"
                   >
                     <td className="py-0.5 font-bold flex items-center gap-1 group-hover:text-amber-800">
@@ -1147,9 +1163,17 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                           {activeWildShape.name}
                         </span>
                       )}
+                      {(generalTcMods.dexBonus || 0) > 0 && (
+                        <span className="text-[8.5px] text-amber-900 bg-amber-200/90 px-1 rounded uppercase font-sans font-bold" title="Dexterity Buff">
+                          +{generalTcMods.dexBonus} (Buff)
+                        </span>
+                      )}
                     </td>
-                    <td className="py-0.5 text-center font-bold">{dexScore}</td>
-                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">{dexMod >= 0 ? '+' : ''}{dexMod}</td>
+                    <td className="py-0.5 text-center font-bold">
+                      {effectiveDexScore}
+                      {(generalTcMods.dexBonus || 0) > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">(Base {dexScore})</span>}
+                    </td>
+                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">{effectiveDexMod >= 0 ? '+' : ''}{effectiveDexMod}</td>
                   </tr>
                   <tr
                     onClick={() => rollAbilityCheck(effectiveConMod, 'Constitution')}
@@ -1165,8 +1189,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                         </span>
                       )}
                       {generalTcMods.conBonus > 0 && (
-                        <span className="text-[8.5px] text-amber-900 bg-amber-200/90 px-1 rounded uppercase font-sans font-bold" title="Barbarian Rage">
-                          +{generalTcMods.conBonus} (Rage)
+                        <span className="text-[8.5px] text-amber-900 bg-amber-200/90 px-1 rounded uppercase font-sans font-bold" title={tcState.rage ? 'Barbarian Rage' : 'Constitution Buff'}>
+                          +{generalTcMods.conBonus} ({tcState.rage ? 'Rage' : 'Buff'})
                         </span>
                       )}
                     </td>
@@ -1179,40 +1203,64 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                     </td>
                   </tr>
                   <tr
-                    onClick={() => rollAbilityCheck(intMod, 'Intelligence')}
-                    className="cursor-pointer hover:bg-slate-200/80 transition-colors group"
+                    onClick={() => rollAbilityCheck(effectiveIntMod, 'Intelligence')}
+                    className={`cursor-pointer hover:bg-slate-200/80 transition-colors group ${(generalTcMods.intBonus || 0) > 0 ? 'bg-amber-100/80' : ''}`}
                     title="Click to roll Intelligence check (1d20 + Int)"
                   >
                     <td className="py-0.5 font-bold flex items-center gap-1 group-hover:text-amber-800">
                       INT
                       <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
+                      {(generalTcMods.intBonus || 0) > 0 && (
+                        <span className="text-[8.5px] text-amber-900 bg-amber-200/90 px-1 rounded uppercase font-sans font-bold" title="Intelligence Buff">
+                          +{generalTcMods.intBonus} (Buff)
+                        </span>
+                      )}
                     </td>
-                    <td className="py-0.5 text-center">{intScore}</td>
-                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">{intMod >= 0 ? '+' : ''}{intMod}</td>
+                    <td className="py-0.5 text-center font-bold">
+                      {effectiveIntScore}
+                      {(generalTcMods.intBonus || 0) > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">(Base {intScore})</span>}
+                    </td>
+                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">{effectiveIntMod >= 0 ? '+' : ''}{effectiveIntMod}</td>
                   </tr>
                   <tr
-                    onClick={() => rollAbilityCheck(wisMod, 'Wisdom')}
-                    className="cursor-pointer hover:bg-slate-200/80 transition-colors group"
+                    onClick={() => rollAbilityCheck(effectiveWisMod, 'Wisdom')}
+                    className={`cursor-pointer hover:bg-slate-200/80 transition-colors group ${(generalTcMods.wisBonus || 0) > 0 ? 'bg-amber-100/80' : ''}`}
                     title="Click to roll Wisdom check (1d20 + Wis)"
                   >
                     <td className="py-0.5 font-bold flex items-center gap-1 group-hover:text-amber-800">
                       WIS
                       <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
+                      {(generalTcMods.wisBonus || 0) > 0 && (
+                        <span className="text-[8.5px] text-amber-900 bg-amber-200/90 px-1 rounded uppercase font-sans font-bold" title="Wisdom Buff">
+                          +{generalTcMods.wisBonus} (Buff)
+                        </span>
+                      )}
                     </td>
-                    <td className="py-0.5 text-center">{wisScore}</td>
-                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">{wisMod >= 0 ? '+' : ''}{wisMod}</td>
+                    <td className="py-0.5 text-center font-bold">
+                      {effectiveWisScore}
+                      {(generalTcMods.wisBonus || 0) > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">(Base {wisScore})</span>}
+                    </td>
+                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">{effectiveWisMod >= 0 ? '+' : ''}{effectiveWisMod}</td>
                   </tr>
                   <tr
-                    onClick={() => rollAbilityCheck(chaMod, 'Charisma')}
-                    className="cursor-pointer hover:bg-slate-200/80 transition-colors group"
+                    onClick={() => rollAbilityCheck(effectiveChaMod, 'Charisma')}
+                    className={`cursor-pointer hover:bg-slate-200/80 transition-colors group ${(generalTcMods.chaBonus || 0) > 0 ? 'bg-amber-100/80' : ''}`}
                     title="Click to roll Charisma check (1d20 + Cha)"
                   >
                     <td className="py-0.5 font-bold flex items-center gap-1 group-hover:text-amber-800">
                       CHA
                       <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition"></i>
+                      {(generalTcMods.chaBonus || 0) > 0 && (
+                        <span className="text-[8.5px] text-amber-900 bg-amber-200/90 px-1 rounded uppercase font-sans font-bold" title="Charisma Buff">
+                          +{generalTcMods.chaBonus} (Buff)
+                        </span>
+                      )}
                     </td>
-                    <td className="py-0.5 text-center">{chaScore}</td>
-                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">{chaMod >= 0 ? '+' : ''}{chaMod}</td>
+                    <td className="py-0.5 text-center font-bold">
+                      {effectiveChaScore}
+                      {(generalTcMods.chaBonus || 0) > 0 && <span className="text-[10px] text-slate-500 font-normal ml-0.5">(Base {chaScore})</span>}
+                    </td>
+                    <td className="py-0.5 text-center font-bold group-hover:text-amber-800">{effectiveChaMod >= 0 ? '+' : ''}{effectiveChaMod}</td>
                   </tr>
                 </tbody>
               </table>
@@ -1235,7 +1283,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                     onClick={() => rollSavingThrow(totalFort, 'Fortitude', {
                       components: [
                         { label: 'Base Fort', value: baseFort },
-                        { label: 'Con', value: effectiveConMod },
+                        { label: 'Con', value: conMod },
                         ...(generalTcMods.fortSaveMod !== 0 ? [{ label: 'Tactical', value: generalTcMods.fortSaveMod }] : []),
                         ...(traitFlawSaveMods.fort !== 0 ? [{ label: 'Trait/Flaw', value: traitFlawSaveMods.fort }] : [])
                       ]
@@ -1249,11 +1297,11 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                     </td>
                     <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px] group-hover:text-amber-800">{totalFort >= 0 ? '+' : ''}{totalFort}</td>
                     <td className="py-0.5 text-center">{baseFort}</td>
-                    <td className="py-0.5 text-center">{effectiveConMod >= 0 ? '+' : ''}{effectiveConMod}</td>
+                    <td className="py-0.5 text-center">{conMod >= 0 ? '+' : ''}{conMod}</td>
                     <td className="py-0.5 text-center text-[10px] print:text-[9px] text-slate-600">
                       {traitFlawSaveMods.fort !== 0 || generalTcMods.fortSaveMod !== 0 ? (
                         <span>
-                          {generalTcMods.fortSaveMod > 0 ? `+${generalTcMods.fortSaveMod} (Rage)` : ''}
+                          {generalTcMods.fortSaveMod > 0 ? `+${generalTcMods.fortSaveMod} (${tcState.rage ? 'Rage' : 'Tactical/Buff'})` : ''}
                           {traitFlawSaveMods.fort !== 0 ? ` ${traitFlawSaveMods.fort > 0 ? `+${traitFlawSaveMods.fort}` : traitFlawSaveMods.fort} (Trait/Flaw)` : ''}
                         </span>
                       ) : '-'}
@@ -1283,7 +1331,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                         <span>
                           {generalTcMods.refSaveMod > 0 ? (
                             tcState.whirlingFrenzy && tcState.haste ? '+3 (+2 Frenzy, +1 Haste)' :
-                            tcState.whirlingFrenzy ? '+2 (Frenzy)' : '+1 (Haste)'
+                            tcState.whirlingFrenzy ? '+2 (Frenzy)' :
+                            tcState.haste ? '+1 (Haste)' :
+                            `+${generalTcMods.refSaveMod} (Tactical/Buff)`
                           ) : ''}
                           {traitFlawSaveMods.ref !== 0 ? ` ${traitFlawSaveMods.ref > 0 ? `+${traitFlawSaveMods.ref}` : traitFlawSaveMods.ref} (Trait/Flaw)` : ''}
                         </span>
@@ -1294,7 +1344,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                     onClick={() => rollSavingThrow(totalWill, 'Will', {
                       components: [
                         { label: 'Base Will', value: baseWill },
-                        { label: 'Wis', value: wisMod },
+                        { label: 'Wis', value: baseWisMod },
                         ...(generalTcMods.willSaveMod !== 0 ? [{ label: 'Tactical', value: generalTcMods.willSaveMod }] : []),
                         ...(traitFlawSaveMods.will !== 0 ? [{ label: 'Trait/Flaw', value: traitFlawSaveMods.will }] : [])
                       ]
@@ -1308,11 +1358,11 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                     </td>
                     <td className="py-0.5 text-center font-bold text-xs print:text-[10.5px] group-hover:text-amber-800">{totalWill >= 0 ? '+' : ''}{totalWill}</td>
                     <td className="py-0.5 text-center">{baseWill}</td>
-                    <td className="py-0.5 text-center">{wisMod >= 0 ? '+' : ''}{wisMod}</td>
+                    <td className="py-0.5 text-center">{baseWisMod >= 0 ? '+' : ''}{baseWisMod}</td>
                     <td className="py-0.5 text-center text-[10px] print:text-[9px] text-slate-600">
                       {traitFlawSaveMods.will !== 0 || generalTcMods.willSaveMod !== 0 ? (
                         <span>
-                          {generalTcMods.willSaveMod > 0 ? `+${generalTcMods.willSaveMod} (Rage)` : ''}
+                          {generalTcMods.willSaveMod > 0 ? `+${generalTcMods.willSaveMod} (${tcState.rage ? 'Rage' : 'Tactical/Buff'})` : ''}
                           {traitFlawSaveMods.will !== 0 ? ` ${traitFlawSaveMods.will > 0 ? `+${traitFlawSaveMods.will}` : traitFlawSaveMods.will} (Trait/Flaw)` : ''}
                         </span>
                       ) : '-'}

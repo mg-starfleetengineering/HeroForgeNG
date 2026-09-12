@@ -171,6 +171,21 @@ export interface Aura {
   source?: string;
   notes?: string;
 }
+export interface ActiveCombatBuff {
+  id: string;
+  name: string;
+  category: 'stance' | 'spell' | 'class_feature' | 'item' | 'other';
+  active: boolean;
+  bonusType?: 'untyped' | 'morale' | 'luck' | 'insight' | 'sacred' | 'profane' | 'enhancement' | 'size' | 'dodge' | 'deflection';
+  abilityBonuses?: Partial<Record<'STR' | 'DEX' | 'CON' | 'INT' | 'WIS' | 'CHA', number>>;
+  attackBonus?: number;
+  damageBonus?: number;
+  acBonus?: { value: number; type: 'dodge' | 'deflection' | 'morale' | 'insight' | 'sacred' | 'untyped' };
+  saveBonuses?: { fort?: number; ref?: number; will?: number; all?: number; type?: 'untyped' | 'morale' | 'luck' | 'insight' | 'sacred' | 'resistance' | 'dodge' };
+  speedBonus?: number;
+  extraAttacks?: number;
+  notes?: string;
+}
 
 export interface TacticalCombatState {
   powerAttack: number;
@@ -298,6 +313,7 @@ export interface CharacterState {
   selectedTemplate?: string;
   selectedDomains?: string[];
   tacticalCombat?: TacticalCombatState;
+  activeBuffs?: ActiveCombatBuff[];
   familiar?: FamiliarState;
   animalCompanion?: AnimalCompanionState;
   wildShape?: WildShapeState;

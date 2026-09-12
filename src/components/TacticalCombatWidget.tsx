@@ -5,6 +5,7 @@ import {
   getTacticalCombatState,
   calculateTacticalCombatModifiers
 } from '../engine/combat';
+import { TacticalPanel } from './TacticalPanel';
 import {
   getClassLevel,
   calculateBarbarianRageUses,
@@ -79,7 +80,10 @@ export const TacticalCombatWidget: React.FC<TacticalCombatWidgetProps> = ({
 
   const handleReset = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    onChange({ tacticalCombat: DEFAULT_TACTICAL_COMBAT });
+    onChange({
+      tacticalCombat: DEFAULT_TACTICAL_COMBAT,
+      activeBuffs: (character.activeBuffs || []).map(b => ({ ...b, active: false }))
+    });
   };
 
   // Toggle Rage / Whirling Frenzy with 1-click automatic daily use tracking
@@ -165,9 +169,10 @@ export const TacticalCombatWidget: React.FC<TacticalCombatWidgetProps> = ({
     tc.whirlingFrenzy ||
     tc.flurryOfBlows ||
     !!tc.smiteEvil ||
-    !!tc.stunningFist;
+    !!tc.stunningFist ||
+    (character.activeBuffs || []).some(b => b.active);
 
-  const mods = calculateTacticalCombatModifiers(tc);
+  const mods = calculateTacticalCombatModifiers(tc, undefined, false, false, character.activeBuffs);
 
   return (
     <div className={`card bg-slate-900/80 backdrop-blur border border-amber-500/20 p-4 rounded-2xl shadow-xl transition-all ${className}`}>
@@ -219,6 +224,13 @@ export const TacticalCombatWidget: React.FC<TacticalCombatWidgetProps> = ({
             {tc.smiteEvil && <span className="badge bg-blue-500/20 text-blue-300 border-blue-500/30">Smite Evil ({remainingSmite}/{smiteMax})</span>}
             {tc.stunningFist && <span className="badge bg-orange-500/20 text-orange-300 border-orange-500/30">Stunning Fist ({remainingStunning}/{stunningMax})</span>}
             {tc.flurryOfBlows && <span className="badge bg-indigo-500/20 text-indigo-300 border-indigo-500/30">Flurry</span>}
+            {(character.activeBuffs || [])
+              .filter(b => b.active && b.id !== 'haste' && b.id !== 'rage' && b.id !== 'whirling_frenzy')
+              .map(b => (
+                <span key={b.id} className="badge bg-purple-500/20 text-purple-300 border-purple-500/30">
+                  {b.name}
+                </span>
+              ))}
           </div>
         )}
 
@@ -617,6 +629,9 @@ export const TacticalCombatWidget: React.FC<TacticalCombatWidgetProps> = ({
               </button>
             )}
           </div>
+
+          {/* Active Buffs & Stances Management Panel */}
+          <TacticalPanel character={character} onChange={onChange} />
 
           {/* Active Modifiers Summary Bar */}
           {hasAnyActive && (

@@ -1,4 +1,5 @@
 import { CharacterSheetData, CharacterState } from '../types/character';
+import { migrateCharacterBuffs } from '../engine/combat';
 import {
   getAllCharacters,
   saveCharacter,
@@ -95,7 +96,7 @@ export async function runLegacyMigrationIfNeeded(
   setActiveCharacterId(activeId);
 
   return {
-    activeCharacter,
+    activeCharacter: migrateCharacterBuffs(activeCharacter) as CharacterSheetData,
     allCharacters: existingCharactersMap
   };
 }

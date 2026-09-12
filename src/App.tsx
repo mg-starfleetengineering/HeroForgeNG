@@ -99,6 +99,7 @@ const DEFAULT_CHARACTER: CharacterState = {
     flurryOfBlows: false,
     isCollapsed: false
   },
+  activeBuffs: [],
   currentHp: 38,
   tempHp: 0,
   nonlethalDamage: 0,

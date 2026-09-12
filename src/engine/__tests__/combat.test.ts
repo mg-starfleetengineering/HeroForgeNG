@@ -5,14 +5,20 @@ import {
   isTwoHandedWeapon,
   isLightWeapon,
   calculateTacticalCombatModifiers,
+  calculateTacticalCombat,
+  calculateCombatStats,
   generateFullAttackSequence,
   getSizeGrappleModifier,
   calculateGrappleModifier,
   getGrappleDamageDice,
   getGrappleAttackEntry,
-  getActiveCombatModifiers
+  getActiveCombatModifiers,
+  STANDARD_SRD_BUFFS,
+  aggregateBuffBonuses,
+  resolveActiveBuffs,
+  migrateCharacterBuffs
 } from '../combat';
-import { CharacterState, WeaponData, RaceData } from '../../types/character';
+import { CharacterState, TacticalCombatState, ActiveCombatBuff, WeaponData, RaceData } from '../../types/character';
 
 describe('Tactical Combat Engine', () => {
   const dummyGreatsword: WeaponData = {
@@ -388,6 +394,337 @@ describe('Tactical Combat Engine', () => {
       const parsed = getTacticalCombatState({ tacticalCombat: tcState } as CharacterState);
       expect(parsed.smiteEvil).toBe(true);
       expect(parsed.stunningFist).toBe(true);
+    });
+  });
+
+  describe('Extensible Combat Buffs & Stances Entity System', () => {
+    it('verifies standard SRD buffs library exports', () => {
+      expect(STANDARD_SRD_BUFFS.length).toBeGreaterThanOrEqual(10);
+      const haste = STANDARD_SRD_BUFFS.find(b => b.id === 'haste');
+      const rage = STANDARD_SRD_BUFFS.find(b => b.id === 'rage');
+      const rm = STANDARD_SRD_BUFFS.find(b => b.id === 'righteous_might');
+      const df = STANDARD_SRD_BUFFS.find(b => b.id === 'divine_favor');
+      const ic = STANDARD_SRD_BUFFS.find(b => b.id === 'inspire_courage');
+      const bs = STANDARD_SRD_BUFFS.find(b => b.id === 'bulls_strength');
+
+      expect(haste).toBeDefined();
+      expect(haste?.attackBonus).toBe(1);
+      expect(haste?.speedBonus).toBe(30);
+
+      expect(rage).toBeDefined();
+      expect(rage?.abilityBonuses?.STR).toBe(4);
+      expect(rage?.abilityBonuses?.CON).toBe(4);
+
+      expect(rm).toBeDefined();
+      expect(rm?.abilityBonuses?.STR).toBe(4);
+
+      expect(df).toBeDefined();
+      expect(df?.bonusType).toBe('luck');
+
+      expect(ic).toBeDefined();
+      expect(ic?.bonusType).toBe('morale');
+
+      expect(bs).toBeDefined();
+      expect(bs?.abilityBonuses?.STR).toBe(4);
+    });
+
+    it('stacks multiple Dodge AC bonuses correctly', () => {
+      const buffs: ActiveCombatBuff[] = [
+        {
+          id: 'haste',
+          name: 'Haste',
+          category: 'spell',
+          active: true,
+          acBonus: { value: 1, type: 'dodge' }
+        },
+        {
+          id: 'dodge_stance',
+          name: 'Dodge Stance',
+          category: 'stance',
+          active: true,
+          acBonus: { value: 2, type: 'dodge' }
+        }
+      ];
+
+      const agg = aggregateBuffBonuses(buffs);
+      expect(agg.acDodgeBonus).toBe(3); // 1 + 2
+      expect(agg.acNetBonus).toBe(3);
+      expect(agg.touchAcBonus).toBe(3);
+      expect(agg.flatAcBonus).toBe(0); // Dodge bonuses lost when flat-footed
+    });
+
+    it('stacks untyped bonuses and penalties properly', () => {
+      const buffs: ActiveCombatBuff[] = [
+        {
+          id: 'rage',
+          name: 'Rage',
+          category: 'class_feature',
+          active: true,
+          acBonus: { value: -2, type: 'untyped' }
+        },
+        {
+          id: 'shield_spell',
+          name: 'Shield',
+          category: 'spell',
+          active: true,
+          acBonus: { value: 4, type: 'untyped' }
+        }
+      ];
+
+      const agg = aggregateBuffBonuses(buffs);
+      expect(agg.acUntypedBonus).toBe(2); // -2 + 4
+      expect(agg.acNetBonus).toBe(2);
+      expect(agg.touchAcBonus).toBe(2);
+      expect(agg.flatAcBonus).toBe(2);
+    });
+
+    it('does not stack deflection bonuses (takes highest)', () => {
+      const buffs: ActiveCombatBuff[] = [
+        {
+          id: 'shield_of_faith',
+          name: 'Shield of Faith',
+          category: 'spell',
+          active: true,
+          acBonus: { value: 2, type: 'deflection' }
+        },
+        {
+          id: 'ring_protection',
+          name: 'Ring of Protection +3',
+          category: 'item',
+          active: true,
+          acBonus: { value: 3, type: 'deflection' }
+        }
+      ];
+
+      const agg = aggregateBuffBonuses(buffs);
+      expect(agg.acDeflectionMax).toBe(3);
+      expect(agg.acNetBonus).toBe(3); // max(2, 3) = 3, does not stack to 5
+      expect(agg.touchAcBonus).toBe(3);
+      expect(agg.flatAcBonus).toBe(3);
+    });
+
+    it('does not stack morale bonuses of the same type (takes highest)', () => {
+      const buffs: ActiveCombatBuff[] = [
+        {
+          id: 'bless',
+          name: 'Bless',
+          category: 'spell',
+          active: true,
+          bonusType: 'morale',
+          attackBonus: 1
+        },
+        {
+          id: 'good_hope',
+          name: 'Good Hope',
+          category: 'spell',
+          active: true,
+          bonusType: 'morale',
+          attackBonus: 2
+        }
+      ];
+
+      const agg = aggregateBuffBonuses(buffs);
+      expect(agg.attackBonus).toBe(2); // max(1, 2)
+    });
+
+    it('stacks different named bonus types (e.g. Morale + Luck + Dodge)', () => {
+      const buffs: ActiveCombatBuff[] = [
+        {
+          id: 'inspire_courage',
+          name: 'Inspire Courage',
+          category: 'class_feature',
+          active: true,
+          bonusType: 'morale',
+          attackBonus: 1,
+          damageBonus: 1
+        },
+        {
+          id: 'divine_favor',
+          name: 'Divine Favor',
+          category: 'spell',
+          active: true,
+          bonusType: 'luck',
+          attackBonus: 2,
+          damageBonus: 2
+        },
+        {
+          id: 'haste',
+          name: 'Haste',
+          category: 'spell',
+          active: true,
+          bonusType: 'dodge',
+          attackBonus: 1
+        }
+      ];
+
+      const agg = aggregateBuffBonuses(buffs);
+      // Morale +1, Luck +2, Dodge +1 => Net +4 Attack; Morale +1, Luck +2 => Net +3 Damage
+      expect(agg.attackBonus).toBe(4);
+      expect(agg.damageBonus).toBe(3);
+    });
+
+    it('calculates ability score bonuses, save bonuses, and HP per level scaling', () => {
+      const buffs: ActiveCombatBuff[] = [
+        {
+          id: 'bulls_strength',
+          name: "Bull's Strength",
+          category: 'spell',
+          active: true,
+          abilityBonuses: { STR: 4 }
+        },
+        {
+          id: 'bears_endurance',
+          name: "Bear's Endurance",
+          category: 'spell',
+          active: true,
+          abilityBonuses: { CON: 4 }
+        },
+        {
+          id: 'prayer',
+          name: 'Prayer',
+          category: 'spell',
+          active: true,
+          bonusType: 'luck',
+          saveBonuses: { all: 1, type: 'luck' }
+        }
+      ];
+
+      const mods = calculateTacticalCombatModifiers(DEFAULT_TACTICAL_COMBAT, undefined, false, false, buffs);
+      expect(mods.strBonus).toBe(4);
+      expect(mods.conBonus).toBe(4);
+      expect(mods.hpBonusPerLevel).toBe(2); // +4 CON => +2 HP/level
+      expect(mods.fortSaveMod).toBe(3); // +2 from CON mod + 1 from Prayer
+      expect(mods.refSaveMod).toBe(1); // +1 from Prayer
+      expect(mods.willSaveMod).toBe(1); // +1 from Prayer
+    });
+
+    it('bridges legacy tacticalCombat booleans seamlessly into activeBuffs', () => {
+      const legacyTc: TacticalCombatState = {
+        ...DEFAULT_TACTICAL_COMBAT,
+        haste: true,
+        rage: true
+      };
+
+      // Calling calculateTacticalCombatModifiers without explicit activeBuffs
+      const mods = calculateTacticalCombatModifiers(legacyTc, dummyGreatsword);
+      expect(mods.attackMod).toBe(1); // +1 from Haste
+      expect(mods.speedMod).toBe(30);
+      expect(mods.strBonus).toBe(4); // +4 from Rage
+      expect(mods.conBonus).toBe(4);
+      expect(mods.acNetMod).toBe(-1); // +1 Haste dodge - 2 Rage untyped = -1
+      expect(mods.touchAcMod).toBe(-1);
+      expect(mods.damageMod).toBe(3); // 2H 1.5x Str mod from Rage
+
+      // Verify resolveActiveBuffs does not duplicate when both legacy flag and entity exist
+      const resolved = resolveActiveBuffs(legacyTc, [{
+        id: 'haste',
+        name: 'Haste',
+        category: 'spell',
+        active: true,
+        attackBonus: 1
+      }]);
+      expect(resolved.filter(b => b.id === 'haste')).toHaveLength(1);
+      expect(resolved.some(b => b.id === 'rage' && b.active)).toBe(true);
+    });
+
+    it('migrates legacy character state with migrateCharacterBuffs', () => {
+      const charState = {
+        name: 'Old Barbarian',
+        tacticalCombat: {
+          ...DEFAULT_TACTICAL_COMBAT,
+          haste: true,
+          whirlingFrenzy: true
+        }
+      } as CharacterState;
+
+      const migrated = migrateCharacterBuffs(charState);
+      expect(migrated.activeBuffs).toBeDefined();
+      expect(migrated.activeBuffs?.some(b => b.id === 'haste' && b.active)).toBe(true);
+      expect(migrated.activeBuffs?.some(b => b.id === 'whirling_frenzy' && b.active)).toBe(true);
+    });
+
+    it('calculates full combat stats using calculateCombatStats helper', () => {
+      const char: CharacterState = {
+        name: 'Test Paladin',
+        player: 'Tester',
+        alignment: 'Lawful Good',
+        deity: 'Heironeous',
+        pointBuyTarget: '32',
+        baseStats: { str: 16, dex: 12, con: 14, int: 10, wis: 12, cha: 14 },
+        enhancementMods: { str: 0, dex: 0, con: 0, int: 0, wis: 0, cha: 0 },
+        levelBumps: {},
+        selectedRace: 'Human',
+        isGestalt: false,
+        levelProgression: [{ level: 1, primaryClass: 'Paladin', hpRoll: 10 }],
+        skillRanks: {},
+        selectedFeats: [],
+        equipment: {
+          armor: 'chainshirt',
+          armorEnhancement: 0,
+          shield: 'none',
+          shieldEnhancement: 0,
+          deflection: 0,
+          natural: 0,
+          dodge: 0,
+          primaryWeapon: 'Greatsword'
+        },
+        tacticalCombat: {
+          ...DEFAULT_TACTICAL_COMBAT,
+          powerAttack: 1
+        },
+        activeBuffs: [
+          {
+            id: 'haste',
+            name: 'Haste',
+            category: 'spell',
+            active: true,
+            attackBonus: 1,
+            acBonus: { value: 1, type: 'dodge' },
+            extraAttacks: 1
+          },
+          {
+            id: 'divine_favor',
+            name: 'Divine Favor',
+            category: 'spell',
+            active: true,
+            attackBonus: 2,
+            damageBonus: 2
+          }
+        ]
+      };
+
+      const combatStats = calculateCombatStats(char, dummyGreatsword, { bab: 6 });
+      // Power Attack -1, Haste +1, Divine Favor +2 => Net Attack +2
+      expect(combatStats.netAttackBonus).toBe(2);
+      // Power Attack 2H +2, Divine Favor +2 => Net Damage +4
+      expect(combatStats.netDamageBonus).toBe(4);
+      // With BAB 6 and Haste: full attack sequence has iterative attack (6, 1) + Haste extra attack at highest BAB
+      expect(combatStats.fullAttackSequence).toBe('+8/+8/+3');
+      expect(combatStats.activeBuffCount).toBe(2);
+    });
+
+    it('populates active combat descriptors with custom buffs', () => {
+      const tcState = {
+        ...DEFAULT_TACTICAL_COMBAT
+      };
+      const customBuffs: ActiveCombatBuff[] = [
+        {
+          id: 'custom_dragon_stance',
+          name: 'Dragon Stance',
+          category: 'stance',
+          active: true,
+          abilityBonuses: { STR: 2 },
+          acBonus: { value: 2, type: 'dodge' },
+          notes: '+2 Str, +2 Dodge AC'
+        }
+      ];
+
+      const descriptors = getActiveCombatModifiers(tcState, 5, customBuffs);
+      expect(descriptors.some(d => d.id === 'custom_dragon_stance')).toBe(true);
+      const dragonStance = descriptors.find(d => d.id === 'custom_dragon_stance');
+      expect(dragonStance?.name).toBe('Dragon Stance');
+      expect(dragonStance?.affectedStats.str).toBe(2);
+      expect(dragonStance?.affectedStats.ac).toBe(2);
     });
   });
 });

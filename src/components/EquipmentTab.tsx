@@ -1585,10 +1585,11 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
 
   // Tactical Combat Modifiers
   const tcState = getTacticalCombatState(character, bab);
-  const generalTcMods = calculateTacticalCombatModifiers(tcState);
-  const activeCombatMods = getActiveCombatModifiers(tcState, totalLevel);
+  const generalTcMods = calculateTacticalCombatModifiers(tcState, undefined, false, false, character.activeBuffs);
+  const activeCombatMods = getActiveCombatModifiers(tcState, totalLevel, character.activeBuffs);
   const effectiveStrScore = strScore + (generalTcMods.strBonus || 0);
   const effectiveStrMod = getAbilityMod(effectiveStrScore);
+  const effectiveDexMod = getAbilityMod(dexScore + (generalTcMods.dexBonus || 0));
 
   // Armor & Shield Special Qualities & Defenses
   const armorQualities = eq.armorQualities || [];
@@ -1606,7 +1607,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const primaryHasKeen = hasKeenQuality(primaryQualities);
   const primaryHasSpeed = hasSpeedQuality(primaryQualities);
   const primaryThreat = primaryWpnObj ? (primaryHasKeen ? calculateKeenThreat(primaryWpnObj.threat) : primaryWpnObj.threat) : 20;
-  const primaryTacticalMods = primaryWpnObj ? calculateTacticalCombatModifiers(tcState, primaryWpnObj, false, false) : null;
+  const primaryTacticalMods = primaryWpnObj ? calculateTacticalCombatModifiers(tcState, primaryWpnObj, false, false, character.activeBuffs) : null;
   const primaryFeatBonuses = primaryWpnObj ? calculateFeatCombatBonuses(character, primaryWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const primaryEnhancement = eq.primaryWeaponEnhancement || 0;
   const primaryTotalAtk = primaryWpnObj ? (bab + effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + (primaryTacticalMods?.attackMod || 0)) : 0;
@@ -1621,7 +1622,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const primaryFullAttackSeq = primaryWpnObj ? generateFullAttackSequence(
     bab,
     effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + (primaryTacticalMods?.attackMod || 0),
-    tcState.haste,
+    tcState.haste || (generalTcMods.extraAttacks || 0) > 0,
     tcState.flurryOfBlows,
     tcState.whirlingFrenzy,
     primaryHasSpeed
@@ -1636,7 +1637,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const secondaryHasKeen = hasKeenQuality(secondaryQualities);
   const secondaryHasSpeed = hasSpeedQuality(secondaryQualities);
   const secondaryThreat = secondaryWpnObj ? (secondaryHasKeen ? calculateKeenThreat(secondaryWpnObj.threat) : secondaryWpnObj.threat) : 20;
-  const secondaryTacticalMods = secondaryWpnObj ? calculateTacticalCombatModifiers(tcState, secondaryWpnObj, true, false) : null;
+  const secondaryTacticalMods = secondaryWpnObj ? calculateTacticalCombatModifiers(tcState, secondaryWpnObj, true, false, character.activeBuffs) : null;
   const secondaryFeatBonuses = secondaryWpnObj ? calculateFeatCombatBonuses(character, secondaryWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const secondaryEnhancement = eq.secondaryWeaponEnhancement || 0;
   const secondaryTotalAtk = secondaryWpnObj ? (bab + effectiveStrMod + secondaryEnhancement + secondaryFeatBonuses.attackBonus + (secondaryTacticalMods?.attackMod || 0)) : 0;
@@ -1657,10 +1658,10 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const rangedHasKeen = hasKeenQuality(rangedQualities);
   const rangedHasSpeed = hasSpeedQuality(rangedQualities);
   const rangedThreat = rangedWpnObj ? (rangedHasKeen ? calculateKeenThreat(rangedWpnObj.threat) : rangedWpnObj.threat) : 20;
-  const rangedTacticalMods = rangedWpnObj ? calculateTacticalCombatModifiers(tcState, rangedWpnObj, false, true) : null;
+  const rangedTacticalMods = rangedWpnObj ? calculateTacticalCombatModifiers(tcState, rangedWpnObj, false, true, character.activeBuffs) : null;
   const rangedFeatBonuses = rangedWpnObj ? calculateFeatCombatBonuses(character, rangedWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const rangedEnhancement = eq.rangedWeaponEnhancement || 0;
-  const rangedTotalAtk = rangedWpnObj ? (bab + dexMod + rangedEnhancement + rangedFeatBonuses.attackBonus + (rangedTacticalMods?.attackMod || 0)) : 0;
+  const rangedTotalAtk = rangedWpnObj ? (bab + effectiveDexMod + rangedEnhancement + rangedFeatBonuses.attackBonus + (rangedTacticalMods?.attackMod || 0)) : 0;
   const rangedDmgVal = rangedWpnObj ? (rangedEnhancement + rangedFeatBonuses.damageBonus + (rangedTacticalMods?.damageMod || 0)) : 0;
   const rangedDmgStr = rangedDmgVal > 0 ? `+${rangedDmgVal}` : (rangedDmgVal < 0 ? `${rangedDmgVal}` : '');
   const rangedBaseDmgFormula = rangedWpnObj ? `${rangedWpnObj.damageM}${rangedDmgStr}` : '';
