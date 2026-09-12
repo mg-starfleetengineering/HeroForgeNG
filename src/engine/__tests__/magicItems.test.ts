@@ -12,7 +12,10 @@ import {
   calculateTotalItemCost,
   formatMagicItemName,
   createMagicWeaponData,
-  createMagicArmorData
+  createMagicArmorData,
+  getWeaponRollOptions,
+  getBaneAttackOption,
+  calculateCritDamagePools
 } from '../magicItems';
 import { generateFullAttackSequence } from '../combat';
 import { calculateTotalDR } from '../dr';
@@ -394,6 +397,157 @@ describe('Magic Item Special Qualities Engine (3.5e DMG)', () => {
       expect(shield.name).toBe('+1 Fortification Heavy Shield');
       expect(shield.enhancementBonus).toBe(1);
       expect(shield.specialQualities).toEqual(['fortification_light']);
+    });
+  });
+
+  describe('Conditional Special Qualities & Damage Pools Engine', () => {
+    it('segregates unconditional from conditional qualities and detects special triggers', () => {
+      const spec = getWeaponSpecialDamage(['flaming', 'holy', 'vicious', 'bane', 'corrosive']);
+
+      expect(spec.unconditionalPools.map(p => p.damageType)).toEqual(['Fire', 'Acid']);
+      expect(spec.hasBane).toBe(true);
+      expect(spec.hasVicious).toBe(true);
+      expect(spec.alignmentPools.map(p => p.damageType)).toEqual(['Holy']);
+      expect(spec.viciousPool?.isRecoil).toBe(true);
+      expect(spec.viciousPool?.dice).toBe('2d6');
+      expect(spec.viciousPool?.recoilDice).toBe('1d6');
+      expect(spec.banePool?.dice).toBe('2d6');
+    });
+
+    it('generates rich roll options for Holy + Vicious weapon', () => {
+      const weapon: WeaponData = {
+        id: 'longsword',
+        name: '+1 Holy Vicious Longsword',
+        category: 'Martial Weapons',
+        damageM: '1d8',
+        critMultiplier: 2,
+        threat: 19,
+        type: 'Slashing',
+        enhancementBonus: 1,
+        size: 'Medium',
+        weight: 4
+      };
+
+      const options = getWeaponRollOptions(weapon, '1d8+4', 4, 10, ['holy', 'vicious']);
+      expect(options.length).toBe(3);
+
+      // 1. Base option (Base 1d8+4 Slashing)
+      const baseOpt = options.find(o => o.id === 'base');
+      expect(baseOpt).toBeDefined();
+      expect(baseOpt?.rollFormula).toBe('1d8+4');
+      expect(baseOpt?.damagePools.length).toBe(1);
+      expect(baseOpt?.damagePools[0].damageType).toBe('Slashing');
+
+      // 2. Holy option (vs Evil)
+      const holyOpt = options.find(o => o.id === 'holy');
+      expect(holyOpt).toBeDefined();
+      expect(holyOpt?.rollFormula).toBe('1d8+4+2d6');
+      expect(holyOpt?.damagePools.length).toBe(2);
+      expect(holyOpt?.damagePools[1].damageType).toBe('Holy');
+
+      // 3. Vicious option (with recoil pool)
+      const viciousOpt = options.find(o => o.id === 'vicious');
+      expect(viciousOpt).toBeDefined();
+      expect(viciousOpt?.rollFormula).toBe('1d8+4+2d6');
+      expect(viciousOpt?.damagePools.length).toBe(3); // Base + Vicious target + Wielder recoil
+      const recoil = viciousOpt?.damagePools.find(p => p.isRecoil);
+      expect(recoil).toBeDefined();
+      expect(recoil?.formula).toBe('1d6');
+    });
+
+    it('generates nonlethal and lethal toggle roll options for Merciful weapon', () => {
+      const weapon: WeaponData = {
+        id: 'heavy_mace',
+        name: '+1 Merciful Heavy Mace',
+        category: 'Martial Weapons',
+        damageM: '1d8',
+        critMultiplier: 2,
+        threat: 20,
+        type: 'Bludgeoning',
+        enhancementBonus: 1,
+        size: 'Medium',
+        weight: 8
+      };
+
+      const options = getWeaponRollOptions(weapon, '1d8+3', 3, 8, ['merciful']);
+      expect(options.length).toBe(2);
+
+      const nonlethalOpt = options.find(o => o.id === 'merciful');
+      expect(nonlethalOpt).toBeDefined();
+      expect(nonlethalOpt?.isNonlethal).toBe(true);
+      expect(nonlethalOpt?.rollFormula).toBe('1d8+3+1d6');
+
+      const lethalOpt = options.find(o => o.id === 'base_lethal');
+      expect(lethalOpt).toBeDefined();
+      expect(lethalOpt?.isNonlethal).toBeUndefined();
+      expect(lethalOpt?.rollFormula).toBe('1d8+3');
+    });
+
+    it('generates Bane attack option with +2 attack bonus', () => {
+      const baneAtk = getBaneAttackOption(9, 'Heavy Flail');
+      expect(baneAtk.atkBonus).toBe(11);
+      expect(baneAtk.label).toContain('vs Designated Foe');
+    });
+
+    it('calculates Critical Damage pools with multiplied base and burst dice', () => {
+      const weapon: WeaponData = {
+        id: 'greataxe',
+        name: '+1 Flaming Burst Greataxe',
+        category: 'Martial Weapons',
+        damageM: '1d12',
+        critMultiplier: 3, // x3 multiplier
+        threat: 20,
+        type: 'Slashing',
+        enhancementBonus: 1,
+        size: 'Medium',
+        weight: 12
+      };
+
+      // Base damage: 1d12+7 (dmgVal = 7)
+      const critInfo = calculateCritDamagePools(weapon, 7, ['flaming_burst']);
+      expect(critInfo).toBeDefined();
+
+      // On x3, base damage multiplies to 3d12+21 (3 * 7 = 21)
+      // Flaming burst adds 1d6 normal fire + 2d10 burst fire ((3 - 1) * 1d10 = 2d10)
+      expect(critInfo.multiplier).toBe(3);
+      expect(critInfo.damagePools.length).toBe(3); // Base (multiplied), Flaming (1d6), Flaming Burst (2d10)
+
+      const basePool = critInfo.damagePools.find(p => p.label.includes('Base Physical'));
+      expect(basePool?.formula).toBe('3d12+21');
+
+      const burstPool = critInfo.damagePools.find(p => p.label.includes('Crit Bonus'));
+      expect(burstPool?.formula).toBe('2d10');
+      expect(burstPool?.damageType).toBe('Fire');
+
+      expect(critInfo.rollFormula).toBe('3d12+21+1d6+2d10');
+    });
+
+    it('calculates Thundering Critical Damage with d8 burst dice', () => {
+      const weapon: WeaponData = {
+        id: 'scythe',
+        name: '+1 Thundering Scythe',
+        category: 'Martial Weapons',
+        damageM: '2d4',
+        critMultiplier: 4, // x4 multiplier!
+        threat: 20,
+        type: 'Piercing/Slashing',
+        enhancementBonus: 1,
+        size: 'Medium',
+        weight: 10
+      };
+
+      // 2d4+5 with x4 multiplier: 8d4+20
+      // Thundering burst on x4: (4 - 1)d8 = 3d8 Sonic
+      const critInfo = calculateCritDamagePools(weapon, 5, ['thundering']);
+      expect(critInfo.multiplier).toBe(4);
+
+      const basePool = critInfo.damagePools.find(p => p.label.includes('Base Physical'));
+      expect(basePool?.formula).toBe('8d4+20');
+
+      const burstPool = critInfo.damagePools.find(p => p.label.includes('Thundering Burst'));
+      expect(burstPool?.formula).toBe('3d8');
+      expect(burstPool?.damageType).toBe('Sonic');
+      expect(critInfo.rollFormula).toBe('8d4+20+3d8');
     });
   });
 });

@@ -46,6 +46,11 @@ import {
   hasKeenQuality,
   hasSpeedQuality,
   getWeaponSpecialDamage,
+  getWeaponRollOptions,
+  calculateCritDamagePools,
+  getBaneAttackOption,
+  WeaponRollOption,
+  DamagePoolInput,
   getArmorSkillBonus,
   getFortificationSummary,
   getQualityById
@@ -281,6 +286,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     featAtkBonus: number;
     featDmgBonus: number;
     tacticalNote?: string;
+    rollOptions?: WeaponRollOption[];
+    critInfo?: { rollFormula: string; damagePools: DamagePoolInput[]; label: string };
+    baneAtk?: { atkBonus: number; label: string; condition: string } | null;
   }> = [];
 
   // 0. Active Wild Shape Natural Attacks (rendered first in weapon table)
@@ -319,6 +327,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const damageStr = `${baseDmgStr}${primarySpecialDmg.damageDiceString}`;
     const damageFormula = `${baseDmgStr}${primarySpecialDmg.damageDiceFormula}`;
 
+    const primaryRollOptions = getWeaponRollOptions(primaryWpn, baseDmgStr, dmgVal, totalAtk, primaryQualities);
+    const primaryBaneAtk = primarySpecialDmg.hasBane ? getBaneAttackOption(totalAtk, primaryWpn.name) : null;
+    const primaryCritInfo = calculateCritDamagePools(primaryWpn, dmgVal, primaryQualities);
+
     const primaryNote = (() => {
       const notes: string[] = [];
       if (primaryHasSpeed) { notes.push('Speed: +1 Extra Atk'); }
@@ -351,7 +363,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       type: primaryWpn.type || 'Slashing',
       featAtkBonus: featBonuses.attackBonus,
       featDmgBonus: featBonuses.damageBonus,
-      tacticalNote: primaryNote
+      tacticalNote: primaryNote,
+      rollOptions: primaryRollOptions,
+      critInfo: primaryCritInfo,
+      baneAtk: primaryBaneAtk
     });
   }
 
@@ -376,6 +391,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const baseDmgStr = `${secWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`;
     const damageStr = `${baseDmgStr}${secondarySpecialDmg.damageDiceString}`;
     const damageFormula = `${baseDmgStr}${secondarySpecialDmg.damageDiceFormula}`;
+
+    const secRollOptions = getWeaponRollOptions(secWpn, baseDmgStr, dmgVal, totalAtk, secondaryQualities);
+    const secBaneAtk = secondarySpecialDmg.hasBane ? getBaneAttackOption(totalAtk, secWpn.name) : null;
+    const secCritInfo = calculateCritDamagePools(secWpn, dmgVal, secondaryQualities);
 
     const secNote = (() => {
       const notes: string[] = [];
@@ -406,7 +425,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       type: secWpn.type || 'Slashing',
       featAtkBonus: featBonuses.attackBonus,
       featDmgBonus: featBonuses.damageBonus,
-      tacticalNote: secNote
+      tacticalNote: secNote,
+      rollOptions: secRollOptions,
+      critInfo: secCritInfo,
+      baneAtk: secBaneAtk
     });
   }
 
@@ -428,6 +450,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const baseDmgStr = `${rngWpn.damageM}${dmgVal > 0 ? `+${dmgVal}` : (dmgVal < 0 ? `${dmgVal}` : '')}`;
     const damageStr = `${baseDmgStr}${rangedSpecialDmg.damageDiceString}`;
     const damageFormula = `${baseDmgStr}${rangedSpecialDmg.damageDiceFormula}`;
+
+    const rngRollOptions = getWeaponRollOptions(rngWpn, baseDmgStr, dmgVal, totalAtk, rangedQualities);
+    const rngBaneAtk = rangedSpecialDmg.hasBane ? getBaneAttackOption(totalAtk, rngWpn.name) : null;
+    const rngCritInfo = calculateCritDamagePools(rngWpn, dmgVal, rangedQualities);
 
     const rngNote = (() => {
       const notes: string[] = [];
@@ -453,7 +479,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       type: rngWpn.type || 'Piercing',
       featAtkBonus: featBonuses.attackBonus,
       featDmgBonus: featBonuses.damageBonus,
-      tacticalNote: rngNote
+      tacticalNote: rngNote,
+      rollOptions: rngRollOptions,
+      critInfo: rngCritInfo,
+      baneAtk: rngBaneAtk
     });
   }
 
@@ -840,13 +869,35 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                         <div className="text-[8.5px] text-slate-500 font-sans font-normal leading-none">{item.tacticalNote}</div>
                       )}
                     </div>
+                    {item.baneAtk && (
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          rollAttack(item.baneAtk!.atkBonus, item.baneAtk!.label, item.weapon);
+                        }}
+                        className="mt-0.5 text-[9px] text-red-600 hover:text-red-800 hover:underline cursor-pointer flex items-center justify-center gap-0.5"
+                        title={`Click to roll ${item.baneAtk.label}`}
+                      >
+                        <i className="fa-solid fa-bullseye text-[8px]"></i>
+                        <span>vs Foe: {item.baneAtk.atkBonus >= 0 ? `+${item.baneAtk.atkBonus}` : item.baneAtk.atkBonus}</span>
+                      </div>
+                    )}
                   </td>
                   <td className="py-1 text-center text-slate-800">
                     <div
                       onClick={() => {
-                        const rollFormula = item.damageFormula || (item.damageStr || '').split(' ')[0];
-                        if (rollFormula) {
-                          rollDamage(rollFormula, `${item.weapon.name} Damage`);
+                        if (item.rollOptions && item.rollOptions.length > 0) {
+                          const baseOpt = item.rollOptions[0];
+                          rollDamage(baseOpt.rollFormula, `${item.weapon.name} Damage`, {
+                            weapon: item.weapon,
+                            damagePools: baseOpt.damagePools,
+                            isNonlethal: baseOpt.isNonlethal
+                          });
+                        } else {
+                          const rollFormula = item.damageFormula || (item.damageStr || '').split(' ')[0];
+                          if (rollFormula) {
+                            rollDamage(rollFormula, `${item.weapon.name} Damage`);
+                          }
                         }
                       }}
                       className="cursor-pointer hover:bg-slate-200/80 px-1.5 py-0.5 rounded transition inline-block group"
@@ -856,8 +907,62 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                         {item.damageStr}
                       </span>
                     </div>
+                    {item.rollOptions && item.rollOptions.length > 1 && (
+                      <div className="flex flex-wrap items-center justify-center gap-1 mt-0.5">
+                        {item.rollOptions.slice(1).map((opt) => (
+                          <button
+                            key={opt.id}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              rollDamage(opt.rollFormula, `${item.weapon.name} ${opt.label}`, {
+                                weapon: item.weapon,
+                                damagePools: opt.damagePools,
+                                isNonlethal: opt.isNonlethal
+                              });
+                            }}
+                            className={`px-1 py-0.2 rounded text-[9px] font-mono font-semibold border transition cursor-pointer ${
+                              opt.type === 'merciful'
+                                ? 'bg-teal-50 hover:bg-teal-100 text-teal-700 border-teal-300'
+                                : opt.type === 'bane'
+                                ? 'bg-red-50 hover:bg-red-100 text-red-700 border-red-300'
+                                : opt.type === 'vicious'
+                                ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-300'
+                                : opt.type === 'alignment'
+                                ? 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-300'
+                                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+                            }`}
+                            title={opt.buttonTitle || `Roll ${opt.label}`}
+                          >
+                            {opt.icon && <i className={`${opt.icon} text-[8px] mr-0.5`}></i>}
+                            <span>{opt.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </td>
-                  <td className="py-1 text-center text-slate-800">{item.critStr}</td>
+                  <td className="py-1 text-center text-slate-800">
+                    {item.critInfo ? (
+                      <div
+                        onClick={() => {
+                          rollDamage(item.critInfo!.rollFormula, item.critInfo!.label, {
+                            rollType: 'damage',
+                            weapon: item.weapon,
+                            critMultiplier: item.weapon.critMultiplier || 2,
+                            damagePools: item.critInfo!.damagePools
+                          });
+                        }}
+                        className="cursor-pointer hover:bg-slate-200/80 px-1.5 py-0.5 rounded transition inline-block group"
+                        title="Click to roll Critical Damage"
+                      >
+                        <span className="group-hover:text-amber-800 group-hover:underline font-bold text-amber-900">
+                          {item.critStr}
+                        </span>
+                        <i className="fa-solid fa-burst text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 ml-1 transition"></i>
+                      </div>
+                    ) : (
+                      item.critStr
+                    )}
+                  </td>
                   <td className="py-1 text-center text-slate-800">{item.type}</td>
                 </tr>
               ))}

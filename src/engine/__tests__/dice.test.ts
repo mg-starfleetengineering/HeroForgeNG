@@ -17,7 +17,8 @@ import {
   subscribeRolls,
   getThreatMin,
   getCritMultiplier,
-  DiceTerm
+  DiceTerm,
+  DamagePoolInput
 } from '../dice';
 import { WeaponData } from '../../types/character';
 
@@ -419,6 +420,94 @@ describe('Interactive Dice Engine (src/engine/dice.ts)', () => {
 
       expect(result.total).toBe(18);
       expect(result.detailedBreakdown).toBe('d20 (12) + Base Fort (3) + Con (2) + Rage (1) = 18');
+    });
+  });
+
+  describe('Damage Pools & Recoil Separation', () => {
+    it('rolls multi-pool damage and computes segregated damagePools array', () => {
+      // 1d8 physical (roll 6), 1d6 fire (roll 4)
+      const rolls = [6, 4];
+      let idx = 0;
+      const customRng = () => rolls[idx++];
+
+      const pools: DamagePoolInput[] = [
+        { formula: '1d8+3', damageType: 'Slashing', label: 'Base' },
+        { formula: '1d6', damageType: 'Fire', label: 'Flaming' }
+      ];
+
+      const result = rollDamage('1d8+3+1d6', '+1 Flaming Longsword Damage', {
+        customRng,
+        damagePools: pools
+      });
+
+      expect(result.total).toBe(13); // 9 (1d8+3) + 4 (1d6)
+      expect(result.targetDamageTotal).toBe(13);
+      expect(result.recoilTotal).toBeUndefined();
+      expect(result.damagePools).toBeDefined();
+      expect(result.damagePools?.length).toBe(2);
+
+      const basePool = result.damagePools?.[0];
+      expect(basePool?.label).toBe('Base');
+      expect(basePool?.damageType).toBe('Slashing');
+      expect(basePool?.total).toBe(9);
+      expect(basePool?.results).toEqual([6]);
+
+      const firePool = result.damagePools?.[1];
+      expect(firePool?.label).toBe('Flaming');
+      expect(firePool?.damageType).toBe('Fire');
+      expect(firePool?.total).toBe(4);
+      expect(firePool?.results).toEqual([4]);
+
+      expect(result.detailedBreakdown).toContain('Base [9 (6)] + Flaming [4 (4)] = 13');
+    });
+
+    it('separates wielder recoil from target damage (Vicious weapon)', () => {
+      // 1d8+3 base (roll 5 -> 8), 2d6 vicious target (rolls 4, 3 -> 7), 1d6 wielder recoil (roll 2 -> 2)
+      const rolls = [5, 4, 3, 2];
+      let idx = 0;
+      const customRng = () => rolls[idx++];
+
+      const pools: DamagePoolInput[] = [
+        { formula: '1d8+3', damageType: 'Slashing', label: 'Base' },
+        { formula: '2d6', damageType: 'Untyped', label: 'Vicious' },
+        { formula: '1d6', damageType: 'Recoil', label: 'Wielder Recoil', isRecoil: true }
+      ];
+
+      const result = rollDamage('1d8+3+2d6', '+1 Vicious Longsword Damage', {
+        customRng,
+        damagePools: pools
+      });
+
+      // Target damage is 8 + 7 = 15. Recoil is 2.
+      expect(result.total).toBe(15);
+      expect(result.targetDamageTotal).toBe(15);
+      expect(result.recoilTotal).toBe(2);
+
+      const recoilPool = result.damagePools?.find(p => p.isRecoil);
+      expect(recoilPool).toBeDefined();
+      expect(recoilPool?.total).toBe(2);
+      expect(recoilPool?.label).toBe('Wielder Recoil');
+
+      // Breakdown string includes recoil warning
+      expect(result.detailedBreakdown).toContain('⚠️ Wielder Takes: 2');
+      expect(result.summary).toContain('⚠️ Wielder Takes: 2');
+    });
+
+    it('flags nonlethal damage correctly', () => {
+      const customRng = () => 4;
+      const pools: DamagePoolInput[] = [
+        { formula: '1d8+3', damageType: 'Bludgeoning', label: 'Base', isNonlethal: true },
+        { formula: '1d6', damageType: 'Nonlethal', label: 'Merciful', isNonlethal: true }
+      ];
+
+      const result = rollDamage('1d8+3+1d6', '+1 Merciful Morningstar Damage (Nonlethal)', {
+        customRng,
+        damagePools: pools,
+        isNonlethal: true
+      });
+
+      expect(result.isNonlethal).toBe(true);
+      expect(result.summary).toContain('[NONLETHAL]');
     });
   });
 });

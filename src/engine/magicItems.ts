@@ -10,9 +10,17 @@ export type QualityTarget = 'weapon' | 'melee' | 'ranged' | 'armor' | 'shield' |
 export type CostType = 'bonus' | 'gp';
 
 export interface DamageBonus {
-  dice: string; // e.g. '1d6', '2d6'
-  type: string; // e.g. 'Fire', 'Cold', 'Electricity', 'Holy'
-  condition?: string; // e.g. 'vs Evil', 'vs Good'
+  dice: string; // e.g. '1d6', '2d6', '0'
+  type: string; // e.g. 'Fire', 'Cold', 'Electricity', 'Acid', 'Sonic', 'Holy'
+  condition?: string; // e.g. 'vs Evil', 'vs Good', 'vs Designated Foe'
+  isConditional?: boolean;
+  isBurst?: boolean;
+  burstDicePerMultiplier?: string; // e.g. 'd10' or 'd8'
+  burstOnly?: boolean; // true for Thundering (extra damage on critical hit only)
+  isRecoil?: boolean; // true for Vicious
+  recoilDice?: string; // e.g. '1d6'
+  isNonlethal?: boolean; // true for Merciful
+  isBane?: boolean; // true for Bane
 }
 
 export interface MagicQuality {
@@ -40,7 +48,7 @@ export interface MagicQuality {
 }
 
 // ----------------------------------------------------------------------
-// WEAPON SPECIAL QUALITIES CATALOG (3.5e DMG)
+// WEAPON SPECIAL QUALITIES CATALOG (3.5e DMG & MIC)
 // ----------------------------------------------------------------------
 
 export const WEAPON_SPECIAL_QUALITIES: MagicQuality[] = [
@@ -72,6 +80,15 @@ export const WEAPON_SPECIAL_QUALITIES: MagicQuality[] = [
     damageBonus: { dice: '1d6', type: 'Electricity' }
   },
   {
+    id: 'corrosive',
+    name: 'Corrosive',
+    target: 'weapon',
+    costType: 'bonus',
+    costValue: 1,
+    description: '+1d6 acid damage on successful hits.',
+    damageBonus: { dice: '1d6', type: 'Acid' }
+  },
+  {
     id: 'keen',
     name: 'Keen',
     target: 'melee',
@@ -87,7 +104,7 @@ export const WEAPON_SPECIAL_QUALITIES: MagicQuality[] = [
     costType: 'bonus',
     costValue: 2,
     description: '+2d6 damage against evil creatures and weapon bypasses Good damage reduction.',
-    damageBonus: { dice: '2d6', type: 'Holy', condition: 'vs Evil' }
+    damageBonus: { dice: '2d6', type: 'Holy', condition: 'vs Evil', isConditional: true }
   },
   {
     id: 'speed',
@@ -105,7 +122,7 @@ export const WEAPON_SPECIAL_QUALITIES: MagicQuality[] = [
     costType: 'bonus',
     costValue: 2,
     description: '+1d6 fire damage on hits, plus extra fire damage on critical hit (+1d10 for x2, +2d10 for x3, +3d10 for x4).',
-    damageBonus: { dice: '1d6', type: 'Fire' }
+    damageBonus: { dice: '1d6', type: 'Fire', isBurst: true, burstDicePerMultiplier: 'd10' }
   },
   {
     id: 'icy_burst',
@@ -114,7 +131,7 @@ export const WEAPON_SPECIAL_QUALITIES: MagicQuality[] = [
     costType: 'bonus',
     costValue: 2,
     description: '+1d6 cold damage on hits, plus extra cold damage on critical hit (+1d10 for x2, +2d10 for x3, +3d10 for x4).',
-    damageBonus: { dice: '1d6', type: 'Cold' }
+    damageBonus: { dice: '1d6', type: 'Cold', isBurst: true, burstDicePerMultiplier: 'd10' }
   },
   {
     id: 'shocking_burst',
@@ -123,7 +140,7 @@ export const WEAPON_SPECIAL_QUALITIES: MagicQuality[] = [
     costType: 'bonus',
     costValue: 2,
     description: '+1d6 electricity damage on hits, plus extra electricity damage on critical hit (+1d10 for x2, +2d10 for x3, +3d10 for x4).',
-    damageBonus: { dice: '1d6', type: 'Electricity' }
+    damageBonus: { dice: '1d6', type: 'Electricity', isBurst: true, burstDicePerMultiplier: 'd10' }
   },
   {
     id: 'unholy',
@@ -132,7 +149,7 @@ export const WEAPON_SPECIAL_QUALITIES: MagicQuality[] = [
     costType: 'bonus',
     costValue: 2,
     description: '+2d6 damage against good creatures and weapon bypasses Evil damage reduction.',
-    damageBonus: { dice: '2d6', type: 'Unholy', condition: 'vs Good' }
+    damageBonus: { dice: '2d6', type: 'Unholy', condition: 'vs Good', isConditional: true }
   },
   {
     id: 'anarchic',
@@ -141,7 +158,7 @@ export const WEAPON_SPECIAL_QUALITIES: MagicQuality[] = [
     costType: 'bonus',
     costValue: 2,
     description: '+2d6 damage against lawful creatures and weapon bypasses Chaotic damage reduction.',
-    damageBonus: { dice: '2d6', type: 'Chaos', condition: 'vs Lawful' }
+    damageBonus: { dice: '2d6', type: 'Chaos', condition: 'vs Lawful', isConditional: true }
   },
   {
     id: 'axiomatic',
@@ -150,7 +167,7 @@ export const WEAPON_SPECIAL_QUALITIES: MagicQuality[] = [
     costType: 'bonus',
     costValue: 2,
     description: '+2d6 damage against chaotic creatures and weapon bypasses Lawful damage reduction.',
-    damageBonus: { dice: '2d6', type: 'Law', condition: 'vs Chaotic' }
+    damageBonus: { dice: '2d6', type: 'Law', condition: 'vs Chaotic', isConditional: true }
   },
   {
     id: 'ghost_touch_weapon',
@@ -167,7 +184,7 @@ export const WEAPON_SPECIAL_QUALITIES: MagicQuality[] = [
     costType: 'bonus',
     costValue: 1,
     description: '+2 effective enhancement bonus and +2d6 damage against a designated creature type.',
-    damageBonus: { dice: '2d6', type: 'Bane', condition: 'vs Designated Foe' }
+    damageBonus: { dice: '2d6', type: 'Bane', condition: 'vs Designated Foe', isConditional: true, isBane: true }
   },
   {
     id: 'vicious',
@@ -176,7 +193,7 @@ export const WEAPON_SPECIAL_QUALITIES: MagicQuality[] = [
     costType: 'bonus',
     costValue: 1,
     description: '+2d6 damage to the target on hit, while the wielder suffers 1d6 damage in feedback.',
-    damageBonus: { dice: '2d6', type: 'Vicious' }
+    damageBonus: { dice: '2d6', type: 'Vicious', isRecoil: true, recoilDice: '1d6' }
   },
   {
     id: 'vorpal',
@@ -224,7 +241,8 @@ export const WEAPON_SPECIAL_QUALITIES: MagicQuality[] = [
     target: 'weapon',
     costType: 'bonus',
     costValue: 1,
-    description: 'Deals extra sonic damage on critical hits (+1d8 for x2, +2d8 for x3, +3d8 for x4) and deafens target.'
+    description: 'Deals extra sonic damage on critical hits (+1d8 for x2, +2d8 for x3, +3d8 for x4) and deafens target.',
+    damageBonus: { dice: '0', type: 'Sonic', isBurst: true, burstDicePerMultiplier: 'd8', burstOnly: true }
   },
   {
     id: 'merciful',
@@ -233,7 +251,7 @@ export const WEAPON_SPECIAL_QUALITIES: MagicQuality[] = [
     costType: 'bonus',
     costValue: 1,
     description: '+1d6 damage, and all damage dealt by the weapon is nonlethal.',
-    damageBonus: { dice: '1d6', type: 'Nonlethal' }
+    damageBonus: { dice: '1d6', type: 'Nonlethal', isNonlethal: true }
   }
 ];
 
@@ -523,11 +541,61 @@ export function hasSpeedQuality(qualities?: string[]): boolean {
   });
 }
 
+export interface StructuredDamagePoolDef {
+  id: string;
+  name: string;
+  dice: string;
+  damageType: string;
+  condition?: string;
+  isConditional?: boolean;
+  isRecoil?: boolean;
+  recoilDice?: string;
+  isNonlethal?: boolean;
+  isBurst?: boolean;
+  burstDicePerMultiplier?: string;
+  burstOnly?: boolean;
+  isBane?: boolean;
+}
+
 export interface SpecialDamageResult {
   damageDiceString: string; // e.g. " + 1d6 Fire + 2d6 Holy (vs Evil)"
   damageDiceFormula: string; // e.g. "+1d6+2d6"
   bonusList: DamageBonus[];
   summaryLabels: string[];
+  unconditionalPools: StructuredDamagePoolDef[];
+  conditionalPools: StructuredDamagePoolDef[];
+  burstPools: StructuredDamagePoolDef[];
+  alignmentPools: StructuredDamagePoolDef[];
+  hasVicious: boolean;
+  viciousPool?: StructuredDamagePoolDef;
+  hasMerciful: boolean;
+  mercifulPool?: StructuredDamagePoolDef;
+  hasBane: boolean;
+  banePool?: StructuredDamagePoolDef;
+}
+
+export interface DamagePoolInput {
+  label: string;
+  damageType: string;
+  formula: string;
+  condition?: string;
+  isRecoil?: boolean;
+  isNonlethal?: boolean;
+}
+
+export interface WeaponRollOption {
+  id: string;
+  label: string;
+  buttonTitle?: string;
+  icon?: string;
+  type: 'base' | 'alignment' | 'bane' | 'vicious' | 'merciful' | 'crit';
+  rollFormula: string;
+  damagePools: DamagePoolInput[];
+  isNonlethal?: boolean;
+  condition?: string;
+  atkBonusDelta?: number;
+  dmgBonusDelta?: number;
+  recoilDice?: string;
 }
 
 /**
@@ -536,7 +604,19 @@ export interface SpecialDamageResult {
  */
 export function getWeaponSpecialDamage(qualities?: string[]): SpecialDamageResult {
   if (!qualities || qualities.length === 0) {
-    return { damageDiceString: '', damageDiceFormula: '', bonusList: [], summaryLabels: [] };
+    return {
+      damageDiceString: '',
+      damageDiceFormula: '',
+      bonusList: [],
+      summaryLabels: [],
+      unconditionalPools: [],
+      conditionalPools: [],
+      burstPools: [],
+      alignmentPools: [],
+      hasVicious: false,
+      hasMerciful: false,
+      hasBane: false
+    };
   }
 
   const bonusList: DamageBonus[] = [];
@@ -544,14 +624,80 @@ export function getWeaponSpecialDamage(qualities?: string[]): SpecialDamageResul
   const formulaParts: string[] = [];
   const summaryLabels: string[] = [];
 
+  const unconditionalPools: StructuredDamagePoolDef[] = [];
+  const conditionalPools: StructuredDamagePoolDef[] = [];
+  const burstPools: StructuredDamagePoolDef[] = [];
+  const alignmentPools: StructuredDamagePoolDef[] = [];
+  let hasVicious = false;
+  let viciousPool: StructuredDamagePoolDef | undefined = undefined;
+  let hasMerciful = false;
+  let mercifulPool: StructuredDamagePoolDef | undefined = undefined;
+  let hasBane = false;
+  let banePool: StructuredDamagePoolDef | undefined = undefined;
+
   for (const qId of qualities) {
     const q = getQualityById(qId);
     if (q && q.damageBonus) {
       bonusList.push(q.damageBonus);
-      const conditionStr = q.damageBonus.condition ? ` (${q.damageBonus.condition})` : '';
-      stringParts.push(`+ ${q.damageBonus.dice} ${q.damageBonus.type}${conditionStr}`);
-      formulaParts.push(`+${q.damageBonus.dice}`);
-      summaryLabels.push(`+${q.damageBonus.dice} ${q.damageBonus.type}`);
+
+      const hasDice = q.damageBonus.dice && q.damageBonus.dice !== '0';
+      if (hasDice) {
+        const conditionStr = q.damageBonus.condition ? ` (${q.damageBonus.condition})` : '';
+        stringParts.push(`+ ${q.damageBonus.dice} ${q.damageBonus.type}${conditionStr}`);
+        formulaParts.push(`+${q.damageBonus.dice}`);
+        summaryLabels.push(`+${q.damageBonus.dice} ${q.damageBonus.type}`);
+      }
+
+      const poolDef: StructuredDamagePoolDef = {
+        id: q.id,
+        name: q.name,
+        dice: q.damageBonus.dice,
+        damageType: q.damageBonus.type,
+        condition: q.damageBonus.condition,
+        isConditional: q.damageBonus.isConditional,
+        isRecoil: q.damageBonus.isRecoil,
+        recoilDice: q.damageBonus.recoilDice,
+        isNonlethal: q.damageBonus.isNonlethal,
+        isBurst: q.damageBonus.isBurst,
+        burstDicePerMultiplier: q.damageBonus.burstDicePerMultiplier,
+        burstOnly: q.damageBonus.burstOnly,
+        isBane: q.damageBonus.isBane
+      };
+
+      if (poolDef.isBurst) {
+        burstPools.push(poolDef);
+      }
+
+      if (poolDef.isRecoil) {
+        hasVicious = true;
+        viciousPool = poolDef;
+      }
+
+      if (poolDef.isNonlethal) {
+        hasMerciful = true;
+        mercifulPool = poolDef;
+      }
+
+      if (poolDef.isBane) {
+        hasBane = true;
+        banePool = poolDef;
+      }
+
+      if (
+        poolDef.id === 'holy' ||
+        poolDef.id === 'unholy' ||
+        poolDef.id === 'axiomatic' ||
+        poolDef.id === 'anarchic'
+      ) {
+        alignmentPools.push(poolDef);
+      }
+
+      if (poolDef.isConditional) {
+        conditionalPools.push(poolDef);
+      } else if (!poolDef.burstOnly && !poolDef.isRecoil && !poolDef.isNonlethal) {
+        // Unconditional elemental damage (e.g. Flaming, Frost, Shock, Corrosive, Flaming Burst +1d6)
+        unconditionalPools.push(poolDef);
+      }
     }
   }
 
@@ -559,7 +705,250 @@ export function getWeaponSpecialDamage(qualities?: string[]): SpecialDamageResul
     damageDiceString: stringParts.length > 0 ? ` ${stringParts.join(' ')}` : '',
     damageDiceFormula: formulaParts.join(''),
     bonusList,
-    summaryLabels
+    summaryLabels,
+    unconditionalPools,
+    conditionalPools,
+    burstPools,
+    alignmentPools,
+    hasVicious,
+    viciousPool,
+    hasMerciful,
+    mercifulPool,
+    hasBane,
+    banePool
+  };
+}
+
+/**
+ * Builds interactive roll options/chips for a weapon based on its base stats and special qualities.
+ */
+export function getWeaponRollOptions(
+  weapon: Partial<WeaponData>,
+  baseDmgFormula: string,
+  baseDmgVal: number,
+  baseAtkBonus: number,
+  qualities?: string[]
+): WeaponRollOption[] {
+  const specDmg = getWeaponSpecialDamage(qualities);
+  const options: WeaponRollOption[] = [];
+
+  // Unconditional pools (Flaming, Frost, Shock, Corrosive, etc.)
+  const unconditionalPools: DamagePoolInput[] = specDmg.unconditionalPools.map(p => ({
+    label: p.name,
+    damageType: p.damageType,
+    formula: p.dice
+  }));
+  const unconditionalFormula = specDmg.unconditionalPools.map(p => `+${p.dice}`).join('');
+  const unconditionalSummary = specDmg.unconditionalPools.map(p => `+${p.dice} ${p.damageType}`).join(' ');
+
+  const basePhysicalPool: DamagePoolInput = {
+    label: 'Base Physical',
+    damageType: weapon.type || 'Physical',
+    formula: baseDmgFormula
+  };
+
+  // 1. Merciful Mode vs Standard Base
+  if (specDmg.hasMerciful) {
+    options.push({
+      id: 'merciful',
+      label: `🕊️ Merciful (${baseDmgFormula}+1d6 Nonlethal)`,
+      buttonTitle: `Roll Merciful Damage (${baseDmgFormula}+1d6 Nonlethal)`,
+      icon: 'fa-solid fa-dove',
+      type: 'merciful',
+      rollFormula: `${baseDmgFormula}+1d6${unconditionalFormula}`,
+      isNonlethal: true,
+      damagePools: [
+        { ...basePhysicalPool, isNonlethal: true },
+        { label: 'Merciful', damageType: 'Nonlethal', formula: '1d6', isNonlethal: true },
+        ...unconditionalPools.map(p => ({ ...p, isNonlethal: true }))
+      ]
+    });
+
+    options.push({
+      id: 'base_lethal',
+      label: `⚔️ Lethal (${baseDmgFormula})`,
+      buttonTitle: `Roll Lethal Damage (${baseDmgFormula})`,
+      icon: 'fa-solid fa-khanda',
+      type: 'base',
+      rollFormula: `${baseDmgFormula}${unconditionalFormula}`,
+      damagePools: [basePhysicalPool, ...unconditionalPools]
+    });
+  } else {
+    options.push({
+      id: 'base',
+      label: unconditionalSummary ? `${baseDmgFormula} ${unconditionalSummary}` : `${baseDmgFormula} Base`,
+      buttonTitle: `Roll Base Damage (${baseDmgFormula}${unconditionalFormula})`,
+      icon: 'fa-solid fa-dice-d6',
+      type: 'base',
+      rollFormula: `${baseDmgFormula}${unconditionalFormula}`,
+      damagePools: [basePhysicalPool, ...unconditionalPools]
+    });
+  }
+
+  // 2. Alignment Qualities (Holy, Unholy, Axiomatic, Anarchic)
+  for (const pool of specDmg.alignmentPools) {
+    let icon = 'fa-solid fa-sun';
+    if (pool.id === 'unholy') icon = 'fa-solid fa-skull';
+    else if (pool.id === 'axiomatic') icon = 'fa-solid fa-scale-balanced';
+    else if (pool.id === 'anarchic') icon = 'fa-solid fa-tornado';
+
+    options.push({
+      id: pool.id,
+      label: `+${pool.dice} ${pool.name}${pool.condition ? ` (${pool.condition})` : ''}`,
+      buttonTitle: `Roll Base + ${pool.name} Damage`,
+      icon,
+      type: 'alignment',
+      condition: pool.condition,
+      rollFormula: `${baseDmgFormula}${unconditionalFormula}+${pool.dice}`,
+      damagePools: [
+        basePhysicalPool,
+        ...unconditionalPools,
+        { label: pool.name, damageType: pool.damageType, formula: pool.dice, condition: pool.condition }
+      ]
+    });
+  }
+
+  // 3. Bane Quality
+  if (specDmg.hasBane && specDmg.banePool) {
+    const baneVal = baseDmgVal + 2;
+    const baneBaseDmgStr = baneVal >= 0 ? `+${baneVal}` : `${baneVal}`;
+    const baneBaseFormula = `${weapon.damageM || '1d8'}${baneVal !== 0 ? baneBaseDmgStr : ''}`;
+
+    options.push({
+      id: 'bane',
+      label: `Base+2 + 2d6 Bane (vs Foe)`,
+      buttonTitle: `Roll Base (+2 Enh) + 2d6 Bane (vs Designated Foe)`,
+      icon: 'fa-solid fa-bullseye',
+      type: 'bane',
+      condition: 'vs Designated Foe',
+      atkBonusDelta: 2,
+      dmgBonusDelta: 2,
+      rollFormula: `${baneBaseFormula}${unconditionalFormula}+2d6`,
+      damagePools: [
+        {
+          label: 'Base Physical (+2 Bane Enh)',
+          damageType: weapon.type || 'Physical',
+          formula: baneBaseFormula,
+          condition: 'vs Designated Foe'
+        },
+        ...unconditionalPools,
+        {
+          label: 'Bane',
+          damageType: 'Bane',
+          formula: '2d6',
+          condition: 'vs Designated Foe'
+        }
+      ]
+    });
+  }
+
+  // 4. Vicious Quality
+  if (specDmg.hasVicious && specDmg.viciousPool) {
+    options.push({
+      id: 'vicious',
+      label: `Base + 2d6 Vicious`,
+      buttonTitle: `Roll Base + 2d6 Vicious (+1d6 Recoil to Wielder)`,
+      icon: 'fa-solid fa-droplet',
+      type: 'vicious',
+      recoilDice: '1d6',
+      rollFormula: `${baseDmgFormula}${unconditionalFormula}+2d6`,
+      damagePools: [
+        basePhysicalPool,
+        ...unconditionalPools,
+        { label: 'Vicious', damageType: 'Vicious', formula: '2d6' },
+        { label: 'Wielder Recoil', damageType: 'Recoil', formula: '1d6', isRecoil: true }
+      ]
+    });
+  }
+
+  return options;
+}
+
+/**
+ * Calculates critical damage pools including base damage multiplied, flat modifiers multiplied,
+ * unmultiplied standard energy, and burst dice scaling per D&D 3.5e rules.
+ */
+export function calculateCritDamagePools(
+  weapon: Partial<WeaponData>,
+  baseDmgVal: number,
+  qualities?: string[]
+): {
+  rollFormula: string;
+  damagePools: DamagePoolInput[];
+  label: string;
+  multiplier: number;
+} {
+  const mult = weapon.critMultiplier && weapon.critMultiplier >= 1 ? weapon.critMultiplier : 2;
+  const specDmg = getWeaponSpecialDamage(qualities);
+  const dmgM = weapon.damageM || '1d8';
+
+  // Parse dice count and sides from damageM (e.g. "1d8" -> count=1, sides=8; "2d4" -> count=2, sides=4)
+  const match = dmgM.match(/(\d+)d(\d+)/i);
+  const baseCount = match ? parseInt(match[1], 10) : 1;
+  const sides = match ? parseInt(match[2], 10) : 8;
+  const critDiceCount = baseCount * mult;
+  const critFlatBonus = baseDmgVal * mult;
+  const critFlatStr = critFlatBonus > 0 ? `+${critFlatBonus}` : (critFlatBonus < 0 ? `${critFlatBonus}` : '');
+  const critPhysicalFormula = `${critDiceCount}d${sides}${critFlatStr}`;
+
+  const pools: DamagePoolInput[] = [
+    {
+      label: `Base Physical (x${mult} Crit)`,
+      damageType: weapon.type || 'Physical',
+      formula: critPhysicalFormula
+    }
+  ];
+
+  const formulaParts: string[] = [critPhysicalFormula];
+
+  // Unconditional elemental damage is NOT multiplied on crits (per 3.5e DMG rules)
+  for (const up of specDmg.unconditionalPools) {
+    pools.push({
+      label: up.name,
+      damageType: up.damageType,
+      formula: up.dice
+    });
+    formulaParts.push(`+${up.dice}`);
+  }
+
+  // Burst damage (Flaming Burst, Icy Burst, Shocking Burst, Thundering)
+  const burstMultiplier = Math.max(1, mult - 1);
+  for (const bp of specDmg.burstPools) {
+    const burstDieSides = bp.burstDicePerMultiplier || 'd10';
+    const burstFormula = `${burstMultiplier}${burstDieSides.startsWith('d') ? burstDieSides : `d${burstDieSides}`}`;
+    const burstLabel = bp.name.toLowerCase().includes('burst') ? `${bp.name} (Crit Bonus)` : `${bp.name} Burst`;
+    pools.push({
+      label: burstLabel,
+      damageType: bp.damageType,
+      formula: burstFormula,
+      condition: 'on Critical Hit'
+    });
+    formulaParts.push(`+${burstFormula}`);
+  }
+
+  return {
+    rollFormula: formulaParts.join(''),
+    damagePools: pools,
+    label: `${weapon.name || 'Weapon'} Crit Damage (x${mult})`,
+    multiplier: mult
+  };
+}
+
+/**
+ * Calculates attack bonus and label for weapons with the Bane special quality.
+ */
+export function getBaneAttackOption(
+  baseAtkBonus: number,
+  weaponName: string
+): {
+  atkBonus: number;
+  label: string;
+  condition: string;
+} {
+  return {
+    atkBonus: baseAtkBonus + 2,
+    label: `${weaponName} Attack (vs Designated Foe)`,
+    condition: 'vs Designated Foe'
   };
 }
 
