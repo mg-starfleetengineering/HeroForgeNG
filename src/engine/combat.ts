@@ -40,10 +40,19 @@ export function getTacticalCombatState(character: CharacterState, bab: number = 
  */
 export function isTwoHandedWeapon(weapon?: WeaponData): boolean {
   if (!weapon) return false;
-  const name = weapon.name.toLowerCase();
-  const cat = (weapon.category || '').toLowerCase();
-  const spec = (weapon.special || '').toLowerCase();
 
+  const size = (weapon.size || '').toUpperCase().trim();
+  const cat = (weapon.category || '').toLowerCase().trim();
+  const spec = (weapon.special || '').toLowerCase().trim();
+
+  // Structured size check: 'T' indicates Two-Handed in HeroForge weapons data
+  if (size === 'T' || size === 'TWO-HANDED' || size === '2H') return true;
+  if (cat.includes('two-handed') || spec.includes('two-handed') || spec.includes('2-handed')) return true;
+
+  // If explicitly designated Light or One-Handed, it is not Two-Handed
+  if (size === 'L' || size === 'O' || size === 'U' || cat.includes('light') || cat.includes('one-handed')) return false;
+
+  const name = weapon.name.toLowerCase();
   return (
     name.includes('great') ||
     name.includes('nodachi') ||
@@ -56,9 +65,8 @@ export function isTwoHandedWeapon(weapon?: WeaponData): boolean {
     name.includes('guisarme') ||
     name.includes('ranseur') ||
     name.includes('heavy flail') ||
-    cat.includes('two-handed') ||
-    spec.includes('two-handed') ||
-    spec.includes('2-handed')
+    name.includes('spiked chain') ||
+    name.includes('longspear')
   );
 }
 
@@ -67,18 +75,30 @@ export function isTwoHandedWeapon(weapon?: WeaponData): boolean {
  */
 export function isLightWeapon(weapon?: WeaponData): boolean {
   if (!weapon) return false;
-  const name = weapon.name.toLowerCase();
-  const spec = (weapon.special || '').toLowerCase();
 
+  const size = (weapon.size || '').toUpperCase().trim();
+  const cat = (weapon.category || '').toLowerCase().trim();
+  const spec = (weapon.special || '').toLowerCase().trim();
+
+  // Structured size check: 'L' indicates Light, 'U' indicates Unarmed in HeroForge weapons data
+  if (size === 'L' || size === 'U' || size === 'LIGHT') return true;
+  if (cat.includes('light') || spec.includes('light')) return true;
+
+  // If explicitly designated Two-Handed or One-Handed, it is not Light
+  if (size === 'T' || size === 'O' || cat.includes('two-handed') || cat.includes('one-handed')) return false;
+
+  const name = weapon.name.toLowerCase();
   return (
     name.includes('dagger') ||
     name.includes('light mace') ||
     name.includes('short sword') ||
+    name.includes('shortsword') ||
     name.includes('handaxe') ||
     name.includes('kukri') ||
     name.includes('sickle') ||
-    name.includes('unarmed') ||
-    spec.includes('light')
+    name.includes('kama') ||
+    name.includes('light pick') ||
+    name.includes('unarmed')
   );
 }
 

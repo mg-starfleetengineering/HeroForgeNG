@@ -1412,15 +1412,33 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
   }
 
   // 6. Wondrous Items
-  (updatedEq.wondrousItems || []).forEach(w => {
-    if (!isItemInInventory(currentInventory, w.name)) {
-      const nextInv = ensureEquippedItemInInventory(currentInventory, { name: w.name, weight: w.weight || 0, notes: w.effect, itemType: 'wondrous' });
-      if (nextInv !== currentInventory) {
-        currentInventory = nextInv;
+  if (updatedEq.wondrousItems && updatedEq.wondrousItems.length > 0) {
+    updatedEq.wondrousItems = updatedEq.wondrousItems.map(w => {
+      let linkedItem = w.inventoryItemId
+        ? currentInventory.find(i => i.id === w.inventoryItemId)
+        : currentInventory.find(i => matchesItemName(i.name, w.name) && (i.itemType === 'wondrous' || !i.itemType));
+
+      if (!linkedItem) {
+        linkedItem = {
+          id: `item-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          name: w.name,
+          quantity: 1,
+          weight: w.weight || 0,
+          notes: w.effect,
+          itemType: 'wondrous',
+          location: 'Carried'
+        };
+        currentInventory = [...currentInventory, linkedItem];
         modified = true;
       }
-    }
-  });
+
+      if (w.inventoryItemId !== linkedItem.id) {
+        modified = true;
+        return { ...w, inventoryItemId: linkedItem.id };
+      }
+      return w;
+    });
+  }
 
   return modified ? { ...character, inventory: currentInventory, equipment: updatedEq } : character;
 }
@@ -1444,8 +1462,11 @@ export function calculateTotalCarriedWeight(character: CharacterState, weaponsDa
   if (eq) {
     // 1. Armor Weight (if not already recorded in inventory)
     if (eq.armor && eq.armor !== 'none') {
-      const armorObj = resolveArmor(eq.armor, character.customArmors || []);
-      if (!isItemInInventory(inv, armorObj.name) && !isItemInInventory(inv, eq.armor)) {
+      const isRecorded = (eq.armorItemId && inv.some(i => i.id === eq.armorItemId)) ||
+        isItemInInventory(inv, eq.armor) ||
+        isItemInInventory(inv, resolveArmor(eq.armor, character.customArmors || []).name);
+
+      if (!isRecorded) {
         const armorKey = eq.armor.toLowerCase().trim();
         if (ARMOR_WEIGHT_MAP[armorKey] !== undefined) {
           weight += ARMOR_WEIGHT_MAP[armorKey];
@@ -1458,8 +1479,11 @@ export function calculateTotalCarriedWeight(character: CharacterState, weaponsDa
 
     // 2. Shield Weight (if not already recorded in inventory)
     if (eq.shield && eq.shield !== 'none') {
-      const shieldObj = resolveShield(eq.shield, character.customArmors || []);
-      if (!isItemInInventory(inv, shieldObj.name) && !isItemInInventory(inv, eq.shield)) {
+      const isRecorded = (eq.shieldItemId && inv.some(i => i.id === eq.shieldItemId)) ||
+        isItemInInventory(inv, eq.shield) ||
+        isItemInInventory(inv, resolveShield(eq.shield, character.customArmors || []).name);
+
+      if (!isRecorded) {
         const shieldKey = eq.shield.toLowerCase().trim();
         if (SHIELD_WEIGHT_MAP[shieldKey] !== undefined) {
           weight += SHIELD_WEIGHT_MAP[shieldKey];
@@ -1472,20 +1496,32 @@ export function calculateTotalCarriedWeight(character: CharacterState, weaponsDa
 
     // 3. Equipped Weapons Weight (if not already recorded in inventory)
     if (eq.primaryWeapon && eq.primaryWeapon !== 'none') {
-      const primaryWpn = resolveWeapon(eq.primaryWeapon, character.customWeapons || [], weaponsData);
-      if (!isItemInInventory(inv, primaryWpn.name) && !isItemInInventory(inv, eq.primaryWeapon)) {
+      const isRecorded = (eq.primaryWeaponItemId && inv.some(i => i.id === eq.primaryWeaponItemId)) ||
+        isItemInInventory(inv, eq.primaryWeapon) ||
+        isItemInInventory(inv, resolveWeapon(eq.primaryWeapon, character.customWeapons || [], weaponsData).name);
+
+      if (!isRecorded) {
+        const primaryWpn = resolveWeapon(eq.primaryWeapon, character.customWeapons || [], weaponsData);
         weight += parseWeight(primaryWpn.weight);
       }
     }
     if (eq.secondaryWeapon && eq.secondaryWeapon !== 'none') {
-      const secWpn = resolveWeapon(eq.secondaryWeapon, character.customWeapons || [], weaponsData);
-      if (!isItemInInventory(inv, secWpn.name) && !isItemInInventory(inv, eq.secondaryWeapon)) {
+      const isRecorded = (eq.secondaryWeaponItemId && inv.some(i => i.id === eq.secondaryWeaponItemId)) ||
+        isItemInInventory(inv, eq.secondaryWeapon) ||
+        isItemInInventory(inv, resolveWeapon(eq.secondaryWeapon, character.customWeapons || [], weaponsData).name);
+
+      if (!isRecorded) {
+        const secWpn = resolveWeapon(eq.secondaryWeapon, character.customWeapons || [], weaponsData);
         weight += parseWeight(secWpn.weight);
       }
     }
     if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
-      const rngWpn = resolveWeapon(eq.rangedWeapon, character.customWeapons || [], weaponsData);
-      if (!isItemInInventory(inv, rngWpn.name) && !isItemInInventory(inv, eq.rangedWeapon)) {
+      const isRecorded = (eq.rangedWeaponItemId && inv.some(i => i.id === eq.rangedWeaponItemId)) ||
+        isItemInInventory(inv, eq.rangedWeapon) ||
+        isItemInInventory(inv, resolveWeapon(eq.rangedWeapon, character.customWeapons || [], weaponsData).name);
+
+      if (!isRecorded) {
+        const rngWpn = resolveWeapon(eq.rangedWeapon, character.customWeapons || [], weaponsData);
         weight += parseWeight(rngWpn.weight);
       }
     }
@@ -1493,7 +1529,9 @@ export function calculateTotalCarriedWeight(character: CharacterState, weaponsDa
     // 4. Wondrous Items Weight (if not already recorded in inventory)
     if (eq.wondrousItems && eq.wondrousItems.length > 0) {
       eq.wondrousItems.forEach(item => {
-        if (!isItemInInventory(inv, item.name)) {
+        const isRecorded = (item.inventoryItemId && inv.some(i => i.id === item.inventoryItemId)) ||
+          isItemInInventory(inv, item.name);
+        if (!isRecorded) {
           weight += parseWeight(item.weight);
         }
       });
