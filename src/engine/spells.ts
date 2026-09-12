@@ -353,6 +353,7 @@ export function syncPreparedSlotsForCharacter(
       syncedForThisClass.push({
         id: slotId,
         className,
+        classId: cKey,
         spellLevel: lvlGroup.spellLevel,
         slotIndex: idx,
         spellId: existing?.spellId || null,
@@ -369,6 +370,8 @@ export function syncPreparedSlotsForCharacter(
       syncedForThisClass.push({
         id: domSlotId,
         className,
+        classId: cKey,
+        domainId: existingDom?.domainId || undefined,
         spellLevel: lvlGroup.spellLevel,
         slotIndex: 0,
         spellId: existingDom?.spellId || null,
@@ -388,7 +391,7 @@ export function syncPreparedSlotsForCharacter(
 export function assignPreparedSpellSlot(
   preparedSpells: PreparedSpellSlot[] = [],
   slotId: string,
-  spell: { id: string; name: string }
+  spell: { id: string; name: string; domainId?: string }
 ): PreparedSpellSlot[] {
   const index = preparedSpells.findIndex(s => s.id === slotId);
   if (index === -1) {
@@ -397,10 +400,12 @@ export function assignPreparedSpellSlot(
   }
 
   const updated = [...preparedSpells];
+  const target = updated[index];
   updated[index] = {
-    ...updated[index],
+    ...target,
     spellId: spell.id,
     spellName: spell.name,
+    domainId: target.isDomain ? (spell.domainId || target.domainId) : undefined,
     isCast: false
   };
   return updated;
@@ -417,10 +422,12 @@ export function clearPreparedSpellSlot(
   if (index === -1) return preparedSpells;
 
   const updated = [...preparedSpells];
+  const target = updated[index];
   updated[index] = {
-    ...updated[index],
+    ...target,
     spellId: null,
     spellName: undefined,
+    domainId: target.isDomain ? undefined : target.domainId,
     isCast: false
   };
   return updated;
@@ -512,29 +519,99 @@ export function removeSpellFromSpellbook(
  */
 export function getStarterWizardCantripIds(spellsData: SpellData[] = []): string[] {
   return spellsData
-    .filter(s => s.levels && s.levels['Wizard'] === 0)
+    .filter(s => {
+      if (s.classLevels && s.classLevels['Wizard'] !== undefined) {
+        return s.classLevels['Wizard'] === 0;
+      }
+      return s.levels && s.levels['Wizard'] === 0;
+    })
     .map(s => s.id);
 }
 
 /**
  * Resolves the spell level for a specific class name (case-insensitive, normalized).
+ * Checks classLevels first, falling back to legacy spell.levels.
  */
 export function getSpellLevelForClass(spell: SpellData, className: string): number | undefined {
-  if (!spell || !spell.levels || !className) return undefined;
+  if (!spell || !className) return undefined;
   const target = className.toLowerCase().replace(/[\s\/-]+/g, '_');
 
-  for (const [clsKey, lvl] of Object.entries(spell.levels)) {
-    const norm = clsKey.toLowerCase().replace(/[\s\/-]+/g, '_');
-    if (norm === target) return lvl;
+  // Check classLevels first
+  if (spell.classLevels) {
+    for (const [clsKey, lvl] of Object.entries(spell.classLevels)) {
+      const norm = clsKey.toLowerCase().replace(/[\s\/-]+/g, '_');
+      if (norm === target) return lvl;
+    }
+    return undefined;
   }
+
+  // Backward compatibility fallback to spell.levels
+  if (spell.levels) {
+    for (const [clsKey, lvl] of Object.entries(spell.levels)) {
+      const norm = clsKey.toLowerCase().replace(/[\s\/-]+/g, '_');
+      if (norm === target) return lvl;
+    }
+  }
+
   return undefined;
 }
 
 /**
+ * Resolves the spell level for a specific domain name or ID (case-insensitive, normalized).
+ * Checks domainLevels first, falling back to legacy spell.levels.
+ */
+export function getSpellLevelForDomain(spell: SpellData, domainNameOrId: string): number | undefined {
+  if (!spell || !domainNameOrId) return undefined;
+  const target = domainNameOrId.toLowerCase().replace(/[\s\/-]+/g, '_');
+
+  // Check domainLevels first
+  if (spell.domainLevels) {
+    for (const [domKey, lvl] of Object.entries(spell.domainLevels)) {
+      const norm = domKey.toLowerCase().replace(/[\s\/-]+/g, '_');
+      if (norm === target) return lvl;
+    }
+    return undefined;
+  }
+
+  // Backward compatibility fallback to spell.levels
+  if (spell.levels) {
+    for (const [domKey, lvl] of Object.entries(spell.levels)) {
+      const norm = domKey.toLowerCase().replace(/[\s\/-]+/g, '_');
+      if (norm === target) return lvl;
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Resolves available spells for a specific prepared spell slot.
+ * Automatically handles Gestalt class boundaries and domain slot restrictions.
+ */
+export function getAvailableSpellsForSlot(
+  slot: PreparedSpellSlot,
+  character: CharacterState,
+  spellsData: SpellData[] = [],
+  domainsData: DomainData[] = [],
+  onlySpellbook: boolean = false
+): SpellData[] {
+  return getAvailableSpellsForPreparation(
+    slot.className || slot.classId || '',
+    slot.spellLevel,
+    character,
+    spellsData,
+    domainsData,
+    !!slot.isDomain,
+    onlySpellbook,
+    slot.domainId
+  );
+}
+
+/**
  * Resolves available spells for daily preparation.
- * For regular slots: returns matching spells of that spell level for the class.
+ * For regular slots: returns matching spells of that spell level looking exclusively in spell.classLevels.
  * If onlySpellbook is true: filters by character.spellbookSpells.
- * For Cleric Domain Slots: returns domain spells corresponding to the character's domains.
+ * For Cleric Domain Slots: returns domain spells looking exclusively in spell.domainLevels or domain.spellIds.
  */
 export function getAvailableSpellsForPreparation(
   className: string,
@@ -543,68 +620,114 @@ export function getAvailableSpellsForPreparation(
   spellsData: SpellData[] = [],
   domainsData: DomainData[] = [],
   isDomainSlot: boolean = false,
-  onlySpellbook: boolean = false
+  onlySpellbook: boolean = false,
+  specificDomainId?: string
 ): SpellData[] {
   const spellbook = new Set(character.spellbookSpells || []);
 
-  // 1. Cleric Domain Slot: Spells from character's selected domains at this level
+  // 1. Cleric Domain Slot: Spells from domain progressions
   if (isDomainSlot) {
-    const selectedDomains = (character.selectedDomains || []).map(d => d.toLowerCase().trim());
-
-    // Check domain spells directly from domain objects
-    const domainSpellNames = new Set<string>();
-    for (const domName of selectedDomains) {
-      const domObj = domainsData.find(
-        d => d.name.toLowerCase() === domName || d.id.toLowerCase() === domName
+    let selectedDomainKeys: string[] = [];
+    if (specificDomainId) {
+      selectedDomainKeys = [specificDomainId.toLowerCase().replace(/[\s\/-]+/g, '_')];
+    } else if (character.selectedDomains && character.selectedDomains.length > 0) {
+      selectedDomainKeys = character.selectedDomains.map(d =>
+        d.toLowerCase().replace(/[\s\/-]+/g, '_')
       );
-      if (domObj && domObj.spells && domObj.spells[spellLevel - 1]) {
-        domainSpellNames.add(domObj.spells[spellLevel - 1].toLowerCase().trim());
-      }
     }
 
-    const domainMatches = spellsData.filter(spell => {
-      // Direct name match from domain spell array
-      if (domainSpellNames.has(spell.name.toLowerCase().trim())) return true;
-      // Or spell.levels has this domain
-      for (const [domKey, domLvl] of Object.entries(spell.levels)) {
-        if (selectedDomains.includes(domKey.toLowerCase().trim()) && domLvl === spellLevel) {
-          return true;
-        }
-      }
-      return false;
-    });
+    if (selectedDomainKeys.length > 0) {
+      // Gather canonical spell IDs and spell names for these domains at this spell level
+      const targetSpellIds = new Set<string>();
+      const targetSpellNames = new Set<string>();
 
-    if (domainMatches.length > 0) {
-      return domainMatches;
-    }
-
-    // Fallback if domains not yet selected: return all domain spells at this level
-    const hasDomainsData = domainsData && domainsData.length > 0;
-    const knownDomainNames = hasDomainsData
-      ? new Set(domainsData.flatMap(d => [d.name.toLowerCase().trim(), d.id.toLowerCase().trim()]))
-      : null;
-
-    return spellsData.filter(spell => {
-      for (const [lvlKey, lvlVal] of Object.entries(spell.levels)) {
-        if (lvlVal === spellLevel) {
-          const kLower = lvlKey.toLowerCase().trim();
-          if (knownDomainNames) {
-            if (knownDomainNames.has(kLower)) return true;
-          } else {
-            const nonDomainClasses = [
-              'wizard', 'sorcerer', 'cleric', 'druid', 'paladin', 'ranger', 'bard',
-              'warmage', 'beguiler', 'dread necromancer', 'duskblade', 'hexblade',
-              'favored soul', 'archivist', 'warlock', 'shugenja', 'wu jen', 'healer'
-            ];
-            if (!nonDomainClasses.includes(kLower)) return true;
+      for (const domKey of selectedDomainKeys) {
+        const domObj = domainsData.find(
+          d =>
+            d.id.toLowerCase().replace(/[\s\/-]+/g, '_') === domKey ||
+            d.name.toLowerCase().replace(/[\s\/-]+/g, '_') === domKey
+        );
+        if (domObj) {
+          if (domObj.spellIds && domObj.spellIds[spellLevel - 1]) {
+            targetSpellIds.add(domObj.spellIds[spellLevel - 1].toLowerCase());
+          }
+          if (domObj.spells && domObj.spells[spellLevel - 1]) {
+            targetSpellNames.add(domObj.spells[spellLevel - 1].toLowerCase().trim());
           }
         }
       }
-      return getSpellLevelForClass(spell, 'Cleric') === spellLevel;
+
+      return spellsData.filter(spell => {
+        // Match by canonical spell ID
+        if (targetSpellIds.has(spell.id.toLowerCase())) return true;
+
+        // Match by spell name from domain spells list
+        if (targetSpellNames.has(spell.name.toLowerCase().trim())) return true;
+
+        // Match by spell.domainLevels
+        if (spell.domainLevels) {
+          for (const [domName, domLvl] of Object.entries(spell.domainLevels)) {
+            const norm = domName.toLowerCase().replace(/[\s\/-]+/g, '_');
+            if (selectedDomainKeys.includes(norm) && domLvl === spellLevel) {
+              return true;
+            }
+          }
+        } else if (spell.levels) {
+          // Backward compatibility if domainLevels not populated
+          for (const [domName, domLvl] of Object.entries(spell.levels)) {
+            const norm = domName.toLowerCase().replace(/[\s\/-]+/g, '_');
+            if (selectedDomainKeys.includes(norm) && domLvl === spellLevel) {
+              return true;
+            }
+          }
+        }
+
+        return false;
+      });
+    }
+
+    // Fallback if domains not yet selected on character:
+    // Return all valid domain spells at this spell level.
+    // Look EXCLUSIVELY in domainLevels or domain.spellIds. Never look at class progressions!
+    const allDomainSpellIdsAtLevel = new Set<string>();
+    for (const dom of domainsData) {
+      if (dom.spellIds && dom.spellIds[spellLevel - 1]) {
+        allDomainSpellIdsAtLevel.add(dom.spellIds[spellLevel - 1].toLowerCase());
+      }
+    }
+
+    return spellsData.filter(spell => {
+      if (allDomainSpellIdsAtLevel.has(spell.id.toLowerCase())) {
+        return true;
+      }
+
+      if (spell.domainLevels) {
+        return Object.values(spell.domainLevels).some(lvl => lvl === spellLevel);
+      }
+
+      // Legacy fallback if spell has neither domainLevels nor classLevels
+      if (!spell.classLevels && spell.levels) {
+        for (const [lvlKey, lvlVal] of Object.entries(spell.levels)) {
+          if (lvlVal === spellLevel) {
+            const normKey = lvlKey.toLowerCase().replace(/[\s\/-]+/g, '_');
+            if (
+              domainsData.some(
+                d =>
+                  d.id.toLowerCase().replace(/[\s\/-]+/g, '_') === normKey ||
+                  d.name.toLowerCase().replace(/[\s\/-]+/g, '_') === normKey
+              )
+            ) {
+              return true;
+            }
+          }
+        }
+      }
+
+      return false;
     });
   }
 
-  // 2. Regular slots for any spellcasting class
+  // 2. Regular class slots: Look exclusively in spell.classLevels (with legacy fallback)
   return spellsData.filter(spell => {
     const classLvl = getSpellLevelForClass(spell, className);
     if (classLvl !== spellLevel) return false;

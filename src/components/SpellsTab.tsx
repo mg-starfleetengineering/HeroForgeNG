@@ -27,6 +27,8 @@ import {
   removeSpellFromSpellbook,
   getStarterWizardCantripIds,
   getAvailableSpellsForPreparation,
+  getAvailableSpellsForSlot,
+  getSpellLevelForClass,
   calculateSpellSaveDc,
   getSpellSlotUsageKey,
   getExpendedSpellSlotsCount,
@@ -265,7 +267,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
   // Calculate estimated spellbook page count (3.5e rule: cantrip = 1 page, level N = N pages)
   const spellbookTotalPages = useMemo(() => {
     return spellbookSpellObjects.reduce((sum, s) => {
-      const lvl = s.levels['Wizard'] ?? s.levels[currentPrepClassName] ?? 1;
+      const lvl = getSpellLevelForClass(s, currentPrepClassName) ?? getSpellLevelForClass(s, 'Wizard') ?? s.levels?.['Wizard'] ?? 1;
       return sum + Math.max(1, lvl);
     }, 0);
   }, [spellbookSpellObjects, currentPrepClassName]);
@@ -595,7 +597,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
 
   // Quick auto-assign to first empty slot of that level
   const handleQuickPrepareFromSpellbook = (spell: SpellData) => {
-    const spellLevel = spell.levels[currentPrepClassName] ?? spell.levels['Wizard'] ?? 0;
+    const spellLevel = getSpellLevelForClass(spell, currentPrepClassName) ?? getSpellLevelForClass(spell, 'Wizard') ?? 0;
     const emptySlot = currentClassPreparedSlots.find(
       s => s.spellLevel === spellLevel && !s.spellId && !s.isDomain
     );
@@ -613,16 +615,14 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
   // Raw base spells for active slot (without search query applied yet)
   const baseSpellsForActiveSlot = useMemo(() => {
     if (!activeAssignSlot) return [];
-    return getAvailableSpellsForPreparation(
-      currentPrepClassName,
-      activeAssignSlot.spellLevel,
+    return getAvailableSpellsForSlot(
+      activeAssignSlot,
       character,
       spellsData,
       domainsData,
-      activeAssignSlot.isDomain,
       false // fetch all eligible class spells, filter via UI
     );
-  }, [activeAssignSlot, currentPrepClassName, character, spellsData, domainsData]);
+  }, [activeAssignSlot, character, spellsData, domainsData]);
 
   // Filtered spells for active slot in assignment modal
   const availableSpellsForActiveSlot = useMemo(() => {
@@ -1192,7 +1192,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
             <div className="space-y-6">
               {Array.from({ length: 10 }, (_, i) => i).map(lvl => {
                 const spellsAtLevel = spellbookSpellObjects.filter(spell => {
-                  const spellLvl = spell.levels['Wizard'] ?? spell.levels[currentPrepClassName] ?? 0;
+                  const spellLvl = getSpellLevelForClass(spell, currentPrepClassName) ?? getSpellLevelForClass(spell, 'Wizard') ?? 0;
                   if (spellLvl !== lvl) return false;
 
                   if (spellbookSearchQuery.trim()) {

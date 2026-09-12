@@ -14,7 +14,18 @@
       "Whirlwind",
       "Elemental Swarm"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "obscuring_mist",
+      "wind_wall",
+      "gaseous_form",
+      "air_walk",
+      "control_winds",
+      "chain_lightning",
+      "control_weather",
+      "whirlwind",
+      "elemental_swarm"
+    ]
   },
   {
     "id": "animal",
@@ -31,7 +42,18 @@
       "Summon Nature's Ally VIII",
       "Shapechange"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "calm_animals",
+      "hold_animal",
+      "dominate_animal",
+      "summon_nature_s_ally_iv",
+      "commune_with_nature",
+      "antilife_shell",
+      "animal_shapes",
+      "summon_nature_s_ally_viii",
+      "shapechange"
+    ]
   },
   {
     "id": "chaos",
@@ -48,7 +70,18 @@
       "Cloak of Chaos",
       "Summon Monster IX"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "protection_from_law",
+      "shatter",
+      "magic_circle_against_law",
+      "chaos_hammer",
+      "dispel_law",
+      "animate_objects",
+      "word_of_chaos",
+      "cloak_of_chaos",
+      "summon_monster_ix"
+    ]
   },
   {
     "id": "death",
@@ -65,7 +98,18 @@
       "Create Greater Undead",
       "Wail of the Banshee"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "cause_fear",
+      "death_knell",
+      "animate_dead",
+      "death_ward",
+      "slay_living",
+      "create_undead",
+      "destruction",
+      "create_greater_undead",
+      "wail_of_the_banshee"
+    ]
   },
   {
     "id": "destruction",
@@ -82,7 +126,18 @@
       "Earthquake",
       "Implosion"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "inflict_light_wounds",
+      "shatter",
+      "contagion",
+      "inflict_critical_wounds",
+      "mass_inflict_light_wounds",
+      "harm",
+      "disintegrate",
+      "earthquake",
+      "implosion"
+    ]
   },
   {
     "id": "earth",
@@ -99,7 +154,18 @@
       "Iron Body",
       "Elemental Swarm"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "magic_stone",
+      "soften_earth_and_stone",
+      "stone_shape",
+      "spike_stones",
+      "wall_of_stone",
+      "stoneskin",
+      "earthquake",
+      "iron_body",
+      "elemental_swarm"
+    ]
   },
   {
     "id": "evil",
@@ -116,7 +182,18 @@
       "Unholy Aura",
       "Summon Monster IX"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "protection_from_good",
+      "desecrate",
+      "magic_circle_against_good",
+      "unholy_blight",
+      "dispel_good",
+      "create_undead",
+      "blasphemy",
+      "unholy_aura",
+      "summon_monster_ix"
+    ]
   },
   {
     "id": "fire",
@@ -133,7 +210,18 @@
       "Incendiary Cloud",
       "Elemental Swarm"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "burning_hands",
+      "produce_flame",
+      "resist_energy",
+      "wall_of_fire",
+      "fire_shield",
+      "fire_seeds",
+      "fire_storm",
+      "incendiary_cloud",
+      "elemental_swarm"
+    ]
   },
   {
     "id": "good",
@@ -150,7 +238,18 @@
       "Holy Aura",
       "Summon Monster IX"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "protection_from_evil",
+      "aid",
+      "magic_circle_against_evil",
+      "holy_smite",
+      "dispel_evil",
+      "blade_barrier",
+      "holy_word",
+      "holy_aura",
+      "summon_monster_ix"
+    ]
   },
   {
     "id": "healing",
@@ -167,7 +266,18 @@
       "Cure Critical Wounds, Mass",
       "Heal, Mass"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "cure_light_wounds",
+      "cure_moderate_wounds",
+      "cure_serious_wounds",
+      "cure_critical_wounds",
+      "mass_cure_light_wounds",
+      "heal",
+      "regenerate",
+      "mass_cure_critical_wounds",
+      "mass_heal"
+    ]
   },
   {
     "id": "knowledge",
@@ -184,7 +294,18 @@
       "Discern Location",
       "Foresight"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "detect_secret_doors",
+      "detect_thoughts",
+      "clairaudience_clairvoyance",
+      "divination",
+      "true_seeing",
+      "find_the_path",
+      "legend_lore",
+      "discern_location",
+      "foresight"
+    ]
   },
   {
     "id": "law",
@@ -201,7 +322,18 @@
       "Shield of Law",
       "Summon Monster IX"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "protection_from_chaos",
+      "calm_emotions",
+      "magic_circle_against_chaos",
+      "order_s_wrath",
+      "dispel_chaos",
+      "hold_monster",
+      "dictum",
+      "shield_of_law",
+      "summon_monster_ix"
+    ]
   },
   {
     "id": "luck",
@@ -218,7 +350,18 @@
       "Moment of Prescience",
       "Miracle"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "entropic_shield",
+      "aid",
+      "protection_from_energy",
+      "freedom_of_movement",
+      "break_enchantment",
+      "mislead",
+      "spell_turning",
+      "moment_of_prescience",
+      "miracle"
+    ]
   },
   {
     "id": "magic",
@@ -235,7 +378,18 @@
       "Protection from Spells",
       "Mordenkainen's Disjunction"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "nystul_s_magic_aura",
+      "identify",
+      "dispel_magic",
+      "imbue_with_spell_ability",
+      "spell_resistance",
+      "antimagic_field",
+      "spell_turning",
+      "protection_from_spells",
+      "mordenkainen_s_disjunction"
+    ]
   },
   {
     "id": "plant",
@@ -252,7 +406,18 @@
       "Control Plants",
       "Shambler"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "entangle",
+      "barkskin",
+      "plant_growth",
+      "command_plants",
+      "wall_of_thorns",
+      "repel_wood",
+      "animate_plants",
+      "control_plants",
+      "shambler"
+    ]
   },
   {
     "id": "protection",
@@ -269,7 +434,18 @@
       "Mind Blank",
       "Prismatic Sphere"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "sanctuary",
+      "shield_other",
+      "protection_from_energy",
+      "spell_immunity",
+      "spell_resistance",
+      "antimagic_field",
+      "repulsion",
+      "mind_blank",
+      "prismatic_sphere"
+    ]
   },
   {
     "id": "strength",
@@ -286,7 +462,18 @@
       "Bigby's Clenched Fist",
       "Bigby's Crushing Hand"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "enlarge_person",
+      "bull_s_strength",
+      "magic_vestment",
+      "spell_immunity",
+      "righteous_might",
+      "stoneskin",
+      "bigby_s_grasping_hand",
+      "bigby_s_clenched_fist",
+      "bigby_s_crushing_hand"
+    ]
   },
   {
     "id": "sun",
@@ -303,7 +490,18 @@
       "Sunburst",
       "Prismatic Sphere"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "endure_elements",
+      "heat_metal",
+      "searing_light",
+      "fire_shield",
+      "flame_strike",
+      "fire_seeds",
+      "sunbeam",
+      "sunburst",
+      "prismatic_sphere"
+    ]
   },
   {
     "id": "travel",
@@ -320,7 +518,18 @@
       "Phase Door",
       "Astral Projection"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "longstrider",
+      "locate_object",
+      "fly",
+      "dimension_door",
+      "teleport",
+      "find_the_path",
+      "greater_teleport",
+      "phase_door",
+      "astral_projection"
+    ]
   },
   {
     "id": "trickery",
@@ -337,7 +546,18 @@
       "Polymorph Any Object",
       "Time Stop"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "disguise_self",
+      "invisibility",
+      "nondetection",
+      "confusion",
+      "false_vision",
+      "mislead",
+      "screen",
+      "polymorph_any_object",
+      "time_stop"
+    ]
   },
   {
     "id": "war",
@@ -354,7 +574,18 @@
       "Power Word Stun",
       "Power Word Kill"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "magic_weapon",
+      "spiritual_weapon",
+      "magic_vestment",
+      "divine_power",
+      "flame_strike",
+      "blade_barrier",
+      "power_word_blind",
+      "power_word_stun",
+      "power_word_kill"
+    ]
   },
   {
     "id": "water",
@@ -371,7 +602,18 @@
       "Horrid Wilting",
       "Elemental Swarm"
     ],
-    "source": "PHB"
+    "source": "PHB",
+    "spellIds": [
+      "obscuring_mist",
+      "fog_cloud",
+      "water_breathing",
+      "control_water",
+      "ice_storm",
+      "cone_of_cold",
+      "acid_fog",
+      "horrid_wilting",
+      "elemental_swarm"
+    ]
   },
   {
     "id": "bestial",
@@ -388,7 +630,18 @@
       "Spread of Savagery",
       "Were-doom"
     ],
-    "source": "VD"
+    "source": "VD",
+    "spellIds": [
+      "magic_fang",
+      "bull_s_strength",
+      "greater_magic_fang",
+      "claws_of_the_savage",
+      "charm_monster",
+      "hold_monster",
+      "whirlwind_of_teeth",
+      "spread_of_savagery",
+      "were_doom"
+    ]
   },
   {
     "id": "demonic",
@@ -405,7 +658,18 @@
       "Utterdark",
       "Gate"
     ],
-    "source": "VD"
+    "source": "VD",
+    "spellIds": [
+      "demonflesh",
+      "demoncall",
+      "demon_wings",
+      "dimensional_anchor",
+      "lesser_planar_binding",
+      "planar_binding",
+      "fiendish_clarity",
+      "utterdark",
+      "gate"
+    ]
   },
   {
     "id": "diabolic",
@@ -422,7 +686,18 @@
       "Demand",
       "Gate"
     ],
-    "source": "VD"
+    "source": "VD",
+    "spellIds": [
+      "devil_s_tail",
+      "devil_s_eye",
+      "devil_s_ego",
+      "hellfire",
+      "lesser_planar_binding",
+      "planar_binding",
+      "hellfire_storm",
+      "demand",
+      "gate"
+    ]
   },
   {
     "id": "pain",
@@ -439,7 +714,18 @@
       "Symbol",
       "Eternity of Torture"
     ],
-    "source": "VD"
+    "source": "VD",
+    "spellIds": [
+      "angry_ache",
+      "sadism",
+      "wrack",
+      "liquid_pain",
+      "thousand_needles",
+      "pox",
+      "wave_of_pain",
+      "symbol",
+      "eternity_of_torture"
+    ]
   },
   {
     "id": "celestial",
@@ -456,7 +742,18 @@
       "Holy Aura",
       "Gate"
     ],
-    "source": "ED"
+    "source": "ED",
+    "spellIds": [
+      "vision_of_heaven",
+      "consecrate",
+      "blessed_sight",
+      "lesser_planar_ally",
+      "heavenly_lightning",
+      "call_faithful_servants",
+      "heavenly_lightning_storm",
+      "holy_aura",
+      "gate"
+    ]
   },
   {
     "id": "endurance",
@@ -473,7 +770,18 @@
       "Spell Turning",
       "Iron Body"
     ],
-    "source": "ED"
+    "source": "ED",
+    "spellIds": [
+      "endure_elements",
+      "bear_s_endurance",
+      "refreshment",
+      "sustain",
+      "stoneskin",
+      "mass_bear_s_endurance",
+      "globe_of_invulnerability",
+      "spell_turning",
+      "iron_body"
+    ]
   },
   {
     "id": "fey",
@@ -490,7 +798,18 @@
       "Unearthly Beauty",
       "Summon Nature's Ally IX"
     ],
-    "source": "ED"
+    "source": "ED",
+    "spellIds": [
+      "faerie_fire",
+      "charm_person",
+      "inspired_aim",
+      "blinding_beauty",
+      "tree_stride",
+      "heroes_feast",
+      "liveoak",
+      "unearthly_beauty",
+      "summon_nature_s_ally_ix"
+    ]
   },
   {
     "id": "herald",
@@ -507,7 +826,18 @@
       "Crown of Glory",
       "Visage of the Deity, Greater"
     ],
-    "source": "ED"
+    "source": "ED",
+    "spellIds": [
+      "comprehend_languages",
+      "enthrall",
+      "tongues",
+      "sending",
+      "greater_command",
+      "dream",
+      "aspect_of_the_deity",
+      "crown_of_glory",
+      "visage_of_the_deity_greater"
+    ]
   },
   {
     "id": "joy",
@@ -524,7 +854,18 @@
       "Sympathy",
       "Otto's Irresistible Dance"
     ],
-    "source": "ED"
+    "source": "ED",
+    "spellIds": [
+      "vision_of_heaven",
+      "elation",
+      "distilled_joy",
+      "good_hope",
+      "chaav_s_laugh",
+      "greater_heroism",
+      "starmantle",
+      "sympathy",
+      "otto_s_irresistible_dance"
+    ]
   },
   {
     "id": "pleasure",
@@ -541,7 +882,18 @@
       "Spread of Contentment",
       "Sublime Revelry"
     ],
-    "source": "ED"
+    "source": "ED",
+    "spellIds": [
+      "remove_fear",
+      "lastai_s_caress",
+      "heart_s_ease",
+      "remove_fatigue",
+      "mass_eagle_s_splendor",
+      "celestial_blood",
+      "empyreal_ecstacy",
+      "spread_of_contentment",
+      "sublime_revelry"
+    ]
   },
   {
     "id": "artifice",
@@ -558,7 +910,18 @@
       "True Creation",
       "Prismatic Sphere"
     ],
-    "source": "ES"
+    "source": "ES",
+    "spellIds": [
+      "animate_rope",
+      "wood_shape",
+      "stone_shape",
+      "minor_creation",
+      "fabricate",
+      "major_creation",
+      "hardening",
+      "true_creation",
+      "prismatic_sphere"
+    ]
   },
   {
     "id": "commerce",
@@ -575,7 +938,18 @@
       "Analyze Dweomer",
       "Polymorph Any Object"
     ],
-    "source": "ES"
+    "source": "ES",
+    "spellIds": [
+      "comprehend_languages",
+      "zone_of_truth",
+      "tongues",
+      "glibness",
+      "true_seeing",
+      "leomund_s_secret_chest",
+      "refuge",
+      "analyze_dweomer",
+      "polymorph_any_object"
+    ]
   },
   {
     "id": "deathless",
@@ -592,7 +966,18 @@
       "Create Greater Deathless",
       "Hero's Blade"
     ],
-    "source": "ES"
+    "source": "ES",
+    "spellIds": [
+      "detect_undead",
+      "consecrate",
+      "halt_deathless",
+      "spirit_steed",
+      "hallow",
+      "create_deathless",
+      "control_deathless",
+      "create_greater_deathless",
+      "hero_s_blade"
+    ]
   },
   {
     "id": "decay",
@@ -609,7 +994,18 @@
       "Horrid Wilting",
       "Energy Drain"
     ],
-    "source": "ES"
+    "source": "ES",
+    "spellIds": [
+      "doom",
+      "ray_of_enfeeblement",
+      "contagion",
+      "enervation",
+      "blight",
+      "antilife_shell",
+      "withering_palm",
+      "horrid_wilting",
+      "energy_drain"
+    ]
   },
   {
     "id": "dragon_below",
@@ -626,7 +1022,18 @@
       "Planar Ally, Greater",
       "Gate"
     ],
-    "source": "ES"
+    "source": "ES",
+    "spellIds": [
+      "cause_fear",
+      "death_knell",
+      "bestow_curse",
+      "lesser_planar_ally",
+      "slay_living",
+      "planar_ally",
+      "blasphemy",
+      "greater_planar_ally",
+      "gate"
+    ]
   },
   {
     "id": "exorcism",
@@ -643,7 +1050,18 @@
       "Holy Aura",
       "Freedom"
     ],
-    "source": "ES"
+    "source": "ES",
+    "spellIds": [
+      "protection_from_evil",
+      "magic_circle_against_evil",
+      "remove_curse",
+      "dismissal",
+      "dispel_evil",
+      "banishment",
+      "holy_word",
+      "holy_aura",
+      "freedom"
+    ]
   },
   {
     "id": "feast",
@@ -660,7 +1078,18 @@
       "Detoxify",
       "Feast of Champions"
     ],
-    "source": "ES"
+    "source": "ES",
+    "spellIds": [
+      "goodberry",
+      "delay_poison",
+      "create_food_and_water",
+      "neutralize_poison",
+      "leomund_s_secure_shelter",
+      "heroes_feast",
+      "mordenkainen_s_magnificent_mansion",
+      "detoxify",
+      "feast_of_champions"
+    ]
   },
   {
     "id": "life",
@@ -677,7 +1106,18 @@
       "Animate Plants",
       "Heal, Mass"
     ],
-    "source": "ES"
+    "source": "ES",
+    "spellIds": [
+      "hide_from_undead",
+      "lesser_restoration",
+      "plant_growth",
+      "death_ward",
+      "disrupting_weapon",
+      "animate_objects",
+      "regenerate",
+      "animate_plants",
+      "mass_heal"
+    ]
   },
   {
     "id": "meditation",
@@ -694,7 +1134,18 @@
       "Mind Blank",
       "Astral Projection"
     ],
-    "source": "ES"
+    "source": "ES",
+    "spellIds": [
+      "comprehend_languages",
+      "owl_s_wisdom",
+      "locate_object",
+      "tongues",
+      "spell_resistance",
+      "find_the_path",
+      "spell_turning",
+      "mind_blank",
+      "astral_projection"
+    ]
   },
   {
     "id": "necromancer",
@@ -711,7 +1162,18 @@
       "Horrid Wilting",
       "Energy Drain"
     ],
-    "source": "ES"
+    "source": "ES",
+    "spellIds": [
+      "ray_of_enfeeblement",
+      "command_undead",
+      "vampiric_touch",
+      "enervation",
+      "waves_of_fatigue",
+      "eyebite",
+      "control_undead",
+      "horrid_wilting",
+      "energy_drain"
+    ]
   },
   {
     "id": "passion",
@@ -728,7 +1190,18 @@
       "Otto's Irresistable Dance",
       "Dominate Monster"
     ],
-    "source": "ES"
+    "source": "ES",
+    "spellIds": [
+      "cause_fear",
+      "tasha_s_hideous_laughter",
+      "confusion",
+      "crushing_despair",
+      "greater_command",
+      "greater_heroism",
+      "song_of_discord",
+      "otto_s_irresistable_dance",
+      "dominate_monster"
+    ]
   },
   {
     "id": "shadow",
@@ -745,7 +1218,18 @@
       "Shadow Evocation, Greater",
       "Shades"
     ],
-    "source": "ES"
+    "source": "ES",
+    "spellIds": [
+      "obscuring_mist",
+      "darkness",
+      "deeper_darkness",
+      "shadow_conjuration",
+      "shadow_evocation",
+      "shadow_walk",
+      "greater_shadow_conjuration",
+      "greater_shadow_evocation",
+      "shades"
+    ]
   },
   {
     "id": "weather",
@@ -762,7 +1246,18 @@
       "Whirlwind",
       "Storm of Vengeance"
     ],
-    "source": "ES"
+    "source": "ES",
+    "spellIds": [
+      "obscuring_mist",
+      "fog_cloud",
+      "call_lightning",
+      "sleet_storm",
+      "call_lightning_storm",
+      "control_winds",
+      "control_weather",
+      "whirlwind",
+      "storm_of_vengeance"
+    ]
   },
   {
     "id": "winter",
@@ -779,7 +1274,18 @@
       "Summon Giants",
       "Fimbulwinter"
     ],
-    "source": "FB"
+    "source": "FB",
+    "spellIds": [
+      "snowsight",
+      "snow_walk",
+      "winter_s_embrace",
+      "ice_storm",
+      "blizzard",
+      "death_hail",
+      "control_weather",
+      "summon_giants",
+      "fimbulwinter"
+    ]
   },
   {
     "id": "city",
@@ -796,7 +1302,18 @@
       "City's Might",
       "Animate City"
     ],
-    "source": "RD"
+    "source": "RD",
+    "spellIds": [
+      "rooftop_strider",
+      "city_lights",
+      "winding_alleys",
+      "commune_with_city",
+      "skyline_runner",
+      "city_stride",
+      "urban_shield",
+      "city_s_might",
+      "animate_city"
+    ]
   },
   {
     "id": "destiny",
@@ -813,7 +1330,18 @@
       "Moment of Prescience",
       "Choose Destiny"
     ],
-    "source": "RD"
+    "source": "RD",
+    "spellIds": [
+      "omen_of_peril",
+      "augury",
+      "delay_death",
+      "bestow_curse",
+      "stalwart_pact",
+      "warp_destiny",
+      "bestow_curse_greater",
+      "moment_of_prescience",
+      "choose_destiny"
+    ]
   },
   {
     "id": "sky",
@@ -830,7 +1358,18 @@
       "Mastery of the Sky",
       "Summon Devoted Roc"
     ],
-    "source": "RW"
+    "source": "RW",
+    "spellIds": [
+      "raptor_s_sight",
+      "summon_dire_hawk",
+      "enduring_flight",
+      "aerial_alacrity",
+      "control_winds",
+      "wind_walk",
+      "reverse_gravity",
+      "mastery_of_the_sky",
+      "summon_devoted_roc"
+    ]
   },
   {
     "id": "repose",
@@ -847,7 +1386,18 @@
       "Surelife",
       "Wail of the Banshee"
     ],
-    "source": "SS"
+    "source": "SS",
+    "spellIds": [
+      "deathwatch",
+      "gentle_repose",
+      "speak_with_dead",
+      "discern_lies",
+      "greater_command",
+      "undeath_to_death",
+      "destruction",
+      "surelife",
+      "wail_of_the_banshee"
+    ]
   },
   {
     "id": "sand",
@@ -864,7 +1414,18 @@
       "Desert Binding",
       "Summon Desert Ally IX"
     ],
-    "source": "SS"
+    "source": "SS",
+    "spellIds": [
+      "waste_strider",
+      "black_sand",
+      "haboob",
+      "blast_of_sand",
+      "flaywind_burst",
+      "awaken_sand",
+      "vitrify",
+      "desert_binding",
+      "summon_desert_ally_ix"
+    ]
   },
   {
     "id": "summer",
@@ -881,7 +1442,18 @@
       "Sunburst",
       "Storm of Vengeance"
     ],
-    "source": "SS"
+    "source": "SS",
+    "spellIds": [
+      "impede_sun_s_brilliance",
+      "sunstroke",
+      "protection_from_dessication",
+      "skin_of_the_cactus",
+      "unearthly_heat",
+      "sunbeam",
+      "control_weather",
+      "sunburst",
+      "storm_of_vengeance"
+    ]
   },
   {
     "id": "thirst",
@@ -898,7 +1470,18 @@
       "Horrid Wilting",
       "Energy Drain"
     ],
-    "source": "SS"
+    "source": "SS",
+    "spellIds": [
+      "parching_touch",
+      "desiccate",
+      "torment_thirst",
+      "dispel_water",
+      "desiccate_mass",
+      "symbol_of_thirst",
+      "mephit_mob",
+      "horrid_wilting",
+      "energy_drain"
+    ]
   },
   {
     "id": "corruption",
@@ -915,7 +1498,18 @@
       "Befoul",
       "Despoil"
     ],
-    "source": "LM"
+    "source": "LM",
+    "spellIds": [
+      "doom",
+      "blindness_deafness",
+      "contagion",
+      "morality_undone",
+      "feeblemind",
+      "pox",
+      "insanity",
+      "befoul",
+      "despoil"
+    ]
   },
   {
     "id": "vile_darkness",
@@ -932,7 +1526,18 @@
       "Utterdark",
       "Screen"
     ],
-    "source": "LM"
+    "source": "LM",
+    "spellIds": [
+      "darkvision",
+      "darkbolt",
+      "deeper_darkness",
+      "damning_darkness",
+      "evard_s_black_tentacles",
+      "wall_of_force",
+      "shadow_walk",
+      "utterdark",
+      "screen"
+    ]
   },
   {
     "id": "blackwater",
@@ -949,7 +1554,18 @@
       "Maelstrom",
       "Doom of the Seas"
     ],
-    "source": "SW"
+    "source": "SW",
+    "spellIds": [
+      "cause_fear",
+      "pressure_sphere",
+      "evard_s_black_tentacles",
+      "transformation_of_the_deeps",
+      "blackwater_tentacle",
+      "blackwater_taint",
+      "dark_tide",
+      "maelstrom",
+      "doom_of_the_seas"
+    ]
   },
   {
     "id": "seafolk",
@@ -966,7 +1582,18 @@
       "Depthsurge",
       "Foresight"
     ],
-    "source": "SW"
+    "source": "SW",
+    "spellIds": [
+      "quickswim",
+      "fins_to_feet",
+      "scales_of_the_sealord",
+      "siren_s_call",
+      "commune_with_nature",
+      "airy_water",
+      "megalodon_empowerment",
+      "depthsurge",
+      "foresight"
+    ]
   },
   {
     "id": "spite",
@@ -983,7 +1610,18 @@
       "Mantle of Pure Spite",
       "Imprison Soul"
     ],
-    "source": "Heroes of Horror"
+    "source": "Heroes of Horror",
+    "spellIds": [
+      "bestow_wound",
+      "rage",
+      "vampiric_touch",
+      "procouncement_of_fate",
+      "fire_in_the_blood",
+      "cloak_of_hate",
+      "pact_of_return",
+      "mantle_of_pure_spite",
+      "imprison_soul"
+    ]
   },
   {
     "id": "balance",
@@ -1000,7 +1638,18 @@
       "Protection from Spells",
       "Weighed in the Balance"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "make_whole",
+      "calm_emotions",
+      "clarity_of_mind",
+      "dismissal",
+      "sanctuary_mass",
+      "banishment",
+      "word_of_balance",
+      "protection_from_spells",
+      "weighed_in_the_balance"
+    ]
   },
   {
     "id": "cavern",
@@ -1017,7 +1666,18 @@
       "Earthquake",
       "Imprisonment"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "detect_secret_doors",
+      "darkness",
+      "meld_into_stone",
+      "leomund_s_secure_shelter",
+      "passwall",
+      "find_the_path",
+      "maw_of_stone",
+      "earthquake",
+      "imprisonment"
+    ]
   },
   {
     "id": "celerity",
@@ -1034,7 +1694,18 @@
       "Blink, Greater",
       "Time Stop"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "expeditious_retreat",
+      "cat_s_grace",
+      "blur",
+      "haste",
+      "tree_stride",
+      "wind_walk",
+      "mass_cat_s_grace",
+      "blink_greater",
+      "time_stop"
+    ]
   },
   {
     "id": "charm",
@@ -1051,7 +1722,18 @@
       "Demand",
       "Dominate Monster"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "charm_person",
+      "calm_emotions",
+      "suggestion",
+      "good_hope",
+      "charm_monster",
+      "geas_quest",
+      "insanity",
+      "demand",
+      "dominate_monster"
+    ]
   },
   {
     "id": "cold",
@@ -1068,7 +1750,18 @@
       "Polar Ray",
       "Obedient Avalanche"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "chill_touch",
+      "chill_metal",
+      "sleet_storm",
+      "ice_storm",
+      "wall_of_ice",
+      "cone_of_cold",
+      "control_weather",
+      "polar_ray",
+      "obedient_avalanche"
+    ]
   },
   {
     "id": "community",
@@ -1085,7 +1778,18 @@
       "Morenkainen's Magnificent Mansion",
       "Heal, Mass"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "bless",
+      "status",
+      "prayer",
+      "tongues",
+      "rary_s_telepathic_bond",
+      "heroes_feast",
+      "refuge",
+      "morenkainen_s_magnificent_mansion",
+      "mass_heal"
+    ]
   },
   {
     "id": "competition",
@@ -1102,7 +1806,18 @@
       "Moment of Prescience",
       "Visage of the Deity, Greater"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "remove_fear",
+      "zeal",
+      "prayer",
+      "divine_power",
+      "righteous_might",
+      "zealot_pact",
+      "regenerate",
+      "moment_of_prescience",
+      "visage_of_the_deity_greater"
+    ]
   },
   {
     "id": "courage",
@@ -1119,7 +1834,18 @@
       "Lion's Roar",
       "Cloak of Bravery, Greater"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "remove_fear",
+      "aid",
+      "cloak_of_bravery",
+      "heroism",
+      "valiant_fury",
+      "heroes_feast",
+      "greater_heroism",
+      "lion_s_roar",
+      "cloak_of_bravery_greater"
+    ]
   },
   {
     "id": "craft",
@@ -1136,7 +1862,18 @@
       "Forcecage",
       "Fantastic Machine, Greater"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "animate_rope",
+      "wood_shape",
+      "stone_shape",
+      "minor_creation",
+      "wall_of_stone",
+      "fantastic_machine",
+      "major_creation",
+      "forcecage",
+      "fantastic_machine_greater"
+    ]
   },
   {
     "id": "creation",
@@ -1153,7 +1890,18 @@
       "True Creation",
       "Pavilion of Grandeur"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "create_water",
+      "minor_image",
+      "create_food_and_water",
+      "minor_creation",
+      "major_creation",
+      "heroes_feast",
+      "permanent_image",
+      "true_creation",
+      "pavilion_of_grandeur"
+    ]
   },
   {
     "id": "darkness",
@@ -1170,7 +1918,18 @@
       "Power Word Blind",
       "Power Word Kill"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "obscuring_mist",
+      "blindness_deafness",
+      "blacklight",
+      "armor_of_darkness",
+      "darkbolt",
+      "prying_eyes",
+      "nightmare",
+      "power_word_blind",
+      "power_word_kill"
+    ]
   },
   {
     "id": "deathbound",
@@ -1187,7 +1946,18 @@
       "Avascular, Mass",
       "Wail of the Banshee"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "chill_of_the_grave",
+      "blade_of_pain_and_fear",
+      "fangs_of_the_vampire_king",
+      "wither_limb",
+      "revive_undead",
+      "awaken_undead",
+      "avasculate",
+      "avascular_mass",
+      "wail_of_the_banshee"
+    ]
   },
   {
     "id": "domination",
@@ -1204,7 +1974,18 @@
       "True Domination",
       "Monstrous Thrall"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "command",
+      "enthrall",
+      "suggestion",
+      "dominate_person",
+      "greater_command",
+      "geas_quest",
+      "mass_suggestion",
+      "true_domination",
+      "monstrous_thrall"
+    ]
   },
   {
     "id": "dragon",
@@ -1221,7 +2002,18 @@
       "Suggestion, Mass",
       "Dominate Monster"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "magic_fang",
+      "resist_energy",
+      "greater_magic_fang",
+      "voice_of_the_dragon",
+      "true_seeing",
+      "stoneskin",
+      "dragon_ally",
+      "mass_suggestion",
+      "dominate_monster"
+    ]
   },
   {
     "id": "dream",
@@ -1238,7 +2030,18 @@
       "Power Word Stun",
       "Weird"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "sleep",
+      "augury",
+      "deep_slumber",
+      "phantasmal_killer",
+      "nightmare",
+      "dream_sight",
+      "greater_scrying",
+      "power_word_stun",
+      "weird"
+    ]
   },
   {
     "id": "drow",
@@ -1255,7 +2058,18 @@
       "Planar Ally, Greater",
       "Gate"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "cloak_of_dark_power",
+      "clairaudience_clairvoyance",
+      "suggestion",
+      "discern_lies",
+      "spiderform",
+      "greater_dispel_magic",
+      "word_of_chaos",
+      "greater_planar_ally",
+      "gate"
+    ]
   },
   {
     "id": "dwarf",
@@ -1272,7 +2086,18 @@
       "Protection from Spells",
       "Elemental Swarm"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "magic_weapon",
+      "bear_s_endurance",
+      "glyph_of_warding",
+      "greater_magic_weapon",
+      "fabricate",
+      "stone_tell",
+      "dictum",
+      "protection_from_spells",
+      "elemental_swarm"
+    ]
   },
   {
     "id": "elf",
@@ -1289,7 +2114,18 @@
       "Sunburst",
       "Antipathy"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "true_strike",
+      "cat_s_grace",
+      "snare",
+      "tree_stride",
+      "commune_with_nature",
+      "find_the_path",
+      "liveoak",
+      "sunburst",
+      "antipathy"
+    ]
   },
   {
     "id": "envy",
@@ -1306,7 +2142,18 @@
       "Simulacrum",
       "Wish"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "disguise_self",
+      "ray_of_enfeeblement",
+      "touch_of_idiocy",
+      "vampiric_touch",
+      "crushing_despair",
+      "magic_jar",
+      "limited_wish",
+      "simulacrum",
+      "wish"
+    ]
   },
   {
     "id": "family",
@@ -1323,7 +2170,18 @@
       "Protection from Spells",
       "Prismatic Sphere"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "bless",
+      "shield_other",
+      "helping_hand",
+      "imbue_with_spell_ability",
+      "rary_s_telepathic_bond",
+      "heroes_feast",
+      "refuge",
+      "protection_from_spells",
+      "prismatic_sphere"
+    ]
   },
   {
     "id": "fate",
@@ -1340,7 +2198,18 @@
       "Mind Blank",
       "Foresight"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "true_strike",
+      "augury",
+      "bestow_curse",
+      "status",
+      "mark_of_justice",
+      "geas_quest",
+      "vision",
+      "mind_blank",
+      "foresight"
+    ]
   },
   {
     "id": "force",
@@ -1357,7 +2226,18 @@
       "Otiluke's Telekinetic Sphere",
       "Bigby's Crushing Hand"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "mage_armor",
+      "magic_missile",
+      "blast_of_force",
+      "otiluke_s_resilient_sphere",
+      "wall_of_force",
+      "repulsion",
+      "forcecage",
+      "otiluke_s_telekinetic_sphere",
+      "bigby_s_crushing_hand"
+    ]
   },
   {
     "id": "glory",
@@ -1374,7 +2254,18 @@
       "Crown of Glory",
       "Gate"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "disrupt_undead",
+      "bless_weapon",
+      "searing_light",
+      "holy_smite",
+      "holy_sword",
+      "bolt_of_glory",
+      "sunbeam",
+      "crown_of_glory",
+      "gate"
+    ]
   },
   {
     "id": "gluttony",
@@ -1391,7 +2282,18 @@
       "Bite of the King",
       "Trap the Soul"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "goodberry",
+      "death_knell",
+      "create_food_and_water",
+      "vampiric_touch",
+      "baleful_polymorph",
+      "heroes_feast",
+      "stone_to_flesh",
+      "bite_of_the_king",
+      "trap_the_soul"
+    ]
   },
   {
     "id": "gnome",
@@ -1408,7 +2310,18 @@
       "Otto's Irresistable Dance",
       "Summon Nature's Ally IX"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "silent_image",
+      "gembomb",
+      "minor_image",
+      "minor_creation",
+      "hallucinatory_terrain",
+      "fantastic_machine",
+      "screen",
+      "otto_s_irresistable_dance",
+      "summon_nature_s_ally_ix"
+    ]
   },
   {
     "id": "greed",
@@ -1425,7 +2338,18 @@
       "Phantasmal Thief",
       "Sympathy"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "cheat",
+      "entice_gift",
+      "knock",
+      "fire_trap",
+      "fabricate",
+      "guards_and_wards",
+      "teleport_object",
+      "phantasmal_thief",
+      "sympathy"
+    ]
   },
   {
     "id": "halfling",
@@ -1442,7 +2366,18 @@
       "Word of Recall",
       "Foresight"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "magic_stone",
+      "cat_s_grace",
+      "magic_vestment",
+      "freedom_of_movement",
+      "mordenkainen_s_faithful_hound",
+      "move_earth",
+      "shadow_walk",
+      "word_of_recall",
+      "foresight"
+    ]
   },
   {
     "id": "hatred",
@@ -1459,7 +2394,18 @@
       "Antipathy",
       "Wail of the Banshee"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "doom",
+      "scare",
+      "bestow_curse",
+      "rage",
+      "righteous_might",
+      "forbiddance",
+      "blasphemy",
+      "antipathy",
+      "wail_of_the_banshee"
+    ]
   },
   {
     "id": "hunger",
@@ -1476,7 +2422,18 @@
       "Bite of the King",
       "Energy Drain"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "ghoul_light",
+      "ghoul_glyph",
+      "ghoul_gesture",
+      "enervation",
+      "ghoul_gauntlet",
+      "eyes_of_the_king",
+      "field_of_ghouls",
+      "bite_of_the_king",
+      "energy_drain"
+    ]
   },
   {
     "id": "illusion",
@@ -1493,7 +2450,18 @@
       "Screen",
       "Weird"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "silent_image",
+      "minor_image",
+      "displacement",
+      "phantasmal_killer",
+      "persistant_image",
+      "mislead",
+      "project_image",
+      "screen",
+      "weird"
+    ]
   },
   {
     "id": "inquisition",
@@ -1510,7 +2478,18 @@
       "Shield of Law",
       "Imprisonment"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "detect_chaos",
+      "zone_of_truth",
+      "detect_thoughts",
+      "discern_lies",
+      "true_seeing",
+      "geas_quest",
+      "dictum",
+      "shield_of_law",
+      "imprisonment"
+    ]
   },
   {
     "id": "liberation",
@@ -1527,7 +2506,18 @@
       "Mind Blank",
       "Unbinding"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "omen_of_peril",
+      "undetectable_alignment",
+      "rage",
+      "freedom_of_movement",
+      "break_enchantment",
+      "greater_dispel_magic",
+      "refuge",
+      "mind_blank",
+      "unbinding"
+    ]
   },
   {
     "id": "lust",
@@ -1544,7 +2534,18 @@
       "Sympathy",
       "Trap the Soul"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "charm_person",
+      "invisibility",
+      "clairaudience_clairvoyance",
+      "lesser_planar_ally",
+      "scrying",
+      "symbol_of_persuasion",
+      "refuge",
+      "sympathy",
+      "trap_the_soul"
+    ]
   },
   {
     "id": "madness",
@@ -1561,7 +2562,18 @@
       "Maddening Scream",
       "Weird"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "lesser_confusion",
+      "touch_of_madness",
+      "rage",
+      "confusion",
+      "bolts_of_bedevilment",
+      "phantasmal_killer",
+      "insanity",
+      "maddening_scream",
+      "weird"
+    ]
   },
   {
     "id": "mentalism",
@@ -1578,7 +2590,18 @@
       "Mind Blank",
       "Astral Projection"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "lesser_confusion",
+      "detect_thoughts",
+      "clairaudience_clairvoyance",
+      "modify_memory",
+      "mind_fog",
+      "rary_s_telepathic_bond",
+      "antipathy",
+      "mind_blank",
+      "astral_projection"
+    ]
   },
   {
     "id": "metal",
@@ -1595,7 +2618,18 @@
       "Iron Body",
       "Repel Metal or Stone"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "magic_weapon",
+      "heat_metal",
+      "keen_edge",
+      "rusting_grasp",
+      "wall_of_iron",
+      "blade_barrier",
+      "transmute_metal_to_wood",
+      "iron_body",
+      "repel_metal_or_stone"
+    ]
   },
   {
     "id": "mind",
@@ -1612,7 +2646,18 @@
       "Mind Blank",
       "Weird"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "comprehend_languages",
+      "detect_thoughts",
+      "telepathic_bond_lesser",
+      "discern_lies",
+      "rary_s_telepathic_bond",
+      "probe_thoughts",
+      "brain_spider",
+      "mind_blank",
+      "weird"
+    ]
   },
   {
     "id": "moon",
@@ -1629,7 +2674,18 @@
       "Animal Shapes",
       "Moonfire"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "faerie_fire",
+      "moonbeam",
+      "moon_blade",
+      "fear",
+      "moon_path",
+      "permanent_image",
+      "insanity",
+      "animal_shapes",
+      "moonfire"
+    ]
   },
   {
     "id": "mysticism",
@@ -1646,7 +2702,18 @@
       "Holy Aura/Unholy Aura",
       "Visage of the Deity, Greater"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "divine_favor",
+      "spiritual_weapon",
+      "visage_of_the_deity_lesser",
+      "weapon_of_the_deity",
+      "righteous_might",
+      "visage_of_the_deity",
+      "blasphemy_holy_word",
+      "holy_aura_unholy_aura",
+      "visage_of_the_deity_greater"
+    ]
   },
   {
     "id": "nobility",
@@ -1663,7 +2730,18 @@
       "Demand",
       "Storm of Vengeance"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "divine_favor",
+      "enthrall",
+      "magic_vestment",
+      "discern_lies",
+      "greater_command",
+      "geas_quest",
+      "repulsion",
+      "demand",
+      "storm_of_vengeance"
+    ]
   },
   {
     "id": "ocean",
@@ -1680,7 +2758,18 @@
       "Maelstrom",
       "Elemental Swarm"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "endure_elements",
+      "sound_burst",
+      "water_breathing",
+      "freedom_of_movement",
+      "wall_of_ice",
+      "otiluke_s_freezing_sphere",
+      "waterspout",
+      "maelstrom",
+      "elemental_swarm"
+    ]
   },
   {
     "id": "oracle",
@@ -1697,7 +2786,18 @@
       "Discern Location",
       "Foresight"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "identify",
+      "augury",
+      "divination",
+      "scrying",
+      "commune",
+      "legend_lore",
+      "greater_scrying",
+      "discern_location",
+      "foresight"
+    ]
   },
   {
     "id": "orc",
@@ -1714,7 +2814,18 @@
       "Cloak of Chaos",
       "Power Word Kill"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "cause_fear",
+      "produce_flame",
+      "prayer",
+      "divine_power",
+      "prying_eyes",
+      "eyebite",
+      "blasphemy",
+      "cloak_of_chaos",
+      "power_word_kill"
+    ]
   },
   {
     "id": "pact",
@@ -1731,7 +2842,18 @@
       "Death Pact",
       "Gate"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "command",
+      "shield_other",
+      "speak_with_dead",
+      "divination",
+      "stalwart_pact",
+      "zealot_pact",
+      "renewal_pact",
+      "death_pact",
+      "gate"
+    ]
   },
   {
     "id": "pestilence",
@@ -1748,7 +2870,18 @@
       "Horrid Wilting",
       "Otyugh Swarm"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "doom",
+      "summon_swarm",
+      "contagion",
+      "poison",
+      "plague_of_rats",
+      "curse_of_lycanthropy",
+      "scourge",
+      "horrid_wilting",
+      "otyugh_swarm"
+    ]
   },
   {
     "id": "planning",
@@ -1765,7 +2898,18 @@
       "Discern Location",
       "Time Stop"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "deathwatch",
+      "augury",
+      "clairaudience_clairvoyance",
+      "status",
+      "detect_scrying",
+      "heroes_feast",
+      "greater_scrying",
+      "discern_location",
+      "time_stop"
+    ]
   },
   {
     "id": "portal",
@@ -1782,7 +2926,18 @@
       "Maze",
       "Gate"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "summon_monster_i",
+      "analyze_portal",
+      "dimensional_anchor",
+      "dimension_door",
+      "teleport",
+      "banishment",
+      "etherealness",
+      "maze",
+      "gate"
+    ]
   },
   {
     "id": "pride",
@@ -1799,7 +2954,18 @@
       "Spell Immunity, Greater",
       "Charm Monster, Mass"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "hypnotism",
+      "eagle_s_splendor",
+      "heroism",
+      "divine_power",
+      "mass_reduce_person",
+      "forbiddance",
+      "greater_heroism",
+      "greater_spell_immunity",
+      "mass_charm_monster"
+    ]
   },
   {
     "id": "purification",
@@ -1816,7 +2982,18 @@
       "Sunburst",
       "Visage of the Deity, Greater"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "nimbus_of_light",
+      "deific_vengeance",
+      "recitation",
+      "castigate",
+      "dance_of_the_unicorn",
+      "fires_of_purity",
+      "righteous_wrath_of_the_faithful",
+      "sunburst",
+      "visage_of_the_deity_greater"
+    ]
   },
   {
     "id": "renewal",
@@ -1833,7 +3010,18 @@
       "Polymorph Any Object",
       "Freedom"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "charm_person",
+      "lesser_restoration",
+      "remove_disease",
+      "reincarnate",
+      "atonement",
+      "heroes_feast",
+      "greater_restoration",
+      "polymorph_any_object",
+      "freedom"
+    ]
   },
   {
     "id": "retribution",
@@ -1850,7 +3038,18 @@
       "Discern Location",
       "Storm of Vengeance"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "shield_of_faith",
+      "bear_s_endurance",
+      "speak_with_dead",
+      "fire_shield",
+      "mark_of_justice",
+      "banishment",
+      "spell_turning",
+      "discern_location",
+      "storm_of_vengeance"
+    ]
   },
   {
     "id": "rune",
@@ -1867,7 +3066,18 @@
       "Symbol of Death",
       "Teleportation Circle"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "erase",
+      "secret_page",
+      "glyph_of_warding",
+      "explosive_runes",
+      "lesser_planar_binding",
+      "greater_glyph_of_warding",
+      "drawmij_s_instant_summons",
+      "symbol_of_death",
+      "teleportation_circle"
+    ]
   },
   {
     "id": "scalykind",
@@ -1884,7 +3094,18 @@
       "Animal Shapes",
       "Shapechange"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "magic_fang",
+      "animal_trance",
+      "greater_magic_fang",
+      "poison",
+      "animal_growth",
+      "eyebite",
+      "creeping_doom",
+      "animal_shapes",
+      "shapechange"
+    ]
   },
   {
     "id": "slime",
@@ -1901,7 +3122,18 @@
       "Power Word Blind",
       "Implosion"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "grease",
+      "melf_s_acid_arrow",
+      "poison",
+      "rusting_grasp",
+      "evard_s_black_tentacles",
+      "transmute_rock_to_mud",
+      "destruction",
+      "power_word_blind",
+      "implosion"
+    ]
   },
   {
     "id": "sloth",
@@ -1918,7 +3150,18 @@
       "Waves of Exhaustion",
       "Astral Projection"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "touch_of_fatigue",
+      "unseen_servant",
+      "deep_slumber",
+      "slow",
+      "symbol_of_sleep",
+      "waves_of_fatigue",
+      "shadow_walk",
+      "waves_of_exhaustion",
+      "astral_projection"
+    ]
   },
   {
     "id": "spell",
@@ -1935,7 +3178,18 @@
       "Antimagic Field",
       "Mordenkainen's Disjunction"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "mage_armor",
+      "silence",
+      "anyspell",
+      "rary_s_mnemonic_enhancer",
+      "break_enchantment",
+      "anyspell_greater",
+      "limited_wish",
+      "antimagic_field",
+      "mordenkainen_s_disjunction"
+    ]
   },
   {
     "id": "spider",
@@ -1952,7 +3206,18 @@
       "Creeping Doom",
       "Spider Shapes"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "spider_climb",
+      "summon_swarm",
+      "phantom_steed",
+      "giant_vermin",
+      "insect_plague",
+      "spider_curse",
+      "stone_spiders",
+      "creeping_doom",
+      "spider_shapes"
+    ]
   },
   {
     "id": "storm",
@@ -1969,7 +3234,18 @@
       "Whirlwind",
       "Storm of Vengeance"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "entropic_shield",
+      "gust_of_wind",
+      "call_lightning",
+      "sleet_storm",
+      "ice_storm",
+      "summon_monster_vi",
+      "control_weather",
+      "whirlwind",
+      "storm_of_vengeance"
+    ]
   },
   {
     "id": "suffering",
@@ -1986,7 +3262,18 @@
       "Symbol of Pain",
       "Horrid Wilting"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "bane",
+      "bear_s_endurance",
+      "bestow_curse",
+      "enervation",
+      "feeblemind",
+      "harm",
+      "eyebite",
+      "symbol_of_pain",
+      "horrid_wilting"
+    ]
   },
   {
     "id": "summoner",
@@ -2003,7 +3290,18 @@
       "Planar Ally, Greater",
       "Gate"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "summon_monster_i",
+      "summon_monster_ii",
+      "summon_monster_iii",
+      "lesser_planar_ally",
+      "summon_monster_v",
+      "planar_ally",
+      "summon_monster_vii",
+      "greater_planar_ally",
+      "gate"
+    ]
   },
   {
     "id": "time",
@@ -2020,7 +3318,18 @@
       "Foresight",
       "Time Stop"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "true_strike",
+      "gentle_repose",
+      "haste",
+      "freedom_of_movement",
+      "permanency",
+      "contingency",
+      "legend_lore",
+      "foresight",
+      "time_stop"
+    ]
   },
   {
     "id": "trade",
@@ -2037,7 +3346,18 @@
       "Mind Blank",
       "Discern Location"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "message",
+      "gembomb",
+      "eagle_s_splendor",
+      "sending",
+      "fabricate",
+      "true_seeing",
+      "mordenkainen_s_magnificent_mansion",
+      "mind_blank",
+      "discern_location"
+    ]
   },
   {
     "id": "tyranny",
@@ -2054,7 +3374,18 @@
       "Charm Monster, Mass",
       "Dominate Monster"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "command",
+      "enthrall",
+      "discern_lies",
+      "fear",
+      "greater_command",
+      "geas_quest",
+      "bigby_s_grasping_hand",
+      "mass_charm_monster",
+      "dominate_monster"
+    ]
   },
   {
     "id": "undeath",
@@ -2071,7 +3402,18 @@
       "Create Greater Undead",
       "Energy Drain"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "detect_undead",
+      "desecrate",
+      "animate_dead",
+      "death_ward",
+      "circle_of_death",
+      "create_undead",
+      "control_undead",
+      "create_greater_undead",
+      "energy_drain"
+    ]
   },
   {
     "id": "wealth",
@@ -2088,7 +3430,18 @@
       "Discern Location",
       "Antipathy"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "alarm",
+      "obscure_object",
+      "glyph_of_warding",
+      "detect_scrying",
+      "leomund_s_secret_chest",
+      "forbiddance",
+      "sequester",
+      "discern_location",
+      "antipathy"
+    ]
   },
   {
     "id": "windstorm",
@@ -2105,7 +3458,18 @@
       "Whirlwind",
       "Whirlwind, Greater"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "obscuring_mist",
+      "binding_winds",
+      "call_lightning",
+      "ice_storm",
+      "arc_of_lightning",
+      "cloudwalkers",
+      "control_weather",
+      "whirlwind",
+      "whirlwind_greater"
+    ]
   },
   {
     "id": "wrath",
@@ -2122,7 +3486,18 @@
       "Shout, Greater",
       "Storm of Vengeance"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "rhino_s_rush",
+      "bull_s_strength",
+      "rage",
+      "shout",
+      "righteous_might",
+      "song_of_discord",
+      "tenser_s_transformation",
+      "greater_shout",
+      "storm_of_vengeance"
+    ]
   },
   {
     "id": "abyss_1",
@@ -2139,7 +3514,18 @@
       "Finger of Death",
       "Implosion"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "align_weapon",
+      "bull_s_strength",
+      "babau_slime",
+      "balor_nimbus",
+      "slay_living",
+      "mass_bull_s_strength",
+      "destruction",
+      "finger_of_death",
+      "implosion"
+    ]
   },
   {
     "id": "abyss_2",
@@ -2156,7 +3542,18 @@
       "Bodak's Glare",
       "Summon Monster IX"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "cause_fear",
+      "death_knell",
+      "summon_monster_iii",
+      "poison",
+      "summon_monster_v",
+      "harm",
+      "summon_monster_vii",
+      "bodak_s_glare",
+      "summon_monster_ix"
+    ]
   },
   {
     "id": "arborea_1",
@@ -2173,7 +3570,18 @@
       "Heroism, Greater",
       "Freedom"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "endure_elements",
+      "aid",
+      "heroism",
+      "neutralize_poison",
+      "break_enchantment",
+      "heroes_feast",
+      "spell_turning",
+      "greater_heroism",
+      "freedom"
+    ]
   },
   {
     "id": "arborea_2",
@@ -2190,7 +3598,18 @@
       "Mind Blank",
       "Summon Monster IX"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "longstrider",
+      "eagle_s_splendor",
+      "summon_monster_iii",
+      "opalescent_glare",
+      "summon_monster_v",
+      "mass_eagle_s_splendor",
+      "summon_monster_vii",
+      "mind_blank",
+      "summon_monster_ix"
+    ]
   },
   {
     "id": "baator_1",
@@ -2207,7 +3626,18 @@
       "Demand",
       "Imprisonment"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "bane",
+      "darkness",
+      "detect_thoughts",
+      "deeper_darkness",
+      "spell_resistance",
+      "dominate_person",
+      "repulsion",
+      "demand",
+      "imprisonment"
+    ]
   },
   {
     "id": "baator_2",
@@ -2224,7 +3654,18 @@
       "Spell Turning",
       "Summon Monster IX"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "disguise_self",
+      "fox_s_cunning",
+      "summon_monster_iii",
+      "suggestion",
+      "summon_monster_v",
+      "mass_fox_s_cunning",
+      "summon_monster_vii",
+      "spell_turning",
+      "summon_monster_ix"
+    ]
   },
   {
     "id": "celestia_1",
@@ -2241,7 +3682,18 @@
       "Power Word Stun",
       "Foresight"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "light_of_lunia",
+      "bear_s_endurance",
+      "magic_vestment",
+      "divine_power",
+      "righteous_might",
+      "blade_barrier",
+      "regenerate",
+      "power_word_stun",
+      "foresight"
+    ]
   },
   {
     "id": "celestia_2",
@@ -2258,7 +3710,18 @@
       "Shield of Law",
       "Summon Monster IX"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "shield_of_faith",
+      "shield_other",
+      "summon_monster_iii",
+      "greater_magic_weapon",
+      "summon_monster_v",
+      "mass_bear_s_endurance",
+      "summon_monster_vii",
+      "shield_of_law",
+      "summon_monster_ix"
+    ]
   },
   {
     "id": "elysium_1",
@@ -2275,7 +3738,18 @@
       "Holy Aura",
       "Heal, Mass"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "charm_person",
+      "enthrall",
+      "magic_circle_against_evil",
+      "charm_monster",
+      "dispel_evil",
+      "find_the_path",
+      "control_weather",
+      "holy_aura",
+      "mass_heal"
+    ]
   },
   {
     "id": "elysium_2",
@@ -2292,7 +3766,18 @@
       "Sunburst",
       "Moment of Prescience"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "protection_from_evil",
+      "planar_tolerance",
+      "mantle_of_good",
+      "holy_smite",
+      "mass_cure_light_wounds",
+      "mind_fog",
+      "holy_word",
+      "sunburst",
+      "moment_of_prescience"
+    ]
   },
   {
     "id": "hades_1",
@@ -2309,7 +3794,18 @@
       "Unholy Aura",
       "Energy Drain"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "doom",
+      "resist_planar_alignment",
+      "magic_circle_against_good",
+      "contagion",
+      "crushing_despair",
+      "mind_fog",
+      "blasphemy",
+      "unholy_aura",
+      "energy_drain"
+    ]
   },
   {
     "id": "hades_2",
@@ -2325,7 +3821,17 @@
       "Waves of Exhaustion",
       "Gate"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "protection_from_good",
+      "mantle_of_evil",
+      "unholy_blight",
+      "dispel_good",
+      "waves_of_fatigue",
+      "plane_shift",
+      "waves_of_exhaustion",
+      "gate"
+    ]
   },
   {
     "id": "limbo_1",
@@ -2342,7 +3848,18 @@
       "Cloak of Chaos",
       "Perinarch, Planar"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "lesser_confusion",
+      "entropic_shield",
+      "magic_circle_against_law",
+      "chaos_hammer",
+      "baleful_polymorph",
+      "animate_objects",
+      "song_of_discord",
+      "cloak_of_chaos",
+      "perinarch_planar"
+    ]
   },
   {
     "id": "limbo_2",
@@ -2359,7 +3876,18 @@
       "Otto's Irresistable Dance",
       "Shapechange"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "protection_from_law",
+      "resist_planar_alignment",
+      "mantle_of_chaos",
+      "perinarch",
+      "dispel_law",
+      "insanity",
+      "word_of_chaos",
+      "otto_s_irresistable_dance",
+      "shapechange"
+    ]
   },
   {
     "id": "mechanus_1",
@@ -2376,7 +3904,18 @@
       "Iron Body",
       "Call Marut"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "command",
+      "calm_emotions",
+      "magic_circle_against_chaos",
+      "discern_lies",
+      "dispel_chaos",
+      "hold_monster",
+      "dictum",
+      "iron_body",
+      "call_marut"
+    ]
   },
   {
     "id": "mechanus_2",
@@ -2393,7 +3932,18 @@
       "Shield of Law",
       "Mordenkainen's Disjunction"
     ],
-    "source": "SpC"
+    "source": "SpC",
+    "spellIds": [
+      "protection_from_chaos",
+      "mechanus_mind",
+      "mantle_of_law",
+      "order_s_wrath",
+      "mark_of_justice",
+      "wall_of_gears",
+      "mass_hold_person",
+      "shield_of_law",
+      "mordenkainen_s_disjunction"
+    ]
   },
   {
     "id": "portal_alternative",
@@ -2410,7 +3960,18 @@
       "Portal Reformat",
       "Gate"
     ],
-    "source": "Underdark"
+    "source": "Underdark",
+    "spellIds": [
+      "portal_stablization",
+      "analyze_portal",
+      "portal_view",
+      "dimension_door",
+      "portal_barricade",
+      "portal_to_portal_redirect",
+      "etherealness",
+      "portal_reformat",
+      "gate"
+    ]
   },
   {
     "id": "watery_death",
@@ -2427,7 +3988,18 @@
       "Horrid Wilting",
       "Drown, Mass"
     ],
-    "source": "Underdark"
+    "source": "Underdark",
+    "spellIds": [
+      "entangle",
+      "mark_of_the_outcast",
+      "control_water",
+      "rushing_water",
+      "dehydrate",
+      "drown",
+      "contagious_fog",
+      "horrid_wilting",
+      "drown_mass"
+    ]
   },
   {
     "id": "mists",
@@ -2444,7 +4016,18 @@
       "Vanish",
       "Imprisonment"
     ],
-    "source": "RVLT"
+    "source": "RVLT",
+    "spellIds": [
+      "obscuring_mist",
+      "fog_cloud",
+      "gaseous_form",
+      "solid_fog",
+      "mind_fog",
+      "wind_walk",
+      "greater_teleport",
+      "vanish",
+      "imprisonment"
+    ]
   },
   {
     "id": "repose_2",
@@ -2461,7 +4044,18 @@
       "Control Undead",
       "Soul Bind"
     ],
-    "source": "RVLT"
+    "source": "RVLT",
+    "spellIds": [
+      "detect_undead",
+      "gentle_repose",
+      "speak_with_dead",
+      "halt_undead",
+      "raise_dead",
+      "antilife_shell",
+      "resurrection",
+      "control_undead",
+      "soul_bind"
+    ]
   },
   {
     "id": "curse",
@@ -2478,7 +4072,18 @@
       "Horrid Wilting",
       "Energy Drain"
     ],
-    "source": "RVLT"
+    "source": "RVLT",
+    "spellIds": [
+      "doom",
+      "hold_person",
+      "bestow_curse",
+      "poison",
+      "insect_plague",
+      "harm",
+      "destruction",
+      "horrid_wilting",
+      "energy_drain"
+    ]
   },
   {
     "id": "glamour",
@@ -2495,7 +4100,18 @@
       "Charm Monster, Mass",
       "Weird"
     ],
-    "source": "RVLT"
+    "source": "RVLT",
+    "spellIds": [
+      "charm_person",
+      "glitterdust",
+      "charm_monster",
+      "modify_memory",
+      "dream",
+      "veil",
+      "nightmare",
+      "mass_charm_monster",
+      "weird"
+    ]
   },
   {
     "id": "alteration",
@@ -2512,7 +4128,18 @@
       "Polymorph Any Object",
       "Shapechange"
     ],
-    "source": "DragonLance"
+    "source": "DragonLance",
+    "spellIds": [
+      "enlarge_person",
+      "alter_self",
+      "gaseous_form",
+      "polymorph",
+      "baleful_polymorph",
+      "flesh_to_stone",
+      "regenerate",
+      "polymorph_any_object",
+      "shapechange"
+    ]
   },
   {
     "id": "forge",
@@ -2529,7 +4156,18 @@
       "Repel Metal or Stone",
       "Iron Body"
     ],
-    "source": "DragonLance"
+    "source": "DragonLance",
+    "spellIds": [
+      "magic_weapon",
+      "heat_metal",
+      "keen_edge",
+      "minor_creation",
+      "wall_of_iron",
+      "major_creation",
+      "hardening",
+      "repel_metal_or_stone",
+      "iron_body"
+    ]
   },
   {
     "id": "insight",
@@ -2546,7 +4184,18 @@
       "Moment of Prescience",
       "Foresight"
     ],
-    "source": "DragonLance"
+    "source": "DragonLance",
+    "spellIds": [
+      "true_strike",
+      "augury",
+      "locate_object",
+      "divination",
+      "commune",
+      "mass_owl_s_wisdom",
+      "greater_arcane_sight",
+      "moment_of_prescience",
+      "foresight"
+    ]
   },
   {
     "id": "liberation_2",
@@ -2563,7 +4212,18 @@
       "Mind Blank",
       "Unbinding"
     ],
-    "source": "DragonLance"
+    "source": "DragonLance",
+    "spellIds": [
+      "remove_fear",
+      "remove_paralysis",
+      "remove_curse",
+      "freedom_of_movement",
+      "break_enchantment",
+      "greater_dispel_magic",
+      "refuge",
+      "mind_blank",
+      "unbinding"
+    ]
   },
   {
     "id": "mentalismdlcs",
@@ -2580,7 +4240,18 @@
       "Mass Charm",
       "Dominate Monster"
     ],
-    "source": "DragonLance"
+    "source": "DragonLance",
+    "spellIds": [
+      "command",
+      "detect_thoughts",
+      "hold_person",
+      "dicern_lies",
+      "greater_command",
+      "hold_monster",
+      "mass_hold_person",
+      "mass_charm",
+      "dominate_monster"
+    ]
   },
   {
     "id": "necromancy",
@@ -2597,7 +4268,18 @@
       "Create Greater Undead",
       "Energy Drain"
     ],
-    "source": "DragonLance"
+    "source": "DragonLance",
+    "spellIds": [
+      "detect_undead",
+      "death_knell",
+      "halt_undead",
+      "animate_dead",
+      "slay_living",
+      "create_undead",
+      "destruction",
+      "create_greater_undead",
+      "energy_drain"
+    ]
   },
   {
     "id": "restoration",
@@ -2614,7 +4296,18 @@
       "Resurrection",
       "True Resurection"
     ],
-    "source": "DragonLance"
+    "source": "DragonLance",
+    "spellIds": [
+      "remove_fear",
+      "lesser_restoration",
+      "remove_disease",
+      "restoration",
+      "raise_dead",
+      "heal",
+      "greater_restoration",
+      "resurrection",
+      "true_resurection"
+    ]
   },
   {
     "id": "sundlcs",
@@ -2631,7 +4324,18 @@
       "Sunburst",
       "Prismatic Sphere"
     ],
-    "source": "DragonLance"
+    "source": "DragonLance",
+    "spellIds": [
+      "endure_elements",
+      "heat_metal",
+      "searing_light",
+      "fire_shield",
+      "flame_strike",
+      "fire_seeds",
+      "sunbeam",
+      "sunburst",
+      "prismatic_sphere"
+    ]
   },
   {
     "id": "treachery",
@@ -2648,7 +4352,18 @@
       "Trap the Soul",
       "Imprisonment"
     ],
-    "source": "DragonLance"
+    "source": "DragonLance",
+    "spellIds": [
+      "undetectable_alignment",
+      "eagle_s_splendor",
+      "bestow_curse",
+      "glibness",
+      "magic_jar",
+      "symbol_of_persuasion",
+      "eyebite",
+      "trap_the_soul",
+      "imprisonment"
+    ]
   },
   {
     "id": "channeling",
@@ -2665,7 +4380,18 @@
       "Iron Body",
       "Diamond Body"
     ],
-    "source": "Age Of Mortals"
+    "source": "Age Of Mortals",
+    "spellIds": [
+      "jump",
+      "bear_s_endurance",
+      "haste",
+      "stoneskin",
+      "greater_heroism",
+      "tenser_s_transformation",
+      "regenerate",
+      "iron_body",
+      "diamond_body"
+    ]
   },
   {
     "id": "sensitivity",
@@ -2682,6 +4408,17 @@
       "Discern Location",
       "Foresight"
     ],
-    "source": "Age Of Mortals"
+    "source": "Age Of Mortals",
+    "spellIds": [
+      "deathwatch",
+      "see_invisibility",
+      "tongues",
+      "discern_lies",
+      "analyxe_dweomer",
+      "legend_lore",
+      "greater_arcane_sight",
+      "discern_location",
+      "foresight"
+    ]
   }
 ]

@@ -17,6 +17,10 @@
     ],
     "levels": {
       "Fire": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Fire": 1
     }
   },
   {
@@ -36,6 +40,10 @@
       }
     ],
     "levels": {
+      "Bestial": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Bestial": 4
     }
   },
@@ -57,6 +65,10 @@
     ],
     "levels": {
       "Bestial": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Bestial": 7
     }
   },
   {
@@ -76,6 +88,10 @@
       }
     ],
     "levels": {
+      "Bestial": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Bestial": 8
     }
   },
@@ -97,6 +113,10 @@
     ],
     "levels": {
       "Bestial": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Bestial": 9
     }
   },
   {
@@ -116,6 +136,10 @@
       }
     ],
     "levels": {
+      "Demonic": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Demonic": 1
     }
   },
@@ -137,6 +161,10 @@
     ],
     "levels": {
       "Demonic": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Demonic": 2
     }
   },
   {
@@ -157,6 +185,10 @@
     ],
     "levels": {
       "Demonic": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Demonic": 3
     }
   },
   {
@@ -176,6 +208,10 @@
       }
     ],
     "levels": {
+      "Demonic": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Demonic": 7
     }
   },
@@ -204,6 +240,11 @@
     "levels": {
       "Demonic": 8,
       "Vile Darkness": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Demonic": 8,
+      "Vile Darkness": 8
     }
   },
   {
@@ -223,6 +264,10 @@
       }
     ],
     "levels": {
+      "Diabolic": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Diabolic": 1
     }
   },
@@ -244,6 +289,10 @@
     ],
     "levels": {
       "Diabolic": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Diabolic": 2
     }
   },
   {
@@ -263,6 +312,10 @@
       }
     ],
     "levels": {
+      "Diabolic": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Diabolic": 3
     }
   },
@@ -284,6 +337,10 @@
     ],
     "levels": {
       "Diabolic": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Diabolic": 4
     }
   },
   {
@@ -303,6 +360,10 @@
       }
     ],
     "levels": {
+      "Diabolic": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Diabolic": 7
     }
   },
@@ -324,6 +385,10 @@
     ],
     "levels": {
       "Pain": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 1
     }
   },
   {
@@ -343,6 +408,10 @@
       }
     ],
     "levels": {
+      "Pain": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Pain": 2
     }
   },
@@ -364,6 +433,10 @@
     ],
     "levels": {
       "Pain": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 3
     }
   },
   {
@@ -384,6 +457,10 @@
     ],
     "levels": {
       "Pain": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 4
     }
   },
   {
@@ -403,6 +480,10 @@
       }
     ],
     "levels": {
+      "Pain": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Pain": 5
     }
   },
@@ -431,6 +512,11 @@
     "levels": {
       "Pain": 6,
       "Corruption": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 6,
+      "Corruption": 6
     }
   },
   {
@@ -450,6 +536,10 @@
       }
     ],
     "levels": {
+      "Pain": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Pain": 7
     }
   },
@@ -471,6 +561,10 @@
     ],
     "levels": {
       "Pain": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 8
     }
   },
   {
@@ -490,6 +584,10 @@
       }
     ],
     "levels": {
+      "Pain": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Pain": 9
     }
   },
@@ -518,6 +616,11 @@
     "levels": {
       "Celestial": 1,
       "Joy": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Celestial": 1,
+      "Joy": 1
     }
   },
   {
@@ -537,6 +640,10 @@
       }
     ],
     "levels": {
+      "Celestial": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Celestial": 3
     }
   },
@@ -558,6 +665,10 @@
     ],
     "levels": {
       "Celestial": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Celestial": 5
     }
   },
   {
@@ -577,6 +688,10 @@
       }
     ],
     "levels": {
+      "Celestial": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Celestial": 6
     }
   },
@@ -598,6 +713,10 @@
     ],
     "levels": {
       "Celestial": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Celestial": 7
     }
   },
   {
@@ -617,6 +736,10 @@
       }
     ],
     "levels": {
+      "Endurance": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Endurance": 3
     }
   },
@@ -638,6 +761,10 @@
     ],
     "levels": {
       "Endurance": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Endurance": 4
     }
   },
   {
@@ -657,6 +784,10 @@
       }
     ],
     "levels": {
+      "Fey": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Fey": 3
     }
   },
@@ -678,6 +809,10 @@
     ],
     "levels": {
       "Fey": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Fey": 4
     }
   },
   {
@@ -698,6 +833,10 @@
     ],
     "levels": {
       "Fey": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Fey": 8
     }
   },
   {
@@ -717,6 +856,10 @@
       }
     ],
     "levels": {
+      "Herald": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Herald": 7
     }
   },
@@ -743,6 +886,11 @@
       }
     ],
     "levels": {
+      "Herald": 8,
+      "Glory": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Herald": 8,
       "Glory": 8
     }
@@ -786,6 +934,13 @@
       "Competition": 9,
       "Mysticism": 9,
       "Purification": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Herald": 9,
+      "Competition": 9,
+      "Mysticism": 9,
+      "Purification": 9
     }
   },
   {
@@ -805,6 +960,10 @@
       }
     ],
     "levels": {
+      "Joy": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Joy": 2
     }
   },
@@ -826,6 +985,10 @@
     ],
     "levels": {
       "Joy": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Joy": 3
     }
   },
   {
@@ -846,6 +1009,10 @@
     ],
     "levels": {
       "Joy": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Joy": 5
     }
   },
   {
@@ -865,6 +1032,10 @@
       }
     ],
     "levels": {
+      "Joy": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Joy": 7
     }
   },
@@ -900,6 +1071,12 @@
       "Joy": 8,
       "Greed": 9,
       "Lust": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Joy": 8,
+      "Greed": 9,
+      "Lust": 8
     }
   },
   {
@@ -919,6 +1096,10 @@
       }
     ],
     "levels": {
+      "Pleasure": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Pleasure": 2
     }
   },
@@ -940,6 +1121,10 @@
     ],
     "levels": {
       "Pleasure": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pleasure": 3
     }
   },
   {
@@ -959,6 +1144,10 @@
       }
     ],
     "levels": {
+      "Pleasure": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Pleasure": 4
     }
   },
@@ -980,6 +1169,10 @@
     ],
     "levels": {
       "Pleasure": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pleasure": 6
     }
   },
   {
@@ -999,6 +1192,10 @@
       }
     ],
     "levels": {
+      "Pleasure": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Pleasure": 7
     }
   },
@@ -1020,6 +1217,10 @@
     ],
     "levels": {
       "Pleasure": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pleasure": 8
     }
   },
   {
@@ -1039,6 +1240,10 @@
       }
     ],
     "levels": {
+      "Pleasure": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Pleasure": 9
     }
   },
@@ -1065,6 +1270,11 @@
       }
     ],
     "levels": {
+      "Artifice": 7,
+      "Forge": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Artifice": 7,
       "Forge": 7
     }
@@ -1094,6 +1304,11 @@
     "levels": {
       "Artifice": 8,
       "Creation": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Artifice": 8,
+      "Creation": 8
     }
   },
   {
@@ -1121,6 +1336,11 @@
     "levels": {
       "Commerce": 2,
       "Inquisition": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Commerce": 2,
+      "Inquisition": 2
     }
   },
   {
@@ -1140,6 +1360,10 @@
       }
     ],
     "levels": {
+      "Deathless": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Deathless": 3
     }
   },
@@ -1161,6 +1385,10 @@
     ],
     "levels": {
       "Deathless": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathless": 4
     }
   },
   {
@@ -1180,6 +1408,10 @@
       }
     ],
     "levels": {
+      "Deathless": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Deathless": 6
     }
   },
@@ -1201,6 +1433,10 @@
     ],
     "levels": {
       "Deathless": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathless": 7
     }
   },
   {
@@ -1220,6 +1456,10 @@
       }
     ],
     "levels": {
+      "Deathless": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Deathless": 8
     }
   },
@@ -1241,6 +1481,10 @@
     ],
     "levels": {
       "Deathless": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathless": 9
     }
   },
   {
@@ -1260,6 +1504,10 @@
       }
     ],
     "levels": {
+      "Decay": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Decay": 7
     }
   },
@@ -1281,6 +1529,10 @@
     ],
     "levels": {
       "Feast": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Feast": 8
     }
   },
   {
@@ -1300,6 +1552,10 @@
       }
     ],
     "levels": {
+      "Feast": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Feast": 9
     }
   },
@@ -1349,6 +1605,14 @@
       "Scalykind": 6,
       "Suffering": 7,
       "Treachery": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Necromancer": 6,
+      "Orc": 6,
+      "Scalykind": 6,
+      "Suffering": 7,
+      "Treachery": 7
     }
   },
   {
@@ -1383,6 +1647,12 @@
       "Passion": 8,
       "Gnome": 8,
       "Limbo-2": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Passion": 8,
+      "Gnome": 8,
+      "Limbo-2": 8
     }
   },
   {
@@ -1402,6 +1672,10 @@
       }
     ],
     "levels": {
+      "Winter": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Winter": 1
     }
   },
@@ -1423,6 +1697,10 @@
     ],
     "levels": {
       "Winter": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Winter": 2
     }
   },
   {
@@ -1442,6 +1720,10 @@
       }
     ],
     "levels": {
+      "Winter": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Winter": 3
     }
   },
@@ -1463,6 +1745,10 @@
     ],
     "levels": {
       "Winter": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Winter": 5
     }
   },
   {
@@ -1482,6 +1768,10 @@
       }
     ],
     "levels": {
+      "Winter": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Winter": 6
     }
   },
@@ -1503,6 +1793,10 @@
     ],
     "levels": {
       "Winter": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Winter": 8
     }
   },
   {
@@ -1522,6 +1816,10 @@
       }
     ],
     "levels": {
+      "Winter": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Winter": 9
     }
   },
@@ -1543,6 +1841,10 @@
     ],
     "levels": {
       "City": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 1
     }
   },
   {
@@ -1562,6 +1864,10 @@
       }
     ],
     "levels": {
+      "City": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
       "City": 2
     }
   },
@@ -1583,6 +1889,10 @@
     ],
     "levels": {
       "City": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 3
     }
   },
   {
@@ -1602,6 +1912,10 @@
       }
     ],
     "levels": {
+      "City": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
       "City": 4
     }
   },
@@ -1623,6 +1937,10 @@
     ],
     "levels": {
       "City": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 5
     }
   },
   {
@@ -1642,6 +1960,10 @@
       }
     ],
     "levels": {
+      "City": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
       "City": 6
     }
   },
@@ -1663,6 +1985,10 @@
     ],
     "levels": {
       "City": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 7
     }
   },
   {
@@ -1683,6 +2009,10 @@
     ],
     "levels": {
       "City": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 8
     }
   },
   {
@@ -1702,6 +2032,10 @@
       }
     ],
     "levels": {
+      "City": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "City": 9
     }
   },
@@ -1730,6 +2064,11 @@
     "levels": {
       "Destiny": 1,
       "Liberation": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Destiny": 1,
+      "Liberation": 1
     }
   },
   {
@@ -1749,6 +2088,10 @@
       }
     ],
     "levels": {
+      "Destiny": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Destiny": 3
     }
   },
@@ -1777,6 +2120,11 @@
     "levels": {
       "Destiny": 5,
       "Pact": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Destiny": 5,
+      "Pact": 5
     }
   },
   {
@@ -1796,6 +2144,10 @@
       }
     ],
     "levels": {
+      "Destiny": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Destiny": 6
     }
   },
@@ -1817,6 +2169,10 @@
     ],
     "levels": {
       "Destiny": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Destiny": 7
     }
   },
   {
@@ -1836,6 +2192,10 @@
       }
     ],
     "levels": {
+      "Destiny": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Destiny": 9
     }
   },
@@ -1857,6 +2217,10 @@
     ],
     "levels": {
       "Sky": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sky": 1
     }
   },
   {
@@ -1876,6 +2240,10 @@
       }
     ],
     "levels": {
+      "Sky": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Sky": 2
     }
   },
@@ -1897,6 +2265,10 @@
     ],
     "levels": {
       "Sky": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sky": 3
     }
   },
   {
@@ -1916,6 +2288,10 @@
       }
     ],
     "levels": {
+      "Sky": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Sky": 4
     }
   },
@@ -1937,6 +2313,10 @@
     ],
     "levels": {
       "Sky": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sky": 8
     }
   },
   {
@@ -1956,6 +2336,10 @@
       }
     ],
     "levels": {
+      "Sky": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Sky": 9
     }
   },
@@ -1977,6 +2361,10 @@
     ],
     "levels": {
       "Repose": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Repose": 8
     }
   },
   {
@@ -1996,6 +2384,10 @@
       }
     ],
     "levels": {
+      "Sand": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Sand": 1
     }
   },
@@ -2017,6 +2409,10 @@
     ],
     "levels": {
       "Sand": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sand": 2
     }
   },
   {
@@ -2036,6 +2432,10 @@
       }
     ],
     "levels": {
+      "Sand": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Sand": 3
     }
   },
@@ -2057,6 +2457,10 @@
     ],
     "levels": {
       "Sand": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sand": 4
     }
   },
   {
@@ -2076,6 +2480,10 @@
       }
     ],
     "levels": {
+      "Sand": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Sand": 5
     }
   },
@@ -2097,6 +2505,10 @@
     ],
     "levels": {
       "Sand": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sand": 6
     }
   },
   {
@@ -2116,6 +2528,10 @@
       }
     ],
     "levels": {
+      "Sand": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Sand": 7
     }
   },
@@ -2137,6 +2553,10 @@
     ],
     "levels": {
       "Sand": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sand": 8
     }
   },
   {
@@ -2156,6 +2576,10 @@
       }
     ],
     "levels": {
+      "Sand": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Sand": 9
     }
   },
@@ -2177,6 +2601,10 @@
     ],
     "levels": {
       "Summer": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Summer": 1
     }
   },
   {
@@ -2196,6 +2624,10 @@
       }
     ],
     "levels": {
+      "Summer": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Summer": 2
     }
   },
@@ -2217,6 +2649,10 @@
     ],
     "levels": {
       "Summer": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Summer": 3
     }
   },
   {
@@ -2236,6 +2672,10 @@
       }
     ],
     "levels": {
+      "Summer": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Summer": 4
     }
   },
@@ -2257,6 +2697,10 @@
     ],
     "levels": {
       "Summer": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Summer": 5
     }
   },
   {
@@ -2276,6 +2720,10 @@
       }
     ],
     "levels": {
+      "Thirst": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Thirst": 1
     }
   },
@@ -2297,6 +2745,10 @@
     ],
     "levels": {
       "Thirst": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Thirst": 2
     }
   },
   {
@@ -2316,6 +2768,10 @@
       }
     ],
     "levels": {
+      "Thirst": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Thirst": 3
     }
   },
@@ -2337,6 +2793,10 @@
     ],
     "levels": {
       "Thirst": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Thirst": 4
     }
   },
   {
@@ -2356,6 +2816,10 @@
       }
     ],
     "levels": {
+      "Thirst": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Thirst": 5
     }
   },
@@ -2377,6 +2841,10 @@
     ],
     "levels": {
       "Thirst": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Thirst": 6
     }
   },
   {
@@ -2396,6 +2864,10 @@
       }
     ],
     "levels": {
+      "Thirst": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Thirst": 7
     }
   },
@@ -2417,6 +2889,10 @@
     ],
     "levels": {
       "Corruption": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Corruption": 4
     }
   },
   {
@@ -2437,6 +2913,10 @@
     ],
     "levels": {
       "Corruption": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Corruption": 8
     }
   },
   {
@@ -2456,6 +2936,10 @@
       }
     ],
     "levels": {
+      "Corruption": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Corruption": 9
     }
   },
@@ -2484,6 +2968,11 @@
     "levels": {
       "Vile Darkness": 2,
       "Darkness": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Vile Darkness": 2,
+      "Darkness": 5
     }
   },
   {
@@ -2503,6 +2992,10 @@
       }
     ],
     "levels": {
+      "Vile Darkness": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Vile Darkness": 4
     }
   },
@@ -2524,6 +3017,10 @@
     ],
     "levels": {
       "Blackwater": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Blackwater": 2
     }
   },
   {
@@ -2543,6 +3040,10 @@
       }
     ],
     "levels": {
+      "Blackwater": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Blackwater": 4
     }
   },
@@ -2564,6 +3065,10 @@
     ],
     "levels": {
       "Blackwater": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Blackwater": 5
     }
   },
   {
@@ -2584,6 +3089,10 @@
     ],
     "levels": {
       "Blackwater": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Blackwater": 6
     }
   },
   {
@@ -2603,6 +3112,10 @@
       }
     ],
     "levels": {
+      "Blackwater": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Blackwater": 7
     }
   },
@@ -2631,6 +3144,11 @@
     "levels": {
       "Blackwater": 8,
       "Ocean": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Blackwater": 8,
+      "Ocean": 8
     }
   },
   {
@@ -2650,6 +3168,10 @@
       }
     ],
     "levels": {
+      "Blackwater": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Blackwater": 9
     }
   },
@@ -2671,6 +3193,10 @@
     ],
     "levels": {
       "Seafolk": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Seafolk": 1
     }
   },
   {
@@ -2690,6 +3216,10 @@
       }
     ],
     "levels": {
+      "Seafolk": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Seafolk": 2
     }
   },
@@ -2711,6 +3241,10 @@
     ],
     "levels": {
       "Seafolk": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Seafolk": 3
     }
   },
   {
@@ -2730,6 +3264,10 @@
       }
     ],
     "levels": {
+      "Seafolk": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Seafolk": 4
     }
   },
@@ -2751,6 +3289,10 @@
     ],
     "levels": {
       "Seafolk": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Seafolk": 6
     }
   },
   {
@@ -2770,6 +3312,10 @@
       }
     ],
     "levels": {
+      "Seafolk": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Seafolk": 7
     }
   },
@@ -2791,6 +3337,10 @@
     ],
     "levels": {
       "Seafolk": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Seafolk": 8
     }
   },
   {
@@ -2810,6 +3360,10 @@
       }
     ],
     "levels": {
+      "Spite": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Spite": 1
     }
   },
@@ -2831,6 +3385,10 @@
     ],
     "levels": {
       "Spite": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spite": 4
     }
   },
   {
@@ -2850,6 +3408,10 @@
       }
     ],
     "levels": {
+      "Spite": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Spite": 5
     }
   },
@@ -2871,6 +3433,10 @@
     ],
     "levels": {
       "Spite": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spite": 6
     }
   },
   {
@@ -2890,6 +3456,10 @@
       }
     ],
     "levels": {
+      "Spite": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Spite": 7
     }
   },
@@ -2911,6 +3481,10 @@
     ],
     "levels": {
       "Spite": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spite": 8
     }
   },
   {
@@ -2930,6 +3504,10 @@
       }
     ],
     "levels": {
+      "Spite": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Spite": 9
     }
   },
@@ -2951,6 +3529,10 @@
     ],
     "levels": {
       "Balance": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Balance": 3
     }
   },
   {
@@ -2970,6 +3552,10 @@
       }
     ],
     "levels": {
+      "Balance": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Balance": 5
     }
   },
@@ -2991,6 +3577,10 @@
     ],
     "levels": {
       "Balance": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Balance": 7
     }
   },
   {
@@ -3010,6 +3600,10 @@
       }
     ],
     "levels": {
+      "Balance": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Balance": 9
     }
   },
@@ -3031,6 +3625,10 @@
     ],
     "levels": {
       "Cavern": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Cavern": 7
     }
   },
   {
@@ -3050,6 +3648,10 @@
       }
     ],
     "levels": {
+      "Celerity": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Celerity": 8
     }
   },
@@ -3071,6 +3673,10 @@
     ],
     "levels": {
       "Cold": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Cold": 9
     }
   },
   {
@@ -3091,6 +3697,10 @@
     ],
     "levels": {
       "Community": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Community": 8
     }
   },
   {
@@ -3110,6 +3720,10 @@
       }
     ],
     "levels": {
+      "Competition": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Competition": 2
     }
   },
@@ -3138,6 +3752,11 @@
     "levels": {
       "Competition": 6,
       "Pact": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Competition": 6,
+      "Pact": 6
     }
   },
   {
@@ -3157,6 +3776,10 @@
       }
     ],
     "levels": {
+      "Courage": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Courage": 3
     }
   },
@@ -3178,6 +3801,10 @@
     ],
     "levels": {
       "Courage": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Courage": 5
     }
   },
   {
@@ -3198,6 +3825,10 @@
     ],
     "levels": {
       "Courage": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Courage": 8
     }
   },
   {
@@ -3217,6 +3848,10 @@
       }
     ],
     "levels": {
+      "Courage": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Courage": 9
     }
   },
@@ -3245,6 +3880,11 @@
     "levels": {
       "Craft": 6,
       "Gnome": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Craft": 6,
+      "Gnome": 6
     }
   },
   {
@@ -3264,6 +3904,10 @@
       }
     ],
     "levels": {
+      "Craft": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Craft": 9
     }
   },
@@ -3285,6 +3929,10 @@
     ],
     "levels": {
       "Creation": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Creation": 9
     }
   },
   {
@@ -3304,6 +3952,10 @@
       }
     ],
     "levels": {
+      "Darkness": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Darkness": 3
     }
   },
@@ -3325,6 +3977,10 @@
     ],
     "levels": {
       "Darkness": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Darkness": 4
     }
   },
   {
@@ -3344,6 +4000,10 @@
       }
     ],
     "levels": {
+      "Deathbound": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Deathbound": 1
     }
   },
@@ -3365,6 +4025,10 @@
     ],
     "levels": {
       "Deathbound": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathbound": 2
     }
   },
   {
@@ -3384,6 +4048,10 @@
       }
     ],
     "levels": {
+      "Deathbound": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Deathbound": 3
     }
   },
@@ -3405,6 +4073,10 @@
     ],
     "levels": {
       "Deathbound": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathbound": 4
     }
   },
   {
@@ -3424,6 +4096,10 @@
       }
     ],
     "levels": {
+      "Deathbound": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Deathbound": 5
     }
   },
@@ -3445,6 +4121,10 @@
     ],
     "levels": {
       "Deathbound": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathbound": 6
     }
   },
   {
@@ -3464,6 +4144,10 @@
       }
     ],
     "levels": {
+      "Deathbound": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Deathbound": 7
     }
   },
@@ -3485,6 +4169,10 @@
     ],
     "levels": {
       "Deathbound": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathbound": 8
     }
   },
   {
@@ -3504,6 +4192,10 @@
       }
     ],
     "levels": {
+      "Domination": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Domination": 8
     }
   },
@@ -3525,6 +4217,10 @@
     ],
     "levels": {
       "Domination": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Domination": 9
     }
   },
   {
@@ -3544,6 +4240,10 @@
       }
     ],
     "levels": {
+      "Dragon": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Dragon": 4
     }
   },
@@ -3565,6 +4265,10 @@
     ],
     "levels": {
       "Dragon": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Dragon": 7
     }
   },
   {
@@ -3584,6 +4288,10 @@
       }
     ],
     "levels": {
+      "Dream": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Dream": 6
     }
   },
@@ -3605,6 +4313,10 @@
     ],
     "levels": {
       "Drow": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Drow": 1
     }
   },
   {
@@ -3624,6 +4336,10 @@
       }
     ],
     "levels": {
+      "Drow": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Drow": 5
     }
   },
@@ -3645,6 +4361,10 @@
     ],
     "levels": {
       "Force": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Force": 3
     }
   },
   {
@@ -3664,6 +4384,10 @@
       }
     ],
     "levels": {
+      "Glory": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Glory": 6
     }
   },
@@ -3690,6 +4414,11 @@
       }
     ],
     "levels": {
+      "Gluttony": 8,
+      "Hunger": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Gluttony": 8,
       "Hunger": 8
     }
@@ -3719,6 +4448,11 @@
     "levels": {
       "Gnome": 2,
       "Trade": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Gnome": 2,
+      "Trade": 2
     }
   },
   {
@@ -3738,6 +4472,10 @@
       }
     ],
     "levels": {
+      "Greed": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Greed": 1
     }
   },
@@ -3759,6 +4497,10 @@
     ],
     "levels": {
       "Greed": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Greed": 2
     }
   },
   {
@@ -3778,6 +4520,10 @@
       }
     ],
     "levels": {
+      "Greed": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Greed": 8
     }
   },
@@ -3799,6 +4545,10 @@
     ],
     "levels": {
       "Hunger": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Hunger": 1
     }
   },
   {
@@ -3818,6 +4568,10 @@
       }
     ],
     "levels": {
+      "Hunger": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Hunger": 2
     }
   },
@@ -3839,6 +4593,10 @@
     ],
     "levels": {
       "Hunger": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Hunger": 3
     }
   },
   {
@@ -3858,6 +4616,10 @@
       }
     ],
     "levels": {
+      "Hunger": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Hunger": 5
     }
   },
@@ -3879,6 +4641,10 @@
     ],
     "levels": {
       "Hunger": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Hunger": 6
     }
   },
   {
@@ -3899,6 +4665,10 @@
     ],
     "levels": {
       "Hunger": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Hunger": 7
     }
   },
   {
@@ -3918,6 +4688,10 @@
       }
     ],
     "levels": {
+      "Illusion": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Illusion": 5
     }
   },
@@ -3945,6 +4719,10 @@
     ],
     "levels": {
       "Liberation": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Liberation": 9
     }
   },
   {
@@ -3964,6 +4742,10 @@
       }
     ],
     "levels": {
+      "Madness": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Madness": 2
     }
   },
@@ -3985,6 +4767,10 @@
     ],
     "levels": {
       "Madness": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Madness": 5
     }
   },
   {
@@ -4004,6 +4790,10 @@
       }
     ],
     "levels": {
+      "Madness": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Madness": 8
     }
   },
@@ -4032,6 +4822,11 @@
     "levels": {
       "Metal": 4,
       "Slime": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Metal": 4,
+      "Slime": 4
     }
   },
   {
@@ -4051,6 +4846,10 @@
       }
     ],
     "levels": {
+      "Mind": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Mind": 3
     }
   },
@@ -4072,6 +4871,10 @@
     ],
     "levels": {
       "Mind": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mind": 6
     }
   },
   {
@@ -4091,6 +4894,10 @@
       }
     ],
     "levels": {
+      "Mind": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Mind": 7
     }
   },
@@ -4112,6 +4919,10 @@
     ],
     "levels": {
       "Moon": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Moon": 2
     }
   },
   {
@@ -4131,6 +4942,10 @@
       }
     ],
     "levels": {
+      "Moon": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Moon": 3
     }
   },
@@ -4152,6 +4967,10 @@
     ],
     "levels": {
       "Moon": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Moon": 5
     }
   },
   {
@@ -4171,6 +4990,10 @@
       }
     ],
     "levels": {
+      "Moon": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Moon": 9
     }
   },
@@ -4192,6 +5015,10 @@
     ],
     "levels": {
       "Mysticism": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mysticism": 3
     }
   },
   {
@@ -4211,6 +5038,10 @@
       }
     ],
     "levels": {
+      "Mysticism": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Mysticism": 4
     }
   },
@@ -4232,6 +5063,10 @@
     ],
     "levels": {
       "Mysticism": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mysticism": 6
     }
   },
   {
@@ -4251,6 +5086,10 @@
       }
     ],
     "levels": {
+      "Mysticism": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Mysticism": 7
     }
   },
@@ -4272,6 +5111,10 @@
     ],
     "levels": {
       "Mysticism": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mysticism": 8
     }
   },
   {
@@ -4291,6 +5134,10 @@
       }
     ],
     "levels": {
+      "Ocean": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Ocean": 7
     }
   },
@@ -4312,6 +5159,10 @@
     ],
     "levels": {
       "Pact": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pact": 7
     }
   },
   {
@@ -4331,6 +5182,10 @@
       }
     ],
     "levels": {
+      "Pact": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Pact": 8
     }
   },
@@ -4352,6 +5207,10 @@
     ],
     "levels": {
       "Pestilence": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pestilence": 5
     }
   },
   {
@@ -4371,6 +5230,10 @@
       }
     ],
     "levels": {
+      "Pestilence": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Pestilence": 6
     }
   },
@@ -4392,6 +5255,10 @@
     ],
     "levels": {
       "Pestilence": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pestilence": 7
     }
   },
   {
@@ -4411,6 +5278,10 @@
       }
     ],
     "levels": {
+      "Pestilence": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Pestilence": 9
     }
   },
@@ -4439,6 +5310,11 @@
     "levels": {
       "Portal": 2,
       "Portal (alternative)": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Portal": 2,
+      "Portal (alternative)": 2
     }
   },
   {
@@ -4458,6 +5334,10 @@
       }
     ],
     "levels": {
+      "Purification": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Purification": 1
     }
   },
@@ -4479,6 +5359,10 @@
     ],
     "levels": {
       "Purification": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Purification": 2
     }
   },
   {
@@ -4498,6 +5382,10 @@
       }
     ],
     "levels": {
+      "Purification": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Purification": 3
     }
   },
@@ -4519,6 +5407,10 @@
     ],
     "levels": {
       "Purification": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Purification": 4
     }
   },
   {
@@ -4538,6 +5430,10 @@
       }
     ],
     "levels": {
+      "Purification": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Purification": 5
     }
   },
@@ -4559,6 +5455,10 @@
     ],
     "levels": {
       "Purification": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Purification": 6
     }
   },
   {
@@ -4578,6 +5478,10 @@
       }
     ],
     "levels": {
+      "Purification": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Purification": 7
     }
   },
@@ -4599,6 +5503,10 @@
     ],
     "levels": {
       "Spell": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spell": 3
     }
   },
   {
@@ -4618,6 +5526,10 @@
       }
     ],
     "levels": {
+      "Spell": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Spell": 6
     }
   },
@@ -4639,6 +5551,10 @@
     ],
     "levels": {
       "Spider": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spider": 6
     }
   },
   {
@@ -4658,6 +5574,10 @@
       }
     ],
     "levels": {
+      "Spider": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Spider": 7
     }
   },
@@ -4679,6 +5599,10 @@
     ],
     "levels": {
       "Spider": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spider": 9
     }
   },
   {
@@ -4698,6 +5622,10 @@
       }
     ],
     "levels": {
+      "Storm": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Storm": 2
     }
   },
@@ -4719,6 +5647,10 @@
     ],
     "levels": {
       "Windstorm": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Windstorm": 2
     }
   },
   {
@@ -4738,6 +5670,10 @@
       }
     ],
     "levels": {
+      "Windstorm": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Windstorm": 5
     }
   },
@@ -4759,6 +5695,10 @@
     ],
     "levels": {
       "Windstorm": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Windstorm": 6
     }
   },
   {
@@ -4778,6 +5718,10 @@
       }
     ],
     "levels": {
+      "Windstorm": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Windstorm": 9
     }
   },
@@ -4799,6 +5743,10 @@
     ],
     "levels": {
       "Wrath": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Wrath": 1
     }
   },
   {
@@ -4818,6 +5766,10 @@
       }
     ],
     "levels": {
+      "Abyss-1": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Abyss-1": 3
     }
   },
@@ -4839,6 +5791,10 @@
     ],
     "levels": {
       "Abyss-1": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Abyss-1": 4
     }
   },
   {
@@ -4858,6 +5814,10 @@
       }
     ],
     "levels": {
+      "Abyss-2": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Abyss-2": 8
     }
   },
@@ -4879,6 +5839,10 @@
     ],
     "levels": {
       "Arborea-2": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Arborea-2": 4
     }
   },
   {
@@ -4898,6 +5862,10 @@
       }
     ],
     "levels": {
+      "Celestia-1": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Celestia-1": 1
     }
   },
@@ -4919,6 +5887,10 @@
     ],
     "levels": {
       "Elysium-2": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Elysium-2": 2
     }
   },
   {
@@ -4938,6 +5910,10 @@
       }
     ],
     "levels": {
+      "Elysium-2": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Elysium-2": 3
     }
   },
@@ -4966,6 +5942,11 @@
     "levels": {
       "Hades-1": 2,
       "Limbo-2": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Hades-1": 2,
+      "Limbo-2": 2
     }
   },
   {
@@ -4985,6 +5966,10 @@
       }
     ],
     "levels": {
+      "Hades-2": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Hades-2": 3
     }
   },
@@ -5006,6 +5991,10 @@
     ],
     "levels": {
       "Limbo-1": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Limbo-1": 9
     }
   },
   {
@@ -5025,6 +6014,10 @@
       }
     ],
     "levels": {
+      "Limbo-2": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Limbo-2": 3
     }
   },
@@ -5046,6 +6039,10 @@
     ],
     "levels": {
       "Limbo-2": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Limbo-2": 4
     }
   },
   {
@@ -5065,6 +6062,10 @@
       }
     ],
     "levels": {
+      "Mechanus-1": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Mechanus-1": 9
     }
   },
@@ -5086,6 +6087,10 @@
     ],
     "levels": {
       "Mechanus-2": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mechanus-2": 2
     }
   },
   {
@@ -5105,6 +6110,10 @@
       }
     ],
     "levels": {
+      "Mechanus-2": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Mechanus-2": 3
     }
   },
@@ -5126,6 +6135,10 @@
     ],
     "levels": {
       "Mechanus-2": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mechanus-2": 6
     }
   },
   {
@@ -5145,6 +6158,10 @@
       }
     ],
     "levels": {
+      "Portal (alternative)": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Portal (alternative)": 1
     }
   },
@@ -5166,6 +6183,10 @@
     ],
     "levels": {
       "Portal (alternative)": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Portal (alternative)": 3
     }
   },
   {
@@ -5185,6 +6206,10 @@
       }
     ],
     "levels": {
+      "Portal (alternative)": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Portal (alternative)": 5
     }
   },
@@ -5206,6 +6231,10 @@
     ],
     "levels": {
       "Portal (alternative)": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Portal (alternative)": 6
     }
   },
   {
@@ -5225,6 +6254,10 @@
       }
     ],
     "levels": {
+      "Portal (alternative)": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Portal (alternative)": 8
     }
   },
@@ -5246,6 +6279,10 @@
     ],
     "levels": {
       "Watery Death": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Watery Death": 2
     }
   },
   {
@@ -5265,6 +6302,10 @@
       }
     ],
     "levels": {
+      "Watery Death": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Watery Death": 4
     }
   },
@@ -5286,6 +6327,10 @@
     ],
     "levels": {
       "Watery Death": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Watery Death": 5
     }
   },
   {
@@ -5305,6 +6350,10 @@
       }
     ],
     "levels": {
+      "Watery Death": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Watery Death": 6
     }
   },
@@ -5326,6 +6375,10 @@
     ],
     "levels": {
       "Watery Death": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Watery Death": 7
     }
   },
   {
@@ -5345,6 +6398,10 @@
       }
     ],
     "levels": {
+      "Watery Death": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Watery Death": 9
     }
   },
@@ -5366,6 +6423,10 @@
     ],
     "levels": {
       "Mists": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mists": 8
     }
   },
   {
@@ -5385,6 +6446,10 @@
       }
     ],
     "levels": {
+      "Insight": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Insight": 6
     }
   },
@@ -5406,6 +6471,10 @@
     ],
     "levels": {
       "Mentalism(DLCS)": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mentalism(DLCS)": 4
     }
   },
   {
@@ -5425,6 +6494,10 @@
       }
     ],
     "levels": {
+      "Mentalism(DLCS)": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Mentalism(DLCS)": 8
     }
   },
@@ -5446,6 +6519,10 @@
     ],
     "levels": {
       "Restoration": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Restoration": 9
     }
   },
   {
@@ -5466,6 +6543,10 @@
     ],
     "levels": {
       "Channeling": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Channeling": 9
     }
   },
   {
@@ -5485,6 +6566,10 @@
       }
     ],
     "levels": {
+      "Sensitivity": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
       "Sensitivity": 5
     }
   }

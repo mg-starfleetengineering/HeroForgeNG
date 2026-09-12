@@ -810,6 +810,19 @@ def extract_spells():
         elif comp_raw:
             components = str(comp_raw)
             
+        class_levels = {}
+        domain_levels = {}
+        standard_classes = {
+            "wizard", "sorcerer", "cleric", "druid", "bard", "ranger", "paladin",
+            "warmage", "beguiler", "duskblade", "dread necromancer", "hexblade",
+            "spellthief", "favored soul", "archivist", "healer", "shugenja", "wu jen"
+        }
+        for k_cls, v_lvl in levels.items():
+            if k_cls.strip().lower() in standard_classes:
+                class_levels[k_cls.strip()] = v_lvl
+            else:
+                domain_levels[k_cls.strip()] = v_lvl
+
         core_spells.append({
             "id": sp_id,
             "name": name,
@@ -817,6 +830,8 @@ def extract_spells():
             "subschool": subschool,
             "descriptors": descriptors,
             "levels": levels,
+            "classLevels": class_levels,
+            "domainLevels": domain_levels,
             "components": components,
             "castingTime": casting_time,
             "range": range_val,
@@ -876,7 +891,9 @@ def extract_spells():
                                 "row": row_idx + 1
                             },
                             "domains": [],
-                            "levels": {}
+                            "levels": {},
+                            "classLevels": {},
+                            "domainLevels": {}
                         }
                     
                     supp_spells_map[sp_id]["domains"].append({
@@ -886,6 +903,7 @@ def extract_spells():
                         "source": current_source
                     })
                     supp_spells_map[sp_id]["levels"][clean_domain_name] = lvl_idx
+                    supp_spells_map[sp_id]["domainLevels"][clean_domain_name] = lvl_idx
                     
     supp_spells_list = list(supp_spells_map.values())
     with open(os.path.join(OUTPUT_DIR, "supplemental_domain_spells.json"), "w", encoding="utf-8") as f:

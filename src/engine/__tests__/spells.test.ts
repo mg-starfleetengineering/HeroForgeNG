@@ -16,6 +16,9 @@ import {
   removeSpellFromSpellbook,
   getStarterWizardCantripIds,
   getAvailableSpellsForPreparation,
+  getAvailableSpellsForSlot,
+  getSpellLevelForClass,
+  getSpellLevelForDomain,
   getSpellSlotUsageKey,
   getExpendedSpellSlotsCount,
   getRemainingSpellSlotsCount,
@@ -27,6 +30,7 @@ import {
 } from '../spells';
 import spellsData from '../../data/spells.json';
 import suppSpellsData from '../../data/supplemental_domain_spells.json';
+import domainsData from '../../data/domains.json';
 
 describe('D&D 3.5e Spells Engine & Data Verification', () => {
   describe('Bonus Spells Calculation (PHB 3.5e Rule)', () => {
@@ -104,7 +108,7 @@ describe('D&D 3.5e Spells Engine & Data Verification', () => {
   });
 
   describe('3.5e Core Spells Database Integrity', () => {
-    it('should load 596 core spells with all required schema fields', () => {
+    it('should load 596 core spells with all required schema fields including separated classLevels & domainLevels', () => {
       expect(spellsData.length).toBe(596);
 
       spellsData.forEach(spell => {
@@ -113,6 +117,10 @@ describe('D&D 3.5e Spells Engine & Data Verification', () => {
         expect(spell.school).toBeTruthy();
         expect(spell.levels).toBeDefined();
         expect(typeof spell.levels).toBe('object');
+        expect(spell.classLevels).toBeDefined();
+        expect(typeof spell.classLevels).toBe('object');
+        expect(spell.domainLevels).toBeDefined();
+        expect(typeof spell.domainLevels).toBe('object');
         expect(spell.castingTime).toBeTruthy();
         expect(spell.range).toBeTruthy();
         expect(spell.duration).toBeTruthy();
@@ -123,26 +131,79 @@ describe('D&D 3.5e Spells Engine & Data Verification', () => {
       });
     });
 
-    it('should contain iconic spells with accurate schools and levels', () => {
+    it('should contain iconic spells with accurate schools, classLevels, and domainLevels', () => {
       const fireball = spellsData.find(s => s.name === 'Fireball');
       expect(fireball).toBeDefined();
       expect(fireball?.school).toBe('Evocation');
       expect(fireball?.levels['Sorcerer']).toBe(3);
       expect(fireball?.levels['Wizard']).toBe(3);
+      expect(fireball?.classLevels?.['Sorcerer']).toBe(3);
+      expect(fireball?.classLevels?.['Wizard']).toBe(3);
       expect(fireball?.savingThrow).toContain('Reflex');
 
       const magicMissile = spellsData.find(s => s.name === 'Magic Missile');
       expect(magicMissile).toBeDefined();
       expect(magicMissile?.school).toBe('Evocation');
       expect(magicMissile?.levels['Wizard']).toBe(1);
+      expect(magicMissile?.classLevels?.['Wizard']).toBe(1);
 
       const cureLight = spellsData.find(s => s.name === 'Cure Light Wounds');
       expect(cureLight).toBeDefined();
       expect(cureLight?.school).toBe('Conjuration');
       expect(cureLight?.levels['Cleric']).toBe(1);
+      expect(cureLight?.classLevels?.['Cleric']).toBe(1);
+
+      // Acid Fog: Wizard 6, Sorcerer 6, Water 7
+      const acidFog = spellsData.find(s => s.name === 'Acid Fog');
+      expect(acidFog).toBeDefined();
+      expect(acidFog?.classLevels?.['Wizard']).toBe(6);
+      expect(acidFog?.classLevels?.['Sorcerer']).toBe(6);
+      expect(acidFog?.domainLevels?.['Water']).toBe(7);
+      // Water domain must NOT leak into classLevels
+      expect(acidFog?.classLevels?.['Water']).toBeUndefined();
+      // Wizard/Sorcerer must NOT leak into domainLevels
+      expect(acidFog?.domainLevels?.['Wizard']).toBeUndefined();
+      expect(acidFog?.domainLevels?.['Sorcerer']).toBeUndefined();
+
+      // Slime domain grants Melf's Acid Arrow at level 2
+      const acidArrow = spellsData.find(s => s.name === "Melf's Acid Arrow");
+      expect(acidArrow).toBeDefined();
+      expect(acidArrow?.classLevels?.['Wizard']).toBe(2);
+      expect(acidArrow?.domainLevels?.['Slime']).toBe(2);
     });
 
-    it('should load supplemental domain spells from Excel workbook', () => {
+    it('should load 158 domains with canonical spellIds', () => {
+      expect(domainsData.length).toBe(158);
+
+      domainsData.forEach(dom => {
+        expect(dom.id).toBeTruthy();
+        expect(dom.name).toBeTruthy();
+        expect(dom.spells).toBeDefined();
+        expect(dom.spells.length).toBeGreaterThanOrEqual(8);
+        expect(dom.spellIds).toBeDefined();
+        expect(dom.spellIds?.length).toBe(dom.spells.length);
+        // All spell IDs must be non-empty strings
+        dom.spellIds?.forEach(spId => {
+          expect(typeof spId).toBe('string');
+          expect(spId.length).toBeGreaterThan(0);
+        });
+      });
+
+      // Check iconic domains
+      const air = domainsData.find(d => d.name === 'Air');
+      expect(air?.spellIds?.[0]).toBe('obscuring_mist');
+      expect(air?.spellIds?.[8]).toBe('elemental_swarm');
+
+      const war = domainsData.find(d => d.name === 'War');
+      expect(war?.spellIds?.[0]).toBe('magic_weapon');
+      expect(war?.spellIds?.[1]).toBe('spiritual_weapon');
+
+      const healing = domainsData.find(d => d.name === 'Healing');
+      expect(healing?.spellIds?.[4]).toBe('mass_cure_light_wounds');
+      expect(healing?.spellIds?.[8]).toBe('mass_heal');
+    });
+
+    it('should load supplemental domain spells from Excel workbook with classLevels & domainLevels', () => {
       expect(suppSpellsData.length).toBeGreaterThan(200);
 
       suppSpellsData.forEach(sp => {
@@ -152,6 +213,8 @@ describe('D&D 3.5e Spells Engine & Data Verification', () => {
         expect(sp.excelOrigin.sheet).toBe('Domains');
         expect(sp.domains.length).toBeGreaterThan(0);
         expect(sp.levels).toBeDefined();
+        expect(sp.classLevels).toBeDefined();
+        expect(sp.domainLevels).toBeDefined();
       });
     });
   });
@@ -506,50 +569,94 @@ describe('D&D 3.5e Spells Engine & Data Verification', () => {
 
   describe('Domain Spell Slot Resolution (getAvailableSpellsForSlot)', () => {
     const mockDomains: any[] = [
-      { id: 'sun', name: 'Sun', power: 'Turn undead', spells: ['Endure Elements', 'Heat Metal'] },
-      { id: 'war', name: 'War', power: 'Free martial proficiency', spells: ['Magic Weapon', 'Spiritual Weapon'] }
+      {
+        id: 'sun',
+        name: 'Sun',
+        power: 'Turn undead',
+        spells: ['Endure Elements', 'Heat Metal'],
+        spellIds: ['endure_elements', 'heat_metal']
+      },
+      {
+        id: 'war',
+        name: 'War',
+        power: 'Free martial proficiency',
+        spells: ['Magic Weapon', 'Spiritual Weapon'],
+        spellIds: ['magic_weapon', 'spiritual_weapon']
+      }
     ];
 
     const mockSpells: any[] = [
       {
         id: 'magic_weapon',
         name: 'Magic Weapon',
-        levels: { Cleric: 1, War: 1, Paladin: 1 }
+        levels: { Cleric: 1, War: 1, Paladin: 1 },
+        classLevels: { Cleric: 1, Paladin: 1 },
+        domainLevels: { War: 1 }
       },
       {
         id: 'warmage_edge_spell',
         name: 'Fist of Stone',
-        levels: { Warmage: 1, Sorcerer: 1 }
+        levels: { Warmage: 1, Sorcerer: 1 },
+        classLevels: { Warmage: 1, Sorcerer: 1 },
+        domainLevels: {}
       },
       {
         id: 'beguiler_spell',
         name: 'Whelm',
-        levels: { Beguiler: 1 }
+        levels: { Beguiler: 1 },
+        classLevels: { Beguiler: 1 },
+        domainLevels: {}
+      },
+      {
+        id: 'duskblade_spell',
+        name: 'Blade of Blood',
+        levels: { Duskblade: 1 },
+        classLevels: { Duskblade: 1 },
+        domainLevels: {}
       },
       {
         id: 'endure_elements',
         name: 'Endure Elements',
-        levels: { Cleric: 1, Sun: 1, Druid: 1, Paladin: 1 }
+        levels: { Cleric: 1, Sun: 1, Druid: 1, Paladin: 1 },
+        classLevels: { Cleric: 1, Druid: 1, Paladin: 1 },
+        domainLevels: { Sun: 1 }
+      },
+      {
+        id: 'entangle',
+        name: 'Entangle',
+        levels: { Druid: 1, Plant: 1 },
+        classLevels: { Druid: 1 },
+        domainLevels: { Plant: 1 }
       }
     ];
 
-    it('returns spells matching character selected domains', () => {
+    it('returns spells matching character selected domains via getAvailableSpellsForSlot', () => {
       const char = { selectedDomains: ['War'] } as any;
-      const available = getAvailableSpellsForPreparation(
-        'Cleric',
-        1,
+      const domainSlot = {
+        id: 'cleric_lvl1_domain_0',
+        className: 'Cleric',
+        classId: 'cleric',
+        spellLevel: 1,
+        slotIndex: 0,
+        spellId: null,
+        isDomain: true
+      };
+
+      const available = getAvailableSpellsForSlot(
+        domainSlot,
         char,
         mockSpells,
-        mockDomains,
-        true // isDomainSlot
+        mockDomains
       );
 
       expect(available.some(s => s.name === 'Magic Weapon')).toBe(true);
+      expect(available.some(s => s.name === 'Endure Elements')).toBe(false);
       expect(available.some(s => s.name === 'Fist of Stone')).toBe(false);
       expect(available.some(s => s.name === 'Whelm')).toBe(false);
+      expect(available.some(s => s.name === 'Blade of Blood')).toBe(false);
     });
 
-    it('does NOT treat non-core classes (Warmage, Beguiler) as domains in domain slot fallback', () => {
+    it('does NOT treat non-core classes (Warmage, Beguiler, Duskblade) as domains in domain slot fallback', () => {
       // Character has no selected domains yet -> fallback triggers
       const char = { selectedDomains: [] } as any;
       const available = getAvailableSpellsForPreparation(
@@ -561,13 +668,193 @@ describe('D&D 3.5e Spells Engine & Data Verification', () => {
         true // isDomainSlot
       );
 
-      // Warmage & Beguiler spells must NOT be returned as domain spells
+      // Warmage, Beguiler & Duskblade spells must NEVER be returned as domain spells
       expect(available.some(s => s.name === 'Fist of Stone')).toBe(false);
       expect(available.some(s => s.name === 'Whelm')).toBe(false);
+      expect(available.some(s => s.name === 'Blade of Blood')).toBe(false);
 
-      // Spells that are on true domain lists should be included
+      // Spells on true domain lists should be included
       expect(available.some(s => s.name === 'Magic Weapon')).toBe(true);
       expect(available.some(s => s.name === 'Endure Elements')).toBe(true);
+    });
+
+    it('strictly isolates class slots from domain slots for Gestalt characters (Cleric / Druid)', () => {
+      const gestaltChar = {
+        selectedDomains: ['War'],
+        classes: [
+          { name: 'Cleric', level: 3 },
+          { name: 'Druid', level: 3 }
+        ]
+      } as any;
+
+      const druidRegularSlot = {
+        id: 'druid_lvl1_slot_0',
+        className: 'Druid',
+        classId: 'druid',
+        spellLevel: 1,
+        slotIndex: 0,
+        spellId: null,
+        isDomain: false
+      };
+
+      const clericRegularSlot = {
+        id: 'cleric_lvl1_slot_0',
+        className: 'Cleric',
+        classId: 'cleric',
+        spellLevel: 1,
+        slotIndex: 0,
+        spellId: null,
+        isDomain: false
+      };
+
+      const clericDomainSlot = {
+        id: 'cleric_lvl1_domain_0',
+        className: 'Cleric',
+        classId: 'cleric',
+        spellLevel: 1,
+        slotIndex: 0,
+        spellId: null,
+        isDomain: true
+      };
+
+      // Druid regular slot:
+      // - Must contain Entangle (Druid 1) and Endure Elements (Druid 1)
+      // - Must NOT contain Magic Weapon (War 1 / Cleric 1, but NOT Druid)
+      const druidAvailable = getAvailableSpellsForSlot(
+        druidRegularSlot,
+        gestaltChar,
+        mockSpells,
+        mockDomains
+      );
+      expect(druidAvailable.some(s => s.name === 'Entangle')).toBe(true);
+      expect(druidAvailable.some(s => s.name === 'Endure Elements')).toBe(true);
+      expect(druidAvailable.some(s => s.name === 'Magic Weapon')).toBe(false);
+
+      // Cleric regular slot:
+      // - Must contain Magic Weapon (Cleric 1) and Endure Elements (Cleric 1)
+      // - Must NOT contain Entangle (Druid only)
+      const clericRegularAvailable = getAvailableSpellsForSlot(
+        clericRegularSlot,
+        gestaltChar,
+        mockSpells,
+        mockDomains
+      );
+      expect(clericRegularAvailable.some(s => s.name === 'Magic Weapon')).toBe(true);
+      expect(clericRegularAvailable.some(s => s.name === 'Endure Elements')).toBe(true);
+      expect(clericRegularAvailable.some(s => s.name === 'Entangle')).toBe(false);
+
+      // Cleric domain slot:
+      // - Must contain Magic Weapon (War domain)
+      // - Must NOT contain Endure Elements (Sun domain, not selected)
+      // - Must NOT contain Entangle
+      const clericDomainAvailable = getAvailableSpellsForSlot(
+        clericDomainSlot,
+        gestaltChar,
+        mockSpells,
+        mockDomains
+      );
+      expect(clericDomainAvailable.some(s => s.name === 'Magic Weapon')).toBe(true);
+      expect(clericDomainAvailable.some(s => s.name === 'Endure Elements')).toBe(false);
+      expect(clericDomainAvailable.some(s => s.name === 'Entangle')).toBe(false);
+    });
+
+    it('maintains backward compatibility with legacy slot definitions without classId / domainId', () => {
+      // Legacy slots created before Sprint 5 without classId or domainId
+      const legacySlots = [
+        {
+          id: 'cleric_lvl1_slot_0',
+          className: 'Cleric',
+          spellLevel: 1,
+          slotIndex: 0,
+          spellId: 'bless',
+          spellName: 'Bless',
+          isDomain: false,
+          isCast: false
+        },
+        {
+          id: 'cleric_lvl1_domain_0',
+          className: 'Cleric',
+          spellLevel: 1,
+          slotIndex: 0,
+          spellId: null,
+          isDomain: true,
+          isCast: false
+        }
+      ];
+
+      // Reconcile and synchronize
+      const synced = syncPreparedSlotsForCharacter('Cleric', 1, 3, ['War'], legacySlots as any);
+      const regularSlot = synced.find(s => s.id === 'cleric_lvl1_slot_0');
+      const domainSlot = synced.find(s => s.id === 'cleric_lvl1_domain_0');
+
+      expect(regularSlot).toBeDefined();
+      expect(regularSlot?.classId).toBe('cleric');
+      expect(regularSlot?.spellId).toBe('bless');
+
+      expect(domainSlot).toBeDefined();
+      expect(domainSlot?.classId).toBe('cleric');
+      expect(domainSlot?.isDomain).toBe(true);
+
+      // Assign spell with domainId
+      const assigned = assignPreparedSpellSlot(synced, 'cleric_lvl1_domain_0', {
+        id: 'magic_weapon',
+        name: 'Magic Weapon',
+        domainId: 'war'
+      });
+      const assignedDomainSlot = assigned.find(s => s.id === 'cleric_lvl1_domain_0');
+      expect(assignedDomainSlot?.spellId).toBe('magic_weapon');
+      expect(assignedDomainSlot?.domainId).toBe('war');
+
+      // Clear slot
+      const cleared = clearPreparedSpellSlot(assigned, 'cleric_lvl1_domain_0');
+      const clearedDomainSlot = cleared.find(s => s.id === 'cleric_lvl1_domain_0');
+      expect(clearedDomainSlot?.spellId).toBeNull();
+      expect(clearedDomainSlot?.domainId).toBeUndefined();
+    });
+
+    it('maintains backward compatibility with legacy spells having only .levels map', () => {
+      const legacySpells: any[] = [
+        {
+          id: 'legacy_cure',
+          name: 'Legacy Cure',
+          levels: { Cleric: 1, Healing: 1 }
+        },
+        {
+          id: 'legacy_smite',
+          name: 'Legacy Smite',
+          levels: { Paladin: 1, Destruction: 1 }
+        }
+      ];
+
+      // Resolves class level via getSpellLevelForClass fallback
+      expect(getSpellLevelForClass(legacySpells[0], 'Cleric')).toBe(1);
+      expect(getSpellLevelForClass(legacySpells[1], 'Paladin')).toBe(1);
+      expect(getSpellLevelForClass(legacySpells[0], 'Wizard')).toBeUndefined();
+
+      // Resolves domain level via getSpellLevelForDomain fallback
+      expect(getSpellLevelForDomain(legacySpells[0], 'Healing')).toBe(1);
+      expect(getSpellLevelForDomain(legacySpells[1], 'Destruction')).toBe(1);
+      expect(getSpellLevelForDomain(legacySpells[0], 'War')).toBeUndefined();
+
+      // Resolves domain slot available spells
+      const char = { selectedDomains: ['Healing'] } as any;
+      const domainSlot = {
+        id: 'cleric_lvl1_domain_0',
+        className: 'Cleric',
+        spellLevel: 1,
+        slotIndex: 0,
+        spellId: null,
+        isDomain: true
+      };
+
+      const available = getAvailableSpellsForSlot(
+        domainSlot,
+        char,
+        legacySpells,
+        [{ id: 'healing', name: 'Healing', power: '', spells: ['Legacy Cure'] } as any]
+      );
+      expect(available.some(s => s.name === 'Legacy Cure')).toBe(true);
+      expect(available.some(s => s.name === 'Legacy Smite')).toBe(false);
     });
   });
 });

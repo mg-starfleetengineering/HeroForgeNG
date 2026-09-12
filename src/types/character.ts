@@ -690,6 +690,7 @@ export interface DomainData {
   name: string;
   power: string;
   spells: string[];
+  spellIds?: string[];
   source?: string;
 }
 
@@ -700,6 +701,8 @@ export interface SpellData {
   subschool?: string | null;
   descriptors?: string[];
   levels: Record<string, number>;
+  classLevels?: Record<string, number>;
+  domainLevels?: Record<string, number>;
   components?: string;
   castingTime: string;
   range: string;
@@ -714,6 +717,8 @@ export interface SpellData {
 export interface PreparedSpellSlot {
   id: string; // unique slot identifier (e.g. "Wizard_1_0" or "Cleric_domain_2_0")
   className: string; // e.g. "Wizard", "Cleric", "Druid", "Paladin", "Ranger"
+  classId?: string; // canonical class ID (e.g. "cleric", "wizard", "druid")
+  domainId?: string; // canonical domain ID (e.g. "water", "sun") if domain slot
   spellLevel: number; // 0 to 9
   slotIndex: number; // 0-based index of slot at this level
   spellId: string | null; // spell ID or null if unassigned
@@ -740,6 +745,8 @@ export interface SupplementalDomainSpellData {
   };
   domains: SupplementalDomainGrant[];
   levels: Record<string, number>;
+  classLevels?: Record<string, number>;
+  domainLevels?: Record<string, number>;
 }
 
 
