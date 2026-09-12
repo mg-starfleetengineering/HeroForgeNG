@@ -206,7 +206,7 @@ export function resolveWeapon(
   customWeapons: WeaponData[] = [],
   weaponsData: WeaponData[] = []
 ): WeaponData {
-  if (!rawName || !rawName.trim()) {
+  if (!rawName || !rawName.trim() || rawName.trim().toLowerCase() === 'none') {
     return normalizeWeapon(DEFAULT_WEAPON);
   }
 
@@ -1081,7 +1081,7 @@ export function resolveEquippedWeapon(
   const eq = character.equipment;
   const slotName = eq?.[slot];
   if (!slotName || slotName === 'none') {
-    return resolveWeapon('none', customWeapons, weaponsData);
+    return normalizeWeapon(DEFAULT_WEAPON);
   }
   const idKey = `${slot}ItemId` as keyof Equipment;
   const itemId = eq[idKey] as string | undefined;

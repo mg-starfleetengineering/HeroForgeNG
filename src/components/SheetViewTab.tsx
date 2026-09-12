@@ -298,7 +298,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const smiteDmgBonus = tcState.smiteEvil ? Math.max(1, paladinLevel) : 0;
 
   // 1. Primary Weapon
-  if (eq.primaryWeapon) {
+  if (eq.primaryWeapon && eq.primaryWeapon !== 'none') {
     const primaryWpn = resolveEquippedWeapon(character, 'primaryWeapon', weaponsData, customWeapons);
     const primaryQualities = (eq.primaryWeaponQualities && eq.primaryWeaponQualities.length > 0) ? eq.primaryWeaponQualities : (primaryWpn.specialQualities || []);
     const primarySpecialDmg = getWeaponSpecialDamage(primaryQualities);
