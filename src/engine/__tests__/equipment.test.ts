@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   calculateTotalCarriedWeight, isItemInInventory, ensureEquippedItemInInventory,
   syncEquippedItemsToInventory, matchesItemName, resolveWeapon, getThemedWeaponBase,
-  resolveArmor, resolveShield, createInventoryWeapon, createInventoryArmor, createInventoryShield
+  resolveArmor, resolveShield, createInventoryWeapon, createInventoryArmor, createInventoryShield,
+  calculateFeatCombatBonuses
 } from '../equipment';
 import { CharacterState, InventoryItem } from '../../types/character';
 
@@ -474,6 +475,83 @@ describe('equipment engine & inventory sync', () => {
     // Weight should be exactly 50 + 15 + 4 + 1 = 70 lbs, not 140 lbs
     const weight = calculateTotalCarriedWeight(charWithIds, []);
     expect(weight).toBe(70);
+  });
+
+  describe('calculateFeatCombatBonuses with precision weapon matching', () => {
+    it('applies Weapon Focus and Specialization to exact weapon matches and aliases', () => {
+      const char = {
+        selectedFeats: [
+          'Weapon Focus (Longsword)',
+          'Weapon Specialization (Longsword)',
+          'Greater Weapon Focus (Greatsword)',
+          'Weapon Focus (Longbow)',
+          'Weapon Focus (Claw)'
+        ]
+      } as unknown as CharacterState;
+
+      // Exact match
+      const longsword = { name: 'Longsword' } as any;
+      const lsBonuses = calculateFeatCombatBonuses(char, longsword);
+      expect(lsBonuses.attackBonus).toBe(1);
+      expect(lsBonuses.damageBonus).toBe(2);
+
+      // Magic weapon with prefix
+      const magicLs = { name: '+1 Flaming Longsword' } as any;
+      const magicLsBonuses = calculateFeatCombatBonuses(char, magicLs);
+      expect(magicLsBonuses.attackBonus).toBe(1);
+      expect(magicLsBonuses.damageBonus).toBe(2);
+
+      // Themed aliased weapon matching base model
+      const nodachi = { name: 'Nodachi (Greatsword)' } as any;
+      const nodachiBonuses = calculateFeatCombatBonuses(char, nodachi);
+      expect(nodachiBonuses.attackBonus).toBe(1); // from Greater Weapon Focus (Greatsword)
+
+      // Bare themed weapon name matching base model via map
+      const bareNodachi = { name: 'Nodachi' } as any;
+      const bareNodachiBonuses = calculateFeatCombatBonuses(char, bareNodachi);
+      expect(bareNodachiBonuses.attackBonus).toBe(1); // from Greater Weapon Focus (Greatsword)
+
+      // Composite bow equivalence
+      const compLongbow = { name: 'Composite Longbow' } as any;
+      const bowBonuses = calculateFeatCombatBonuses(char, compLongbow);
+      expect(bowBonuses.attackBonus).toBe(1);
+
+      // Natural weapon count suffix
+      const claw = { name: 'Claw (2x)' } as any;
+      const clawBonuses = calculateFeatCombatBonuses(char, claw);
+      expect(clawBonuses.attackBonus).toBe(1);
+    });
+
+    it('does NOT apply feat bonuses to different weapons in the same broad name family', () => {
+      const char = {
+        selectedFeats: [
+          'Weapon Focus (Longsword)',
+          'Weapon Focus (Battleaxe)',
+          'Weapon Focus (Heavy Mace)',
+          'Weapon Focus (Bow)'
+        ]
+      } as unknown as CharacterState;
+
+      // Nodachi (Greatsword) is a Greatsword, NOT a Longsword: Weapon Focus (Longsword) must NOT apply
+      const nodachi = { name: 'Nodachi (Greatsword)' } as any;
+      const nodachiBonuses = calculateFeatCombatBonuses(char, nodachi);
+      expect(nodachiBonuses.attackBonus).toBe(0);
+
+      // Greataxe should not match Battleaxe focus
+      const greataxe = { name: 'Greataxe' } as any;
+      const gaBonuses = calculateFeatCombatBonuses(char, greataxe);
+      expect(gaBonuses.attackBonus).toBe(0);
+
+      // Light Mace should not match Heavy Mace focus
+      const lightMace = { name: 'Light Mace' } as any;
+      const lmBonuses = calculateFeatCombatBonuses(char, lightMace);
+      expect(lmBonuses.attackBonus).toBe(0);
+
+      // Crossbow should not match generic Bow focus
+      const crossbow = { name: 'Heavy Crossbow' } as any;
+      const xbowBonuses = calculateFeatCombatBonuses(char, crossbow);
+      expect(xbowBonuses.attackBonus).toBe(0);
+    });
   });
 });
 

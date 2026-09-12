@@ -359,4 +359,76 @@ describe('Wild Shape Engine & Form Manager', () => {
       expect(getSizeAcModifier('Small')).toBe(1);
     });
   });
+
+  describe('Natural Attack Damage Types', () => {
+    it('accurately resolves damage types for catalog wildshape forms', () => {
+      const char = createBaseCharacter({ wildShape: { isActive: true, selectedFormId: 'wolf' } });
+      const wolfForm = formsData.find(f => f.id === 'wolf')!;
+      const wolfAttacks = calculateWildShapeAttacks(char, wolfForm, 6, 1, 2, defaultTcState);
+
+      // Wolf Bite -> Piercing/Slashing
+      expect(wolfAttacks[0].type).toBe('Piercing/Slashing');
+
+      const bearForm = formsData.find(f => f.id === 'black_bear')!;
+      const bearAttacks = calculateWildShapeAttacks(char, bearForm, 6, 4, 1, defaultTcState);
+
+      // Black Bear Claw -> Slashing, Bite -> Piercing/Slashing
+      expect(bearAttacks[0].type).toBe('Slashing');
+      expect(bearAttacks[1].type).toBe('Piercing/Slashing');
+    });
+
+    it('falls back to D&D 3.5e natural attack heuristic for custom attacks without explicit damageType', () => {
+      const char = createBaseCharacter({ wildShape: { isActive: true, selectedFormId: 'custom' } });
+      const testForm: WildShapeFormData = {
+        id: 'test_beast',
+        name: 'Test Beast',
+        category: 'animal',
+        size: 'Large',
+        creatureType: 'Animal',
+        minDruidLevel: 5,
+        str: 18,
+        dex: 12,
+        con: 14,
+        naturalArmor: 3,
+        speed: { land: 40 },
+        attacks: [
+          { name: 'Hoof', damage: '1d6', isPrimary: true },
+          { name: 'Tail Slap', damage: '1d8', isPrimary: false },
+          { name: 'Sting', damage: '1d4', isPrimary: false },
+          { name: 'Gore', damage: '1d8', isPrimary: false },
+          { name: 'Slam', damage: '1d6', isPrimary: false }
+        ]
+      };
+
+      const attacks = calculateWildShapeAttacks(char, testForm, 6, 4, 1, defaultTcState);
+      expect(attacks[0].type).toBe('Bludgeoning'); // Hoof
+      expect(attacks[1].type).toBe('Bludgeoning'); // Tail Slap
+      expect(attacks[2].type).toBe('Piercing');    // Sting
+      expect(attacks[3].type).toBe('Piercing/Slashing'); // Gore
+      expect(attacks[4].type).toBe('Bludgeoning'); // Slam
+    });
+
+    it('honors explicit damageType overrides on attacks', () => {
+      const char = createBaseCharacter({ wildShape: { isActive: true, selectedFormId: 'custom' } });
+      const testForm: WildShapeFormData = {
+        id: 'override_beast',
+        name: 'Override Beast',
+        category: 'magical beast',
+        size: 'Medium',
+        creatureType: 'Magical Beast',
+        minDruidLevel: 5,
+        str: 16,
+        dex: 14,
+        con: 14,
+        naturalArmor: 2,
+        speed: { land: 30 },
+        attacks: [
+          { name: 'Tentacle', damage: '1d4', isPrimary: true, damageType: 'Bludgeoning/Piercing' }
+        ]
+      };
+
+      const attacks = calculateWildShapeAttacks(char, testForm, 6, 3, 2, defaultTcState);
+      expect(attacks[0].type).toBe('Bludgeoning/Piercing');
+    });
+  });
 });
