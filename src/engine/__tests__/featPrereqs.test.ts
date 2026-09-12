@@ -5,10 +5,19 @@ import {
   evaluateFeatPrerequisitesWithContext,
   splitPrerequisiteClauses,
   normalizeFeatName,
-  aggregateAndDeduplicateFeats
+  aggregateAndDeduplicateFeats,
+  featNameToId,
+  parseFeatPrerequisiteClause,
+  matchesFeatTarget,
+  migrateLegacyFeatStrings,
+  parseLegacyFeatString,
+  compilePrerequisiteClause,
+  compileFeatPrerequisites,
+  evaluateStructuredRule,
+  evaluatePrereqClauseAST
 } from '../featPrereqs';
 import { isItemSourceAllowed, getAllSourceBadges } from '../../utils/sourceFilter';
-import { CharacterState, FeatData, ClassData, RaceData } from '../../types/character';
+import { CharacterState, FeatData, ClassData, RaceData, CharacterFeat } from '../../types/character';
 
 const MOCK_CLASSES: ClassData[] = [
   {
@@ -661,6 +670,442 @@ describe('Feat Prerequisite Validator Engine', () => {
       expect(tunnel?.prerequisites).toBe('Base attack bonus +1');
       expect(tunnel?.sources).toEqual(expect.arrayContaining(['PH', 'Ds']));
       expect(tunnel?.description).toContain('squeezing');
+    });
+  });
+
+  describe('Sprint 4: migrateLegacyFeatStrings helper', () => {
+    it('parses weapon feats with parenthetical and colon targets', () => {
+      const entities = migrateLegacyFeatStrings([
+        'Weapon Focus (Longsword)',
+        'Weapon Specialization: Nodachi',
+        'Greater Weapon Focus (Greatsword)'
+      ]);
+
+      expect(entities).toHaveLength(3);
+      expect(entities[0]).toMatchObject({
+        featId: 'weapon_focus',
+        targetId: 'longsword',
+        targetType: 'weapon'
+      });
+      expect(entities[1]).toMatchObject({
+        featId: 'weapon_specialization',
+        targetId: 'nodachi',
+        targetType: 'weapon'
+      });
+      expect(entities[2]).toMatchObject({
+        featId: 'greater_weapon_focus',
+        targetId: 'greatsword',
+        targetType: 'weapon'
+      });
+    });
+
+    it('parses school, skill, and energy targeted feats', () => {
+      const entities = migrateLegacyFeatStrings([
+        'Spell Focus (Evocation)',
+        'Greater Spell Focus (Necromancy)',
+        'Skill Focus (Spot)',
+        'Energy Substitution (Fire)'
+      ]);
+
+      expect(entities).toHaveLength(4);
+      expect(entities[0]).toMatchObject({
+        featId: 'spell_focus',
+        targetId: 'evocation',
+        targetType: 'school'
+      });
+      expect(entities[1]).toMatchObject({
+        featId: 'greater_spell_focus',
+        targetId: 'necromancy',
+        targetType: 'school'
+      });
+      expect(entities[2]).toMatchObject({
+        featId: 'skill_focus',
+        targetId: 'spot',
+        targetType: 'skill'
+      });
+      expect(entities[3]).toMatchObject({
+        featId: 'energy_substitution',
+        targetId: 'fire',
+        targetType: 'energy'
+      });
+    });
+
+    it('parses armor proficiencies and untargeted feats', () => {
+      const entities = migrateLegacyFeatStrings([
+        'Armor Proficiency (light)',
+        'Armor Proficiency (medium)',
+        'Power Attack',
+        'Cleave'
+      ]);
+
+      expect(entities).toHaveLength(4);
+      expect(entities[0].featId).toBe('armor_proficiency_light');
+      expect(entities[1].featId).toBe('armor_proficiency_medium');
+      expect(entities[2]).toMatchObject({
+        featId: 'power_attack'
+      });
+      expect(entities[2].targetId).toBeUndefined();
+      expect(entities[3]).toMatchObject({
+        featId: 'cleave'
+      });
+    });
+
+    it('migrates a CharacterState object and deduplicates entries', () => {
+      const char = {
+        selectedFeats: ['Power Attack', 'Weapon Focus (Longsword)', 'Power Attack']
+      } as unknown as CharacterState;
+
+      const result = migrateLegacyFeatStrings(char);
+      expect(result).toHaveLength(2);
+      expect(char.selectedFeatEntities).toHaveLength(2);
+      expect(char.selectedFeatEntities?.map(e => e.featId)).toEqual(['power_attack', 'weapon_focus']);
+    });
+  });
+
+  describe('Sprint 4: Feat Entity Model & Prerequisite Matching', () => {
+    it('qualifies when character has matching featId and matching targetId', () => {
+      const char = createBaseCharacter({
+        selectedFeatEntities: [
+          { id: '1', featId: 'weapon_focus', targetId: 'longsword', targetType: 'weapon' }
+        ]
+      });
+
+      const feat: FeatData = {
+        id: 'special_ls_feat',
+        name: 'Longsword Specialist',
+        prerequisites: 'Weapon Focus (Longsword)',
+        description: 'Special bonus'
+      };
+
+      const res = evaluateFeatPrerequisites(feat, char, MOCK_CLASSES, MOCK_RACES);
+      expect(res.isQualified).toBe(true);
+      expect(res.satisfiedPrereqs).toContain('Feat: Weapon Focus (Longsword)');
+    });
+
+    it('fails when character has matching featId but differing targetId', () => {
+      const char = createBaseCharacter({
+        selectedFeatEntities: [
+          { id: '1', featId: 'weapon_focus', targetId: 'dagger', targetType: 'weapon' }
+        ]
+      });
+
+      const feat: FeatData = {
+        id: 'special_ls_feat',
+        name: 'Longsword Specialist',
+        prerequisites: 'Weapon Focus (Longsword)',
+        description: 'Special bonus'
+      };
+
+      const res = evaluateFeatPrerequisites(feat, char, MOCK_CLASSES, MOCK_RACES);
+      expect(res.isQualified).toBe(false);
+      expect(res.unmetPrereqs[0]).toContain('Requires Feat: Weapon Focus (Longsword)');
+    });
+
+    it('evaluates multi-target prerequisite clauses correctly', () => {
+      const hammerChar = createBaseCharacter({
+        selectedFeatEntities: [
+          { id: '1', featId: 'weapon_focus', targetId: 'light hammer', targetType: 'weapon' }
+        ]
+      });
+
+      const swordChar = createBaseCharacter({
+        selectedFeatEntities: [
+          { id: '1', featId: 'weapon_focus', targetId: 'longsword', targetType: 'weapon' }
+        ]
+      });
+
+      const hammerFeat: FeatData = {
+        id: 'hammer_style',
+        name: 'Hammer Style',
+        prerequisites: 'Weapon Focus (warhammer or light hammer)',
+        description: 'Style bonus'
+      };
+
+      expect(evaluateFeatPrerequisites(hammerFeat, hammerChar, MOCK_CLASSES, MOCK_RACES).isQualified).toBe(true);
+      expect(evaluateFeatPrerequisites(hammerFeat, swordChar, MOCK_CLASSES, MOCK_RACES).isQualified).toBe(false);
+    });
+
+    it('evaluates same-target prerequisite clauses with candidate target binding', () => {
+      const ftr8Char = createBaseCharacter({
+        levelProgression: [
+          { level: 1, primaryClass: 'Fighter', hpRoll: 10 },
+          { level: 2, primaryClass: 'Fighter', hpRoll: 6 },
+          { level: 3, primaryClass: 'Fighter', hpRoll: 6 },
+          { level: 4, primaryClass: 'Fighter', hpRoll: 6 },
+          { level: 5, primaryClass: 'Fighter', hpRoll: 6 },
+          { level: 6, primaryClass: 'Fighter', hpRoll: 6 },
+          { level: 7, primaryClass: 'Fighter', hpRoll: 6 },
+          { level: 8, primaryClass: 'Fighter', hpRoll: 6 }
+        ],
+        selectedFeatEntities: [
+          { id: '1', featId: 'weapon_focus', targetId: 'longsword', targetType: 'weapon' }
+        ]
+      });
+
+      const gwf: FeatData = {
+        id: 'greater_weapon_focus',
+        name: 'Greater Weapon Focus',
+        prerequisites: 'Proficient with Weapon, Weapon Focus with Weapon, Fighter level 8+',
+        description: '+1 attack'
+      };
+
+      // When targeting Longsword (matching character's Weapon Focus)
+      const resMatch = evaluateFeatPrerequisites(gwf, ftr8Char, MOCK_CLASSES, MOCK_RACES, [], [], [], 'Longsword');
+      expect(resMatch.isQualified).toBe(true);
+
+      // When targeting Dagger (mismatches character's Weapon Focus)
+      const resMismatch = evaluateFeatPrerequisites(gwf, ftr8Char, MOCK_CLASSES, MOCK_RACES, [], [], [], 'Dagger');
+      expect(resMismatch.isQualified).toBe(false);
+      expect(resMismatch.unmetPrereqs.some(u => u.includes('Dagger'))).toBe(true);
+
+      // When evaluating generally without candidate target specified (character has Weapon Focus in at least one weapon)
+      const resGeneral = evaluateFeatPrerequisites(gwf, ftr8Char, MOCK_CLASSES, MOCK_RACES);
+      expect(resGeneral.isQualified).toBe(true);
+    });
+
+    it('evaluates school-targeted spell feats with candidate target binding', () => {
+      const wizardChar = createBaseCharacter({
+        selectedFeatEntities: [
+          { id: '1', featId: 'spell_focus', targetId: 'evocation', targetType: 'school' }
+        ]
+      });
+
+      const gsf: FeatData = {
+        id: 'greater_spell_focus',
+        name: 'Greater Spell Focus',
+        prerequisites: 'Spell Focus in chosen school',
+        description: '+1 DC'
+      };
+
+      const match = evaluateFeatPrerequisites(gsf, wizardChar, MOCK_CLASSES, MOCK_RACES, [], [], [], 'Evocation');
+      expect(match.isQualified).toBe(true);
+
+      const mismatch = evaluateFeatPrerequisites(gsf, wizardChar, MOCK_CLASSES, MOCK_RACES, [], [], [], 'Necromancy');
+      expect(mismatch.isQualified).toBe(false);
+    });
+
+    it('automatically migrates and validates legacy string selectedFeats with backward compatibility', () => {
+      const legacyChar = createBaseCharacter({
+        levelProgression: [
+          { level: 1, primaryClass: 'Fighter', hpRoll: 10 },
+          { level: 2, primaryClass: 'Fighter', hpRoll: 6 },
+          { level: 3, primaryClass: 'Fighter', hpRoll: 6 },
+          { level: 4, primaryClass: 'Fighter', hpRoll: 6 }
+        ],
+        selectedFeats: ['Weapon Focus (Longsword)', 'Power Attack']
+      });
+
+      const wsFeat: FeatData = {
+        id: 'weapon_specialization',
+        name: 'Weapon Specialization',
+        prerequisites: 'Proficient with weapon, Weapon Focus with weapon, fighter level 4th',
+        description: '+2 damage'
+      };
+
+      const cleaveFeat: FeatData = {
+        id: 'cleave',
+        name: 'Cleave',
+        prerequisites: 'Power Attack, Str 13',
+        description: 'Extra attack on dropped foe'
+      };
+
+      const wsRes = evaluateFeatPrerequisites(wsFeat, legacyChar, MOCK_CLASSES, MOCK_RACES, [], [], [], 'Longsword');
+      expect(wsRes.isQualified).toBe(true);
+
+      const cleaveRes = evaluateFeatPrerequisites(cleaveFeat, legacyChar, MOCK_CLASSES, MOCK_RACES);
+      expect(cleaveRes.isQualified).toBe(true);
+    });
+
+    it('evaluates Ability to cast 2nd-level spells correctly for Acidic Splatter without false class match', () => {
+      const wiz1Char = createBaseCharacter({
+        baseStats: { str: 10, dex: 10, con: 10, int: 14, wis: 10, cha: 10 },
+        levelProgression: [
+          { level: 1, primaryClass: 'Wizard', hpRoll: 4 }
+        ]
+      });
+
+      const acidicSplatter: FeatData = {
+        id: 'acidic_splatter',
+        name: 'Acidic Splatter',
+        prerequisites: 'Ability to cast 2nd-level spells',
+        description: 'Throw orb of acid in place of 2nd level acid spell.'
+      };
+
+      const resWiz1 = evaluateFeatPrerequisites(acidicSplatter, wiz1Char, MOCK_CLASSES, MOCK_RACES);
+      expect(resWiz1.isQualified).toBe(false);
+      expect(resWiz1.unmetPrereqs[0]).toContain('Requires ability to cast level 2 spells (current max: 1)');
+
+      const wiz3Char = createBaseCharacter({
+        baseStats: { str: 10, dex: 10, con: 10, int: 14, wis: 10, cha: 10 },
+        levelProgression: [
+          { level: 1, primaryClass: 'Wizard', hpRoll: 4 },
+          { level: 2, primaryClass: 'Wizard', hpRoll: 4 },
+          { level: 3, primaryClass: 'Wizard', hpRoll: 4 }
+        ]
+      });
+
+      const resWiz3 = evaluateFeatPrerequisites(acidicSplatter, wiz3Char, MOCK_CLASSES, MOCK_RACES);
+      expect(resWiz3.isQualified).toBe(true);
+    });
+  });
+
+  describe('Sprint 4 Phase 2: Prerequisite AST Compiler & Rule Engine', () => {
+    it('compiles atomic clauses into typed FeatPrereqRule objects', () => {
+      // Ability score
+      const strRule = compilePrerequisiteClause('Str 13');
+      expect(strRule.type).toBe('ability_score');
+      expect(strRule.stat).toBe('str');
+      expect(strRule.minValue).toBe(13);
+
+      // BAB
+      const babRule = compilePrerequisiteClause('Base attack bonus +6');
+      expect(babRule.type).toBe('bab');
+      expect(babRule.minValue).toBe(6);
+
+      // Base save
+      const saveRule = compilePrerequisiteClause('Base Fortitude save bonus +2');
+      expect(saveRule.type).toBe('base_save');
+      expect(saveRule.saveType).toBe('fort');
+      expect(saveRule.minValue).toBe(2);
+
+      // Character level
+      const charLvlRule = compilePrerequisiteClause('Character level 6th');
+      expect(charLvlRule.type).toBe('character_level');
+      expect(charLvlRule.minValue).toBe(6);
+
+      // 1st level only
+      const firstLvlRule = compilePrerequisiteClause('1st level only');
+      expect(firstLvlRule.type).toBe('first_level_only');
+
+      // Skill rank
+      const skillRule = compilePrerequisiteClause('Knowledge (religion) 4 ranks');
+      expect(skillRule.type).toBe('skill_rank');
+      expect(skillRule.skillName).toBe('knowledge (religion)');
+      expect(skillRule.minValue).toBe(4);
+
+      // Caster level
+      const clRule = compilePrerequisiteClause('Caster level 3rd');
+      expect(clRule.type).toBe('caster_level');
+      expect(clRule.minValue).toBe(3);
+
+      // Spell level (generic)
+      const spellLvlRule = compilePrerequisiteClause('Ability to cast 2nd-level spells');
+      expect(spellLvlRule.type).toBe('spell_level');
+      expect(spellLvlRule.minValue).toBe(2);
+      expect(spellLvlRule.spellType).toBe('any');
+
+      // Spell level (arcane)
+      const arcaneSpellRule = compilePrerequisiteClause('Ability to cast 1st-level arcane spells');
+      expect(arcaneSpellRule.type).toBe('spell_level');
+      expect(arcaneSpellRule.minValue).toBe(1);
+      expect(arcaneSpellRule.spellType).toBe('arcane');
+
+      // Class level
+      const classRule = compilePrerequisiteClause('Fighter level 4th');
+      expect(classRule.type).toBe('class_level');
+      expect(classRule.className).toBe('fighter');
+      expect(classRule.minValue).toBe(4);
+
+      // Class feature
+      const featureRule = compilePrerequisiteClause('Turn or rebuke undead');
+      expect(featureRule.type).toBe('special_feature');
+      expect(featureRule.featureName).toBe('turn_or_rebuke_undead');
+
+      // Targeted feat
+      const targetedFeatRule = compilePrerequisiteClause('Weapon Focus (Longsword)');
+      expect(targetedFeatRule.type).toBe('feat');
+      expect(targetedFeatRule.featId).toBe('weapon_focus');
+      expect(targetedFeatRule.targetCandidates).toEqual(['longsword']);
+
+      // Same-target requirement
+      const sameTargetRule = compilePrerequisiteClause('Weapon Focus with weapon');
+      expect(sameTargetRule.type).toBe('feat');
+      expect(sameTargetRule.featId).toBe('weapon_focus');
+      expect(sameTargetRule.requiresSameTarget).toBe(true);
+
+      // Untargeted feat
+      const untargetedRule = compilePrerequisiteClause('Power Attack');
+      expect(untargetedRule.type).toBe('feat');
+      expect(untargetedRule.featId).toBe('power_attack');
+    });
+
+    it('compiles complex full prerequisite strings into cached ASTs with AND / OR operators', () => {
+      const complexPrereq = 'Base attack bonus +6 or fighter level 4th, Weapon Focus with weapon';
+      const compiled = compileFeatPrerequisites(complexPrereq);
+
+      expect(compiled.clauses).toHaveLength(2);
+      expect(compiled.clauses[0].operator).toBe('OR');
+      expect(compiled.clauses[0].rules).toHaveLength(2);
+      expect(compiled.clauses[0].rules[0].type).toBe('bab');
+      expect(compiled.clauses[0].rules[0].minValue).toBe(6);
+      expect(compiled.clauses[0].rules[1].type).toBe('class_level');
+      expect(compiled.clauses[0].rules[1].className).toBe('fighter');
+      expect(compiled.clauses[0].rules[1].minValue).toBe(4);
+
+      expect(compiled.clauses[1].operator).toBe('AND');
+      expect(compiled.clauses[1].rules).toHaveLength(1);
+      expect(compiled.clauses[1].rules[0].type).toBe('feat');
+      expect(compiled.clauses[1].rules[0].requiresSameTarget).toBe(true);
+
+      // Memoized global cache
+      const cached = compileFeatPrerequisites(complexPrereq);
+      expect(cached).toBe(compiled);
+    });
+
+    it('evaluates compound OR prerequisite rules deterministically', () => {
+      const featWithOr: FeatData = {
+        id: 'versatile_combatant',
+        name: 'Versatile Combatant',
+        prerequisites: 'Base attack bonus +6 or fighter level 4th',
+        description: 'Test feat with OR prerequisite'
+      };
+
+      // Case 1: Character with BAB +6 but 0 fighter levels (e.g. Rogue 8)
+      const rogue8 = createBaseCharacter({
+        levelProgression: Array(8).fill(null).map((_, i) => ({ level: i + 1, primaryClass: 'Rogue', hpRoll: 6 }))
+      });
+      const resRogue = evaluateFeatPrerequisites(featWithOr, rogue8, MOCK_CLASSES, MOCK_RACES);
+      expect(resRogue.isQualified).toBe(true);
+      expect(resRogue.satisfiedPrereqs[0]).toContain('BAB +6');
+
+      // Case 2: Character with Fighter 4 and BAB +4 (satisfies the second branch)
+      const ftr4 = createBaseCharacter({
+        levelProgression: Array(4).fill(null).map((_, i) => ({ level: i + 1, primaryClass: 'Fighter', hpRoll: 10 }))
+      });
+      const resFtr = evaluateFeatPrerequisites(featWithOr, ftr4, MOCK_CLASSES, MOCK_RACES);
+      expect(resFtr.isQualified).toBe(true);
+      expect(resFtr.satisfiedPrereqs[0]).toContain('Fighter level 4');
+
+      // Case 3: Character with neither (e.g. Wizard 2, BAB +1, Fighter 0)
+      const wiz2 = createBaseCharacter({
+        levelProgression: Array(2).fill(null).map((_, i) => ({ level: i + 1, primaryClass: 'Wizard', hpRoll: 4 }))
+      });
+      const resWiz = evaluateFeatPrerequisites(featWithOr, wiz2, MOCK_CLASSES, MOCK_RACES);
+      expect(resWiz.isQualified).toBe(false);
+      expect(resWiz.unmetPrereqs[0]).toContain('Requires BAB +6');
+      expect(resWiz.unmetPrereqs[0]).toContain('Requires Fighter level 4');
+    });
+
+    it('evaluates multiple structured rules without regex executing at runtime', () => {
+      const multiFeat: FeatData = {
+        id: 'heavy_cleave',
+        name: 'Heavy Cleave',
+        prerequisites: 'Str 13, Power Attack, BAB +1',
+        description: 'Advanced cleave requirement'
+      };
+
+      const char = createBaseCharacter({
+        baseStats: { str: 14, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+        levelProgression: [{ level: 1, primaryClass: 'Fighter', hpRoll: 10 }],
+        selectedFeatEntities: [{ id: 'power_attack', featId: 'power_attack' }]
+      });
+
+      const res = evaluateFeatPrerequisites(multiFeat, char, MOCK_CLASSES, MOCK_RACES);
+      expect(res.isQualified).toBe(true);
+      expect(res.satisfiedPrereqs).toHaveLength(3);
+      expect(res.satisfiedPrereqs).toContain('STR 13');
+      expect(res.satisfiedPrereqs).toContain('Feat: Power Attack');
+      expect(res.satisfiedPrereqs).toContain('BAB +1');
     });
   });
 });

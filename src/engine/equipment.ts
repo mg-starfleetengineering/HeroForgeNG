@@ -477,7 +477,6 @@ export function calculateFeatCombatBonuses(
   let attackBonus = 0;
   let damageBonus = 0;
 
-  const selectedFeats = character.selectedFeats || [];
   const rawWpnName = (weapon.name || '').toLowerCase().trim();
 
   // Strip magic prefixes like "+1 ", "+2 Keen "
@@ -501,29 +500,61 @@ export function calculateFeatCombatBonuses(
     ? cleanWpnName.replace(/^composite\s+/, '').trim()
     : null;
 
+  const wpnId = (weapon.id || '').toLowerCase().trim();
+  const baseWpnId = (weapon.baseWeaponId || '').toLowerCase().trim();
+
+  const isWeaponMatch = (target: string): boolean => {
+    const t = target.toLowerCase().trim();
+    const tWithSpaces = t.replace(/_/g, ' ');
+    const tWithUnderscores = t.replace(/\s+/g, '_');
+    return (
+      t === rawWpnName ||
+      t === cleanWpnName ||
+      t === customSubName ||
+      t === baseSubName ||
+      (baseWithoutComposite !== null && t === baseWithoutComposite) ||
+      tWithSpaces === rawWpnName ||
+      tWithSpaces === cleanWpnName ||
+      tWithSpaces === customSubName ||
+      tWithSpaces === baseSubName ||
+      (baseWithoutComposite !== null && tWithSpaces === baseWithoutComposite) ||
+      (wpnId.length > 0 && (t === wpnId || tWithUnderscores === wpnId)) ||
+      (baseWpnId.length > 0 && (t === baseWpnId || tWithUnderscores === baseWpnId))
+    );
+  };
+
+  const applyBonus = (featNameOrId: string) => {
+    const key = featNameOrId.toLowerCase().replace(/[\s\-]+/g, '_');
+    if (key === 'weapon_focus') attackBonus += 1;
+    if (key === 'greater_weapon_focus') attackBonus += 1;
+    if (key === 'weapon_specialization') damageBonus += 2;
+    if (key === 'greater_weapon_specialization') damageBonus += 2;
+    if (key === 'epic_weapon_focus') attackBonus += 2;
+    if (key === 'epic_weapon_specialization') damageBonus += 4;
+  };
+
+  // 1. Check structured CharacterFeat entities first if present
+  if (Array.isArray(character.selectedFeatEntities) && character.selectedFeatEntities.length > 0) {
+    character.selectedFeatEntities.forEach(entity => {
+      if (!entity.featId || !entity.targetId) return;
+      if (isWeaponMatch(entity.targetId)) {
+        applyBonus(entity.featId);
+      }
+    });
+    return { attackBonus, damageBonus };
+  }
+
+  // 2. Fallback to legacy string parsing
+  const selectedFeats = character.selectedFeats || [];
   selectedFeats.forEach(featStr => {
-    // Parse feat pattern e.g. "Weapon Focus (Nodachi)" or "Weapon Focus: Nodachi"
     const featMatch = featStr.match(/^(.+?)(?:\s*[\(:])\s*(.+?)\)?$/);
     if (!featMatch) return;
 
-    const featName = featMatch[1].trim().toLowerCase();
-    const featTarget = featMatch[2].trim().toLowerCase();
+    const featName = featMatch[1].trim();
+    const featTarget = featMatch[2].trim();
 
-    // Check exact target matches (weapon name, custom alias name, base model, or composite base)
-    const isMatch =
-      featTarget === rawWpnName ||
-      featTarget === cleanWpnName ||
-      featTarget === customSubName ||
-      featTarget === baseSubName ||
-      (baseWithoutComposite !== null && featTarget === baseWithoutComposite);
-
-    if (isMatch) {
-      if (featName === 'weapon focus') attackBonus += 1;
-      if (featName === 'greater weapon focus') attackBonus += 1;
-      if (featName === 'weapon specialization') damageBonus += 2;
-      if (featName === 'greater weapon specialization') damageBonus += 2;
-      if (featName === 'epic weapon focus') attackBonus += 2;
-      if (featName === 'epic weapon specialization') damageBonus += 4;
+    if (isWeaponMatch(featTarget)) {
+      applyBonus(featName);
     }
   });
 
