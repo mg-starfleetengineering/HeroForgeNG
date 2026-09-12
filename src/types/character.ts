@@ -726,6 +726,7 @@ export interface WildShapeAttack {
   isPrimary?: boolean;
   attackCount?: number;
   special?: string;
+  damageType?: string;
 }
 
 export interface WildShapeFormData {

@@ -503,5 +503,72 @@ describe('D&D 3.5e Spells Engine & Data Verification', () => {
       });
     });
   });
+
+  describe('Domain Spell Slot Resolution (getAvailableSpellsForSlot)', () => {
+    const mockDomains: any[] = [
+      { id: 'sun', name: 'Sun', power: 'Turn undead', spells: ['Endure Elements', 'Heat Metal'] },
+      { id: 'war', name: 'War', power: 'Free martial proficiency', spells: ['Magic Weapon', 'Spiritual Weapon'] }
+    ];
+
+    const mockSpells: any[] = [
+      {
+        id: 'magic_weapon',
+        name: 'Magic Weapon',
+        levels: { Cleric: 1, War: 1, Paladin: 1 }
+      },
+      {
+        id: 'warmage_edge_spell',
+        name: 'Fist of Stone',
+        levels: { Warmage: 1, Sorcerer: 1 }
+      },
+      {
+        id: 'beguiler_spell',
+        name: 'Whelm',
+        levels: { Beguiler: 1 }
+      },
+      {
+        id: 'endure_elements',
+        name: 'Endure Elements',
+        levels: { Cleric: 1, Sun: 1, Druid: 1, Paladin: 1 }
+      }
+    ];
+
+    it('returns spells matching character selected domains', () => {
+      const char = { selectedDomains: ['War'] } as any;
+      const available = getAvailableSpellsForPreparation(
+        'Cleric',
+        1,
+        char,
+        mockSpells,
+        mockDomains,
+        true // isDomainSlot
+      );
+
+      expect(available.some(s => s.name === 'Magic Weapon')).toBe(true);
+      expect(available.some(s => s.name === 'Fist of Stone')).toBe(false);
+      expect(available.some(s => s.name === 'Whelm')).toBe(false);
+    });
+
+    it('does NOT treat non-core classes (Warmage, Beguiler) as domains in domain slot fallback', () => {
+      // Character has no selected domains yet -> fallback triggers
+      const char = { selectedDomains: [] } as any;
+      const available = getAvailableSpellsForPreparation(
+        'Cleric',
+        1,
+        char,
+        mockSpells,
+        mockDomains,
+        true // isDomainSlot
+      );
+
+      // Warmage & Beguiler spells must NOT be returned as domain spells
+      expect(available.some(s => s.name === 'Fist of Stone')).toBe(false);
+      expect(available.some(s => s.name === 'Whelm')).toBe(false);
+
+      // Spells that are on true domain lists should be included
+      expect(available.some(s => s.name === 'Magic Weapon')).toBe(true);
+      expect(available.some(s => s.name === 'Endure Elements')).toBe(true);
+    });
+  });
 });
 

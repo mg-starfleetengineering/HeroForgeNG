@@ -478,12 +478,28 @@ export function calculateFeatCombatBonuses(
   let damageBonus = 0;
 
   const selectedFeats = character.selectedFeats || [];
-  const wpnName = weapon.name.toLowerCase();
+  const rawWpnName = (weapon.name || '').toLowerCase().trim();
+
+  // Strip magic prefixes like "+1 ", "+2 Keen "
+  const parsed = parseMagicItemName(rawWpnName);
+  const baseParsedName = (parsed.baseName || rawWpnName).toLowerCase().trim();
+
+  // Strip count suffixes like " (2x)" on natural attacks
+  const cleanWpnName = baseParsedName.replace(/\s*\(\d+x\)$/i, '').trim();
 
   // Extract base model if alias pattern exists, e.g. "Nodachi (Greatsword)" -> "greatsword"
-  const aliasMatch = weapon.name.match(/^(.+?)\s*\((.+?)\)$/);
-  const customSubName = aliasMatch ? aliasMatch[1].trim().toLowerCase() : wpnName;
-  const baseSubName = aliasMatch ? aliasMatch[2].trim().toLowerCase() : wpnName;
+  // or via themed weapon map e.g. "Nodachi" -> "greatsword"
+  const aliasMatch = cleanWpnName.match(/^(.+?)\s*\((.+?)\)$/);
+  const themedBase = getThemedWeaponBase(cleanWpnName);
+  const customSubName = aliasMatch ? aliasMatch[1].trim().toLowerCase() : cleanWpnName;
+  const baseSubName = aliasMatch
+    ? aliasMatch[2].trim().toLowerCase()
+    : (themedBase ? themedBase.toLowerCase() : cleanWpnName);
+
+  // Composite bow equivalence (e.g. Composite Longbow qualifies for Longbow focus)
+  const baseWithoutComposite = cleanWpnName.startsWith('composite ')
+    ? cleanWpnName.replace(/^composite\s+/, '').trim()
+    : null;
 
   selectedFeats.forEach(featStr => {
     // Parse feat pattern e.g. "Weapon Focus (Nodachi)" or "Weapon Focus: Nodachi"
@@ -493,13 +509,13 @@ export function calculateFeatCombatBonuses(
     const featName = featMatch[1].trim().toLowerCase();
     const featTarget = featMatch[2].trim().toLowerCase();
 
-    // Check if target matches custom weapon name, base weapon name, or full string
+    // Check exact target matches (weapon name, custom alias name, base model, or composite base)
     const isMatch =
-      featTarget === wpnName ||
+      featTarget === rawWpnName ||
+      featTarget === cleanWpnName ||
       featTarget === customSubName ||
       featTarget === baseSubName ||
-      wpnName.includes(featTarget) ||
-      featTarget.includes(wpnName);
+      (baseWithoutComposite !== null && featTarget === baseWithoutComposite);
 
     if (isMatch) {
       if (featName === 'weapon focus') attackBonus += 1;

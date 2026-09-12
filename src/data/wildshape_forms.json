@@ -21,10 +21,15 @@
         "damage": "1d6",
         "strMultiplier": 1.5,
         "isPrimary": true,
-        "special": "Trip"
+        "special": "Trip",
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Trip (+1 check)", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Trip (+1 check)",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A swift canine predator known for its deadly tripping bite and scent tracking."
   },
@@ -50,16 +55,21 @@
         "damage": "1d4",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "1d6",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A powerful Medium predator featuring a multiattack routine with two sharp claws and a bite."
   },
@@ -86,17 +96,25 @@
         "damage": "1d6",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "special": "Improved Grab"
+        "special": "Improved Grab",
+        "damageType": "Piercing/Slashing"
       },
       {
         "name": "Claw",
         "damage": "1d3",
         "strMultiplier": 0.5,
         "isPrimary": false,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Slashing"
       }
     ],
-    "specialQualities": ["Pounce", "Improved Grab", "Rake (2x 1d3)", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Pounce",
+      "Improved Grab",
+      "Rake (2x 1d3)",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "An agile hunter capable of pouncing on a charge to make a full attack with rake claws."
   },
@@ -122,17 +140,24 @@
         "damage": "1d6",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "special": "Trip"
+        "special": "Trip",
+        "damageType": "Piercing/Slashing"
       },
       {
         "name": "Claw",
         "damage": "1d2",
         "strMultiplier": 0.5,
         "isPrimary": false,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Slashing"
       }
     ],
-    "specialQualities": ["Sprint (500 ft 1/hr)", "Trip", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Sprint (500 ft 1/hr)",
+      "Trip",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "The fastest land animal, capable of incredible burst sprints and tripping prey with its bite."
   },
@@ -157,23 +182,30 @@
         "name": "Talons",
         "damage": "2d6",
         "strMultiplier": 1.0,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Slashing"
       },
       {
         "name": "Foreclaws",
         "damage": "1d3",
         "strMultiplier": 0.5,
         "isPrimary": false,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "1d6",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Pounce", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Pounce",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A savage raptor dinosaur with a devastating 2d6 talon attack and pounce on a charge."
   },
@@ -199,23 +231,32 @@
         "damage": "1d6",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "1d6",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       },
       {
         "name": "Tail Slap",
         "damage": "1d6",
         "strMultiplier": 0.5,
         "isPrimary": false,
-        "special": "Poison (1d6 Dex / 1d6 Dex, DC 14)"
+        "special": "Poison (1d6 Dex / 1d6 Dex, DC 14)",
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Leaping Pounce", "Poison (DC 14)", "Rake (2x 1d6)", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Leaping Pounce",
+      "Poison (DC 14)",
+      "Rake (2x 1d6)",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual III",
     "description": "An elite combat dinosaur with 4 natural attacks, venomous tail stinger, and leaping pounce."
   },
@@ -240,10 +281,15 @@
         "name": "Gore",
         "damage": "1d8",
         "strMultiplier": 1.5,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Piercing"
       }
     ],
-    "specialQualities": ["Ferocity (fight to -9 HP)", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Ferocity (fight to -9 HP)",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A rugged wild pig that gains tough natural armor (+6) and continues fighting even below 0 HP."
   },
@@ -270,16 +316,22 @@
         "damage": "1d8",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "special": "Improved Grab"
+        "special": "Improved Grab",
+        "damageType": "Piercing/Slashing"
       },
       {
         "name": "Tail Slap",
         "damage": "1d12",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Improved Grab", "Hold Breath", "Low-Light Vision"],
+    "specialQualities": [
+      "Improved Grab",
+      "Hold Breath",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "An amphibious hunter with high Strength (19), strong swimming speed, and powerful grab bite."
   },
@@ -305,10 +357,15 @@
         "damage": "1d6",
         "strMultiplier": 1.5,
         "isPrimary": true,
-        "special": "Trip"
+        "special": "Trip",
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Trip (+3 check)", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Trip (+3 check)",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A trained domestic war hound with +4 natural armor and tripping bite."
   },
@@ -336,16 +393,21 @@
         "damage": "1d4",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "1d4",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Flight 80 ft", "Low-Light Vision"],
+    "specialQualities": [
+      "Flight 80 ft",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A swift avian form providing early 80 ft flight speed and aerial scouting."
   },
@@ -372,16 +434,23 @@
         "damage": "1d2",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "1d3",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Rage (+4 Str, +4 Con, -2 AC)", "Burrow 10 ft", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Rage (+4 Str, +4 Con, -2 AC)",
+      "Burrow 10 ft",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A fierce burrowing creature that can tunnel underground and fly into a rage when damaged."
   },
@@ -409,10 +478,15 @@
         "damage": "1d4",
         "strMultiplier": 1.5,
         "isPrimary": true,
-        "special": "Filth Fever (DC 11)"
+        "special": "Filth Fever (DC 11)",
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Filth Fever", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Filth Fever",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A versatile infiltrator possessing land, climbing, and swimming speeds."
   },
@@ -440,10 +514,16 @@
         "damage": "1d4",
         "strMultiplier": 1.5,
         "isPrimary": true,
-        "special": "Improved Grab"
+        "special": "Improved Grab",
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Improved Grab", "Constrict (1d4+Str)", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Improved Grab",
+      "Constrict (1d4+Str)",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A crushing serpent capable of grappling foes and suffocating them with Constrict damage."
   },
@@ -471,16 +551,23 @@
         "damage": "1d4",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "1d6",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Rage (+4 Str, +4 Con, -2 AC)", "Burrow 10 ft", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Rage (+4 Str, +4 Con, -2 AC)",
+      "Burrow 10 ft",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A tenacious carnivore that burrows through earth and erupts into a furious rage."
   },
@@ -507,16 +594,22 @@
         "strMultiplier": 1.0,
         "isPrimary": true,
         "attackCount": 2,
-        "special": "Improved Grab"
+        "special": "Improved Grab",
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "2d6",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Improved Grab", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Improved Grab",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "The quintessential Large wild shape form with enormous Strength (27), +5 Natural Armor, and Improved Grab."
   },
@@ -544,16 +637,23 @@
         "strMultiplier": 1.0,
         "isPrimary": true,
         "attackCount": 2,
-        "special": "Improved Grab"
+        "special": "Improved Grab",
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "2d6",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Improved Grab", "Cold Resistance", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Improved Grab",
+      "Cold Resistance",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "An arctic apex predator identical in power to the brown bear, plus a 30 ft swim speed."
   },
@@ -580,16 +680,23 @@
         "damage": "1d6",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "1d8",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Rend (2d6+Str)", "10 ft Reach", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Rend (2d6+Str)",
+      "10 ft Reach",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A Large bipedal ape featuring full 10 ft reach, climbing agility, and brutal Rend damage."
   },
@@ -614,10 +721,15 @@
         "name": "Gore",
         "damage": "1d8",
         "strMultiplier": 1.5,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Piercing"
       }
     ],
-    "specialQualities": ["Ferocity (fight to -9 HP)", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Ferocity (fight to -9 HP)",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A massive armored boar with 27 Strength, +6 Natural Armor, and relentless Ferocity."
   },
@@ -643,10 +755,16 @@
         "damage": "1d8",
         "strMultiplier": 1.5,
         "isPrimary": true,
-        "special": "Trip"
+        "special": "Trip",
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Trip (+11 check)", "Speed 50 ft", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Trip (+11 check)",
+      "Speed 50 ft",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A gigantic wolf boasting 25 Strength, 50 ft land speed, and high tripping modifiers."
   },
@@ -673,10 +791,15 @@
         "name": "Bite",
         "damage": "1d8",
         "strMultiplier": 1.5,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Blindsense 40 ft", "Fly 40 ft (good)", "High Dexterity (22)"],
+    "specialQualities": [
+      "Blindsense 40 ft",
+      "Fly 40 ft (good)",
+      "High Dexterity (22)"
+    ],
     "source": "Monster Manual",
     "description": "A Large aerial form with Blindsense 40 ft, 22 Dexterity, and +5 natural armor."
   },
@@ -703,16 +826,24 @@
         "strMultiplier": 1.0,
         "isPrimary": true,
         "attackCount": 2,
-        "special": "Improved Grab"
+        "special": "Improved Grab",
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "1d8",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Pounce", "Improved Grab", "Rake (2x 1d4)", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Pounce",
+      "Improved Grab",
+      "Rake (2x 1d4)",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A Large feline predator with Pounce, Improved Grab, and devastating rake attacks."
   },
@@ -740,16 +871,24 @@
         "strMultiplier": 1.0,
         "isPrimary": true,
         "attackCount": 2,
-        "special": "Improved Grab"
+        "special": "Improved Grab",
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "2d6",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Pounce", "Improved Grab", "Rake (2x 1d8)", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Pounce",
+      "Improved Grab",
+      "Rake (2x 1d8)",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A lethal Large carnivore combining 23 Strength, Pounce, and 1d8 rake claws."
   },
@@ -774,23 +913,31 @@
         "name": "Talons",
         "damage": "2d8",
         "strMultiplier": 1.0,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Slashing"
       },
       {
         "name": "Foreclaws",
         "damage": "1d4",
         "strMultiplier": 0.5,
         "isPrimary": false,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "1d8",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Pounce", "Speed 60 ft", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Pounce",
+      "Speed 60 ft",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A Large apex dinosaur capable of charging at 60 ft speed with a 2d8 talons attack."
   },
@@ -818,10 +965,16 @@
         "damage": "1d8",
         "strMultiplier": 1.5,
         "isPrimary": true,
-        "special": "Improved Grab"
+        "special": "Improved Grab",
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Improved Grab", "Constrict (1d8+Str)", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Improved Grab",
+      "Constrict (1d8+Str)",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A colossal constrictor serpent capable of grappling Huge opponents and suffocating them."
   },
@@ -846,10 +999,16 @@
         "name": "Gore",
         "damage": "2d6",
         "strMultiplier": 1.5,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Piercing"
       }
     ],
-    "specialQualities": ["Powerful Charge (4d6+Str)", "Natural Armor +7", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Powerful Charge (4d6+Str)",
+      "Natural Armor +7",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A heavily plated beast with +7 Natural Armor and a devastating 4d6 Powerful Charge."
   },
@@ -876,16 +1035,24 @@
         "strMultiplier": 1.0,
         "isPrimary": true,
         "attackCount": 2,
-        "special": "Improved Grab"
+        "special": "Improved Grab",
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "2d6",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Pounce", "Improved Grab", "Rake (2x 1d6)", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Pounce",
+      "Improved Grab",
+      "Rake (2x 1d6)",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Frostburn",
     "description": "A prehistoric saber-toothed cat packing 26 Strength and brutal pouncing rake claws."
   },
@@ -908,7 +1075,11 @@
       "flyManeuverability": "good"
     },
     "attacks": [],
-    "specialQualities": ["Blindsense 20 ft", "Fly 40 ft (good)", "Tiny Infiltration"],
+    "specialQualities": [
+      "Blindsense 20 ft",
+      "Fly 40 ft (good)",
+      "Tiny Infiltration"
+    ],
     "source": "Monster Manual",
     "description": "A tiny nocturnal flyer ideal for stealth, covert scouting, and sonar detection."
   },
@@ -934,16 +1105,22 @@
         "damage": "1d2",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "1d3",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Stealth Infiltration", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Stealth Infiltration",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "An inconspicuous urban scout capable of blending in anywhere in civilized settlements."
   },
@@ -970,10 +1147,15 @@
         "name": "Talons",
         "damage": "1d4",
         "strMultiplier": 1.0,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Slashing"
       }
     ],
-    "specialQualities": ["Fly 60 ft", "Spot +8", "Low-Light Vision"],
+    "specialQualities": [
+      "Fly 60 ft",
+      "Spot +8",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A nimble raptor bird granting high Dex (17) and long-range aerial recon."
   },
@@ -1001,10 +1183,15 @@
         "damage": "1d2",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "special": "Poison (1d6 Con / 1d6 Con, DC 10)"
+        "special": "Poison (1d6 Con / 1d6 Con, DC 10)",
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Poison (1d6 Con)", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Poison (1d6 Con)",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A miniature serpent with Constitution-damaging venom for stealth assassinations."
   },
@@ -1031,16 +1218,24 @@
         "strMultiplier": 1.0,
         "isPrimary": true,
         "attackCount": 2,
-        "special": "Improved Grab"
+        "special": "Improved Grab",
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "2d8",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Improved Grab", "10 ft Reach", "Natural Armor +7", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Improved Grab",
+      "10 ft Reach",
+      "Natural Armor +7",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A colossal beast with 31 Strength (+10 mod), Huge size bonuses to Grapple (+8), and +7 natural armor."
   },
@@ -1068,16 +1263,24 @@
         "strMultiplier": 1.0,
         "isPrimary": true,
         "attackCount": 2,
-        "special": "Improved Grab"
+        "special": "Improved Grab",
+        "damageType": "Slashing"
       },
       {
         "name": "Bite",
         "damage": "2d6",
         "strMultiplier": 0.5,
-        "isPrimary": false
+        "isPrimary": false,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Pounce", "Improved Grab", "Rake (2x 2d4)", "10 ft Reach", "Scent"],
+    "specialQualities": [
+      "Pounce",
+      "Improved Grab",
+      "Rake (2x 2d4)",
+      "10 ft Reach",
+      "Scent"
+    ],
     "source": "Monster Manual",
     "description": "A Huge charging cat that pounces with 2d4 claws, bite, and two 2d4 rake attacks."
   },
@@ -1102,17 +1305,24 @@
         "name": "Slam",
         "damage": "2d6",
         "strMultiplier": 1.5,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Bludgeoning"
       },
       {
         "name": "Stamp",
         "damage": "2d6",
         "strMultiplier": 0.5,
         "isPrimary": false,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Trample (2d8+Str, DC 25)", "10 ft Reach", "Natural Armor +7", "Scent"],
+    "specialQualities": [
+      "Trample (2d8+Str, DC 25)",
+      "10 ft Reach",
+      "Natural Armor +7",
+      "Scent"
+    ],
     "source": "Monster Manual",
     "description": "A massive 30 Strength quadruped capable of trampling enemy lines underfoot."
   },
@@ -1137,10 +1347,16 @@
         "name": "Gore",
         "damage": "2d8",
         "strMultiplier": 1.5,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Piercing"
       }
     ],
-    "specialQualities": ["Powerful Charge (4d8+Str)", "Trample (2d12+Str)", "Natural Armor +11", "Low-Light Vision"],
+    "specialQualities": [
+      "Powerful Charge (4d8+Str)",
+      "Trample (2d12+Str)",
+      "Natural Armor +11",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A fortified ceratopsian dinosaur with an unmatched +11 Natural Armor and 4d8 Powerful Charge."
   },
@@ -1166,10 +1382,17 @@
         "damage": "3d6",
         "strMultiplier": 1.5,
         "isPrimary": true,
-        "special": "Improved Grab"
+        "special": "Improved Grab",
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Improved Grab", "Swallow Whole", "10 ft Reach", "Scent", "Low-Light Vision"],
+    "specialQualities": [
+      "Improved Grab",
+      "Swallow Whole",
+      "10 ft Reach",
+      "Scent",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "The king of dinosaurs, delivering a single colossal 3d6 bite that can grab and swallow foes whole."
   },
@@ -1195,10 +1418,17 @@
         "damage": "2d6",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Plant Traits (Immune to crit/poison/sleep)", "Natural Armor +13", "15 ft Reach", "Trample (2d6+Str)", "Double Damage vs Objects"],
+    "specialQualities": [
+      "Plant Traits (Immune to crit/poison/sleep)",
+      "Natural Armor +13",
+      "15 ft Reach",
+      "Trample (2d6+Str)",
+      "Double Damage vs Objects"
+    ],
     "source": "Monster Manual",
     "description": "A towering sentient tree providing +13 Natural Armor, 15 ft Reach, and total plant immunities."
   },
@@ -1226,10 +1456,17 @@
         "strMultiplier": 1.0,
         "isPrimary": true,
         "attackCount": 2,
-        "special": "Improved Grab"
+        "special": "Improved Grab",
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Immunity to Electricity", "Fire Resistance 10", "Improved Grab", "Constrict (2d6+Str)", "Plant Traits"],
+    "specialQualities": [
+      "Immunity to Electricity",
+      "Fire Resistance 10",
+      "Improved Grab",
+      "Constrict (2d6+Str)",
+      "Plant Traits"
+    ],
     "source": "Monster Manual",
     "description": "A dense mass of vegetation with +11 Natural Armor, Constrict, and immunity to electrical damage."
   },
@@ -1254,10 +1491,15 @@
         "name": "Bite",
         "damage": "1d6",
         "strMultiplier": 1.5,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Piercing/Slashing"
       }
     ],
-    "specialQualities": ["Greater Invisibility (Su)", "Plant Traits", "Low-Light Vision"],
+    "specialQualities": [
+      "Greater Invisibility (Su)",
+      "Plant Traits",
+      "Low-Light Vision"
+    ],
     "source": "Monster Manual",
     "description": "A carnivorous fungal creature permanently cloaked in supernatural Greater Invisibility."
   },
@@ -1284,10 +1526,16 @@
         "name": "Slam",
         "damage": "1d4",
         "strMultiplier": 1.5,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Elemental Traits (Immune to crit/flanking/poison)", "Fly 100 ft (perfect)", "Air Mastery", "Whirlwind"],
+    "specialQualities": [
+      "Elemental Traits (Immune to crit/flanking/poison)",
+      "Fly 100 ft (perfect)",
+      "Air Mastery",
+      "Whirlwind"
+    ],
     "source": "Monster Manual",
     "description": "A vortex of living air with 100 ft perfect flight and whirlwind transformation."
   },
@@ -1314,10 +1562,16 @@
         "name": "Slam",
         "damage": "1d6",
         "strMultiplier": 1.5,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Elemental Traits", "Fly 100 ft (perfect)", "Dexterity 21", "Whirlwind"],
+    "specialQualities": [
+      "Elemental Traits",
+      "Fly 100 ft (perfect)",
+      "Dexterity 21",
+      "Whirlwind"
+    ],
     "source": "Monster Manual",
     "description": "A swirling gale with 21 Dexterity and perfect aerial maneuverability."
   },
@@ -1345,10 +1599,17 @@
         "damage": "2d6",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Elemental Traits", "Fly 100 ft (perfect)", "Dexterity 25", "2 Slams", "Whirlwind"],
+    "specialQualities": [
+      "Elemental Traits",
+      "Fly 100 ft (perfect)",
+      "Dexterity 25",
+      "2 Slams",
+      "Whirlwind"
+    ],
     "source": "Monster Manual",
     "description": "A Large vortex boasting 25 Dexterity, 2 powerful Slams, and 10 ft reach."
   },
@@ -1376,10 +1637,17 @@
         "damage": "2d8",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Elemental Traits", "Fly 100 ft (perfect)", "Dexterity 29", "15 ft Reach", "Whirlwind"],
+    "specialQualities": [
+      "Elemental Traits",
+      "Fly 100 ft (perfect)",
+      "Dexterity 29",
+      "15 ft Reach",
+      "Whirlwind"
+    ],
     "source": "Monster Manual",
     "description": "An enormous cyclone of air featuring 29 Dexterity, 15 ft reach, and devastating slam strikes."
   },
@@ -1405,10 +1673,16 @@
         "name": "Slam",
         "damage": "1d6",
         "strMultiplier": 1.5,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Earth Glide (glide through unworked stone)", "Natural Armor +7", "Earth Mastery (+1 Atk/Dmg on ground)", "Elemental Traits"],
+    "specialQualities": [
+      "Earth Glide (glide through unworked stone)",
+      "Natural Armor +7",
+      "Earth Mastery (+1 Atk/Dmg on ground)",
+      "Elemental Traits"
+    ],
     "source": "Monster Manual",
     "description": "Living rock capable of gliding effortlessly through solid stone and earth."
   },
@@ -1434,10 +1708,17 @@
         "name": "Slam",
         "damage": "1d8",
         "strMultiplier": 1.5,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Earth Glide", "Natural Armor +9", "Strength 21", "Earth Mastery", "Elemental Traits"],
+    "specialQualities": [
+      "Earth Glide",
+      "Natural Armor +9",
+      "Strength 21",
+      "Earth Mastery",
+      "Elemental Traits"
+    ],
     "source": "Monster Manual",
     "description": "A dense humanoid figure of stone with 21 Strength and +9 Natural Armor."
   },
@@ -1464,10 +1745,17 @@
         "damage": "2d8",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Earth Glide", "Natural Armor +10", "Strength 25", "10 ft Reach", "Earth Mastery"],
+    "specialQualities": [
+      "Earth Glide",
+      "Natural Armor +10",
+      "Strength 25",
+      "10 ft Reach",
+      "Earth Mastery"
+    ],
     "source": "Monster Manual",
     "description": "A Large stone monolith with 25 Strength, +10 Natural Armor, and 2 crushing Slams."
   },
@@ -1494,10 +1782,17 @@
         "damage": "2d10",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Earth Glide", "Natural Armor +11", "Strength 29", "15 ft Reach", "Earth Mastery"],
+    "specialQualities": [
+      "Earth Glide",
+      "Natural Armor +11",
+      "Strength 29",
+      "15 ft Reach",
+      "Earth Mastery"
+    ],
     "source": "Monster Manual",
     "description": "A towering colossus of living mountain with 29 Strength and 2d10 slam damage."
   },
@@ -1523,10 +1818,17 @@
         "damage": "1d4",
         "strMultiplier": 1.5,
         "isPrimary": true,
-        "special": "Burn (1d4 Fire, DC 11)"
+        "special": "Burn (1d4 Fire, DC 11)",
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Fire Immunity", "Vulnerability to Cold", "Burn (1d4 Fire)", "Speed 50 ft", "Elemental Traits"],
+    "specialQualities": [
+      "Fire Immunity",
+      "Vulnerability to Cold",
+      "Burn (1d4 Fire)",
+      "Speed 50 ft",
+      "Elemental Traits"
+    ],
     "source": "Monster Manual",
     "description": "A swift pillar of flame that ignites enemies with its fiery slam."
   },
@@ -1552,10 +1854,17 @@
         "damage": "1d6",
         "strMultiplier": 1.5,
         "isPrimary": true,
-        "special": "Burn (1d6 Fire, DC 14)"
+        "special": "Burn (1d6 Fire, DC 14)",
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Fire Immunity", "Vulnerability to Cold", "Burn (1d6 Fire)", "Speed 50 ft", "Elemental Traits"],
+    "specialQualities": [
+      "Fire Immunity",
+      "Vulnerability to Cold",
+      "Burn (1d6 Fire)",
+      "Speed 50 ft",
+      "Elemental Traits"
+    ],
     "source": "Monster Manual",
     "description": "A roaring blaze with 50 ft speed, Dexterity 17, and scorching Burn damage."
   },
@@ -1582,10 +1891,17 @@
         "strMultiplier": 1.0,
         "isPrimary": true,
         "attackCount": 2,
-        "special": "Burn (2d6 Fire, DC 18)"
+        "special": "Burn (2d6 Fire, DC 18)",
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Fire Immunity", "Burn (2d6 Fire)", "Dexterity 21", "2 Slams", "10 ft Reach"],
+    "specialQualities": [
+      "Fire Immunity",
+      "Burn (2d6 Fire)",
+      "Dexterity 21",
+      "2 Slams",
+      "10 ft Reach"
+    ],
     "source": "Monster Manual",
     "description": "A Large conflagration delivering 2 Slams with 2d6 Burn and 10 ft reach."
   },
@@ -1612,10 +1928,17 @@
         "strMultiplier": 1.0,
         "isPrimary": true,
         "attackCount": 2,
-        "special": "Burn (2d8 Fire, DC 22)"
+        "special": "Burn (2d8 Fire, DC 22)",
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Fire Immunity", "Burn (2d8 Fire)", "Dexterity 25", "Speed 60 ft", "15 ft Reach"],
+    "specialQualities": [
+      "Fire Immunity",
+      "Burn (2d8 Fire)",
+      "Dexterity 25",
+      "Speed 60 ft",
+      "15 ft Reach"
+    ],
     "source": "Monster Manual",
     "description": "An enormous inferno with 60 ft speed, 25 Dexterity, and 2d8 burn."
   },
@@ -1641,10 +1964,16 @@
         "name": "Slam",
         "damage": "1d6",
         "strMultiplier": 1.5,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Water Mastery (+1 Atk/Dmg in water)", "Swim 90 ft", "Vortex", "Elemental Traits"],
+    "specialQualities": [
+      "Water Mastery (+1 Atk/Dmg in water)",
+      "Swim 90 ft",
+      "Vortex",
+      "Elemental Traits"
+    ],
     "source": "Monster Manual",
     "description": "A cresting wave of aquatic force with 90 ft swim speed and vortex creation."
   },
@@ -1670,10 +1999,16 @@
         "name": "Slam",
         "damage": "1d8",
         "strMultiplier": 1.5,
-        "isPrimary": true
+        "isPrimary": true,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Water Mastery", "Swim 90 ft", "Natural Armor +6", "Vortex"],
+    "specialQualities": [
+      "Water Mastery",
+      "Swim 90 ft",
+      "Natural Armor +6",
+      "Vortex"
+    ],
     "source": "Monster Manual",
     "description": "A surging torrent of living water with +6 Natural Armor and Vortex control."
   },
@@ -1700,10 +2035,17 @@
         "damage": "2d8",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Water Mastery", "Swim 90 ft", "Natural Armor +8", "10 ft Reach", "Vortex"],
+    "specialQualities": [
+      "Water Mastery",
+      "Swim 90 ft",
+      "Natural Armor +8",
+      "10 ft Reach",
+      "Vortex"
+    ],
     "source": "Monster Manual",
     "description": "A Large tidal wave of water delivering 2 Slams with 10 ft reach and 90 ft swim speed."
   },
@@ -1730,10 +2072,17 @@
         "damage": "2d10",
         "strMultiplier": 1.0,
         "isPrimary": true,
-        "attackCount": 2
+        "attackCount": 2,
+        "damageType": "Bludgeoning"
       }
     ],
-    "specialQualities": ["Water Mastery", "Swim 120 ft", "Natural Armor +9", "15 ft Reach", "Vortex"],
+    "specialQualities": [
+      "Water Mastery",
+      "Swim 120 ft",
+      "Natural Armor +9",
+      "15 ft Reach",
+      "Vortex"
+    ],
     "source": "Monster Manual",
     "description": "A tsunami of living sea with 120 ft swim speed, 24 Strength, and 2d10 slams."
   }

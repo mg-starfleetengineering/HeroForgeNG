@@ -340,6 +340,27 @@ export function calculateWildShapeAttacks(
 
     const damageStr = `${atk.damage}${dmgBonus >= 0 ? `+${dmgBonus}` : dmgBonus}`;
 
+    const resolvedType = atk.damageType || (() => {
+      const lower = atk.name.toLowerCase();
+      if (
+        lower.includes('slam') || lower.includes('hoof') || lower.includes('tail') ||
+        lower.includes('tentacle') || lower.includes('constrict') || lower.includes('butt') ||
+        lower.includes('pummel')
+      ) {
+        return 'Bludgeoning';
+      }
+      if (lower.includes('sting') || lower.includes('horn')) {
+        return 'Piercing';
+      }
+      if (lower.includes('bite') || lower.includes('gore')) {
+        return 'Piercing/Slashing';
+      }
+      if (lower.includes('claw') || lower.includes('talon') || lower.includes('pincer')) {
+        return 'Slashing';
+      }
+      return 'Bludgeoning';
+    })();
+
     const pseudoWeapon: WeaponData = {
       id: `ws_nat_${form.id}_${index}`,
       name: `${atk.name}${count > 1 ? ` (${count}x)` : ''}`,
@@ -348,8 +369,7 @@ export function calculateWildShapeAttacks(
       damageM: atk.damage,
       threat: 20,
       critMultiplier: 2,
-      type: atk.name.toLowerCase().includes('slam') ? 'Bludgeoning' :
-            atk.name.toLowerCase().includes('gore') || atk.name.toLowerCase().includes('bite') || atk.name.toLowerCase().includes('talon') ? 'Piercing/Slashing' : 'Slashing',
+      type: resolvedType,
       weight: 0,
       special: atk.special,
       source: form.source || 'Monster Manual'

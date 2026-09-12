@@ -579,13 +579,25 @@ export function getAvailableSpellsForPreparation(
     }
 
     // Fallback if domains not yet selected: return all domain spells at this level
+    const hasDomainsData = domainsData && domainsData.length > 0;
+    const knownDomainNames = hasDomainsData
+      ? new Set(domainsData.flatMap(d => [d.name.toLowerCase().trim(), d.id.toLowerCase().trim()]))
+      : null;
+
     return spellsData.filter(spell => {
       for (const [lvlKey, lvlVal] of Object.entries(spell.levels)) {
-        if (
-          lvlVal === spellLevel &&
-          !['Wizard', 'Sorcerer', 'Cleric', 'Druid', 'Paladin', 'Ranger', 'Bard'].includes(lvlKey)
-        ) {
-          return true;
+        if (lvlVal === spellLevel) {
+          const kLower = lvlKey.toLowerCase().trim();
+          if (knownDomainNames) {
+            if (knownDomainNames.has(kLower)) return true;
+          } else {
+            const nonDomainClasses = [
+              'wizard', 'sorcerer', 'cleric', 'druid', 'paladin', 'ranger', 'bard',
+              'warmage', 'beguiler', 'dread necromancer', 'duskblade', 'hexblade',
+              'favored soul', 'archivist', 'warlock', 'shugenja', 'wu jen', 'healer'
+            ];
+            if (!nonDomainClasses.includes(kLower)) return true;
+          }
         }
       }
       return getSpellLevelForClass(spell, 'Cleric') === spellLevel;
