@@ -833,6 +833,7 @@ export function createInventoryWeapon(
     quantity?: number;
     enhancementBonus?: number;
     specialQualities?: string[];
+    baneTarget?: string;
     location?: string;
   },
   arg3?: WeaponData[] | {
@@ -841,6 +842,7 @@ export function createInventoryWeapon(
     quantity?: number;
     enhancementBonus?: number;
     specialQualities?: string[];
+    baneTarget?: string;
     location?: string;
   },
   arg4?: {
@@ -849,6 +851,7 @@ export function createInventoryWeapon(
     quantity?: number;
     enhancementBonus?: number;
     specialQualities?: string[];
+    baneTarget?: string;
     location?: string;
   }
 ): InventoryItem {
@@ -859,6 +862,7 @@ export function createInventoryWeapon(
     quantity?: number;
     enhancementBonus?: number;
     specialQualities?: string[];
+    baneTarget?: string;
     location?: string;
   } | undefined;
 
@@ -876,6 +880,7 @@ export function createInventoryWeapon(
 
   const enh = options?.enhancementBonus ?? resolved.enhancementBonus ?? 0;
   const qualities = options?.specialQualities ?? resolved.specialQualities ?? [];
+  const baneTarget = options?.baneTarget ?? (resolved as any).baneTarget;
   const name = options?.name || (enh > 0 || qualities.length > 0
     ? formatMagicItemName(resolved.name, enh, qualities)
     : resolved.name);
@@ -890,6 +895,7 @@ export function createInventoryWeapon(
     baseItemId: resolved.id,
     enhancementBonus: enh,
     specialQualities: qualities,
+    baneTarget,
     weaponData: {
       category: resolved.category,
       size: resolved.size,
@@ -899,7 +905,8 @@ export function createInventoryWeapon(
       critMultiplier: resolved.critMultiplier ?? 2,
       damageType: resolved.type,
       rangeIncrement: resolved.rangeIncrement,
-      isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged'
+      isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged',
+      baneTarget
     }
   };
 }
@@ -1084,7 +1091,9 @@ export function resolveEquippedWeapon(
     return normalizeWeapon(DEFAULT_WEAPON);
   }
   const idKey = `${slot}ItemId` as keyof Equipment;
+  const baneKey = `${slot}BaneTarget` as keyof Equipment;
   const itemId = eq[idKey] as string | undefined;
+  const eqBaneTarget = eq[baneKey] as string | undefined;
   if (itemId && character.inventory) {
     const item = character.inventory.find(i => i.id === itemId);
     if (item && item.weaponData) {
@@ -1100,11 +1109,16 @@ export function resolveEquippedWeapon(
         type: item.weaponData.damageType || 'Slashing',
         enhancementBonus: item.enhancementBonus || 0,
         specialQualities: item.specialQualities ? [...item.specialQualities] : [],
+        baneTarget: eqBaneTarget || item.weaponData.baneTarget || item.baneTarget,
         source: 'Custom'
       };
     }
   }
-  return resolveWeapon(slotName, customWeapons, weaponsData);
+  const resolved = resolveWeapon(slotName, customWeapons, weaponsData);
+  if (eqBaneTarget && !resolved.baneTarget) {
+    return { ...resolved, baneTarget: eqBaneTarget };
+  }
+  return resolved;
 }
 
 /**
@@ -1274,10 +1288,16 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
         existing.itemType = 'weapon';
         modified = true;
       }
-      if (updatedEq.primaryWeapon !== existing.name || updatedEq.primaryWeaponEnhancement !== (existing.enhancementBonus || 0)) {
+      const existingBane = existing.weaponData?.baneTarget || existing.baneTarget;
+      if (
+        updatedEq.primaryWeapon !== existing.name ||
+        updatedEq.primaryWeaponEnhancement !== (existing.enhancementBonus || 0) ||
+        updatedEq.primaryWeaponBaneTarget !== existingBane
+      ) {
         updatedEq.primaryWeapon = existing.name;
         updatedEq.primaryWeaponEnhancement = existing.enhancementBonus || 0;
         updatedEq.primaryWeaponQualities = existing.specialQualities || [];
+        updatedEq.primaryWeaponBaneTarget = existingBane;
         modified = true;
       }
     } else {
@@ -1308,13 +1328,18 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
       if ((!existingMatch.specialQualities || existingMatch.specialQualities.length === 0) && updatedEq.primaryWeaponQualities) {
         existingMatch.specialQualities = [...updatedEq.primaryWeaponQualities];
       }
+      if (!existingMatch.weaponData.baneTarget && updatedEq.primaryWeaponBaneTarget) {
+        existingMatch.weaponData.baneTarget = updatedEq.primaryWeaponBaneTarget;
+        existingMatch.baneTarget = updatedEq.primaryWeaponBaneTarget;
+      }
       updatedEq.primaryWeaponItemId = existingMatch.id;
       modified = true;
     } else {
       const newWpn = createInventoryWeapon(resolved, {
         name: updatedEq.primaryWeapon,
         enhancementBonus: updatedEq.primaryWeaponEnhancement,
-        specialQualities: updatedEq.primaryWeaponQualities
+        specialQualities: updatedEq.primaryWeaponQualities,
+        baneTarget: updatedEq.primaryWeaponBaneTarget
       });
       currentInventory.push(newWpn);
       updatedEq.primaryWeaponItemId = newWpn.id;
@@ -1342,10 +1367,16 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
         existing.itemType = 'weapon';
         modified = true;
       }
-      if (updatedEq.secondaryWeapon !== existing.name || updatedEq.secondaryWeaponEnhancement !== (existing.enhancementBonus || 0)) {
+      const existingBane = existing.weaponData?.baneTarget || existing.baneTarget;
+      if (
+        updatedEq.secondaryWeapon !== existing.name ||
+        updatedEq.secondaryWeaponEnhancement !== (existing.enhancementBonus || 0) ||
+        updatedEq.secondaryWeaponBaneTarget !== existingBane
+      ) {
         updatedEq.secondaryWeapon = existing.name;
         updatedEq.secondaryWeaponEnhancement = existing.enhancementBonus || 0;
         updatedEq.secondaryWeaponQualities = existing.specialQualities || [];
+        updatedEq.secondaryWeaponBaneTarget = existingBane;
         modified = true;
       }
     } else {
@@ -1376,13 +1407,18 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
       if ((!existingMatch.specialQualities || existingMatch.specialQualities.length === 0) && updatedEq.secondaryWeaponQualities) {
         existingMatch.specialQualities = [...updatedEq.secondaryWeaponQualities];
       }
+      if (!existingMatch.weaponData.baneTarget && updatedEq.secondaryWeaponBaneTarget) {
+        existingMatch.weaponData.baneTarget = updatedEq.secondaryWeaponBaneTarget;
+        existingMatch.baneTarget = updatedEq.secondaryWeaponBaneTarget;
+      }
       updatedEq.secondaryWeaponItemId = existingMatch.id;
       modified = true;
     } else {
       const newWpn = createInventoryWeapon(resolved, {
         name: updatedEq.secondaryWeapon,
         enhancementBonus: updatedEq.secondaryWeaponEnhancement,
-        specialQualities: updatedEq.secondaryWeaponQualities
+        specialQualities: updatedEq.secondaryWeaponQualities,
+        baneTarget: updatedEq.secondaryWeaponBaneTarget
       });
       currentInventory.push(newWpn);
       updatedEq.secondaryWeaponItemId = newWpn.id;
@@ -1410,10 +1446,16 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
         existing.itemType = 'weapon';
         modified = true;
       }
-      if (updatedEq.rangedWeapon !== existing.name || updatedEq.rangedWeaponEnhancement !== (existing.enhancementBonus || 0)) {
+      const existingBane = existing.weaponData?.baneTarget || existing.baneTarget;
+      if (
+        updatedEq.rangedWeapon !== existing.name ||
+        updatedEq.rangedWeaponEnhancement !== (existing.enhancementBonus || 0) ||
+        updatedEq.rangedWeaponBaneTarget !== existingBane
+      ) {
         updatedEq.rangedWeapon = existing.name;
         updatedEq.rangedWeaponEnhancement = existing.enhancementBonus || 0;
         updatedEq.rangedWeaponQualities = existing.specialQualities || [];
+        updatedEq.rangedWeaponBaneTarget = existingBane;
         modified = true;
       }
     } else {
@@ -1444,13 +1486,18 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
       if ((!existingMatch.specialQualities || existingMatch.specialQualities.length === 0) && updatedEq.rangedWeaponQualities) {
         existingMatch.specialQualities = [...updatedEq.rangedWeaponQualities];
       }
+      if (!existingMatch.weaponData.baneTarget && updatedEq.rangedWeaponBaneTarget) {
+        existingMatch.weaponData.baneTarget = updatedEq.rangedWeaponBaneTarget;
+        existingMatch.baneTarget = updatedEq.rangedWeaponBaneTarget;
+      }
       updatedEq.rangedWeaponItemId = existingMatch.id;
       modified = true;
     } else {
       const newWpn = createInventoryWeapon(resolved, {
         name: updatedEq.rangedWeapon,
         enhancementBonus: updatedEq.rangedWeaponEnhancement,
-        specialQualities: updatedEq.rangedWeaponQualities
+        specialQualities: updatedEq.rangedWeaponQualities,
+        baneTarget: updatedEq.rangedWeaponBaneTarget
       });
       currentInventory.push(newWpn);
       updatedEq.rangedWeaponItemId = newWpn.id;

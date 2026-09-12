@@ -59,6 +59,7 @@ export interface ItemWeaponData {
   damageType?: string;
   rangeIncrement?: number;
   isRanged?: boolean;
+  baneTarget?: string;
 }
 
 export interface Equipment {
@@ -72,12 +73,15 @@ export interface Equipment {
   primaryWeapon: string;
   primaryWeaponEnhancement?: number;
   primaryWeaponQualities?: string[];
+  primaryWeaponBaneTarget?: string;
   secondaryWeapon?: string;
   secondaryWeaponEnhancement?: number;
   secondaryWeaponQualities?: string[];
+  secondaryWeaponBaneTarget?: string;
   rangedWeapon?: string;
   rangedWeaponEnhancement?: number;
   rangedWeaponQualities?: string[];
+  rangedWeaponBaneTarget?: string;
   armorQualities?: string[];
   shieldQualities?: string[];
   wondrousItems?: WondrousItem[];
@@ -100,6 +104,7 @@ export interface InventoryItem {
   notes?: string;
   enhancementBonus?: number;
   specialQualities?: string[];
+  baneTarget?: string;
   baseItemId?: string;
 
   itemType?: 'weapon' | 'armor' | 'shield' | 'wondrous' | 'gear' | 'consumable';
@@ -477,6 +482,7 @@ export interface WeaponData {
   source?: string;
   enhancementBonus?: number;
   specialQualities?: string[];
+  baneTarget?: string;
   baseWeaponId?: string;
   cost?: string;
 }

@@ -48,6 +48,44 @@ export interface MagicQuality {
 }
 
 // ----------------------------------------------------------------------
+// CANONICAL 3.5e BANE CREATURE TYPES (DMG Table 7-14)
+// ----------------------------------------------------------------------
+
+export const BANE_CREATURE_TYPES: readonly string[] = [
+  'Aberrations',
+  'Animals',
+  'Constructs',
+  'Dragons',
+  'Elementals',
+  'Fey',
+  'Giants',
+  'Humanoids (Aquatic)',
+  'Humanoids (Dwarf)',
+  'Humanoids (Elf)',
+  'Humanoids (Gnoll)',
+  'Humanoids (Goblinoid)',
+  'Humanoids (Halfling)',
+  'Humanoids (Human)',
+  'Humanoids (Orc)',
+  'Humanoids (Reptilian)',
+  'Magical Beasts',
+  'Monstrous Humanoids',
+  'Oozes',
+  'Outsiders (Air)',
+  'Outsiders (Chaotic)',
+  'Outsiders (Earth)',
+  'Outsiders (Evil)',
+  'Outsiders (Fire)',
+  'Outsiders (Good)',
+  'Outsiders (Lawful)',
+  'Outsiders (Native)',
+  'Outsiders (Water)',
+  'Plants',
+  'Undead',
+  'Vermin'
+];
+
+// ----------------------------------------------------------------------
 // WEAPON SPECIAL QUALITIES CATALOG (3.5e DMG & MIC)
 // ----------------------------------------------------------------------
 
@@ -602,7 +640,7 @@ export interface WeaponRollOption {
  * Gathers and compiles all extra damage dice granted by special qualities.
  * e.g. Flaming (+1d6 Fire), Frost (+1d6 Cold), Shock (+1d6 Elec), Holy (+2d6 Holy vs Evil)
  */
-export function getWeaponSpecialDamage(qualities?: string[]): SpecialDamageResult {
+export function getWeaponSpecialDamage(qualities?: string[], baneTarget?: string): SpecialDamageResult {
   if (!qualities || qualities.length === 0) {
     return {
       damageDiceString: '',
@@ -640,9 +678,13 @@ export function getWeaponSpecialDamage(qualities?: string[]): SpecialDamageResul
     if (q && q.damageBonus) {
       bonusList.push(q.damageBonus);
 
+      const resolvedCondition = q.damageBonus.isBane
+        ? (baneTarget ? `vs ${baneTarget}` : 'vs Designated Foe')
+        : q.damageBonus.condition;
+
       const hasDice = q.damageBonus.dice && q.damageBonus.dice !== '0';
       if (hasDice) {
-        const conditionStr = q.damageBonus.condition ? ` (${q.damageBonus.condition})` : '';
+        const conditionStr = resolvedCondition ? ` (${resolvedCondition})` : '';
         stringParts.push(`+ ${q.damageBonus.dice} ${q.damageBonus.type}${conditionStr}`);
         formulaParts.push(`+${q.damageBonus.dice}`);
         summaryLabels.push(`+${q.damageBonus.dice} ${q.damageBonus.type}`);
@@ -653,7 +695,7 @@ export function getWeaponSpecialDamage(qualities?: string[]): SpecialDamageResul
         name: q.name,
         dice: q.damageBonus.dice,
         damageType: q.damageBonus.type,
-        condition: q.damageBonus.condition,
+        condition: resolvedCondition,
         isConditional: q.damageBonus.isConditional,
         isRecoil: q.damageBonus.isRecoil,
         recoilDice: q.damageBonus.recoilDice,
@@ -727,9 +769,11 @@ export function getWeaponRollOptions(
   baseDmgFormula: string,
   baseDmgVal: number,
   baseAtkBonus: number,
-  qualities?: string[]
+  qualities?: string[],
+  baneTarget?: string
 ): WeaponRollOption[] {
-  const specDmg = getWeaponSpecialDamage(qualities);
+  const targetFoe = baneTarget || weapon.baneTarget;
+  const specDmg = getWeaponSpecialDamage(qualities, targetFoe);
   const options: WeaponRollOption[] = [];
 
   // Unconditional pools (Flaming, Frost, Shock, Corrosive, etc.)
@@ -813,30 +857,31 @@ export function getWeaponRollOptions(
     const baneVal = baseDmgVal + 2;
     const baneBaseDmgStr = baneVal >= 0 ? `+${baneVal}` : `${baneVal}`;
     const baneBaseFormula = `${weapon.damageM || '1d8'}${baneVal !== 0 ? baneBaseDmgStr : ''}`;
+    const condition = targetFoe ? `vs ${targetFoe}` : 'vs Designated Foe';
 
     options.push({
       id: 'bane',
-      label: `Base+2 + 2d6 Bane (vs Foe)`,
-      buttonTitle: `Roll Base (+2 Enh) + 2d6 Bane (vs Designated Foe)`,
+      label: `${baneBaseFormula} + 2d6 Bane (${condition})`,
+      buttonTitle: `Roll Base (+2 Enh) + 2d6 Bane (${condition})`,
       icon: 'fa-solid fa-bullseye',
       type: 'bane',
-      condition: 'vs Designated Foe',
+      condition,
       atkBonusDelta: 2,
       dmgBonusDelta: 2,
       rollFormula: `${baneBaseFormula}${unconditionalFormula}+2d6`,
       damagePools: [
         {
-          label: 'Base Physical (+2 Bane Enh)',
+          label: 'Physical: Base+(+2 Enh)',
           damageType: weapon.type || 'Physical',
           formula: baneBaseFormula,
-          condition: 'vs Designated Foe'
+          condition
         },
         ...unconditionalPools,
         {
-          label: 'Bane',
+          label: '+2d6 Bane',
           damageType: 'Bane',
           formula: '2d6',
-          condition: 'vs Designated Foe'
+          condition
         }
       ]
     });
@@ -871,7 +916,8 @@ export function getWeaponRollOptions(
 export function calculateCritDamagePools(
   weapon: Partial<WeaponData>,
   baseDmgVal: number,
-  qualities?: string[]
+  qualities?: string[],
+  baneTarget?: string
 ): {
   rollFormula: string;
   damagePools: DamagePoolInput[];
@@ -879,7 +925,8 @@ export function calculateCritDamagePools(
   multiplier: number;
 } {
   const mult = weapon.critMultiplier && weapon.critMultiplier >= 1 ? weapon.critMultiplier : 2;
-  const specDmg = getWeaponSpecialDamage(qualities);
+  const targetFoe = baneTarget || weapon.baneTarget;
+  const specDmg = getWeaponSpecialDamage(qualities, targetFoe);
   const dmgM = weapon.damageM || '1d8';
 
   // Parse dice count and sides from damageM (e.g. "1d8" -> count=1, sides=8; "2d4" -> count=2, sides=4)
@@ -939,16 +986,18 @@ export function calculateCritDamagePools(
  */
 export function getBaneAttackOption(
   baseAtkBonus: number,
-  weaponName: string
+  weaponName: string,
+  baneTarget?: string
 ): {
   atkBonus: number;
   label: string;
   condition: string;
 } {
+  const targetCondition = baneTarget ? `vs ${baneTarget}` : 'vs Designated Foe';
   return {
     atkBonus: baseAtkBonus + 2,
-    label: `${weaponName} Attack (vs Designated Foe)`,
-    condition: 'vs Designated Foe'
+    label: `${weaponName} Attack (${targetCondition})`,
+    condition: targetCondition
   };
 }
 

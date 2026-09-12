@@ -15,7 +15,8 @@ import {
   createMagicArmorData,
   getWeaponRollOptions,
   getBaneAttackOption,
-  calculateCritDamagePools
+  calculateCritDamagePools,
+  BANE_CREATURE_TYPES
 } from '../magicItems';
 import { generateFullAttackSequence } from '../combat';
 import { calculateTotalDR } from '../dr';
@@ -548,6 +549,105 @@ describe('Magic Item Special Qualities Engine (3.5e DMG)', () => {
       expect(burstPool?.formula).toBe('3d8');
       expect(burstPool?.damageType).toBe('Sonic');
       expect(critInfo.rollFormula).toBe('8d4+20+3d8');
+    });
+  });
+
+  describe('Bane Target Foe Definition (Phase 2)', () => {
+    it('exports canonical 3.5e BANE_CREATURE_TYPES array with core categories', () => {
+      expect(Array.isArray(BANE_CREATURE_TYPES)).toBe(true);
+      expect(BANE_CREATURE_TYPES).toContain('Aberrations');
+      expect(BANE_CREATURE_TYPES).toContain('Dragons');
+      expect(BANE_CREATURE_TYPES).toContain('Undead');
+      expect(BANE_CREATURE_TYPES).toContain('Constructs');
+      expect(BANE_CREATURE_TYPES).toContain('Outsiders (Evil)');
+      expect(BANE_CREATURE_TYPES).toContain('Humanoids (Reptilian)');
+    });
+
+    it('resolves dynamic designated foe in getWeaponSpecialDamage', () => {
+      const resUndead = getWeaponSpecialDamage(['bane'], 'Undead');
+      expect(resUndead.hasBane).toBe(true);
+      expect(resUndead.damageDiceString).toBe(' + 2d6 Bane (vs Undead)');
+      expect(resUndead.banePool?.condition).toBe('vs Undead');
+
+      const resDefault = getWeaponSpecialDamage(['bane']);
+      expect(resDefault.damageDiceString).toBe(' + 2d6 Bane (vs Designated Foe)');
+      expect(resDefault.banePool?.condition).toBe('vs Designated Foe');
+    });
+
+    it('resolves dynamic designated foe in getBaneAttackOption', () => {
+      const baneAtk = getBaneAttackOption(7, 'Longsword', 'Dragons');
+      expect(baneAtk.atkBonus).toBe(9);
+      expect(baneAtk.label).toBe('Longsword Attack (vs Dragons)');
+      expect(baneAtk.condition).toBe('vs Dragons');
+
+      const fallbackAtk = getBaneAttackOption(7, 'Longsword');
+      expect(fallbackAtk.label).toBe('Longsword Attack (vs Designated Foe)');
+      expect(fallbackAtk.condition).toBe('vs Designated Foe');
+    });
+
+    it('generates itemized Bane roll options with Physical: Base+(+2 Enh) and +2d6 Bane pools', () => {
+      const weapon: WeaponData = {
+        id: 'longsword',
+        name: '+1 Bane Longsword',
+        category: 'Martial Weapons',
+        damageM: '1d8',
+        critMultiplier: 2,
+        threat: 19,
+        type: 'Slashing',
+        enhancementBonus: 1,
+        size: 'Medium',
+        weight: 4
+      };
+
+      const options = getWeaponRollOptions(weapon, '1d8+4', 4, 8, ['bane'], 'Evil Outsiders');
+      const baneOpt = options.find(o => o.id === 'bane');
+      expect(baneOpt).toBeDefined();
+      expect(baneOpt?.label).toBe('1d8+6 + 2d6 Bane (vs Evil Outsiders)');
+      expect(baneOpt?.condition).toBe('vs Evil Outsiders');
+      expect(baneOpt?.atkBonusDelta).toBe(2);
+      expect(baneOpt?.dmgBonusDelta).toBe(2);
+
+      expect(baneOpt?.damagePools).toHaveLength(2);
+      const physPool = baneOpt?.damagePools[0];
+      expect(physPool?.label).toBe('Physical: Base+(+2 Enh)');
+      expect(physPool?.formula).toBe('1d8+6');
+      expect(physPool?.condition).toBe('vs Evil Outsiders');
+
+      const baneDamagePool = baneOpt?.damagePools[1];
+      expect(baneDamagePool?.label).toBe('+2d6 Bane');
+      expect(baneDamagePool?.damageType).toBe('Bane');
+      expect(baneDamagePool?.formula).toBe('2d6');
+      expect(baneDamagePool?.condition).toBe('vs Evil Outsiders');
+    });
+
+    it('handles multi-quality weapons combining Flaming and Bane', () => {
+      const weapon: WeaponData = {
+        id: 'longsword',
+        name: '+1 Flaming Bane Longsword',
+        category: 'Martial Weapons',
+        damageM: '1d8',
+        critMultiplier: 2,
+        threat: 19,
+        type: 'Slashing',
+        enhancementBonus: 1,
+        size: 'Medium',
+        weight: 4
+      };
+
+      const options = getWeaponRollOptions(weapon, '1d8+4', 4, 8, ['flaming', 'bane'], 'Undead');
+      const baseOpt = options.find(o => o.id === 'base');
+      expect(baseOpt).toBeDefined();
+      expect(baseOpt?.rollFormula).toBe('1d8+4+1d6');
+
+      const baneOpt = options.find(o => o.id === 'bane');
+      expect(baneOpt).toBeDefined();
+      expect(baneOpt?.label).toBe('1d8+6 + 2d6 Bane (vs Undead)');
+      expect(baneOpt?.rollFormula).toBe('1d8+6+1d6+2d6');
+      expect(baneOpt?.damagePools).toHaveLength(3); // Physical, Flaming, Bane
+      expect(baneOpt?.damagePools[0].label).toBe('Physical: Base+(+2 Enh)');
+      expect(baneOpt?.damagePools[1].label).toBe('Flaming');
+      expect(baneOpt?.damagePools[2].label).toBe('+2d6 Bane');
+      expect(baneOpt?.damagePools[2].condition).toBe('vs Undead');
     });
   });
 });

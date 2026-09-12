@@ -309,7 +309,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   if (eq.primaryWeapon && eq.primaryWeapon !== 'none') {
     const primaryWpn = resolveEquippedWeapon(character, 'primaryWeapon', weaponsData, customWeapons);
     const primaryQualities = (eq.primaryWeaponQualities && eq.primaryWeaponQualities.length > 0) ? eq.primaryWeaponQualities : (primaryWpn.specialQualities || []);
-    const primarySpecialDmg = getWeaponSpecialDamage(primaryQualities);
+    const primaryBaneTarget = eq.primaryWeaponBaneTarget || primaryWpn.baneTarget;
+    const primarySpecialDmg = getWeaponSpecialDamage(primaryQualities, primaryBaneTarget);
     const primaryHasKeen = hasKeenQuality(primaryQualities);
     const primaryHasSpeed = hasSpeedQuality(primaryQualities);
     const primaryThreat = primaryHasKeen ? calculateKeenThreat(primaryWpn.threat) : primaryWpn.threat;
@@ -327,9 +328,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const damageStr = `${baseDmgStr}${primarySpecialDmg.damageDiceString}`;
     const damageFormula = `${baseDmgStr}${primarySpecialDmg.damageDiceFormula}`;
 
-    const primaryRollOptions = getWeaponRollOptions(primaryWpn, baseDmgStr, dmgVal, totalAtk, primaryQualities);
-    const primaryBaneAtk = primarySpecialDmg.hasBane ? getBaneAttackOption(totalAtk, primaryWpn.name) : null;
-    const primaryCritInfo = calculateCritDamagePools(primaryWpn, dmgVal, primaryQualities);
+    const primaryRollOptions = getWeaponRollOptions(primaryWpn, baseDmgStr, dmgVal, totalAtk, primaryQualities, primaryBaneTarget);
+    const primaryBaneAtk = primarySpecialDmg.hasBane ? getBaneAttackOption(totalAtk, primaryWpn.name, primaryBaneTarget) : null;
+    const primaryCritInfo = calculateCritDamagePools(primaryWpn, dmgVal, primaryQualities, primaryBaneTarget);
 
     const primaryNote = (() => {
       const notes: string[] = [];
@@ -374,7 +375,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   if (eq.secondaryWeapon && eq.secondaryWeapon !== 'none') {
     const secWpn = resolveEquippedWeapon(character, 'secondaryWeapon', weaponsData, customWeapons);
     const secondaryQualities = (eq.secondaryWeaponQualities && eq.secondaryWeaponQualities.length > 0) ? eq.secondaryWeaponQualities : (secWpn.specialQualities || []);
-    const secondarySpecialDmg = getWeaponSpecialDamage(secondaryQualities);
+    const secBaneTarget = eq.secondaryWeaponBaneTarget || secWpn.baneTarget;
+    const secondarySpecialDmg = getWeaponSpecialDamage(secondaryQualities, secBaneTarget);
     const secondaryHasKeen = hasKeenQuality(secondaryQualities);
     const secondaryHasSpeed = hasSpeedQuality(secondaryQualities);
     const secThreat = secondaryHasKeen ? calculateKeenThreat(secWpn.threat) : secWpn.threat;
@@ -392,9 +394,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const damageStr = `${baseDmgStr}${secondarySpecialDmg.damageDiceString}`;
     const damageFormula = `${baseDmgStr}${secondarySpecialDmg.damageDiceFormula}`;
 
-    const secRollOptions = getWeaponRollOptions(secWpn, baseDmgStr, dmgVal, totalAtk, secondaryQualities);
-    const secBaneAtk = secondarySpecialDmg.hasBane ? getBaneAttackOption(totalAtk, secWpn.name) : null;
-    const secCritInfo = calculateCritDamagePools(secWpn, dmgVal, secondaryQualities);
+    const secRollOptions = getWeaponRollOptions(secWpn, baseDmgStr, dmgVal, totalAtk, secondaryQualities, secBaneTarget);
+    const secBaneAtk = secondarySpecialDmg.hasBane ? getBaneAttackOption(totalAtk, secWpn.name, secBaneTarget) : null;
+    const secCritInfo = calculateCritDamagePools(secWpn, dmgVal, secondaryQualities, secBaneTarget);
 
     const secNote = (() => {
       const notes: string[] = [];
@@ -436,7 +438,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
     const rngWpn = resolveEquippedWeapon(character, 'rangedWeapon', weaponsData, customWeapons);
     const rangedQualities = (eq.rangedWeaponQualities && eq.rangedWeaponQualities.length > 0) ? eq.rangedWeaponQualities : (rngWpn.specialQualities || []);
-    const rangedSpecialDmg = getWeaponSpecialDamage(rangedQualities);
+    const rngBaneTarget = eq.rangedWeaponBaneTarget || rngWpn.baneTarget;
+    const rangedSpecialDmg = getWeaponSpecialDamage(rangedQualities, rngBaneTarget);
     const rangedHasKeen = hasKeenQuality(rangedQualities);
     const rangedHasSpeed = hasSpeedQuality(rangedQualities);
     const rngThreat = rangedHasKeen ? calculateKeenThreat(rngWpn.threat) : rngWpn.threat;
@@ -451,9 +454,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const damageStr = `${baseDmgStr}${rangedSpecialDmg.damageDiceString}`;
     const damageFormula = `${baseDmgStr}${rangedSpecialDmg.damageDiceFormula}`;
 
-    const rngRollOptions = getWeaponRollOptions(rngWpn, baseDmgStr, dmgVal, totalAtk, rangedQualities);
-    const rngBaneAtk = rangedSpecialDmg.hasBane ? getBaneAttackOption(totalAtk, rngWpn.name) : null;
-    const rngCritInfo = calculateCritDamagePools(rngWpn, dmgVal, rangedQualities);
+    const rngRollOptions = getWeaponRollOptions(rngWpn, baseDmgStr, dmgVal, totalAtk, rangedQualities, rngBaneTarget);
+    const rngBaneAtk = rangedSpecialDmg.hasBane ? getBaneAttackOption(totalAtk, rngWpn.name, rngBaneTarget) : null;
+    const rngCritInfo = calculateCritDamagePools(rngWpn, dmgVal, rangedQualities, rngBaneTarget);
 
     const rngNote = (() => {
       const notes: string[] = [];
@@ -879,7 +882,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                         title={`Click to roll ${item.baneAtk.label}`}
                       >
                         <i className="fa-solid fa-bullseye text-[8px]"></i>
-                        <span>vs Foe: {item.baneAtk.atkBonus >= 0 ? `+${item.baneAtk.atkBonus}` : item.baneAtk.atkBonus}</span>
+                        <span>{item.baneAtk.atkBonus >= 0 ? `+${item.baneAtk.atkBonus}` : item.baneAtk.atkBonus} ({item.baneAtk.condition})</span>
                       </div>
                     )}
                   </td>

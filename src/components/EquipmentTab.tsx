@@ -41,7 +41,8 @@ import {
   parseMagicItemName,
   MagicQuality,
   WEAPON_SPECIAL_QUALITIES,
-  ARMOR_SHIELD_SPECIAL_QUALITIES
+  ARMOR_SHIELD_SPECIAL_QUALITIES,
+  BANE_CREATURE_TYPES
 } from '../engine/magicItems';
 
 interface EquipmentTabProps {
@@ -127,6 +128,8 @@ const QualitySelector: React.FC<{
   enhancementBonus?: number;
   itemType?: 'weapon' | 'armor' | 'shield';
   onOpenGuide?: () => void;
+  baneTarget?: string;
+  onEditBaneTarget?: () => void;
 }> = ({
   title,
   qualities,
@@ -135,7 +138,9 @@ const QualitySelector: React.FC<{
   onRemove,
   enhancementBonus = 0,
   itemType = 'weapon',
-  onOpenGuide
+  onOpenGuide,
+  baneTarget,
+  onEditBaneTarget
 }) => {
   const costSummary = calculateTotalItemCost(0, enhancementBonus, qualities, itemType);
 
@@ -197,13 +202,31 @@ const QualitySelector: React.FC<{
         {qualities.map(qId => {
           const q = getQualityById(qId);
           if (!q) return null;
+          const isBane = qId === 'bane';
+          const badgeLabel = isBane ? `Bane (${baneTarget || 'Designated Foe'})` : q.name;
           return (
             <span
               key={qId}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-medium shadow-xs"
-              title={q.description}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[11px] font-medium shadow-xs ${
+                isBane
+                  ? 'bg-red-500/15 border-red-500/40 text-red-300'
+                  : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+              }`}
+              title={isBane ? `${q.description} (Click to change designated foe)` : q.description}
             >
-              <span>{q.name}</span>
+              {isBane && onEditBaneTarget ? (
+                <button
+                  type="button"
+                  onClick={onEditBaneTarget}
+                  className="hover:underline hover:text-red-200 cursor-pointer flex items-center gap-1 text-left"
+                  title="Click to change designated foe"
+                >
+                  <i className="fa-solid fa-bullseye text-[10px] text-red-400"></i>
+                  <span>{badgeLabel}</span>
+                </button>
+              ) : (
+                <span>{badgeLabel}</span>
+              )}
               <span className="text-[9px] font-mono opacity-75">
                 ({q.costType === 'bonus' ? `+${q.costValue}` : `${q.costValue.toLocaleString()} gp`})
               </span>
@@ -236,6 +259,175 @@ const QualitySelector: React.FC<{
   );
 };
 
+const BaneTargetModal: React.FC<{
+  isOpen: boolean;
+  weaponName?: string;
+  currentTarget?: string;
+  onSave: (target: string) => void;
+  onClose: () => void;
+}> = ({ isOpen, weaponName, currentTarget = '', onSave, onClose }) => {
+  const [selectedType, setSelectedType] = useState(currentTarget);
+  const [customText, setCustomText] = useState(
+    currentTarget && !BANE_CREATURE_TYPES.includes(currentTarget) ? currentTarget : ''
+  );
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      const isPreset = BANE_CREATURE_TYPES.includes(currentTarget);
+      setSelectedType(isPreset ? currentTarget : '');
+      setCustomText(!isPreset ? currentTarget : '');
+      setSearch('');
+    }
+  }, [isOpen, currentTarget]);
+
+  if (!isOpen) return null;
+
+  const filteredTypes = BANE_CREATURE_TYPES.filter(t =>
+    t.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const effectiveTarget = customText.trim() || selectedType || 'Designated Foe';
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
+      <div className="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh]">
+        {/* Header */}
+        <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+          <div className="flex items-center gap-2.5">
+            <span className="w-8 h-8 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center border border-red-500/30">
+              <i className="fa-solid fa-bullseye text-base"></i>
+            </span>
+            <div>
+              <h3 className="font-heading font-bold text-slate-100 text-base flex items-center gap-2">
+                Select Bane Designated Foe
+              </h3>
+              {weaponName && (
+                <span className="text-xs text-amber-400 font-mono font-medium">{weaponName}</span>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-200 text-lg transition p-1 cursor-pointer"
+            title="Cancel"
+          >
+            &times;
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="p-5 overflow-y-auto space-y-4 text-xs text-slate-300">
+          <p className="text-slate-400 leading-relaxed">
+            In D&D 3.5e, a <strong className="text-red-400">Bane</strong> weapon excels against a designated creature type. Against its designated foe, its effective enhancement bonus is +2 higher (+2 to Attack and +2 to Base Damage) and it deals an extra +2d6 Bane damage.
+          </p>
+
+          {/* Quick Filter Search */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+              <i className="fa-solid fa-magnifying-glass text-slate-400 text-[11px]"></i>
+              Canonical 3.5e Creature Types (DMG Table 7-14):
+            </label>
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search creature type (e.g. Undead, Dragons, Giants)..."
+              className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 text-xs focus:outline-none focus:border-red-500/60"
+            />
+          </div>
+
+          {/* Creature Type Chips Grid */}
+          <div className="max-h-48 overflow-y-auto p-2 bg-slate-950/80 rounded-lg border border-slate-800 grid grid-cols-2 sm:grid-cols-3 gap-1.5 scrollbar-thin">
+            {filteredTypes.map(type => {
+              const isSelected = selectedType === type && !customText.trim();
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => {
+                    setSelectedType(type);
+                    setCustomText('');
+                  }}
+                  className={`px-2.5 py-1.5 rounded text-left text-xs font-medium transition cursor-pointer flex items-center justify-between border ${
+                    isSelected
+                      ? 'bg-red-500/20 text-red-200 border-red-500/50 shadow-xs'
+                      : 'bg-slate-900/90 text-slate-300 border-slate-800 hover:bg-slate-800 hover:border-slate-700'
+                  }`}
+                >
+                  <span className="truncate">{type}</span>
+                  {isSelected && <i className="fa-solid fa-check text-[10px] text-red-400 ml-1"></i>}
+                </button>
+              );
+            })}
+            {filteredTypes.length === 0 && (
+              <div className="col-span-full py-4 text-center text-slate-500 italic">
+                No matching preset types. Use the custom input below.
+              </div>
+            )}
+          </div>
+
+          {/* Custom Foe Text Input */}
+          <div className="space-y-1.5 pt-2 border-t border-slate-800">
+            <label className="text-xs font-semibold text-slate-200 flex items-center justify-between">
+              <span>Or Specify Custom Foe / Subtype:</span>
+              {customText.trim() && (
+                <span className="text-[10px] text-red-400 font-mono">Custom Active</span>
+              )}
+            </label>
+            <input
+              type="text"
+              value={customText}
+              onChange={e => {
+                setCustomText(e.target.value);
+                if (e.target.value.trim()) {
+                  setSelectedType('');
+                }
+              }}
+              placeholder="e.g. Drow, Mind Flayers, Fire Outsiders, Red Dragons..."
+              className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 text-xs focus:outline-none focus:border-red-500/60 font-mono"
+            />
+          </div>
+
+          {/* Preview Banner */}
+          <div className="p-3 bg-red-950/30 border border-red-500/30 rounded-lg flex items-center justify-between">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-red-400 block tracking-wider">
+                Active Bane Selection:
+              </span>
+              <span className="text-sm font-bold text-slate-100 font-mono">
+                Bane ({effectiveTarget})
+              </span>
+            </div>
+            <span className="text-[11px] font-mono text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+              +2 Atk / +2 Dmg / +2d6 Bane
+            </span>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 py-3 border-t border-slate-800 flex justify-end gap-2 bg-slate-950/60">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3.5 py-1.5 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 transition text-xs font-medium cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => onSave(effectiveTarget)}
+            className="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold transition text-xs flex items-center gap-1.5 cursor-pointer shadow-md shadow-red-950"
+          >
+            <i className="fa-solid fa-check text-[11px]"></i>
+            Save Designated Foe
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   character,
   weaponsData,
@@ -250,6 +442,12 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const [showQualitiesGuide, setShowQualitiesGuide] = useState(false);
   const [qualitiesGuideFilter, setQualitiesGuideFilter] = useState<'all' | 'weapon' | 'armor'>('all');
   const [qualitiesGuideSearch, setQualitiesGuideSearch] = useState('');
+  const [baneModalConfig, setBaneModalConfig] = useState<{
+    isOpen: boolean;
+    field: 'primaryWeaponQualities' | 'secondaryWeaponQualities' | 'rangedWeaponQualities';
+    currentTarget?: string;
+    weaponName?: string;
+  } | null>(null);
 
   useEffect(() => {
     const syncedChar = syncEquippedItemsToInventory(character, weaponsData);
@@ -329,9 +527,11 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.primaryWeaponItemId = undefined;
         newEq.primaryWeaponEnhancement = 0;
         newEq.primaryWeaponQualities = [];
+        newEq.primaryWeaponBaneTarget = undefined;
       } else if (val === '__CUSTOM__') {
         newEq.primaryWeapon = '__CUSTOM__';
         newEq.primaryWeaponItemId = undefined;
+        newEq.primaryWeaponBaneTarget = undefined;
       } else {
         const clean = (val || '').trim();
         if (!clean) return;
@@ -359,6 +559,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.primaryWeaponItemId = invItem.id;
         newEq.primaryWeaponEnhancement = invItem.enhancementBonus || 0;
         newEq.primaryWeaponQualities = invItem.specialQualities ? [...invItem.specialQualities] : [];
+        newEq.primaryWeaponBaneTarget = invItem.baneTarget || invItem.weaponData?.baneTarget;
 
         // Transfer weapon from other weapon slots if already equipped there
         if (newEq.secondaryWeaponItemId === invItem.id) {
@@ -366,12 +567,14 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.secondaryWeaponItemId = undefined;
           newEq.secondaryWeaponEnhancement = 0;
           newEq.secondaryWeaponQualities = [];
+          newEq.secondaryWeaponBaneTarget = undefined;
         }
         if (newEq.rangedWeaponItemId === invItem.id) {
           newEq.rangedWeapon = 'none';
           newEq.rangedWeaponItemId = undefined;
           newEq.rangedWeaponEnhancement = 0;
           newEq.rangedWeaponQualities = [];
+          newEq.rangedWeaponBaneTarget = undefined;
         }
 
         const isTwoHanded = invItem.weaponData?.size === 'T' ||
@@ -384,6 +587,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             newEq.secondaryWeaponItemId = undefined;
             newEq.secondaryWeaponEnhancement = 0;
             newEq.secondaryWeaponQualities = [];
+            newEq.secondaryWeaponBaneTarget = undefined;
           }
           if (newEq.shield && newEq.shield !== 'none' && !newEq.shield.toLowerCase().includes('buckler')) {
             newEq.shield = 'none';
@@ -399,9 +603,11 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.secondaryWeaponItemId = undefined;
         newEq.secondaryWeaponEnhancement = 0;
         newEq.secondaryWeaponQualities = [];
+        newEq.secondaryWeaponBaneTarget = undefined;
       } else if (val === '__CUSTOM__') {
         newEq.secondaryWeapon = '__CUSTOM__';
         newEq.secondaryWeaponItemId = undefined;
+        newEq.secondaryWeaponBaneTarget = undefined;
       } else {
         const clean = (val || '').trim();
         if (!clean) return;
@@ -429,6 +635,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.secondaryWeaponItemId = invItem.id;
         newEq.secondaryWeaponEnhancement = invItem.enhancementBonus || 0;
         newEq.secondaryWeaponQualities = invItem.specialQualities ? [...invItem.specialQualities] : [];
+        newEq.secondaryWeaponBaneTarget = invItem.baneTarget || invItem.weaponData?.baneTarget;
 
         // Transfer weapon from other weapon slots if already equipped there
         if (newEq.primaryWeaponItemId === invItem.id) {
@@ -436,12 +643,14 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.primaryWeaponItemId = undefined;
           newEq.primaryWeaponEnhancement = 0;
           newEq.primaryWeaponQualities = [];
+          newEq.primaryWeaponBaneTarget = undefined;
         }
         if (newEq.rangedWeaponItemId === invItem.id) {
           newEq.rangedWeapon = 'none';
           newEq.rangedWeaponItemId = undefined;
           newEq.rangedWeaponEnhancement = 0;
           newEq.rangedWeaponQualities = [];
+          newEq.rangedWeaponBaneTarget = undefined;
         }
 
         if (newEq.primaryWeapon && newEq.primaryWeapon !== 'none') {
@@ -451,6 +660,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             newEq.primaryWeaponItemId = undefined;
             newEq.primaryWeaponEnhancement = 0;
             newEq.primaryWeaponQualities = [];
+            newEq.primaryWeaponBaneTarget = undefined;
           }
         }
         if (newEq.shield && newEq.shield !== 'none' && !newEq.shield.toLowerCase().includes('buckler')) {
@@ -466,9 +676,11 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.rangedWeaponItemId = undefined;
         newEq.rangedWeaponEnhancement = 0;
         newEq.rangedWeaponQualities = [];
+        newEq.rangedWeaponBaneTarget = undefined;
       } else if (val === '__CUSTOM__') {
         newEq.rangedWeapon = '__CUSTOM__';
         newEq.rangedWeaponItemId = undefined;
+        newEq.rangedWeaponBaneTarget = undefined;
       } else {
         const clean = (val || '').trim();
         if (!clean) return;
@@ -496,6 +708,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.rangedWeaponItemId = invItem.id;
         newEq.rangedWeaponEnhancement = invItem.enhancementBonus || 0;
         newEq.rangedWeaponQualities = invItem.specialQualities ? [...invItem.specialQualities] : [];
+        newEq.rangedWeaponBaneTarget = invItem.baneTarget || invItem.weaponData?.baneTarget;
 
         // Transfer weapon from other weapon slots if already equipped there
         if (newEq.primaryWeaponItemId === invItem.id) {
@@ -503,12 +716,14 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.primaryWeaponItemId = undefined;
           newEq.primaryWeaponEnhancement = 0;
           newEq.primaryWeaponQualities = [];
+          newEq.primaryWeaponBaneTarget = undefined;
         }
         if (newEq.secondaryWeaponItemId === invItem.id) {
           newEq.secondaryWeapon = 'none';
           newEq.secondaryWeaponItemId = undefined;
           newEq.secondaryWeaponEnhancement = 0;
           newEq.secondaryWeaponQualities = [];
+          newEq.secondaryWeaponBaneTarget = undefined;
         }
       }
     } else if (field === 'armor') {
@@ -733,18 +948,21 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       newEq.primaryWeaponItemId = undefined;
       newEq.primaryWeaponEnhancement = 0;
       newEq.primaryWeaponQualities = [];
+      newEq.primaryWeaponBaneTarget = undefined;
     }
     if (newEq.secondaryWeaponItemId === equippedItem.id && slot !== 'secondaryWeapon') {
       newEq.secondaryWeapon = 'none';
       newEq.secondaryWeaponItemId = undefined;
       newEq.secondaryWeaponEnhancement = 0;
       newEq.secondaryWeaponQualities = [];
+      newEq.secondaryWeaponBaneTarget = undefined;
     }
     if (newEq.rangedWeaponItemId === equippedItem.id && slot !== 'rangedWeapon') {
       newEq.rangedWeapon = 'none';
       newEq.rangedWeaponItemId = undefined;
       newEq.rangedWeaponEnhancement = 0;
       newEq.rangedWeaponQualities = [];
+      newEq.rangedWeaponBaneTarget = undefined;
     }
     if (newEq.armorItemId === equippedItem.id && slot !== 'armor') {
       newEq.armor = 'none';
@@ -764,6 +982,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       newEq.primaryWeaponItemId = equippedItem.id;
       newEq.primaryWeaponEnhancement = equippedItem.enhancementBonus || 0;
       newEq.primaryWeaponQualities = equippedItem.specialQualities ? [...equippedItem.specialQualities] : [];
+      newEq.primaryWeaponBaneTarget = equippedItem.baneTarget || equippedItem.weaponData?.baneTarget;
 
       const isTwoHanded = equippedItem.weaponData?.size === 'T' ||
         equippedItem.weaponData?.category === 'Two-Handed' ||
@@ -775,6 +994,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.secondaryWeaponItemId = undefined;
           newEq.secondaryWeaponEnhancement = 0;
           newEq.secondaryWeaponQualities = [];
+          newEq.secondaryWeaponBaneTarget = undefined;
         }
         if (newEq.shield && newEq.shield !== 'none' && !newEq.shield.toLowerCase().includes('buckler')) {
           newEq.shield = 'none';
@@ -788,6 +1008,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       newEq.secondaryWeaponItemId = equippedItem.id;
       newEq.secondaryWeaponEnhancement = equippedItem.enhancementBonus || 0;
       newEq.secondaryWeaponQualities = equippedItem.specialQualities ? [...equippedItem.specialQualities] : [];
+      newEq.secondaryWeaponBaneTarget = equippedItem.baneTarget || equippedItem.weaponData?.baneTarget;
 
       if (newEq.primaryWeapon && newEq.primaryWeapon !== 'none') {
         const primaryObj = resolveEquippedWeapon({ ...character, equipment: newEq }, 'primaryWeapon', weaponsData, customWeapons);
@@ -796,6 +1017,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.primaryWeaponItemId = undefined;
           newEq.primaryWeaponEnhancement = 0;
           newEq.primaryWeaponQualities = [];
+          newEq.primaryWeaponBaneTarget = undefined;
         }
       }
       if (newEq.shield && newEq.shield !== 'none' && !newEq.shield.toLowerCase().includes('buckler')) {
@@ -809,6 +1031,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       newEq.rangedWeaponItemId = equippedItem.id;
       newEq.rangedWeaponEnhancement = equippedItem.enhancementBonus || 0;
       newEq.rangedWeaponQualities = equippedItem.specialQualities ? [...equippedItem.specialQualities] : [];
+      newEq.rangedWeaponBaneTarget = equippedItem.baneTarget || equippedItem.weaponData?.baneTarget;
     } else if (slot === 'armor') {
       newEq.armor = equippedItem.name;
       newEq.armorItemId = equippedItem.id;
@@ -828,6 +1051,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             newEq.primaryWeaponItemId = undefined;
             newEq.primaryWeaponEnhancement = 0;
             newEq.primaryWeaponQualities = [];
+            newEq.primaryWeaponBaneTarget = undefined;
           }
         }
         if (newEq.secondaryWeapon && newEq.secondaryWeapon !== 'none') {
@@ -835,6 +1059,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.secondaryWeaponItemId = undefined;
           newEq.secondaryWeaponEnhancement = 0;
           newEq.secondaryWeaponQualities = [];
+          newEq.secondaryWeaponBaneTarget = undefined;
         }
       }
     }
@@ -849,10 +1074,83 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     onChange({ funds: { ...funds, [field]: Math.max(0, val || 0) } });
   };
 
+  const openBaneModal = (field: 'primaryWeaponQualities' | 'secondaryWeaponQualities' | 'rangedWeaponQualities') => {
+    const slotKey = field === 'primaryWeaponQualities' ? 'primaryWeapon' : (field === 'secondaryWeaponQualities' ? 'secondaryWeapon' : 'rangedWeapon');
+    const baneKey = `${slotKey}BaneTarget` as keyof Equipment;
+    const wpnName = eq[slotKey] || 'Weapon';
+    setBaneModalConfig({
+      isOpen: true,
+      field,
+      currentTarget: (eq[baneKey] as string) || '',
+      weaponName: wpnName
+    });
+  };
+
+  const handleSaveBaneTarget = (targetFoe: string) => {
+    if (!baneModalConfig) return;
+    const { field } = baneModalConfig;
+    const slotKey = field === 'primaryWeaponQualities' ? 'primaryWeapon' : (field === 'secondaryWeaponQualities' ? 'secondaryWeapon' : 'rangedWeapon');
+    const baneKey = `${slotKey}BaneTarget` as keyof Equipment;
+    const idKey = `${slotKey}ItemId` as keyof Equipment;
+    const currentQualities = eq[field] || [];
+    const newQualities = currentQualities.includes('bane') ? [...currentQualities] : [...currentQualities, 'bane'];
+
+    let updatedInv = [...inventory];
+    const targetItemId = eq[idKey];
+    if (targetItemId) {
+      const itemIdx = updatedInv.findIndex(i => i.id === targetItemId);
+      if (itemIdx >= 0) {
+        const item = updatedInv[itemIdx];
+        const existingQualities = item.specialQualities || [];
+        const itemQualities = existingQualities.includes('bane') ? [...existingQualities] : [...existingQualities, 'bane'];
+        updatedInv[itemIdx] = {
+          ...item,
+          specialQualities: itemQualities,
+          baneTarget: targetFoe,
+          weaponData: item.weaponData ? { ...item.weaponData, baneTarget: targetFoe } : undefined
+        };
+      }
+    } else {
+      const currentName = eq[slotKey];
+      if (currentName && currentName !== 'none') {
+        updatedInv = updatedInv.map(i => {
+          if (matchesItemName(i.name, currentName)) {
+            const existingQualities = i.specialQualities || [];
+            const itemQualities = existingQualities.includes('bane') ? [...existingQualities] : [...existingQualities, 'bane'];
+            return {
+              ...i,
+              specialQualities: itemQualities,
+              baneTarget: targetFoe,
+              weaponData: i.weaponData ? { ...i.weaponData, baneTarget: targetFoe } : undefined
+            };
+          }
+          return i;
+        });
+      }
+    }
+
+    const newEq = {
+      ...eq,
+      [field]: newQualities,
+      [baneKey]: targetFoe
+    };
+
+    onChange({
+      equipment: newEq,
+      inventory: updatedInv
+    });
+
+    setBaneModalConfig(null);
+  };
+
   const handleAddQuality = (
     field: 'primaryWeaponQualities' | 'secondaryWeaponQualities' | 'rangedWeaponQualities' | 'armorQualities' | 'shieldQualities',
     qId: string
   ) => {
+    if (qId === 'bane' && (field === 'primaryWeaponQualities' || field === 'secondaryWeaponQualities' || field === 'rangedWeaponQualities')) {
+      openBaneModal(field);
+      return;
+    }
     const current = eq[field] || [];
     if (!current.includes(qId)) {
       handleEqChange(field, [...current, qId]);
@@ -864,7 +1162,37 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     qId: string
   ) => {
     const current = eq[field] || [];
-    handleEqChange(field, current.filter(id => id !== qId));
+    const newQualities = current.filter(id => id !== qId);
+    if (qId === 'bane' && (field === 'primaryWeaponQualities' || field === 'secondaryWeaponQualities' || field === 'rangedWeaponQualities')) {
+      const slotKey = field === 'primaryWeaponQualities' ? 'primaryWeapon' : (field === 'secondaryWeaponQualities' ? 'secondaryWeapon' : 'rangedWeapon');
+      const baneKey = `${slotKey}BaneTarget` as keyof Equipment;
+      const idKey = `${slotKey}ItemId` as keyof Equipment;
+      let updatedInv = [...inventory];
+      const targetItemId = eq[idKey];
+      if (targetItemId) {
+        const itemIdx = updatedInv.findIndex(i => i.id === targetItemId);
+        if (itemIdx >= 0) {
+          const item = updatedInv[itemIdx];
+          updatedInv[itemIdx] = {
+            ...item,
+            specialQualities: (item.specialQualities || []).filter(q => q !== 'bane'),
+            baneTarget: undefined,
+            weaponData: item.weaponData ? { ...item.weaponData, baneTarget: undefined } : undefined
+          };
+        }
+      }
+      const newEq = {
+        ...eq,
+        [field]: newQualities,
+        [baneKey]: undefined
+      };
+      onChange({
+        equipment: newEq,
+        inventory: updatedInv
+      });
+      return;
+    }
+    handleEqChange(field, newQualities);
   };
 
   const raceObj: Partial<RaceData> = racesData.find(r => r.name === character.selectedRace) || {};
@@ -1272,10 +1600,11 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   // Resolve Primary Weapon & Special Qualities
   const hasPrimary = Boolean(eq.primaryWeapon && eq.primaryWeapon !== 'none');
   const primaryQualities = eq.primaryWeaponQualities || [];
-  const primarySpecialDmg = getWeaponSpecialDamage(primaryQualities);
+  const primaryWpnObj = hasPrimary ? resolveEquippedWeapon(character, 'primaryWeapon', weaponsData, customWeapons) : null;
+  const primaryBaneTarget = eq.primaryWeaponBaneTarget || primaryWpnObj?.baneTarget;
+  const primarySpecialDmg = getWeaponSpecialDamage(primaryQualities, primaryBaneTarget);
   const primaryHasKeen = hasKeenQuality(primaryQualities);
   const primaryHasSpeed = hasSpeedQuality(primaryQualities);
-  const primaryWpnObj = hasPrimary ? resolveEquippedWeapon(character, 'primaryWeapon', weaponsData, customWeapons) : null;
   const primaryThreat = primaryWpnObj ? (primaryHasKeen ? calculateKeenThreat(primaryWpnObj.threat) : primaryWpnObj.threat) : 20;
   const primaryTacticalMods = primaryWpnObj ? calculateTacticalCombatModifiers(tcState, primaryWpnObj, false, false) : null;
   const primaryFeatBonuses = primaryWpnObj ? calculateFeatCombatBonuses(character, primaryWpnObj) : { attackBonus: 0, damageBonus: 0 };
@@ -1286,9 +1615,9 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const primaryBaseDmgFormula = primaryWpnObj ? `${primaryWpnObj.damageM}${primaryDmgVal !== 0 ? primaryDmgStr : ''}` : '';
   const primaryDamageDisplay = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceString}`;
   const primaryRollDamageFormula = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceFormula}`;
-  const primaryRollOptions = primaryWpnObj ? getWeaponRollOptions(primaryWpnObj, primaryBaseDmgFormula, primaryDmgVal, primaryTotalAtk, primaryQualities) : [];
-  const primaryBaneAtk = primarySpecialDmg.hasBane && primaryWpnObj ? getBaneAttackOption(primaryTotalAtk, primaryWpnObj.name) : null;
-  const primaryCritInfo = primaryWpnObj ? calculateCritDamagePools(primaryWpnObj, primaryDmgVal, primaryQualities) : null;
+  const primaryRollOptions = primaryWpnObj ? getWeaponRollOptions(primaryWpnObj, primaryBaseDmgFormula, primaryDmgVal, primaryTotalAtk, primaryQualities, primaryBaneTarget) : [];
+  const primaryBaneAtk = primarySpecialDmg.hasBane && primaryWpnObj ? getBaneAttackOption(primaryTotalAtk, primaryWpnObj.name, primaryBaneTarget) : null;
+  const primaryCritInfo = primaryWpnObj ? calculateCritDamagePools(primaryWpnObj, primaryDmgVal, primaryQualities, primaryBaneTarget) : null;
   const primaryFullAttackSeq = primaryWpnObj ? generateFullAttackSequence(
     bab,
     effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + (primaryTacticalMods?.attackMod || 0),
@@ -1301,10 +1630,11 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   // Resolve Secondary Weapon & Special Qualities
   const hasSecondary = eq.secondaryWeapon && eq.secondaryWeapon !== 'none';
   const secondaryQualities = eq.secondaryWeaponQualities || [];
-  const secondarySpecialDmg = getWeaponSpecialDamage(secondaryQualities);
+  const secondaryWpnObj = hasSecondary ? resolveEquippedWeapon(character, 'secondaryWeapon', weaponsData, customWeapons) : null;
+  const secondaryBaneTarget = eq.secondaryWeaponBaneTarget || secondaryWpnObj?.baneTarget;
+  const secondarySpecialDmg = getWeaponSpecialDamage(secondaryQualities, secondaryBaneTarget);
   const secondaryHasKeen = hasKeenQuality(secondaryQualities);
   const secondaryHasSpeed = hasSpeedQuality(secondaryQualities);
-  const secondaryWpnObj = hasSecondary ? resolveEquippedWeapon(character, 'secondaryWeapon', weaponsData, customWeapons) : null;
   const secondaryThreat = secondaryWpnObj ? (secondaryHasKeen ? calculateKeenThreat(secondaryWpnObj.threat) : secondaryWpnObj.threat) : 20;
   const secondaryTacticalMods = secondaryWpnObj ? calculateTacticalCombatModifiers(tcState, secondaryWpnObj, true, false) : null;
   const secondaryFeatBonuses = secondaryWpnObj ? calculateFeatCombatBonuses(character, secondaryWpnObj) : { attackBonus: 0, damageBonus: 0 };
@@ -1314,17 +1644,18 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const secondaryBaseDmgFormula = secondaryWpnObj ? `${secondaryWpnObj.damageM}${secondaryDmgVal >= 0 ? `+${secondaryDmgVal}` : secondaryDmgVal}` : '';
   const secondaryDamageDisplay = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceString}`;
   const secondaryRollDamageFormula = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceFormula}`;
-  const secondaryRollOptions = secondaryWpnObj ? getWeaponRollOptions(secondaryWpnObj, secondaryBaseDmgFormula, secondaryDmgVal, secondaryTotalAtk, secondaryQualities) : [];
-  const secondaryBaneAtk = secondarySpecialDmg.hasBane && secondaryWpnObj ? getBaneAttackOption(secondaryTotalAtk, secondaryWpnObj.name) : null;
-  const secondaryCritInfo = secondaryWpnObj ? calculateCritDamagePools(secondaryWpnObj, secondaryDmgVal, secondaryQualities) : null;
+  const secondaryRollOptions = secondaryWpnObj ? getWeaponRollOptions(secondaryWpnObj, secondaryBaseDmgFormula, secondaryDmgVal, secondaryTotalAtk, secondaryQualities, secondaryBaneTarget) : [];
+  const secondaryBaneAtk = secondarySpecialDmg.hasBane && secondaryWpnObj ? getBaneAttackOption(secondaryTotalAtk, secondaryWpnObj.name, secondaryBaneTarget) : null;
+  const secondaryCritInfo = secondaryWpnObj ? calculateCritDamagePools(secondaryWpnObj, secondaryDmgVal, secondaryQualities, secondaryBaneTarget) : null;
 
   // Resolve Ranged Weapon & Special Qualities
   const hasRanged = eq.rangedWeapon && eq.rangedWeapon !== 'none';
   const rangedQualities = eq.rangedWeaponQualities || [];
-  const rangedSpecialDmg = getWeaponSpecialDamage(rangedQualities);
+  const rangedWpnObj = hasRanged ? resolveEquippedWeapon(character, 'rangedWeapon', weaponsData, customWeapons) : null;
+  const rangedBaneTarget = eq.rangedWeaponBaneTarget || rangedWpnObj?.baneTarget;
+  const rangedSpecialDmg = getWeaponSpecialDamage(rangedQualities, rangedBaneTarget);
   const rangedHasKeen = hasKeenQuality(rangedQualities);
   const rangedHasSpeed = hasSpeedQuality(rangedQualities);
-  const rangedWpnObj = hasRanged ? resolveEquippedWeapon(character, 'rangedWeapon', weaponsData, customWeapons) : null;
   const rangedThreat = rangedWpnObj ? (rangedHasKeen ? calculateKeenThreat(rangedWpnObj.threat) : rangedWpnObj.threat) : 20;
   const rangedTacticalMods = rangedWpnObj ? calculateTacticalCombatModifiers(tcState, rangedWpnObj, false, true) : null;
   const rangedFeatBonuses = rangedWpnObj ? calculateFeatCombatBonuses(character, rangedWpnObj) : { attackBonus: 0, damageBonus: 0 };
@@ -1335,9 +1666,9 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const rangedBaseDmgFormula = rangedWpnObj ? `${rangedWpnObj.damageM}${rangedDmgStr}` : '';
   const rangedDamageDisplay = `${rangedBaseDmgFormula}${rangedSpecialDmg.damageDiceString}`;
   const rangedRollDamageFormula = `${rangedBaseDmgFormula}${rangedSpecialDmg.damageDiceFormula}`;
-  const rangedRollOptions = rangedWpnObj ? getWeaponRollOptions(rangedWpnObj, rangedBaseDmgFormula, rangedDmgVal, rangedTotalAtk, rangedQualities) : [];
-  const rangedBaneAtk = rangedSpecialDmg.hasBane && rangedWpnObj ? getBaneAttackOption(rangedTotalAtk, rangedWpnObj.name) : null;
-  const rangedCritInfo = rangedWpnObj ? calculateCritDamagePools(rangedWpnObj, rangedDmgVal, rangedQualities) : null;
+  const rangedRollOptions = rangedWpnObj ? getWeaponRollOptions(rangedWpnObj, rangedBaseDmgFormula, rangedDmgVal, rangedTotalAtk, rangedQualities, rangedBaneTarget) : [];
+  const rangedBaneAtk = rangedSpecialDmg.hasBane && rangedWpnObj ? getBaneAttackOption(rangedTotalAtk, rangedWpnObj.name, rangedBaneTarget) : null;
+  const rangedCritInfo = rangedWpnObj ? calculateCritDamagePools(rangedWpnObj, rangedDmgVal, rangedQualities, rangedBaneTarget) : null;
 
   // Inventory Actions
   const handleAddInventoryItem = (e: React.FormEvent) => {
@@ -1415,18 +1746,21 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.primaryWeaponItemId = undefined;
         newEq.primaryWeaponEnhancement = 0;
         newEq.primaryWeaponQualities = [];
+        newEq.primaryWeaponBaneTarget = undefined;
       }
       if (newEq.secondaryWeaponItemId === id) {
         newEq.secondaryWeapon = 'none';
         newEq.secondaryWeaponItemId = undefined;
         newEq.secondaryWeaponEnhancement = 0;
         newEq.secondaryWeaponQualities = [];
+        newEq.secondaryWeaponBaneTarget = undefined;
       }
       if (newEq.rangedWeaponItemId === id) {
         newEq.rangedWeapon = 'none';
         newEq.rangedWeaponItemId = undefined;
         newEq.rangedWeaponEnhancement = 0;
         newEq.rangedWeaponQualities = [];
+        newEq.rangedWeaponBaneTarget = undefined;
       }
       if (newEq.armorItemId === id) {
         newEq.armor = 'none';
@@ -1447,12 +1781,15 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       if (!stillInInventory) {
         if (!newEq.primaryWeaponItemId && eq.primaryWeapon && (matchesItemName(resolveWeapon(eq.primaryWeapon, customWeapons, weaponsData).name, cleanName) || matchesItemName(eq.primaryWeapon, cleanName))) {
           newEq.primaryWeapon = 'none';
+          newEq.primaryWeaponBaneTarget = undefined;
         }
         if (!newEq.secondaryWeaponItemId && eq.secondaryWeapon && (matchesItemName(resolveWeapon(eq.secondaryWeapon, customWeapons, weaponsData).name, cleanName) || matchesItemName(eq.secondaryWeapon, cleanName))) {
           newEq.secondaryWeapon = 'none';
+          newEq.secondaryWeaponBaneTarget = undefined;
         }
         if (!newEq.rangedWeaponItemId && eq.rangedWeapon && (matchesItemName(resolveWeapon(eq.rangedWeapon, customWeapons, weaponsData).name, cleanName) || matchesItemName(eq.rangedWeapon, cleanName))) {
           newEq.rangedWeapon = 'none';
+          newEq.rangedWeaponBaneTarget = undefined;
         }
         if (!newEq.armorItemId && eq.armor && (matchesItemName(resolveArmor(eq.armor, customArmors).name, cleanName) || matchesItemName(eq.armor, cleanName))) {
           newEq.armor = 'none';
@@ -2143,6 +2480,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 enhancementBonus={primaryEnhancement}
                 itemType="weapon"
                 onOpenGuide={() => setShowQualitiesGuide(true)}
+                baneTarget={eq.primaryWeaponBaneTarget}
+                onEditBaneTarget={() => openBaneModal('primaryWeaponQualities')}
               />
             )}
 
@@ -2195,7 +2534,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                         title={`Click to roll ${primaryBaneAtk.label}`}
                       >
                         <i className="fa-solid fa-bullseye text-xs text-red-400"></i>
-                        <span>{primaryBaneAtk.atkBonus >= 0 ? '+' : ''}{primaryBaneAtk.atkBonus} Melee (vs Foe)</span>
+                        <span>{primaryBaneAtk.atkBonus >= 0 ? '+' : ''}{primaryBaneAtk.atkBonus} Melee ({primaryBaneAtk.condition})</span>
                       </button>
                     )}
                   </div>
@@ -2315,6 +2654,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 enhancementBonus={secondaryEnhancement}
                 itemType="weapon"
                 onOpenGuide={() => setShowQualitiesGuide(true)}
+                baneTarget={eq.secondaryWeaponBaneTarget}
+                onEditBaneTarget={() => openBaneModal('secondaryWeaponQualities')}
               />
             )}
 
@@ -2350,7 +2691,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                         title={`Click to roll ${secondaryBaneAtk.label}`}
                       >
                         <i className="fa-solid fa-bullseye text-[10px] text-red-400"></i>
-                        <span>{secondaryBaneAtk.atkBonus >= 0 ? '+' : ''}{secondaryBaneAtk.atkBonus} Atk (vs Foe)</span>
+                        <span>{secondaryBaneAtk.atkBonus >= 0 ? '+' : ''}{secondaryBaneAtk.atkBonus} Atk ({secondaryBaneAtk.condition})</span>
                       </button>
                     )}
                   </div>
@@ -2451,6 +2792,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 enhancementBonus={rangedEnhancement}
                 itemType="weapon"
                 onOpenGuide={() => setShowQualitiesGuide(true)}
+                baneTarget={eq.rangedWeaponBaneTarget}
+                onEditBaneTarget={() => openBaneModal('rangedWeaponQualities')}
               />
             )}
 
@@ -2486,7 +2829,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                         title={`Click to roll ${rangedBaneAtk.label}`}
                       >
                         <i className="fa-solid fa-bullseye text-[10px] text-red-400"></i>
-                        <span>{rangedBaneAtk.atkBonus >= 0 ? '+' : ''}{rangedBaneAtk.atkBonus} Ranged (vs Foe)</span>
+                        <span>{rangedBaneAtk.atkBonus >= 0 ? '+' : ''}{rangedBaneAtk.atkBonus} Ranged ({rangedBaneAtk.condition})</span>
                       </button>
                     )}
                   </div>
@@ -3563,6 +3906,17 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal: Bane Designated Foe Selector */}
+      {baneModalConfig && (
+        <BaneTargetModal
+          isOpen={baneModalConfig.isOpen}
+          weaponName={baneModalConfig.weaponName}
+          currentTarget={baneModalConfig.currentTarget}
+          onSave={handleSaveBaneTarget}
+          onClose={() => setBaneModalConfig(null)}
+        />
       )}
     </div>
   );

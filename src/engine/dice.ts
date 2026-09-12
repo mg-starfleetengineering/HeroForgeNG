@@ -433,7 +433,8 @@ export function rollDice(
       const recPools = evaluatedPools.filter(p => p.isRecoil);
       const targetParts = targetPools.map(p => {
         const resStr = p.results && p.results.length > 0 ? ` (${p.results.join(' + ')})` : '';
-        return `${p.label} [${p.total}${resStr}]`;
+        const condStr = p.condition && !p.label.includes(p.condition) ? ` (${p.condition})` : '';
+        return `${p.label}${condStr} [${p.total}${resStr}]`;
       });
       let poolBreakdown = `${targetParts.join(' + ')} = ${total}`;
       if (recoilTotal !== undefined) {
