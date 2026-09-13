@@ -445,6 +445,7 @@ export interface ClassData {
     martialWeapons: boolean;
   };
   classSkills: string[];
+  features?: string[];
 }
 
 export interface RaceData {
@@ -454,6 +455,8 @@ export interface RaceData {
   size?: string;
   type?: string;
   subtype?: string;
+  subtypes?: string[];
+  traits?: string[];
   hd?: number;
   speed?: {
     land: number;

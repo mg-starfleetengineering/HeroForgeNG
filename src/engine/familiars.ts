@@ -1,6 +1,7 @@
 import { FamiliarData, CustomFamiliarData, FamiliarState, CharacterState, ClassData } from '../types/character';
 import { getAbilityMod } from './stats';
 import { calculateBAB, calculateBaseSave, calculateTotalHP } from './classes';
+import { hasClassFeature } from './features';
 
 export interface SizeModifier {
   size: string;
@@ -27,7 +28,7 @@ export interface UnlockedFamiliarAbility {
   unlocked: boolean;
 }
 
-export function getMasterFamiliarLevel(character: CharacterState): number {
+export function getMasterFamiliarLevel(character: CharacterState, classesData?: ClassData[]): number {
   const progression = character.levelProgression || [];
   if (progression.length === 0) return 1;
 
@@ -40,11 +41,20 @@ export function getMasterFamiliarLevel(character: CharacterState): number {
   let count = 0;
   for (const item of progression) {
     if (item.primaryClass) {
-      const clsLower = item.primaryClass.toLowerCase().replace(/\s+/g, '_');
-      if (familiarClasses.has(clsLower)) {
+      const clsLower = item.primaryClass.toLowerCase().replace(/[\s-]+/g, '_');
+      const clsObj = classesData?.find(
+        c => (c.id && c.id.toLowerCase().replace(/[\s-]+/g, '_') === clsLower) ||
+             c.name.toLowerCase().replace(/[\s-]+/g, '_') === clsLower
+      );
+      if (clsObj?.features?.includes('familiar') || familiarClasses.has(clsLower)) {
         count++;
       }
     }
+  }
+
+  // If character has the familiar class feature or active familiar
+  if (count === 0 && hasClassFeature(character, 'familiar', classesData)) {
+    return progression.filter(l => l.primaryClass).length || 1;
   }
 
   // If no specific caster class found or count is 0, fall back to total character level
@@ -187,7 +197,7 @@ export function computeFamiliarStats(
     return null;
   }
 
-  const masterLevel = getMasterFamiliarLevel(character);
+  const masterLevel = getMasterFamiliarLevel(character, classesData);
   const masterBAB = calculateBAB(character.levelProgression, classesData);
   const masterBaseFort = calculateBaseSave('fort', character.levelProgression, classesData);
   const masterBaseRef = calculateBaseSave('ref', character.levelProgression, classesData);

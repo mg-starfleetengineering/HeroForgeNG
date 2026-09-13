@@ -1,4 +1,5 @@
-import { CharacterState, ClassData, LevelProgression, StatType, SkillTrickData } from '../types/character';
+import { CharacterState, ClassData, LevelProgression, StatType, SkillTrickData, RaceData } from '../types/character';
+import { hasRacialTrait } from './features';
 
 export interface SkillDefinition {
   name: string;
@@ -66,8 +67,13 @@ export function calculateTotalSkillPoints(
   levelProgression: LevelProgression[],
   classDatabase: ClassData[],
   intMod: number,
-  isHuman: boolean = false
+  raceOrBonusSkillPoints: RaceData | string | boolean = false
 ): number {
+  const hasBonusSkillPoints =
+    typeof raceOrBonusSkillPoints === 'boolean'
+      ? raceOrBonusSkillPoints
+      : hasRacialTrait(raceOrBonusSkillPoints, 'bonus_skill_points');
+
   let totalPts = 0;
 
   levelProgression.forEach((lvl, idx) => {
@@ -81,7 +87,7 @@ export function calculateTotalSkillPoints(
     }
 
     let gained = Math.max(1, ptsPerLvl + intMod);
-    if (isHuman) gained += 1;
+    if (hasBonusSkillPoints) gained += 1;
 
     if (idx === 0) {
       totalPts += gained * 4;

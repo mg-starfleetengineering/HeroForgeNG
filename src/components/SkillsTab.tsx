@@ -13,6 +13,7 @@ import {
 } from '../engine/skills';
 import { calculateTotalScore, getAbilityMod, parseRaceMods, calculateTraitFlawStatMods, calculateTraitFlawSkillMods } from '../engine/stats';
 import { getArmorSkillBonus } from '../engine/magicItems';
+import { hasRacialTrait } from '../engine/features';
 
 interface SkillsTabProps {
   character: CharacterState;
@@ -50,11 +51,12 @@ export const SkillsTab: React.FC<SkillsTabProps> = ({
   const totalLevel = character.levelProgression?.filter(l => l.primaryClass).length || 1;
   const intScore = calculateTotalScore('int', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
   const intMod = getAbilityMod(intScore);
-  const isHuman = !!character.selectedRace && character.selectedRace.toLowerCase().includes('human');
+  const currentRace = (racesData || []).find(r => r.name === character.selectedRace || r.id === character.selectedRace);
+  const hasBonusSkillPoints = hasRacialTrait(currentRace || character.selectedRace, 'bonus_skill_points');
 
   const activeSkills = getAvailableSkills(usePathfinder);
 
-  const totalBudget = calculateTotalSkillPoints(character.levelProgression, classesData, intMod, isHuman);
+  const totalBudget = calculateTotalSkillPoints(character.levelProgression, classesData, intMod, hasBonusSkillPoints);
   const spentPts = calculateSpentSkillPoints(character.skillRanks, character.levelProgression, classesData, usePathfinder, selectedSkillTricks);
   const maxSkillTricks = getMaxSkillTricks(totalLevel);
   const remainingSkillPoints = totalBudget - spentPts;

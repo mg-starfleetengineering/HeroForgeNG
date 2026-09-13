@@ -1,4 +1,5 @@
 import { CharacterState, TacticalCombatState, ActiveCombatBuff, WeaponData, RaceData, TemplateData } from '../types/character';
+import { hasRacialTrait } from './features';
 
 export const STANDARD_SRD_BUFFS: ActiveCombatBuff[] = [
   {
@@ -1169,8 +1170,7 @@ export function calculateGrappleModifier(
   const traits = (character.selectedTraits || []).map(t => t.toLowerCase());
 
   const hasPowerfulBuild =
-    raceName.includes('goliath') ||
-    raceName.includes('half-giant') ||
+    hasRacialTrait(raceObj as RaceData || character.selectedRace, 'powerful_build') ||
     raceAbils.includes('powerful build') ||
     traits.some(t => t.includes('powerful build'));
 

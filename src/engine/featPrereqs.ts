@@ -25,6 +25,7 @@ import {
 import { calculateBAB, calculateBaseSave } from './classes';
 import { SPELLCASTING_CLASSES, getSpellSlotsForClass } from './spells';
 import { getThemedWeaponBase } from './equipment';
+import { hasSubtype, hasClassFeature } from './features';
 
 export type {
   CharacterFeat,
@@ -555,23 +556,29 @@ export function buildCharacterPrereqContext(
   const raceName = selectedRace.toLowerCase().trim();
   const raceType = (templateObj?.type || raceObj?.type || 'Humanoid').toLowerCase();
   const raceSubtypes: string[] = [];
+  if (raceObj?.subtypes) {
+    raceObj.subtypes.forEach(st => {
+      const clean = st.toLowerCase().trim();
+      if (clean && !raceSubtypes.includes(clean)) raceSubtypes.push(clean);
+    });
+  }
   if (raceObj?.subtype) {
-    raceObj.subtype.split(',').forEach(st => raceSubtypes.push(st.toLowerCase().trim()));
+    raceObj.subtype.split(',').forEach(st => {
+      const clean = st.toLowerCase().trim();
+      if (clean && !raceSubtypes.includes(clean)) raceSubtypes.push(clean);
+    });
   }
   if (templateObj?.subtype) {
-    templateObj.subtype.split(',').forEach(st => raceSubtypes.push(st.toLowerCase().trim()));
+    templateObj.subtype.split(',').forEach(st => {
+      const clean = st.toLowerCase().trim();
+      if (clean && !raceSubtypes.includes(clean)) raceSubtypes.push(clean);
+    });
   }
-  if (raceName.includes('dragon') || raceName.includes('kobold') || raceName.includes('spellscale')) {
-    if (!raceSubtypes.includes('dragonblood')) raceSubtypes.push('dragonblood');
-  }
-  if (raceName.includes('elf') && !raceSubtypes.includes('elf')) raceSubtypes.push('elf');
-  if (raceName.includes('dwarf') && !raceSubtypes.includes('dwarf')) raceSubtypes.push('dwarf');
-  if (raceName.includes('gnome') && !raceSubtypes.includes('gnome')) raceSubtypes.push('gnome');
-  if (raceName.includes('halfling') && !raceSubtypes.includes('halfling')) raceSubtypes.push('halfling');
-  if (raceName.includes('orc') && !raceSubtypes.includes('orc')) raceSubtypes.push('orc');
-  if (raceName.includes('goblin') && !raceSubtypes.includes('goblinoid')) raceSubtypes.push('goblinoid');
-  if (raceName.includes('shifter') || raceName.includes('changeling')) {
-    if (!raceSubtypes.includes('shapechanger')) raceSubtypes.push('shapechanger');
+  const standardSubtypes = ['dragonblood', 'elf', 'dwarf', 'gnome', 'halfling', 'orc', 'goblinoid', 'shapechanger', 'human', 'humanoid'];
+  for (const st of standardSubtypes) {
+    if (hasSubtype(raceObj || selectedRace, st) && !raceSubtypes.includes(st)) {
+      raceSubtypes.push(st);
+    }
   }
 
   const size = (templateObj?.size || raceObj?.size || 'Medium').toLowerCase();
@@ -593,51 +600,17 @@ export function buildCharacterPrereqContext(
   const wizardLvl = classLevels['wizard'] || 0;
   const sorcererLvl = classLevels['sorcerer'] || 0;
 
-  if (clericLvl >= 1 || paladinLvl >= 4) {
-    specialFeatures.add('turn_undead');
-    specialFeatures.add('rebuke_undead');
-    specialFeatures.add('turn_or_rebuke_undead');
-  }
-  if (druidLvl >= 5 || character.wildShape?.isActive || Boolean(character.wildShape?.selectedFormId)) {
-    specialFeatures.add('wild_shape');
-  }
-  if (rogueLvl >= 1 || scoutLvl >= 1 || classLevels['assassin'] || classLevels['ninja']) {
-    specialFeatures.add('sneak_attack');
-    if (scoutLvl >= 1) specialFeatures.add('skirmish');
-  }
-  if (rogueLvl >= 2 || monkLvl >= 2 || scoutLvl >= 5) {
-    specialFeatures.add('evasion');
-  }
-  if (rogueLvl >= 5 || barbarianLvl >= 2) {
-    specialFeatures.add('uncanny_dodge');
-  }
-  if (rogueLvl >= 10 || barbarianLvl >= 5) {
-    specialFeatures.add('improved_uncanny_dodge');
-  }
-  if (bardLvl >= 1) {
-    specialFeatures.add('bardic_music');
-  }
-  if (barbarianLvl >= 1) {
-    specialFeatures.add('rage');
-  }
-  if (monkLvl >= 1) {
-    specialFeatures.add('flurry_of_blows');
-    specialFeatures.add('improved_unarmed_strike');
-  }
-  if (monkLvl >= 4) {
-    specialFeatures.add('ki_strike');
-  }
-  if (paladinLvl >= 1) {
-    specialFeatures.add('smite_evil');
-  }
-  if (paladinLvl >= 2) {
-    specialFeatures.add('lay_on_hands');
-  }
-  if (wizardLvl >= 1 || sorcererLvl >= 1 || character.familiar?.hasFamiliar || Boolean(character.familiar?.selectedFamiliarId)) {
-    specialFeatures.add('familiar');
-  }
-  if (druidLvl >= 1 || rangerLvl >= 4 || character.animalCompanion?.hasCompanion || Boolean(character.animalCompanion?.selectedCompanionId)) {
-    specialFeatures.add('animal_companion');
+  const checkFeatures = [
+    'turn_undead', 'rebuke_undead', 'turn_or_rebuke_undead',
+    'wild_shape', 'sneak_attack', 'skirmish', 'evasion',
+    'uncanny_dodge', 'improved_uncanny_dodge', 'bardic_music',
+    'rage', 'flurry_of_blows', 'improved_unarmed_strike', 'ki_strike',
+    'smite_evil', 'lay_on_hands', 'familiar', 'animal_companion'
+  ];
+  for (const feat of checkFeatures) {
+    if (hasClassFeature(character, feat, classesData)) {
+      specialFeatures.add(feat);
+    }
   }
   if (raceName.includes('dragonborn') || raceName.includes('half-dragon') || classLevels['dragonfire adept']) {
     specialFeatures.add('breath_weapon');
@@ -1388,7 +1361,7 @@ export function evaluateStructuredRule(
 
     case 'subtype': {
       const st = rule.subtypeName!;
-      if (context.raceSubtypes.includes(st)) {
+      if (context.raceSubtypes.includes(st) || hasSubtype(context.race, st)) {
         return { satisfied: true, satisfiedDescription: `${st} subtype` };
       }
       return { satisfied: false, unmetDescription: `Requires ${st} subtype` };

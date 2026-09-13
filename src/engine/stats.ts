@@ -1,5 +1,6 @@
 import { BaseStats, RaceData, StatType, TraitData, FlawData, CharacterState, ClassData, TemplateData, ActiveCombatBuff } from '../types/character';
 import { resolveArmor } from './equipment';
+import { hasRacialTrait } from './features';
 export { calculateCombatStats, calculateTacticalCombat, aggregateBuffBonuses, resolveActiveBuffs, migrateCharacterBuffs, STANDARD_SRD_BUFFS } from './combat';
 
 export const ABILITY_NAMES: StatType[] = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
@@ -155,12 +156,10 @@ export function calculateTotalFeatSlots(
   // 1. Standard D&D 3.5e character level progression feats: Lvl 1, 3, 6, 9, 12, 15, 18
   const baseFeats = totalLevel >= 1 ? 1 + Math.floor((totalLevel - 1) / 3) : 1;
 
-  // 2. Racial bonus feats (Human, Silverbrow Human, or any race with bonusFeats)
+  // 2. Racial bonus feats (Human, Silverbrow Human, or any race with bonus_feat trait)
   const raceName = (character.selectedRace || '').toLowerCase();
   const raceObj = raceDatabase.find(r => r.name.toLowerCase() === raceName || r.id === raceName);
-  const isHumanoidHuman = raceName.includes('human');
-  const isStrongheart = raceName.includes('strongheart');
-  const hasRacialBonusFeat = isHumanoidHuman || isStrongheart || Boolean(raceObj?.bonusFeats && raceObj.bonusFeats.toLowerCase().includes('bonus feat'));
+  const hasRacialBonusFeat = hasRacialTrait(raceObj || character.selectedRace, 'bonus_feat');
   const racialBonus = hasRacialBonusFeat ? 1 : 0;
 
   // 3. Class bonus feats count
@@ -514,8 +513,7 @@ export function calculateTotalSpeed(
   }
 
   const armorKey = armorCategory || (character.equipment?.armor || 'none').toLowerCase();
-  const raceName = (character.selectedRace || '').toLowerCase();
-  const isDwarf = raceName.includes('dwarf');
+  const isDwarf = hasRacialTrait(raceObj as RaceData || character.selectedRace, 'dwarf_speed');
 
   const classBonus = calculateClassSpeedBonus(character.levelProgression, armorKey, false);
   const featBonus = calculateFeatSpeedBonus(character.selectedFeats);

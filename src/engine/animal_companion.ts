@@ -2,9 +2,11 @@ import {
   CharacterState,
   AnimalCompanionData,
   CustomAnimalCompanionData,
-  AnimalCompanionState
+  AnimalCompanionState,
+  ClassData
 } from '../types/character';
 import { getAbilityMod } from './stats';
+import { hasClassFeature } from './features';
 
 export interface SizeModifier {
   size: string;
@@ -163,7 +165,11 @@ export function getAnimalCompanionBonus(effectiveDruidLevel: number, minLevelReq
   };
 }
 
-export function getEffectiveDruidLevel(character: CharacterState, hasNaturalBondToggle?: boolean): number {
+export function getEffectiveDruidLevel(
+  character: CharacterState,
+  hasNaturalBondToggle?: boolean,
+  classesData?: ClassData[]
+): number {
   const progression = character.levelProgression || [];
   const charLvl = progression.length || 1;
 
@@ -175,6 +181,10 @@ export function getEffectiveDruidLevel(character: CharacterState, hasNaturalBond
   for (const p of progression) {
     if (!p.primaryClass) continue;
     const cls = p.primaryClass.toLowerCase().replace(/[\s_-]+/g, '');
+    const clsObj = classesData?.find(
+      c => (c.id && c.id.toLowerCase().replace(/[\s_-]+/g, '') === cls) ||
+           c.name.toLowerCase().replace(/[\s_-]+/g, '') === cls
+    );
 
     if (cls === 'druid') {
       druidLevels++;
@@ -182,7 +192,12 @@ export function getEffectiveDruidLevel(character: CharacterState, hasNaturalBond
       rangerLevels++;
     } else if (cls === 'beastmaster') {
       beastmasterLevels++;
-    } else if (cls.includes('lionoftalisid') || cls.includes('wavekeeper') || cls.includes('halforc')) {
+    } else if (
+      clsObj?.features?.includes('animal_companion') ||
+      cls.includes('lionoftalisid') ||
+      cls.includes('wavekeeper') ||
+      cls.includes('wildrunner')
+    ) {
       otherLevels++;
     }
   }
@@ -207,8 +222,8 @@ export function getEffectiveDruidLevel(character: CharacterState, hasNaturalBond
     effective += 3;
   }
 
-  // If total effective druid level is 0 but user enabled companion, default to min 1
-  if (effective === 0 && charLvl > 0) {
+  // If total effective druid level is 0 but character has animal_companion feature (or companion enabled), default to min 1
+  if (effective === 0 && charLvl > 0 && hasClassFeature(character, 'animal_companion', classesData)) {
     effective = 1;
   }
 
@@ -306,13 +321,14 @@ export const STANDARD_COMPANION_SKILLS = [
 export function computeAnimalCompanionStats(
   character: CharacterState,
   companionsData: AnimalCompanionData[],
-  state?: AnimalCompanionState
+  state?: AnimalCompanionState,
+  classesData?: ClassData[]
 ): AnimalCompanionComputedStats | null {
   if (!state || !state.hasCompanion) {
     return null;
   }
 
-  const effectiveDruidLevel = getEffectiveDruidLevel(character, state.hasNaturalBondFeat);
+  const effectiveDruidLevel = getEffectiveDruidLevel(character, state.hasNaturalBondFeat, classesData);
   const selectedId = state.selectedCompanionId || 'wolf';
 
   let baseData: {
