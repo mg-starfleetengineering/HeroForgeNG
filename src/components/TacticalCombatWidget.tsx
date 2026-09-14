@@ -38,9 +38,9 @@ export const TacticalCombatWidget: React.FC<TacticalCombatWidgetProps> = ({
   const maxCe = Math.max(0, Math.min(bab, 5));
 
   // Determine what features the character possesses
-  const selectedFeats = character.selectedFeats || [];
-  const hasPowerAttack = selectedFeats.some(f => f.toLowerCase().includes('power attack')) || bab >= 1;
-  const hasCombatExpertise = selectedFeats.some(f => f.toLowerCase().includes('combat expertise')) || (character.baseStats.int >= 13 && bab >= 1);
+  const selectedFeatEntities = character.selectedFeatEntities || [];
+  const hasPowerAttack = selectedFeatEntities.some(f => f.featId === 'power_attack' || f.featId.includes('power_attack'));
+  const hasCombatExpertise = selectedFeatEntities.some(f => f.featId === 'combat_expertise' || f.featId.includes('combat_expertise'));
 
   const barbLevel = getClassLevel(character, 'barbarian');
   const rageMax = calculateBarbarianRageUses(character);

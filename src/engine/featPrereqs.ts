@@ -443,22 +443,10 @@ export function buildCharacterPrereqContext(
 
   // 6. Active Feats
   const rawActiveFeats = character.selectedFeats || [];
-  const activeFeatEntities: CharacterFeat[] = (Array.isArray(character.selectedFeatEntities) && character.selectedFeatEntities.length > 0)
-    ? [...character.selectedFeatEntities]
+  const hasEntities = Array.isArray(character.selectedFeatEntities) && character.selectedFeatEntities.length > 0;
+  const activeFeatEntities: CharacterFeat[] = hasEntities
+    ? [...character.selectedFeatEntities!]
     : migrateLegacyFeatStrings(rawActiveFeats);
-
-  // If character has selectedFeatEntities but also extra strings in selectedFeats, merge any unmigrated ones
-  if (Array.isArray(character.selectedFeatEntities) && character.selectedFeatEntities.length > 0 && rawActiveFeats.length > 0) {
-    const existingKeys = new Set(activeFeatEntities.map(e => `${e.featId}::${e.targetId || ''}`));
-    const extraMigrated = migrateLegacyFeatStrings(rawActiveFeats);
-    extraMigrated.forEach(e => {
-      const key = `${e.featId}::${e.targetId || ''}`;
-      if (!existingKeys.has(key)) {
-        existingKeys.add(key);
-        activeFeatEntities.push(e);
-      }
-    });
-  }
 
   const activeFeats: string[] = [];
   let metamagicCount = 0;
@@ -476,17 +464,20 @@ export function buildCharacterPrereqContext(
     }
   });
 
-  rawActiveFeats.forEach(f => {
-    const rawLower = f.toLowerCase().trim();
-    if (!activeFeats.includes(rawLower)) {
-      activeFeats.push(rawLower);
-    }
+  // Only check legacy strings if character had no structured entities
+  if (!hasEntities && Array.isArray(character.selectedFeats)) {
+    character.selectedFeats.forEach(f => {
+      const rawLower = f.toLowerCase().trim();
+      if (!activeFeats.includes(rawLower)) {
+        activeFeats.push(rawLower);
+      }
 
-    const norm = normalizeFeatName(f);
-    if (norm && !activeFeats.includes(norm)) {
-      activeFeats.push(norm);
-    }
-  });
+      const norm = normalizeFeatName(f);
+      if (norm && !activeFeats.includes(norm)) {
+        activeFeats.push(norm);
+      }
+    });
+  }
 
   // Metamagic and item creation counts
   activeFeats.forEach(f => {
@@ -519,25 +510,27 @@ export function buildCharacterPrereqContext(
     if (id === 'martial_weapon_proficiency') proficiencies.martialWeapons = true;
   });
 
-  rawActiveFeats.forEach(f => {
-    const rawLower = f.toLowerCase().trim();
-    if (rawLower.includes('armor proficiency (light)')) proficiencies.lightArmor = true;
-    if (rawLower.includes('armor proficiency (medium)')) {
-      proficiencies.lightArmor = true;
-      proficiencies.mediumArmor = true;
-    }
-    if (rawLower.includes('armor proficiency (heavy)')) {
-      proficiencies.lightArmor = true;
-      proficiencies.mediumArmor = true;
-      proficiencies.heavyArmor = true;
-    }
-    if (rawLower.includes('shield proficiency')) proficiencies.shields = true;
-    if (rawLower.includes('tower shield proficiency')) {
-      proficiencies.shields = true;
-      proficiencies.towerShield = true;
-    }
-    if (rawLower.includes('martial weapon proficiency')) proficiencies.martialWeapons = true;
-  });
+  if (!hasEntities && Array.isArray(character.selectedFeats)) {
+    character.selectedFeats.forEach(f => {
+      const rawLower = f.toLowerCase().trim();
+      if (rawLower.includes('armor proficiency (light)')) proficiencies.lightArmor = true;
+      if (rawLower.includes('armor proficiency (medium)')) {
+        proficiencies.lightArmor = true;
+        proficiencies.mediumArmor = true;
+      }
+      if (rawLower.includes('armor proficiency (heavy)')) {
+        proficiencies.lightArmor = true;
+        proficiencies.mediumArmor = true;
+        proficiencies.heavyArmor = true;
+      }
+      if (rawLower.includes('shield proficiency')) proficiencies.shields = true;
+      if (rawLower.includes('tower shield proficiency')) {
+        proficiencies.shields = true;
+        proficiencies.towerShield = true;
+      }
+      if (rawLower.includes('martial weapon proficiency')) proficiencies.martialWeapons = true;
+    });
+  }
 
   // 7. Skills
   const skills: Record<string, number> = {};
@@ -1423,7 +1416,7 @@ export function evaluateStructuredRule(
 
       if (reqFeatId) {
         const matchingEntities = context.activeFeatEntities.filter(
-          entity => featNameToId(entity.featId) === reqFeatId
+          entity => entity.featId === reqFeatId || featNameToId(entity.featId) === reqFeatId
         );
 
         if (matchingEntities.length > 0) {

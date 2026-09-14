@@ -55,7 +55,11 @@ const DEFAULT_CHARACTER: CharacterState = {
     { level: 5, primaryClass: 'Fighter', secondaryClass: '', hpRoll: 6 }
   ],
   skillRanks: {},
-  selectedFeats: ['Power Attack', 'Weapon Focus (Longsword)', 'Cleave'],
+  selectedFeatEntities: [
+    { id: 'power_attack', featId: 'power_attack', notes: 'Power Attack' },
+    { id: 'weapon_focus_longsword', featId: 'weapon_focus', targetId: 'longsword', targetType: 'weapon', notes: 'Weapon Focus (Longsword)' },
+    { id: 'cleave', featId: 'cleave', notes: 'Cleave' }
+  ],
   selectedTraits: [],
   selectedFlaws: [],
   equipment: {

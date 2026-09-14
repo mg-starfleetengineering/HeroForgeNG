@@ -1,4 +1,4 @@
-import { BaseStats, RaceData, StatType, TraitData, FlawData, CharacterState, ClassData, TemplateData, ActiveCombatBuff } from '../types/character';
+import { BaseStats, RaceData, StatType, TraitData, FlawData, CharacterState, CharacterFeat, ClassData, TemplateData, ActiveCombatBuff } from '../types/character';
 import { resolveArmor } from './equipment';
 import { hasRacialTrait } from './features';
 export { calculateCombatStats, calculateTacticalCombat, aggregateBuffBonuses, resolveActiveBuffs, migrateCharacterBuffs, STANDARD_SRD_BUFFS } from './combat';
@@ -428,13 +428,14 @@ export function calculateClassSpeedBonus(
   return bonus;
 }
 
-export function calculateFeatSpeedBonus(selectedFeats: string[] = []): number {
+export function calculateFeatSpeedBonus(feats: (string | CharacterFeat)[] = []): number {
   let bonus = 0;
-  (selectedFeats || []).forEach(f => {
-    const fLower = f.toLowerCase();
-    if (fLower.includes('dash')) bonus += 5;
-    if (fLower.includes('speed of thought')) bonus += 10;
-    if (fLower.includes('fleet of foot')) bonus += 10;
+  (feats || []).forEach(f => {
+    const fLower = typeof f === 'string' ? f.toLowerCase() : (f.notes || f.featId).toLowerCase();
+    const fId = typeof f === 'string' ? f.toLowerCase().replace(/[^a-z0-9]+/g, '_') : f.featId.toLowerCase();
+    if (fId.includes('dash') || fLower.includes('dash')) bonus += 5;
+    if (fId.includes('speed_of_thought') || fLower.includes('speed of thought')) bonus += 10;
+    if (fId.includes('fleet_of_foot') || fLower.includes('fleet of foot')) bonus += 10;
   });
   return bonus;
 }
@@ -516,7 +517,7 @@ export function calculateTotalSpeed(
   const isDwarf = hasRacialTrait(raceObj as RaceData || character.selectedRace, 'dwarf_speed');
 
   const classBonus = calculateClassSpeedBonus(character.levelProgression, armorKey, false);
-  const featBonus = calculateFeatSpeedBonus(character.selectedFeats);
+  const featBonus = calculateFeatSpeedBonus(character.selectedFeatEntities || character.selectedFeats);
 
   const selectedTraits = character.selectedTraits || [];
   const selectedFlaws = character.selectedFlaws || [];

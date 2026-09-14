@@ -42,10 +42,20 @@ export function getClassLevel(character: CharacterState, targetClassName: string
  * Counts how many times a feat (or feat starting with prefix) is selected by the character.
  */
 export function countFeats(character: CharacterState, targetFeat: string): number {
-  if (!character.selectedFeats || !Array.isArray(character.selectedFeats)) return 0;
   const target = targetFeat.toLowerCase().trim();
+  const targetId = target.replace(/[^a-z0-9]+/g, '_');
 
-  return character.selectedFeats.filter(f => {
+  if (Array.isArray(character.selectedFeatEntities) && character.selectedFeatEntities.length > 0) {
+    return character.selectedFeatEntities.filter(e => {
+      const fId = (e.featId || '').toLowerCase();
+      const notes = (e.notes || '').toLowerCase();
+      return fId === targetId || fId.startsWith(targetId) || notes === target || notes.startsWith(target);
+    }).length;
+  }
+
+  const legacy = (character as any).selectedFeats;
+  if (!legacy || !Array.isArray(legacy)) return 0;
+  return legacy.filter((f: string) => {
     const fn = (f || '').toLowerCase().trim();
     return fn === target || fn.startsWith(target);
   }).length;

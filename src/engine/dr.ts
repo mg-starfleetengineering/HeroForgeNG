@@ -146,7 +146,9 @@ export function collectDRSources(
   const sources: DRSource[] = [];
   const levelProgression = character.levelProgression || [];
   const characterLevel = getCharacterLevel(levelProgression);
-  const selectedFeats = character.selectedFeats || [];
+  const featEntities = (character.selectedFeatEntities && character.selectedFeatEntities.length > 0)
+    ? character.selectedFeatEntities
+    : (character.selectedFeats || []).map(f => ({ id: f, featId: f.toLowerCase().replace(/[^a-z0-9]+/g, '_'), notes: f }));
 
   // 1. Race DR
   if (raceObj) {
@@ -283,11 +285,12 @@ export function collectDRSources(
   }
 
   // 4. Feats DR
-  for (const fName of selectedFeats) {
-    const fLower = fName.toLowerCase();
+  for (const entity of featEntities) {
+    const fLower = (entity.notes || entity.featId).toLowerCase();
+    const fId = entity.featId.toLowerCase();
 
     // Roll With It (+2/- per selection, STACKS)
-    if (fLower.includes('roll with it')) {
+    if (fId.includes('roll_with_it') || fLower.includes('roll with it')) {
       let rollCount = 1;
       if (fLower.includes('x3')) rollCount = 3;
       else if (fLower.includes('x2')) rollCount = 2;
@@ -302,7 +305,7 @@ export function collectDRSources(
     }
 
     // Armor Specialization (+2/- while wearing armor, STACKS)
-    if (fLower.includes('armor specialization')) {
+    if (fId.includes('armor_specialization') || fLower.includes('armor specialization')) {
       sources.push({
         name: 'Armor Specialization (2/-)',
         category: 'feat',
@@ -314,7 +317,7 @@ export function collectDRSources(
     }
 
     // Epic DR / Damage Reduction (+3/- per selection, STACKS)
-    if (fLower === 'damage reduction' || fLower === 'improved damage reduction' || fLower.includes('damage reduction x')) {
+    if (fId === 'damage_reduction' || fId === 'improved_damage_reduction' || fLower.includes('damage reduction')) {
       let count = 1;
       if (fLower.includes('x3')) count = 3;
       else if (fLower.includes('x2')) count = 2;
@@ -329,7 +332,7 @@ export function collectDRSources(
     }
 
     // Divine Damage Reduction (2/Adamantine, non-stacking)
-    if (fLower.includes('divine damage reduction')) {
+    if (fId.includes('divine_damage_reduction') || fLower.includes('divine damage reduction')) {
       sources.push({
         name: 'Divine Damage Reduction (2/Adamantine)',
         category: 'feat',
@@ -341,8 +344,8 @@ export function collectDRSources(
     }
 
     // Fey Skin / Fey Heritage (1/Cold Iron + 1 per 2 Fey feats)
-    if (fLower.includes('fey skin')) {
-      const feyCount = selectedFeats.filter(f => f.toLowerCase().includes('fey')).length;
+    if (fId.includes('fey_skin') || fLower.includes('fey skin')) {
+      const feyCount = featEntities.filter(f => (f.notes || f.featId).toLowerCase().includes('fey')).length;
       const feyDR = 1 + Math.floor(feyCount / 2);
       sources.push({
         name: `Fey Skin (${feyDR}/Cold Iron)`,
@@ -355,7 +358,7 @@ export function collectDRSources(
     }
 
     // Check general feat description from featsData if not covered above
-    const fObj = featsData.find(f => f.name.toLowerCase() === fLower || f.id === fLower);
+    const fObj = featsData.find(f => f.name.toLowerCase() === fLower || f.id === fId || f.id === fLower);
     if (fObj && fObj.description) {
       if (fObj.description.toLowerCase().includes('damage reduction') || fObj.description.toLowerCase().includes('dr ')) {
         const parsed = parseDRText(fObj.description);
@@ -394,8 +397,11 @@ export function collectDRSources(
       ''
     ).toLowerCase();
 
-    const isAdamantine = armorName.includes('adamantine') || armorKey.includes('adamantine') ||
+    const isAdamantine = equippedArmorItem?.material === 'adamantine' ||
+      character.equipment?.armorMaterial === 'adamantine' ||
+      armorName.includes('adamantine') || armorKey.includes('adamantine') ||
       Boolean(customArmor && customArmor.name.toLowerCase().includes('adamantine')) ||
+      Boolean(customArmor && customArmor.material === 'adamantine') ||
       Boolean(equippedArmorItem?.specialQualities?.some(q => q.toLowerCase().includes('adamantine')));
 
     if (isAdamantine) {
@@ -486,13 +492,16 @@ export function calculateTotalDR(
   classesData: ClassData[] = []
 ): ActiveDRSummary {
   const sources = collectDRSources(character, raceObj, templateObj, featsData, classesData);
-  const selectedFeats = character.selectedFeats || [];
+  const featEntities = (character.selectedFeatEntities && character.selectedFeatEntities.length > 0)
+    ? character.selectedFeatEntities
+    : (character.selectedFeats || []).map(f => ({ id: f, featId: f.toLowerCase().replace(/[^a-z0-9]+/g, '_'), notes: f }));
 
   // Check for Thick-skinned feat bonus (+2 to all DR per rank)
   let thickSkinnedBonus = 0;
-  selectedFeats.forEach(f => {
-    const fLower = f.toLowerCase();
-    if (fLower.includes('thick-skinned') || fLower.includes('thick skinned')) {
+  featEntities.forEach(entity => {
+    const fLower = (entity.notes || entity.featId).toLowerCase();
+    const fId = entity.featId.toLowerCase();
+    if (fId.includes('thick_skinned') || fLower.includes('thick-skinned') || fLower.includes('thick skinned')) {
       if (fLower.includes('x3')) thickSkinnedBonus += 6;
       else if (fLower.includes('x2')) thickSkinnedBonus += 4;
       else thickSkinnedBonus += 2;

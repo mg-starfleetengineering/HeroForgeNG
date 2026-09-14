@@ -1078,24 +1078,22 @@ export function generateFullAttackSequence(
   hasWhirlingFrenzy: boolean = false,
   hasSpeed: boolean = false
 ): string {
-  const baseBab = Math.max(1, bab);
-
   // Generate standard iterative attacks
-  const attacks: number[] = [baseBab];
-  if (baseBab >= 6) attacks.push(baseBab - 5);
-  if (baseBab >= 11) attacks.push(baseBab - 10);
-  if (baseBab >= 16) attacks.push(baseBab - 15);
+  const attacks: number[] = [bab];
+  if (bab >= 6) attacks.push(bab - 5);
+  if (bab >= 11) attacks.push(bab - 10);
+  if (bab >= 16) attacks.push(bab - 15);
 
   // Extra attacks at highest BAB
   // In D&D 3.5e, Speed grants 1 extra attack at highest BAB and does not stack with Haste
   if (hasHaste || hasSpeed) {
-    attacks.unshift(baseBab);
+    attacks.unshift(bab);
   }
   if (hasFlurry) {
-    attacks.unshift(baseBab);
+    attacks.unshift(bab);
   }
   if (hasWhirlingFrenzy) {
-    attacks.unshift(baseBab);
+    attacks.unshift(bab);
   }
 
   // Apply net attack bonus to every attack in sequence
@@ -1181,17 +1179,19 @@ export function calculateGrappleModifier(
 
   // Feat bonuses
   let featBonus = 0;
-  const selectedFeats = character.selectedFeats || [];
+  const featEntities = (character.selectedFeatEntities && character.selectedFeatEntities.length > 0)
+    ? character.selectedFeatEntities
+    : ((character.selectedFeats || []).map(f => ({ id: f, featId: f.toLowerCase().replace(/[^a-z0-9]+/g, '_') })));
 
-  for (const fName of selectedFeats) {
-    const fLower = fName.toLowerCase();
-    if (fLower === 'improved grapple' || fLower === '--improved grapple--') {
+  for (const entity of featEntities) {
+    const fId = entity.featId.toLowerCase();
+    if (fId === 'improved_grapple') {
       featBonus += 4;
       notes.push('Improved Grapple (+4)');
-    } else if (fLower.includes('illithid grapple')) {
+    } else if (fId.includes('illithid_grapple')) {
       featBonus += 2;
       notes.push('Illithid Grapple (+2)');
-    } else if (fLower.includes('jotunbrud') && sizeMod === 0) {
+    } else if (fId.includes('jotunbrud') && sizeMod === 0) {
       sizeMod = 4;
       notes.push('Jotunbrud (+4)');
     }

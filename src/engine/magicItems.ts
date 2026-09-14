@@ -3,7 +3,8 @@
  * Source: D&D 3.5e Dungeon Master's Guide (DMG) Chapter 7
  */
 
-import { WeaponData, CustomArmorData } from '../types/character';
+import { WeaponData, CustomArmorData, EquipmentMaterial } from '../types/character';
+export type { EquipmentMaterial };
 
 export type QualityTarget = 'weapon' | 'melee' | 'ranged' | 'armor' | 'shield' | 'armor_or_shield';
 
@@ -1137,10 +1138,85 @@ export function calculateTotalItemCost(
  * - baseName="Chain Shirt", enh=2, qualities=['shadow'] -> "+2 Shadow Chain Shirt"
  * - baseName="Longsword", enh=0, qualities=[] -> "Longsword"
  */
+export function formatMaterialName(material?: EquipmentMaterial | string): string {
+  if (!material || material === 'standard') return '';
+  switch (material.toLowerCase()) {
+    case 'adamantine': return 'Adamantine';
+    case 'mithral':
+    case 'mithril': return 'Mithral';
+    case 'dragonhide': return 'Dragonhide';
+    case 'darkwood': return 'Darkwood';
+    case 'cold_iron':
+    case 'cold iron': return 'Cold Iron';
+    case 'alchemical_silver':
+    case 'alchemical silver':
+    case 'silver': return 'Alchemical Silver';
+    default:
+      return material.charAt(0).toUpperCase() + material.slice(1);
+  }
+}
+
+export function parseItemMaterial(fullName: string | undefined): { material: EquipmentMaterial; cleanName: string } {
+  if (!fullName || !fullName.trim()) {
+    return { material: 'standard', cleanName: '' };
+  }
+
+  let clean = fullName.trim();
+
+  // Match multi-word materials first
+  if (/\b(?:alchemical\s+silver|alchemical_silver)\b/i.test(clean)) {
+    return {
+      material: 'alchemical_silver',
+      cleanName: clean.replace(/\b(?:alchemical\s+silver|alchemical_silver)\b/i, '').replace(/\s+/g, ' ').trim()
+    };
+  }
+  if (/\b(?:cold\s+iron|cold_iron)\b/i.test(clean)) {
+    return {
+      material: 'cold_iron',
+      cleanName: clean.replace(/\b(?:cold\s+iron|cold_iron)\b/i, '').replace(/\s+/g, ' ').trim()
+    };
+  }
+  if (/\b(?:adamantine)\b/i.test(clean)) {
+    return {
+      material: 'adamantine',
+      cleanName: clean.replace(/\b(?:adamantine)\b/i, '').replace(/\s+/g, ' ').trim()
+    };
+  }
+  if (/\b(?:mithral|mithril)\b/i.test(clean)) {
+    return {
+      material: 'mithral',
+      cleanName: clean.replace(/\b(?:mithral|mithril)\b/i, '').replace(/\s+/g, ' ').trim()
+    };
+  }
+  if (/\b(?:dragonhide|dragon-hide)\b/i.test(clean)) {
+    return {
+      material: 'dragonhide',
+      cleanName: clean.replace(/\b(?:dragonhide|dragon-hide)\b/i, '').replace(/\s+/g, ' ').trim()
+    };
+  }
+  if (/\b(?:darkwood|dark-wood)\b/i.test(clean)) {
+    return {
+      material: 'darkwood',
+      cleanName: clean.replace(/\b(?:darkwood|dark-wood)\b/i, '').replace(/\s+/g, ' ').trim()
+    };
+  }
+  // Standalone silver
+  if (/\b(?:silver)\b/i.test(clean)) {
+    return {
+      material: 'alchemical_silver',
+      cleanName: clean.replace(/\b(?:silver)\b/i, '').replace(/\s+/g, ' ').trim()
+    };
+  }
+
+  return { material: 'standard', cleanName: clean };
+}
+
 export function formatMagicItemName(
   baseName: string,
   enhancementBonus: number = 0,
-  qualities: string[] = []
+  qualities: string[] = [],
+  material?: EquipmentMaterial | string,
+  isMasterwork?: boolean
 ): string {
   if (!baseName || baseName.trim() === '' || baseName === 'none') return baseName;
 
@@ -1148,11 +1224,38 @@ export function formatMagicItemName(
   const parsed = parseMagicItemName(baseName);
   let cleanBase = parsed.baseName.trim();
 
+  // Strip any leading "Masterwork " or "Mwk " from cleanBase first to prevent duplication
+  cleanBase = cleanBase.replace(/^(?:masterwork|mwk\.?)\s+/i, '').trim();
+
   // Strip remaining known fortification / SR prefixes
   cleanBase = cleanBase
     .replace(/^(?:Light|Moderate|Heavy)\s+Fortification\s+/i, '')
     .replace(/^SR\s+\d+\s+/i, '')
     .trim();
+
+  // Normalize snake_case or raw single-word IDs into clean Title Case display format
+  if (cleanBase.includes('_')) {
+    cleanBase = cleanBase
+      .split('_')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(' ');
+  } else if (/^(?:fullplate|chainshirt|bandedmail|splintmail|halfplate)$/i.test(cleanBase)) {
+    const map: Record<string, string> = {
+      fullplate: 'Full Plate',
+      chainshirt: 'Chain Shirt',
+      bandedmail: 'Banded Mail',
+      splintmail: 'Splint Mail',
+      halfplate: 'Half-Plate'
+    };
+    cleanBase = map[cleanBase.toLowerCase()] || cleanBase;
+  }
+
+  const effectiveMat = (material && material !== 'standard') ? material : (parsed.material && parsed.material !== 'standard' ? parsed.material : undefined);
+
+  const effectiveMwk = isMasterwork !== undefined ? isMasterwork : parsed.isMasterwork;
+  if (effectiveMwk && enhancementBonus === 0 && (!effectiveMat || effectiveMat === 'standard')) {
+    cleanBase = `Masterwork ${cleanBase}`;
+  }
 
   const parts: string[] = [];
   if (enhancementBonus > 0) {
@@ -1175,6 +1278,13 @@ export function formatMagicItemName(
     parts.push(qualityNames.join(' '));
   }
 
+  if (effectiveMat && effectiveMat !== 'standard') {
+    const matName = formatMaterialName(effectiveMat);
+    if (matName && !new RegExp(`^${matName}\\b`, 'i').test(cleanBase)) {
+      cleanBase = `${matName} ${cleanBase}`;
+    }
+  }
+
   parts.push(cleanBase);
   return parts.join(' ').trim();
 }
@@ -1183,6 +1293,8 @@ export interface ParsedMagicItem {
   baseName: string;
   enhancementBonus: number;
   qualities: string[];
+  material?: EquipmentMaterial | string;
+  isMasterwork?: boolean;
 }
 
 /**
@@ -1191,6 +1303,7 @@ export interface ParsedMagicItem {
  * - "+1 Flaming Longsword" -> { baseName: 'Longsword', enhancementBonus: 1, qualities: ['flaming'] }
  * - "+2 Keen Falchion" -> { baseName: 'Falchion', enhancementBonus: 2, qualities: ['keen'] }
  * - "Unholy Holy Dagger" -> { baseName: 'Dagger', enhancementBonus: 0, qualities: ['unholy', 'holy'] }
+ * - "Masterwork Longsword" -> { baseName: 'Longsword', enhancementBonus: 0, qualities: [], isMasterwork: true }
  * - "Javelin" -> { baseName: 'Javelin', enhancementBonus: 0, qualities: [] }
  */
 export function parseMagicItemName(
@@ -1198,11 +1311,25 @@ export function parseMagicItemName(
   targetHint?: 'weapon' | 'armor' | 'shield'
 ): ParsedMagicItem {
   if (!fullName || !fullName.trim()) {
-    return { baseName: '', enhancementBonus: 0, qualities: [] };
+    return { baseName: '', enhancementBonus: 0, qualities: [], material: 'standard', isMasterwork: false };
   }
 
-  let clean = fullName.trim();
+  // 0. Extract material first
+  const matResult = parseItemMaterial(fullName);
+  let clean = matResult.cleanName;
+  let material: EquipmentMaterial | string = matResult.material;
   let enhancementBonus = 0;
+  let isMasterwork = false;
+
+  // Detect and strip leading "Masterwork " or "Mwk " (case-insensitive) or "(Masterwork)"
+  if (/^(?:masterwork|mwk\.?)\s+/i.test(clean)) {
+    isMasterwork = true;
+    clean = clean.replace(/^(?:masterwork|mwk\.?)\s+/i, '').trim();
+  }
+  if (/\s*\(\s*(?:masterwork|mwk\.?)\s*\)\s*/i.test(clean)) {
+    isMasterwork = true;
+    clean = clean.replace(/\s*\(\s*(?:masterwork|mwk\.?)\s*\)\s*/i, ' ').trim();
+  }
 
   // 1. Extract leading +X enhancement bonus (e.g. "+1 ", "+2 ")
   const leadingEnh = clean.match(/^\+(\d+)\s+(.+)$/);
@@ -1215,6 +1342,25 @@ export function parseMagicItemName(
     if (trailingEnh) {
       enhancementBonus = parseInt(trailingEnh[2], 10);
       clean = trailingEnh[1].trim();
+    }
+  }
+
+  // Check if masterwork prefix was after +X (e.g. "+1 Masterwork Longsword")
+  if (/^(?:masterwork|mwk\.?)\s+/i.test(clean)) {
+    isMasterwork = true;
+    clean = clean.replace(/^(?:masterwork|mwk\.?)\s+/i, '').trim();
+  }
+  if (/\s*\(\s*(?:masterwork|mwk\.?)\s*\)\s*/i.test(clean)) {
+    isMasterwork = true;
+    clean = clean.replace(/\s*\(\s*(?:masterwork|mwk\.?)\s*\)\s*/i, ' ').trim();
+  }
+
+  // Check if material appeared after enhancement bonus (e.g. "+1 Adamantine Full Plate")
+  if (material === 'standard') {
+    const secondMat = parseItemMaterial(clean);
+    if (secondMat.material !== 'standard') {
+      material = secondMat.material;
+      clean = secondMat.cleanName;
     }
   }
 
@@ -1267,12 +1413,33 @@ export function parseMagicItemName(
     clean = clean.replace(/^[a-zA-Z\s]+?\s+Bane\s+/i, '').replace(/\bBane\b/i, '').trim();
   }
 
+  // If after qualities removal material still remains (e.g. "Keen Mithral Longsword")
+  if (material === 'standard') {
+    const thirdMat = parseItemMaterial(clean);
+    if (thirdMat.material !== 'standard') {
+      material = thirdMat.material;
+      clean = thirdMat.cleanName;
+    }
+  }
+
+  // Check if masterwork tag was trailing (e.g. "Longsword (Masterwork)")
+  if (/\s*\(\s*(?:masterwork|mwk\.?)\s*\)\s*/i.test(clean)) {
+    isMasterwork = true;
+    clean = clean.replace(/\s*\(\s*(?:masterwork|mwk\.?)\s*\)\s*/i, ' ').trim();
+  }
+  if (/^(?:masterwork|mwk\.?)\s+/i.test(clean)) {
+    isMasterwork = true;
+    clean = clean.replace(/^(?:masterwork|mwk\.?)\s+/i, '').trim();
+  }
+
   clean = clean.replace(/\s+/g, ' ').trim();
 
   return {
     baseName: clean || fullName.trim(),
     enhancementBonus,
-    qualities: matchedQualities
+    qualities: matchedQualities,
+    material,
+    isMasterwork: Boolean(isMasterwork || enhancementBonus > 0 || material === 'adamantine')
   };
 }
 

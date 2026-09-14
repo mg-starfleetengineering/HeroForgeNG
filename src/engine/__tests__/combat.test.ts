@@ -256,6 +256,20 @@ describe('Tactical Combat Engine', () => {
     expect(seqFrenzy).toBe('+11/+11/+6/+1');
   });
 
+  it('correctly formats attack sequence when character has BAB 0', () => {
+    // Level 1 Dragon Shaman / Wizard (BAB 0), Str 12 (+1), Masterwork (+1) => +2 total attack
+    const seqMwk = generateFullAttackSequence(0, 2);
+    expect(seqMwk).toBe('+2');
+
+    // Level 1 Dragon Shaman / Wizard (BAB 0), Str 12 (+1), Standard (+0) => +1 total attack
+    const seqNormal = generateFullAttackSequence(0, 1);
+    expect(seqNormal).toBe('+1');
+
+    // Level 1 Dragon Shaman / Wizard (BAB 0), Str 10 (+0), Standard (+0) => +0 total attack
+    const seqZero = generateFullAttackSequence(0, 0);
+    expect(seqZero).toBe('+0');
+  });
+
   describe('Active Combat Modifiers Descriptor List', () => {
     it('returns empty array when no tactical modifiers are active', () => {
       const active = getActiveCombatModifiers(DEFAULT_TACTICAL_COMBAT, 5);

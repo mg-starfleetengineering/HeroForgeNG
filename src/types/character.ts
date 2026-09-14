@@ -28,7 +28,9 @@ export interface CustomArmorData {
   enhancementBonus?: number;
   specialQualities?: string[];
   baseArmorId?: string;
+  material?: 'adamantine' | 'mithral' | 'dragonhide' | 'darkwood' | 'cold_iron' | 'alchemical_silver' | 'standard' | string;
   cost?: string;
+  isMasterwork?: boolean;
 }
 
 export interface WondrousItem {
@@ -47,6 +49,7 @@ export interface ItemArmorData {
   armorCheckPenalty: number;
   spellFailure?: number;
   speedPenalty?: boolean;
+  isMasterwork?: boolean;
 }
 
 export interface ItemWeaponData {
@@ -60,13 +63,20 @@ export interface ItemWeaponData {
   rangeIncrement?: number;
   isRanged?: boolean;
   baneTarget?: string;
+  isMasterwork?: boolean;
 }
+
+export type EquipmentMaterial = 'adamantine' | 'mithral' | 'dragonhide' | 'darkwood' | 'cold_iron' | 'alchemical_silver' | 'standard';
 
 export interface Equipment {
   armor: string;
   armorEnhancement: number;
+  armorMaterial?: EquipmentMaterial | string;
+  armorMasterwork?: boolean;
   shield: string;
   shieldEnhancement: number;
+  shieldMaterial?: EquipmentMaterial | string;
+  shieldMasterwork?: boolean;
   deflection: number;
   natural: number;
   dodge: number;
@@ -74,14 +84,20 @@ export interface Equipment {
   primaryWeaponEnhancement?: number;
   primaryWeaponQualities?: string[];
   primaryWeaponBaneTarget?: string;
+  primaryWeaponMaterial?: EquipmentMaterial | string;
+  primaryWeaponMasterwork?: boolean;
   secondaryWeapon?: string;
   secondaryWeaponEnhancement?: number;
   secondaryWeaponQualities?: string[];
   secondaryWeaponBaneTarget?: string;
+  secondaryWeaponMaterial?: EquipmentMaterial | string;
+  secondaryWeaponMasterwork?: boolean;
   rangedWeapon?: string;
   rangedWeaponEnhancement?: number;
   rangedWeaponQualities?: string[];
   rangedWeaponBaneTarget?: string;
+  rangedWeaponMaterial?: EquipmentMaterial | string;
+  rangedWeaponMasterwork?: boolean;
   armorQualities?: string[];
   shieldQualities?: string[];
   wondrousItems?: WondrousItem[];
@@ -102,10 +118,12 @@ export interface InventoryItem {
   location?: 'Carried' | 'Backpack' | 'Belt Pouch' | 'Haversack' | 'Mount' | 'Stash' | string;
   value?: string;
   notes?: string;
+  material?: EquipmentMaterial | string;
+  baseItemId?: string;
   enhancementBonus?: number;
   specialQualities?: string[];
   baneTarget?: string;
-  baseItemId?: string;
+  isMasterwork?: boolean;
 
   itemType?: 'weapon' | 'armor' | 'shield' | 'wondrous' | 'gear' | 'consumable';
   armorData?: ItemArmorData;
@@ -291,7 +309,7 @@ export interface CharacterState {
   isGestalt: boolean;
   levelProgression: LevelProgression[];
   skillRanks: Record<string, number>;
-  selectedFeats: string[];
+  selectedFeats?: string[];
   selectedFeatEntities?: CharacterFeat[];
   equipment: Equipment;
   inventory?: InventoryItem[];
@@ -503,7 +521,9 @@ export interface WeaponData {
   specialQualities?: string[];
   baneTarget?: string;
   baseWeaponId?: string;
+  material?: EquipmentMaterial | string;
   cost?: string;
+  isMasterwork?: boolean;
 }
 
 export interface FeatData {

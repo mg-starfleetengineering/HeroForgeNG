@@ -1,19 +1,23 @@
 import React, { useState, useMemo } from 'react';
 import {
   CharacterState,
+  CharacterFeat,
   FeatData,
   ClassData,
   RaceData,
   TemplateData,
   TraitData,
-  FlawData
+  FlawData,
+  parseLegacyFeatString,
+  migrateLegacyFeatStrings
 } from '../types/character';
 import { getSourceBadgeInfo, getAllSourceBadges, sortDropdownItems } from '../utils/sourceFilter';
 import { calculateBonusFeatsFromFlaws, calculateTotalFeatSlots } from '../engine/stats';
 import {
   buildCharacterPrereqContext,
   evaluateFeatPrerequisitesWithContext,
-  aggregateAndDeduplicateFeats
+  aggregateAndDeduplicateFeats,
+  featNameToId
 } from '../engine/featPrereqs';
 import { FeatTreeModal } from './FeatTreeModal';
 
@@ -42,6 +46,47 @@ const PARAMETERIZED_FEAT_BASES = [
   'Weapon Finesse'
 ];
 
+const KNOWN_SPELL_SCHOOLS = new Set([
+  'abjuration',
+  'conjuration',
+  'divination',
+  'enchantment',
+  'evocation',
+  'illusion',
+  'necromancy',
+  'transmutation',
+  'universal'
+]);
+
+const KNOWN_ENERGY_TYPES = new Set([
+  'acid',
+  'cold',
+  'electricity',
+  'fire',
+  'sonic'
+]);
+
+function formatFeatIdToTitle(featId: string): string {
+  if (featId.startsWith('armor_proficiency_')) {
+    const type = featId.replace('armor_proficiency_', '');
+    return `Armor Proficiency (${type.charAt(0).toUpperCase() + type.slice(1)})`;
+  }
+  return featId
+    .split('_')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
+function getFeatDisplayName(entity: CharacterFeat, featData?: FeatData): string {
+  if (entity.notes) return entity.notes;
+  const baseName = featData ? featData.name.replace(/\s*\(.+?\)/, '').trim() : formatFeatIdToTitle(entity.featId);
+  if (entity.targetId) {
+    const targetDisplay = entity.targetId.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    return `${baseName} (${targetDisplay})`;
+  }
+  return baseName;
+}
+
 export const FeatsTab: React.FC<FeatsTabProps> = ({
   character,
   featsData,
@@ -61,7 +106,16 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
   const [paramModalFeat, setParamModalFeat] = useState<FeatData | null>(null);
   const [paramTarget, setParamTarget] = useState('');
 
-  const selectedFeats = character.selectedFeats || [];
+  const selectedFeatEntities: CharacterFeat[] = useMemo(() => {
+    if (Array.isArray(character.selectedFeatEntities) && character.selectedFeatEntities.length > 0) {
+      return character.selectedFeatEntities;
+    }
+    if (Array.isArray(character.selectedFeats) && character.selectedFeats.length > 0) {
+      return migrateLegacyFeatStrings(character.selectedFeats);
+    }
+    return [];
+  }, [character.selectedFeatEntities, character.selectedFeats]);
+
   const selectedFlaws = character.selectedFlaws || [];
   const flawBonusFeatCount = calculateBonusFeatsFromFlaws(selectedFlaws);
   const featSlotInfo = calculateTotalFeatSlots(character, classesData, racesData);
@@ -90,17 +144,9 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
     [deduplicatedFeatsData, character.allowedSources]
   );
 
-  const handleRemoveFeat = (featName: string) => {
-    const updated = selectedFeats.filter(f => f !== featName);
-    onChange({ selectedFeats: updated });
-  };
-
-  const handleAddFeatString = (featStr: string) => {
-    if (!featStr.trim()) return;
-    const clean = featStr.trim();
-    if (!selectedFeats.includes(clean)) {
-      onChange({ selectedFeats: [...selectedFeats, clean] });
-    }
+  const handleRemoveFeat = (entityId: string) => {
+    const updated = selectedFeatEntities.filter(e => e.id !== entityId);
+    onChange({ selectedFeatEntities: updated });
   };
 
   const handleSelectLibraryFeat = (feat: FeatData) => {
@@ -116,7 +162,16 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
       const primaryWpn = character.equipment?.primaryWeapon || 'Nodachi';
       setParamTarget(primaryWpn.replace(/\s*\(.+?\)/, '')); // e.g. Nodachi
     } else {
-      handleAddFeatString(feat.name);
+      const featId = feat.id || featNameToId(feat.name);
+      if (selectedFeatEntities.some(e => e.featId === featId && !e.targetId)) {
+        return;
+      }
+      const newEntity: CharacterFeat = {
+        id: featId,
+        featId,
+        notes: feat.name
+      };
+      onChange({ selectedFeatEntities: [...selectedFeatEntities, newEntity] });
     }
   };
 
@@ -124,9 +179,38 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
     e.preventDefault();
     if (!paramModalFeat || !paramTarget.trim()) return;
 
-    const baseName = paramModalFeat.name.replace(/\s*\(.+?\)/, '');
-    const fullFeatStr = `${baseName} (${paramTarget.trim()})`;
-    handleAddFeatString(fullFeatStr);
+    const baseName = paramModalFeat.name.replace(/\s*\(.+?\)/, '').trim();
+    const target = paramTarget.trim();
+    const cleanTarget = target.toLowerCase();
+    const targetSlug = cleanTarget.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+
+    const baseId = paramModalFeat.id
+      ? paramModalFeat.id.replace(/_choose.*$/, '').replace(/_target.*$/, '')
+      : featNameToId(baseName);
+
+    let targetType: 'weapon' | 'school' | 'skill' | 'energy' = 'weapon';
+    const lowerBase = baseName.toLowerCase();
+    if (lowerBase.includes('spell') || KNOWN_SPELL_SCHOOLS.has(cleanTarget)) {
+      targetType = 'school';
+    } else if (lowerBase.includes('energy') || KNOWN_ENERGY_TYPES.has(cleanTarget)) {
+      targetType = 'energy';
+    } else if (lowerBase.includes('skill')) {
+      targetType = 'skill';
+    } else if (lowerBase.includes('weapon') || lowerBase.includes('critical') || lowerBase.includes('proficiency')) {
+      targetType = 'weapon';
+    }
+
+    const newEntity: CharacterFeat = {
+      id: `${baseId}_${targetSlug}`,
+      featId: baseId,
+      targetId: cleanTarget,
+      targetType,
+      notes: `${baseName} (${target})`
+    };
+
+    if (!selectedFeatEntities.some(e => e.featId === newEntity.featId && e.targetId === newEntity.targetId)) {
+      onChange({ selectedFeatEntities: [...selectedFeatEntities, newEntity] });
+    }
 
     setParamModalFeat(null);
     setParamTarget('');
@@ -134,10 +218,35 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
 
   const handleAddCustomFeatSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (customFeatInput.trim()) {
-      handleAddFeatString(customFeatInput.trim());
-      setCustomFeatInput('');
+    const clean = customFeatInput.trim();
+    if (!clean) return;
+
+    const parsed = parseLegacyFeatString(clean, selectedFeatEntities.length);
+    if (parsed) {
+      const exists = selectedFeatEntities.some(
+        e => e.featId === parsed.featId && (e.targetId || '') === (parsed.targetId || '')
+      );
+      if (!exists) {
+        parsed.notes = clean;
+        onChange({ selectedFeatEntities: [...selectedFeatEntities, parsed] });
+      }
     }
+    setCustomFeatInput('');
+  };
+
+  const isFeatSelectedInLibrary = (feat: FeatData) => {
+    const featId = feat.id || featNameToId(feat.name);
+    return selectedFeatEntities.some(
+      e => e.featId === featId || featNameToId(e.featId) === featNameToId(feat.name)
+    );
+  };
+
+  const handleRemoveLibraryFeat = (feat: FeatData) => {
+    const featId = feat.id || featNameToId(feat.name);
+    const updated = selectedFeatEntities.filter(
+      e => e.featId !== featId && featNameToId(e.featId) !== featNameToId(feat.name)
+    );
+    onChange({ selectedFeatEntities: updated });
   };
 
   const filtered = useMemo(() => {
@@ -183,16 +292,16 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
       <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-4">
         <h2 className="text-lg font-bold font-heading text-slate-100 border-b border-slate-800 pb-3 flex items-center justify-between flex-wrap gap-2">
           <span className="flex items-center gap-2">
-            <i className="fa-solid fa-award text-amber-500"></i> Active Feats ({selectedFeats.length} / {featSlotInfo.totalSlots})
+            <i className="fa-solid fa-award text-amber-500"></i> Active Feats ({selectedFeatEntities.length} / {featSlotInfo.totalSlots})
           </span>
           <span
             className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-bold border ${
-              selectedFeats.length <= featSlotInfo.totalSlots
+              selectedFeatEntities.length <= featSlotInfo.totalSlots
                 ? 'bg-amber-500/10 text-amber-300 border-amber-500/30'
                 : 'bg-rose-950/80 text-rose-300 border-rose-500/40'
             }`}
           >
-            {selectedFeats.length} / {featSlotInfo.totalSlots} Slots
+            {selectedFeatEntities.length} / {featSlotInfo.totalSlots} Slots
           </span>
         </h2>
 
@@ -233,35 +342,31 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
 
         {/* Active Feats List */}
         <div className="space-y-3 pt-2 border-t border-slate-800">
-          {selectedFeats.length === 0 ? (
+          {selectedFeatEntities.length === 0 ? (
             <p className="text-xs text-slate-500 italic p-3 text-center bg-slate-950/40 rounded-xl">
               No feats selected yet. Add custom feats above or select from the library.
             </p>
           ) : (
-            selectedFeats.map(featName => {
-              // Try match base feat or exact
-              const aliasMatch = featName.match(/^(.+?)\s*\((.+?)\)$/);
-              const baseFeatName = aliasMatch ? aliasMatch[1].trim() : featName;
+            selectedFeatEntities.map(entity => {
               const featObj: FeatData = deduplicatedFeatsData.find(
-                f =>
-                  f.name.toLowerCase() === baseFeatName.toLowerCase() ||
-                  f.name.toLowerCase() === featName.toLowerCase()
+                f => f.id === entity.featId || featNameToId(f.name) === entity.featId
               ) || {
-                id: featName.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
-                name: featName,
-                description: aliasMatch ? `Specialized feat for ${aliasMatch[2]}.` : 'Active character feat.'
+                id: entity.featId,
+                name: entity.notes || getFeatDisplayName(entity),
+                description: entity.targetId ? `Specialized feat for ${entity.targetId}.` : 'Active character feat.'
               };
 
-              const validation = evaluateFeatPrerequisitesWithContext(featObj, prereqContext);
+              const validation = evaluateFeatPrerequisitesWithContext(featObj, prereqContext, entity.targetId);
+              const displayName = getFeatDisplayName(entity, featObj);
 
               return (
                 <div
-                  key={featName}
+                  key={entity.id}
                   className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-col gap-2 text-xs"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-amber-400 block truncate">{featName}</span>
+                      <span className="font-bold text-amber-400 block truncate">{displayName}</span>
                       {featObj.prerequisites && (
                         validation.isQualified ? (
                           <span
@@ -281,7 +386,7 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
                       )}
                     </div>
                     <button
-                      onClick={() => handleRemoveFeat(featName)}
+                      onClick={() => handleRemoveFeat(entity.id)}
                       className="text-slate-500 hover:text-rose-400 p-1 transition-colors shrink-0"
                       title="Remove Feat"
                     >
@@ -371,9 +476,7 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
             </div>
           ) : (
             filtered.map(feat => {
-              const isSelected = selectedFeats.some(
-                sf => sf === feat.name || sf.startsWith(`${feat.name} (`)
-              );
+              const isSelected = isFeatSelectedInLibrary(feat);
               const sourceBadgeResult = getAllSourceBadges(feat, character.allowedSources);
               const validation = evaluateFeatPrerequisitesWithContext(feat, prereqContext);
 
@@ -436,7 +539,7 @@ export const FeatsTab: React.FC<FeatsTabProps> = ({
                       </div>
                       <button
                         onClick={() =>
-                          isSelected ? handleRemoveFeat(feat.name) : handleSelectLibraryFeat(feat)
+                          isSelected ? handleRemoveLibraryFeat(feat) : handleSelectLibraryFeat(feat)
                         }
                         className={`btn text-[11px] py-1 px-3 ${
                           isSelected ? 'btn-secondary text-rose-400' : 'btn-primary'

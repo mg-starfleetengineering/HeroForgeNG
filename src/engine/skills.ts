@@ -250,8 +250,10 @@ export function calculatePerceptionStats(
   const ranks = (character.skillRanks || {})['Perception'] || 0;
   const isClass = isClassSkillForCharacter('Perception', character.levelProgression, classDatabase);
 
-  const selectedFeats = character.selectedFeats || [];
-  const hasAlertness = selectedFeats.some(f => f.toLowerCase() === 'alertness');
+  const featEntities = (character.selectedFeatEntities && character.selectedFeatEntities.length > 0)
+    ? character.selectedFeatEntities
+    : (((character as any).selectedFeats || []).map((f: string) => ({ id: f, featId: f.toLowerCase().replace(/[^a-z0-9]+/g, '_') })));
+  const hasAlertness = featEntities.some(f => f.featId === 'alertness');
   const alertnessBonus = hasAlertness ? 2 : 0;
 
   const totalBonus = Math.floor(ranks) + wisMod + alertnessBonus;
@@ -279,7 +281,9 @@ export function validateSkillTrickPrerequisites(
 ): { valid: boolean; missing: string[] } {
   const missing: string[] = [];
   const ranksMap = character.skillRanks || {};
-  const selectedFeats = character.selectedFeats || [];
+  const featEntities = (character.selectedFeatEntities && character.selectedFeatEntities.length > 0)
+    ? character.selectedFeatEntities
+    : (((character as any).selectedFeats || []).map((f: string) => ({ id: f, featId: f.toLowerCase().replace(/[^a-z0-9]+/g, '_'), notes: f })));
   const usePathfinder = !!character.usePathfinderPerception;
 
   // Check skill ranks
@@ -314,7 +318,10 @@ export function validateSkillTrickPrerequisites(
   // Check feat prerequisites
   if (trick.prereqFeats) {
     for (const featName of trick.prereqFeats) {
-      const hasFeat = selectedFeats.some(f => f.toLowerCase() === featName.toLowerCase());
+      const featId = featName.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+      const hasFeat = featEntities.some(
+        f => f.featId === featId || (f.notes && f.notes.toLowerCase() === featName.toLowerCase())
+      );
       if (!hasFeat) {
         missing.push(`Requires ${featName} feat`);
       }

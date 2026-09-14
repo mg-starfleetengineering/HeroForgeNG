@@ -180,8 +180,13 @@ export function generateRoll20JSON(
   });
 
   // Selected Feats Mapping
-  (character.selectedFeats || []).forEach((featName, idx) => {
-    const featObj = featsData.find(f => f.name === featName);
+  const featEntities = (character.selectedFeatEntities && character.selectedFeatEntities.length > 0)
+    ? character.selectedFeatEntities
+    : (((character as any).selectedFeats || []).map((f: string) => ({ id: f, featId: f.toLowerCase().replace(/[^a-z0-9]+/g, '_'), notes: f })));
+
+  featEntities.forEach((entity, idx) => {
+    const featObj = featsData.find(f => f.id === entity.featId || f.name.toLowerCase() === entity.featId.replace(/_/g, ' '));
+    const featName = entity.notes || (featObj ? featObj.name : entity.featId.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
     const desc = featObj ? featObj.description : '3.5e Feat';
     attribs.push({ name: `repeating_feats_$${idx}_featname`, current: featName });
     attribs.push({ name: `repeating_feats_$${idx}_featnotes`, current: desc });

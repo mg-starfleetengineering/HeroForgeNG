@@ -3,9 +3,13 @@ import {
   calculateTotalCarriedWeight, isItemInInventory, ensureEquippedItemInInventory,
   syncEquippedItemsToInventory, matchesItemName, resolveWeapon, getThemedWeaponBase,
   resolveArmor, resolveShield, createInventoryWeapon, createInventoryArmor, createInventoryShield,
-  calculateFeatCombatBonuses, resolveEquippedWeapon, DEFAULT_WEAPON
+  calculateFeatCombatBonuses, resolveEquippedWeapon, DEFAULT_WEAPON,
+  resolveEquippedArmor, resolveEquippedShield, applyMaterialToArmorData, applyMaterialToWeight,
+  getWeaponEffectiveAttackEnhancement, getWeaponMaterialDamageMod, getWeaponMaterialTraits
 } from '../equipment';
-import { CharacterState, InventoryItem, CharacterFeat } from '../../types/character';
+import { formatMagicItemName } from '../magicItems';
+import { CharacterState, InventoryItem, CharacterFeat, CharacterSheetData } from '../../types/character';
+import { migrateLegacyEquipmentToInventory } from '../../storage/migration';
 
 describe('equipment engine & inventory sync', () => {
   it('identifies if item is in inventory case-insensitively', () => {
@@ -624,6 +628,471 @@ describe('equipment engine & inventory sync', () => {
       // Only the selectedFeatEntities (Weapon Focus) should be evaluated: +1 attack, 0 damage (not +2 attack, +2 damage)
       expect(bonuses.attackBonus).toBe(1);
       expect(bonuses.damageBonus).toBe(0);
+    });
+  });
+
+  describe('structured equipment & material rules (Phase 2)', () => {
+    it('applies 3.5e material rules to armor data and weight correctly', () => {
+      // Mithral Full Plate:
+      // Standard Full Plate: Heavy, AC 8, Max Dex 1, Check -6, Spell Failure 35%, Weight 50
+      const baseFullPlate = {
+        type: 'heavy' as const,
+        acBonus: 8,
+        maxDex: 1,
+        armorCheckPenalty: -6,
+        spellFailure: 35,
+        speedPenalty: true
+      };
+
+      const mithralPlateData = applyMaterialToArmorData(baseFullPlate, 'mithral');
+      expect(mithralPlateData.type).toBe('medium'); // 1 category lighter
+      expect(mithralPlateData.maxDex).toBe(3); // +2 max dex
+      expect(mithralPlateData.armorCheckPenalty).toBe(-3); // check penalty reduced by 3
+      expect(mithralPlateData.spellFailure).toBe(25); // ASF reduced by 10%
+      expect(applyMaterialToWeight(50, 'mithral')).toBe(25); // weight halved
+
+      // Darkwood Shield:
+      // Standard Heavy Shield: Check -2, Weight 15
+      const baseShield = {
+        type: 'shield' as const,
+        acBonus: 2,
+        maxDex: 99,
+        armorCheckPenalty: -2,
+        spellFailure: 15
+      };
+
+      const darkwoodShieldData = applyMaterialToArmorData(baseShield, 'darkwood');
+      expect(darkwoodShieldData.armorCheckPenalty).toBe(0); // reduced by 2 (min 0)
+      expect(applyMaterialToWeight(15, 'darkwood')).toBe(7.5); // weight halved
+    });
+
+    it('creates structured inventory items with material and baseItemId', () => {
+      const armorItem = createInventoryArmor('fullplate', [], {
+        material: 'mithral',
+        enhancementBonus: 1
+      });
+
+      expect(armorItem.itemType).toBe('armor');
+      expect(armorItem.material).toBe('mithral');
+      expect(armorItem.enhancementBonus).toBe(1);
+      expect(armorItem.weight).toBe(25);
+      expect(armorItem.armorData?.type).toBe('medium');
+      expect(armorItem.armorData?.maxDex).toBe(3);
+      expect(armorItem.armorData?.armorCheckPenalty).toBe(-3);
+
+      const weaponItem = createInventoryWeapon('Longsword', {
+        material: 'adamantine',
+        enhancementBonus: 2,
+        specialQualities: ['keen']
+      });
+
+      expect(weaponItem.itemType).toBe('weapon');
+      expect(weaponItem.material).toBe('adamantine');
+      expect(weaponItem.enhancementBonus).toBe(2);
+      expect(weaponItem.specialQualities).toEqual(['keen']);
+      expect(weaponItem.weaponData?.damageM).toBe('1d8');
+      expect(weaponItem.weaponData?.critMultiplier).toBe(2);
+    });
+
+    it('resolves equipped armor and shield from structured inventory items without regex string parsing', () => {
+      const char = {
+        equipment: {
+          armor: '+1 Mithral Full Plate',
+          armorItemId: 'inv_armor_1',
+          armorEnhancement: 1,
+          armorMaterial: 'mithral',
+          shield: 'Darkwood Heavy Shield',
+          shieldItemId: 'inv_shield_1',
+          shieldEnhancement: 0,
+          shieldMaterial: 'darkwood'
+        },
+        inventory: [
+          {
+            id: 'inv_armor_1',
+            name: '+1 Mithral Full Plate',
+            quantity: 1,
+            weight: 25,
+            itemType: 'armor',
+            material: 'mithral',
+            baseItemId: 'fullplate',
+            enhancementBonus: 1,
+            armorData: {
+              type: 'medium',
+              acBonus: 8,
+              maxDex: 3,
+              armorCheckPenalty: -3,
+              spellFailure: 25,
+              speedPenalty: true
+            }
+          },
+          {
+            id: 'inv_shield_1',
+            name: 'Darkwood Heavy Shield',
+            quantity: 1,
+            weight: 7.5,
+            itemType: 'shield',
+            material: 'darkwood',
+            baseItemId: 'heavy_shield',
+            enhancementBonus: 0,
+            armorData: {
+              type: 'shield',
+              acBonus: 2,
+              maxDex: 99,
+              armorCheckPenalty: 0,
+              spellFailure: 15,
+              speedPenalty: false
+            }
+          }
+        ]
+      } as unknown as CharacterState;
+
+      const resolvedArmor = resolveEquippedArmor(char);
+      expect(resolvedArmor.material).toBe('mithral');
+      expect(resolvedArmor.type).toBe('medium');
+      expect(resolvedArmor.maxDex).toBe(3);
+      expect(resolvedArmor.checkPenalty).toBe(-3);
+      expect(resolvedArmor.weight).toBe(25);
+
+      const resolvedShield = resolveEquippedShield(char);
+      expect(resolvedShield.material).toBe('darkwood');
+      expect(resolvedShield.checkPenalty).toBe(0);
+      expect(resolvedShield.weight).toBe(7.5);
+    });
+
+    it('resolves equipped weapon from structured inventory item directly', () => {
+      const char = {
+        equipment: {
+          primaryWeapon: '+2 Adamantine Keen Longsword',
+          primaryWeaponItemId: 'inv_wpn_1',
+          primaryWeaponEnhancement: 2,
+          primaryWeaponQualities: ['keen'],
+          primaryWeaponMaterial: 'adamantine'
+        },
+        inventory: [
+          {
+            id: 'inv_wpn_1',
+            name: '+2 Adamantine Keen Longsword',
+            quantity: 1,
+            weight: 4,
+            itemType: 'weapon',
+            material: 'adamantine',
+            baseItemId: 'longsword',
+            enhancementBonus: 2,
+            specialQualities: ['keen'],
+            weaponData: {
+              category: 'Martial',
+              size: 'M',
+              damageM: '1d8',
+              threat: 19,
+              critMultiplier: 2,
+              damageType: 'Slashing',
+              isRanged: false
+            }
+          }
+        ]
+      } as unknown as CharacterState;
+
+      const resolved = resolveEquippedWeapon(char, 'primaryWeapon');
+      expect(resolved.name).toBe('+2 Adamantine Keen Longsword');
+      expect(resolved.material).toBe('adamantine');
+      expect(resolved.enhancementBonus).toBe(2);
+      expect(resolved.specialQualities).toEqual(['keen']);
+      expect(resolved.damageM).toBe('1d8');
+    });
+
+    it('formats clean Title Case names when given snake_case base items', () => {
+      expect(formatMagicItemName('full_plate', 0, [], 'mithral')).toBe('Mithral Full Plate');
+      expect(formatMagicItemName('heavy_shield', 0, [], 'darkwood')).toBe('Darkwood Heavy Shield');
+      expect(formatMagicItemName('bastard_sword', 1, [], 'adamantine')).toBe('+1 Adamantine Bastard Sword');
+      expect(formatMagicItemName('fullplate', 0, [], 'mithral')).toBe('Mithral Full Plate');
+    });
+
+    it('createInventoryArmor and createInventoryShield produce clean human-readable names with materials', () => {
+      const arm = createInventoryArmor('fullplate', [], { material: 'mithral' });
+      expect(arm.name).toBe('Mithral Full Plate');
+      expect(arm.baseItemId).toBe('full_plate');
+
+      const shd = createInventoryShield('heavy_shield', [], { material: 'darkwood' });
+      expect(shd.name).toBe('Darkwood Heavy Shield');
+      expect(shd.baseItemId).toBe('heavy_shield');
+    });
+
+    it('calculates 3.5e Adamantine weapon masterwork attack bonus and material damage mods', () => {
+      // Adamantine weapon is masterwork: +1 enhancement to attack when 0 magical enhancement
+      expect(getWeaponEffectiveAttackEnhancement('adamantine', 0)).toBe(1);
+      // Magical enhancement overrides masterwork (non-stacking)
+      expect(getWeaponEffectiveAttackEnhancement('adamantine', 2)).toBe(2);
+      // Standard weapon has 0 enhancement by default
+      expect(getWeaponEffectiveAttackEnhancement('standard', 0)).toBe(0);
+
+      // Damage: Adamantine deals normal damage
+      expect(getWeaponMaterialDamageMod('adamantine')).toBe(0);
+      // Alchemical Silver has -1 damage penalty
+      expect(getWeaponMaterialDamageMod('alchemical_silver')).toBe(-1);
+    });
+
+    it('returns material traits for display on weapon cards', () => {
+      const traits = getWeaponMaterialTraits('adamantine');
+      expect(traits).toContain('Adamantine (Bypasses DR/Adamantine & Hardness < 20)');
+      expect(traits).toContain('Masterwork (+1 Atk)');
+
+      const silverTraits = getWeaponMaterialTraits('alchemical_silver');
+      expect(silverTraits).toContain('Silver (Bypasses DR/Silver, -1 Dmg)');
+    });
+  });
+
+  describe('Masterwork Equipment Support (3.5e PHB & DMG)', () => {
+    it('calculates masterwork weapon attack enhancement correctly without stacking with magic bonuses', () => {
+      // Standard masterwork weapon: +1 enhancement to attack
+      expect(getWeaponEffectiveAttackEnhancement('standard', 0, true)).toBe(1);
+      // Standard non-masterwork weapon: +0
+      expect(getWeaponEffectiveAttackEnhancement('standard', 0, false)).toBe(0);
+      // Magical enhancement overrides masterwork bonus (non-stacking: +1 MWK weapon gives +1, not +2)
+      expect(getWeaponEffectiveAttackEnhancement('standard', 1, true)).toBe(1);
+      expect(getWeaponEffectiveAttackEnhancement('standard', 2, true)).toBe(2);
+
+      // Adamantine weapon is inherently masterwork
+      expect(getWeaponEffectiveAttackEnhancement('adamantine', 0, false)).toBe(1);
+      expect(getWeaponEffectiveAttackEnhancement('adamantine', 0, true)).toBe(1);
+      expect(getWeaponEffectiveAttackEnhancement('adamantine', 3, true)).toBe(3);
+    });
+
+    it('returns masterwork trait in getWeaponMaterialTraits', () => {
+      expect(getWeaponMaterialTraits('standard', true)).toContain('Masterwork (+1 Atk)');
+      expect(getWeaponMaterialTraits('standard', false)).not.toContain('Masterwork (+1 Atk)');
+      // For adamantine, it has Masterwork (+1 Atk) exactly once
+      const admTraits = getWeaponMaterialTraits('adamantine', true);
+      expect(admTraits.filter(t => t === 'Masterwork (+1 Atk)')).toHaveLength(1);
+    });
+
+    it('reduces armor and shield check penalty by 1 for masterwork (minimum 0)', () => {
+      const fullPlateData = {
+        type: 'heavy' as const,
+        acBonus: 8,
+        maxDex: 1,
+        armorCheckPenalty: -6,
+        spellFailure: 35,
+        speedPenalty: true
+      };
+
+      // Full Plate: -6 ACP becomes -5 for masterwork
+      const mwkFullPlate = applyMaterialToArmorData(fullPlateData, 'standard', true);
+      expect(mwkFullPlate.armorCheckPenalty).toBe(-5);
+
+      // Non-masterwork Full Plate stays -6
+      const stdFullPlate = applyMaterialToArmorData(fullPlateData, 'standard', false);
+      expect(stdFullPlate.armorCheckPenalty).toBe(-6);
+
+      // Adamantine Full Plate reduces ACP by 1
+      const admFullPlate = applyMaterialToArmorData(fullPlateData, 'adamantine', false);
+      expect(admFullPlate.armorCheckPenalty).toBe(-5);
+
+      // Mithral Full Plate reduces ACP by 3 to -3, does not stack with masterwork
+      const mithFullPlate = applyMaterialToArmorData(fullPlateData, 'mithral', true);
+      expect(mithFullPlate.armorCheckPenalty).toBe(-3);
+
+      // Heavy Shield (-2 ACP): masterwork reduces to -1
+      const heavyShieldData = {
+        type: 'shield' as const,
+        acBonus: 2,
+        maxDex: 99,
+        armorCheckPenalty: -2,
+        spellFailure: 15,
+        speedPenalty: false
+      };
+      const mwkShield = applyMaterialToArmorData(heavyShieldData, 'standard', true);
+      expect(mwkShield.armorCheckPenalty).toBe(-1);
+
+      // Minimum 0 check penalty: Leather Armor (ACP 0) stays 0, never becomes positive
+      const leatherData = {
+        type: 'light' as const,
+        acBonus: 2,
+        maxDex: 6,
+        armorCheckPenalty: 0,
+        spellFailure: 10,
+        speedPenalty: false
+      };
+      const mwkLeather = applyMaterialToArmorData(leatherData, 'standard', true);
+      expect(mwkLeather.armorCheckPenalty).toBe(0);
+    });
+
+    it('resolves masterwork weapons, armors, and shields with structured isMasterwork flag and reduced ACP', () => {
+      // Weapon
+      const mwkSword = resolveWeapon('Masterwork Longsword', [], [{
+        id: 'longsword',
+        name: 'Longsword',
+        category: 'Martial',
+        size: 'M',
+        damageM: '1d8',
+        threat: 19,
+        critMultiplier: 2,
+        weight: 4,
+        type: 'Slashing'
+      }]);
+      expect(mwkSword.isMasterwork).toBe(true);
+      expect(mwkSword.enhancementBonus).toBe(0);
+
+      // Armor
+      const mwkPlate = resolveArmor('Masterwork Full Plate');
+      expect(mwkPlate.isMasterwork).toBe(true);
+      expect(mwkPlate.checkPenalty).toBe(-5); // Baseline is -6, reduced to -5
+
+      // Shield
+      const mwkShield = resolveShield('Masterwork Heavy Shield');
+      expect(mwkShield.isMasterwork).toBe(true);
+      expect(mwkShield.checkPenalty).toBe(-1); // Baseline is -2, reduced to -1
+    });
+
+    it('createInventory items properly initialize isMasterwork and apply ACP reductions', () => {
+      const wpn = createInventoryWeapon('Masterwork Longsword', [], []);
+      expect(wpn.isMasterwork).toBe(true);
+      expect(wpn.name).toBe('Masterwork Longsword');
+
+      const arm = createInventoryArmor('Full Plate', [], { isMasterwork: true });
+      expect(arm.isMasterwork).toBe(true);
+      expect(arm.name).toBe('Masterwork Full Plate');
+      expect(arm.armorData?.armorCheckPenalty).toBe(-5);
+
+      const shd = createInventoryShield('Heavy Shield', [], { isMasterwork: true });
+      expect(shd.isMasterwork).toBe(true);
+      expect(shd.name).toBe('Masterwork Heavy Shield');
+      expect(shd.armorData?.armorCheckPenalty).toBe(-1);
+    });
+
+    it('resolveEquippedWeapon propagates equipment masterwork flag to resolved item', () => {
+      const char = {
+        equipment: {
+          primaryWeapon: 'Masterwork Longsword',
+          primaryWeaponItemId: 'wpn-1',
+          primaryWeaponMasterwork: true,
+          primaryWeaponEnhancement: 0
+        },
+        inventory: [
+          {
+            id: 'wpn-1',
+            name: 'Masterwork Longsword',
+            isMasterwork: true,
+            quantity: 1,
+            weight: 4,
+            location: 'Equipped',
+            weaponData: {
+              category: 'Martial',
+              size: 'M',
+              damageM: '1d8'
+            }
+          }
+        ]
+      } as unknown as CharacterState;
+
+      const resolved = resolveEquippedWeapon(char, 'primaryWeapon');
+      expect(resolved.isMasterwork).toBe(true);
+      expect(resolved.name).toBe('Masterwork Longsword');
+    });
+
+    it('syncEquippedItemsToInventory synchronizes masterwork status between equipment and inventory', () => {
+      const char = {
+        equipment: {
+          primaryWeapon: 'Masterwork Longsword',
+          primaryWeaponMasterwork: true,
+          armor: 'Masterwork Chain Shirt',
+          armorMasterwork: true,
+          shield: 'none'
+        },
+        inventory: [
+          {
+            id: 'inv-1',
+            name: 'Masterwork Longsword',
+            quantity: 1,
+            weight: 4,
+            location: 'Equipped'
+          },
+          {
+            id: 'inv-2',
+            name: 'Masterwork Chain Shirt',
+            quantity: 1,
+            weight: 25,
+            location: 'Equipped'
+          }
+        ]
+      } as unknown as CharacterState;
+
+      const synced = syncEquippedItemsToInventory(char);
+      const wpn = synced.inventory.find(i => i.id === 'inv-1');
+      const arm = synced.inventory.find(i => i.id === 'inv-2');
+      expect(wpn?.isMasterwork).toBe(true);
+      expect(arm?.isMasterwork).toBe(true);
+      expect(synced.equipment.primaryWeaponMasterwork).toBe(true);
+      expect(synced.equipment.armorMasterwork).toBe(true);
+    });
+
+    it('migrates legacy equipment masterwork strings to structured isMasterwork in character loader', () => {
+      const legacyChar = {
+        id: 'test-char-1',
+        updatedAt: Date.now(),
+        equipment: {
+          primaryWeapon: 'Masterwork Longsword',
+          armor: 'Masterwork Breastplate',
+          shield: 'Masterwork Heavy Shield'
+        },
+        inventory: []
+      } as unknown as CharacterSheetData;
+
+      const migrated = migrateLegacyEquipmentToInventory(legacyChar);
+      expect(migrated.equipment.primaryWeaponMasterwork).toBe(true);
+      expect(migrated.equipment.armorMasterwork).toBe(true);
+      expect(migrated.equipment.shieldMasterwork).toBe(true);
+
+      const wpn = migrated.inventory.find(i => i.name.includes('Longsword'));
+      const arm = migrated.inventory.find(i => i.name.includes('Breastplate'));
+      const shd = migrated.inventory.find(i => i.name.includes('Heavy Shield'));
+
+      expect(wpn?.isMasterwork).toBe(true);
+      expect(arm?.isMasterwork).toBe(true);
+      expect(shd?.isMasterwork).toBe(true);
+      // Breastplate baseline ACP is -4; masterwork is -3
+      expect(arm?.armorData?.armorCheckPenalty).toBe(-3);
+      // Heavy shield baseline ACP is -2; masterwork is -1
+      expect(shd?.armorData?.armorCheckPenalty).toBe(-1);
+    });
+
+    it('preserves equipment masterwork toggle when synchronizing with non-masterwork inventory item', () => {
+      const char = {
+        equipment: {
+          primaryWeapon: 'Longsword',
+          primaryWeaponItemId: 'inv-ls-1',
+          primaryWeaponMasterwork: true
+        },
+        inventory: [
+          {
+            id: 'inv-ls-1',
+            name: 'Longsword',
+            baseItemId: 'longsword',
+            isMasterwork: false,
+            itemType: 'weapon',
+            weaponData: {
+              category: 'Martial',
+              size: 'M',
+              damageM: '1d8',
+              threat: 19,
+              critMultiplier: 2,
+              damageType: 'Slashing',
+              isMasterwork: false
+            }
+          }
+        ]
+      } as unknown as CharacterSheetData;
+
+      const synced = syncEquippedItemsToInventory(char as any);
+      expect(synced.equipment.primaryWeaponMasterwork).toBe(true);
+      expect(synced.equipment.primaryWeapon).toBe('Masterwork Longsword');
+      const item = synced.inventory.find(i => i.id === 'inv-ls-1');
+      expect(item?.isMasterwork).toBe(true);
+      expect(item?.name).toBe('Masterwork Longsword');
+      expect(item?.weaponData?.isMasterwork).toBe(true);
+
+      const resolved = resolveEquippedWeapon({ equipment: synced.equipment, inventory: synced.inventory } as any, 'primaryWeapon');
+      expect(resolved.isMasterwork).toBe(true);
+      expect(getWeaponEffectiveAttackEnhancement(resolved.material, 0, resolved.isMasterwork)).toBe(1);
     });
   });
 });

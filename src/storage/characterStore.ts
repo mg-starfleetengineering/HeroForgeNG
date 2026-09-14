@@ -1,11 +1,15 @@
 import { CharacterSheetData, CharacterState, CharacterSummary, LevelProgression } from '../types/character';
-import { migrateCharacterBuffs } from '../engine/combat';
+import { normalizeCharacterOnLoad } from './migration';
+
+export { normalizeCharacterOnLoad };
 
 const DB_NAME = 'HeroForgeDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'characters';
 const ACTIVE_ID_KEY = 'heroforge_active_character_id';
 const FALLBACK_STORE_KEY = 'heroforge_multi_characters_fallback';
+
+let memoryFallbackStore: Record<string, CharacterSheetData> = {};
 
 /**
  * Format level progression into a readable class summary string.
@@ -82,17 +86,22 @@ function openDB(): Promise<IDBDatabase> {
   });
 }
 
-// LocalStorage Fallback helpers
+// LocalStorage / In-memory Fallback helpers
 function getFallbackStore(): Record<string, CharacterSheetData> {
+  if (typeof localStorage === 'undefined') {
+    return memoryFallbackStore;
+  }
   try {
     const data = localStorage.getItem(FALLBACK_STORE_KEY);
-    return data ? JSON.parse(data) : {};
+    return data ? JSON.parse(data) : memoryFallbackStore;
   } catch {
-    return {};
+    return memoryFallbackStore;
   }
 }
 
 function saveFallbackStore(store: Record<string, CharacterSheetData>): void {
+  memoryFallbackStore = store;
+  if (typeof localStorage === 'undefined') return;
   try {
     localStorage.setItem(FALLBACK_STORE_KEY, JSON.stringify(store));
   } catch (e) {
@@ -116,7 +125,7 @@ export async function getAllCharacters(): Promise<Record<string, CharacterSheetD
         const map: Record<string, CharacterSheetData> = {};
         for (const char of result) {
           if (char && char.id) {
-            map[char.id] = char;
+            map[char.id] = normalizeCharacterOnLoad(char);
           }
         }
         // Sync to fallback store for extra safety
@@ -130,7 +139,14 @@ export async function getAllCharacters(): Promise<Record<string, CharacterSheetD
     });
   } catch (e) {
     console.warn('IndexedDB read failed, using localStorage fallback:', e);
-    return getFallbackStore();
+    const rawMap = getFallbackStore();
+    const map: Record<string, CharacterSheetData> = {};
+    for (const [id, char] of Object.entries(rawMap)) {
+      if (char && id) {
+        map[id] = normalizeCharacterOnLoad(char);
+      }
+    }
+    return map;
   }
 }
 
@@ -157,7 +173,7 @@ export async function getCharacter(id: string): Promise<CharacterSheetData | nul
 
       request.onsuccess = () => {
         const char = request.result || null;
-        resolve(char ? (migrateCharacterBuffs(char) as CharacterSheetData) : null);
+        resolve(char ? normalizeCharacterOnLoad(char) : null);
       };
 
       request.onerror = () => {
@@ -167,7 +183,7 @@ export async function getCharacter(id: string): Promise<CharacterSheetData | nul
   } catch {
     const fallback = getFallbackStore();
     const char = fallback[id] || null;
-    return char ? (migrateCharacterBuffs(char) as CharacterSheetData) : null;
+    return char ? normalizeCharacterOnLoad(char) : null;
   }
 }
 
@@ -354,10 +370,10 @@ export async function importRosterPackage(parsed: any): Promise<{ importedCount:
 
   for (const item of characterArray) {
     if (item && typeof item === 'object' && (item.name || item.levelProgression)) {
-      const migrated = migrateCharacterBuffs(item);
+      const normalized = normalizeCharacterOnLoad(item);
       const charToSave: CharacterSheetData = {
-        ...migrated,
-        id: migrated.id || generateCharacterId(),
+        ...normalized,
+        id: normalized.id || generateCharacterId(),
         updatedAt: Date.now()
       };
       const saved = await saveCharacter(charToSave);

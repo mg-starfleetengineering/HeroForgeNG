@@ -58,7 +58,9 @@ export function collectSRSources(
   const sources: SRSource[] = [];
   const levelProgression = character.levelProgression || [];
   const characterLevel = getCharacterLevel(levelProgression);
-  const selectedFeats = character.selectedFeats || [];
+  const featEntities = (character.selectedFeatEntities && character.selectedFeatEntities.length > 0)
+    ? character.selectedFeatEntities
+    : (((character as any).selectedFeats || []).map((f: string) => ({ id: f, featId: f.toLowerCase().replace(/[^a-z0-9]+/g, '_'), notes: f })));
 
   // 1. Race SR
   if (raceObj) {
@@ -239,10 +241,11 @@ export function collectSRSources(
   }
 
   // 6. Feats SR
-  for (const fName of selectedFeats) {
-    const fLower = fName.toLowerCase();
+  for (const entity of featEntities) {
+    const fLower = (entity.notes || entity.featId).toLowerCase();
+    const fId = entity.featId.toLowerCase();
 
-    if (fLower.includes('awaken spell resistance')) {
+    if (fId.includes('awaken_spell_resistance') || fLower.includes('awaken spell resistance')) {
       sources.push({
         name: 'Awaken Spell Resistance',
         category: 'feat',
@@ -252,7 +255,7 @@ export function collectSRSources(
     }
 
     // Explicit Feat from featsData with static/dynamic SR
-    const fObj = featsData.find(f => f.name.toLowerCase() === fLower || f.id === fLower);
+    const fObj = featsData.find(f => f.name.toLowerCase() === fLower || f.id === fId || f.id === fLower);
     if (fObj && fObj.description) {
       if (fObj.description.toLowerCase().includes('spell resistance') || fObj.description.toLowerCase().includes('sr ')) {
         const parsed = parseSRText(fObj.description, characterLevel);
@@ -284,20 +287,23 @@ export function calculateTotalSR(
   classesData: ClassData[] = []
 ): ActiveSRSummary {
   const sources = collectSRSources(character, raceObj, templateObj, featsData, classesData);
-  const selectedFeats = character.selectedFeats || [];
+  const featEntities = (character.selectedFeatEntities && character.selectedFeatEntities.length > 0)
+    ? character.selectedFeatEntities
+    : (((character as any).selectedFeats || []).map((f: string) => ({ id: f, featId: f.toLowerCase().replace(/[^a-z0-9]+/g, '_'), notes: f })));
 
   // Calculate stacking SR bonuses from feats
   let stackingBonus = 0;
-  for (const fName of selectedFeats) {
-    const fLower = fName.toLowerCase();
+  for (const entity of featEntities) {
+    const fLower = (entity.notes || entity.featId).toLowerCase();
+    const fId = entity.featId.toLowerCase();
 
     // Boost Spell Resistance (+2 profane bonus to existing SR)
-    if (fLower.includes('boost spell resistance')) {
+    if (fId.includes('boost_spell_resistance') || fLower.includes('boost spell resistance')) {
       stackingBonus += 2;
     }
 
     // Improved Spell Resistance (+2 per rank)
-    if (fLower === 'improved spell resistance' || fLower.includes('improved spell resistance x')) {
+    if (fId === 'improved_spell_resistance' || fId.includes('improved_spell_resistance') || fLower.includes('improved spell resistance')) {
       let count = 1;
       if (fLower.includes('x3')) count = 3;
       else if (fLower.includes('x2')) count = 2;

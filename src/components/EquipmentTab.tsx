@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { CharacterState, WeaponData, RaceData, ClassData, Equipment, CustomArmorData, WondrousItem, InventoryItem, Funds } from '../types/character';
+import { CharacterState, WeaponData, RaceData, ClassData, Equipment, CustomArmorData, WondrousItem, InventoryItem, Funds, EquipmentMaterial, ItemArmorData } from '../types/character';
 import { getSourceBadgeInfo, sortDropdownItems } from '../utils/sourceFilter';
 import { SearchableSelect, SearchableOption } from './SearchableSelect';
 import { calculateTotalScore, getAbilityMod, parseRaceMods } from '../engine/stats';
@@ -12,7 +12,9 @@ import {
   matchesItemName, THEMED_WEAPON_BASE_MAP, getThemedWeaponBase, THEMED_WEAPON_LIST,
   STANDARD_BASE_WEAPONS, createInventoryWeapon, createInventoryArmor, createInventoryShield,
   getEquippedArmorItem, getEquippedShieldItem, getEquippedWeaponItem,
-  resolveEquippedArmor, resolveEquippedShield, resolveEquippedWeapon
+  resolveEquippedArmor, resolveEquippedShield, resolveEquippedWeapon,
+  applyMaterialToArmorData, applyMaterialToWeight,
+  getWeaponEffectiveAttackEnhancement, getWeaponMaterialDamageMod, getWeaponMaterialTraits
 } from '../engine/equipment';
 import {
   getTacticalCombatState,
@@ -79,6 +81,30 @@ const COMMON_ITEM_PRESETS = [
   { name: "Tanglefoot Bag", weight: 4, location: 'Backpack', value: '50 gp' },
   { name: "Spyglass", weight: 1, location: 'Belt Pouch', value: '1,000 gp' }
 ].sort((a, b) => a.name.localeCompare(b.name));
+
+const ARMOR_MATERIAL_OPTIONS: SearchableOption[] = [
+  { value: 'standard', label: 'Standard', sublabel: 'Standard material', isAllowed: true },
+  { value: 'mithral', label: 'Mithral', sublabel: 'Weight halved, Max Dex +2, ACP -3, ASF -10%', isAllowed: true },
+  { value: 'adamantine', label: 'Adamantine', sublabel: 'Grants Damage Reduction (DR 1/-, 2/-, or 3/-)', isAllowed: true },
+  { value: 'dragonhide', label: 'Dragonhide', sublabel: 'Non-metal, usable by Druids', isAllowed: true }
+];
+
+const SHIELD_MATERIAL_OPTIONS: SearchableOption[] = [
+  { value: 'standard', label: 'Standard', sublabel: 'Standard material', isAllowed: true },
+  { value: 'darkwood', label: 'Darkwood', sublabel: 'Weight halved, ACP -2', isAllowed: true },
+  { value: 'mithral', label: 'Mithral', sublabel: 'Weight halved, ACP -3, ASF -10%', isAllowed: true },
+  { value: 'adamantine', label: 'Adamantine', sublabel: 'Hardness 20, +1/3 hp', isAllowed: true },
+  { value: 'dragonhide', label: 'Dragonhide', sublabel: 'Non-metal, usable by Druids', isAllowed: true }
+];
+
+const WEAPON_MATERIAL_OPTIONS: SearchableOption[] = [
+  { value: 'standard', label: 'Standard', sublabel: 'Standard material', isAllowed: true },
+  { value: 'adamantine', label: 'Adamantine', sublabel: 'Bypasses Adamantine DR & Hardness < 20', isAllowed: true },
+  { value: 'mithral', label: 'Mithral', sublabel: 'Weight halved, bypasses Silver DR', isAllowed: true },
+  { value: 'cold_iron', label: 'Cold Iron', sublabel: 'Bypasses Cold Iron DR', isAllowed: true },
+  { value: 'alchemical_silver', label: 'Alchemical Silver', sublabel: 'Bypasses Silver DR (-1 damage)', isAllowed: true },
+  { value: 'darkwood', label: 'Darkwood', sublabel: 'Weight halved for wooden weapons', isAllowed: true }
+];
 
 const CustomWeaponInput: React.FC<{
   value: string;
@@ -528,10 +554,14 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.primaryWeaponEnhancement = 0;
         newEq.primaryWeaponQualities = [];
         newEq.primaryWeaponBaneTarget = undefined;
+        newEq.primaryWeaponMaterial = undefined;
+        newEq.primaryWeaponMasterwork = false;
       } else if (val === '__CUSTOM__') {
         newEq.primaryWeapon = '__CUSTOM__';
         newEq.primaryWeaponItemId = undefined;
         newEq.primaryWeaponBaneTarget = undefined;
+        newEq.primaryWeaponMaterial = undefined;
+        newEq.primaryWeaponMasterwork = false;
       } else {
         const clean = (val || '').trim();
         if (!clean) return;
@@ -560,6 +590,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.primaryWeaponEnhancement = invItem.enhancementBonus || 0;
         newEq.primaryWeaponQualities = invItem.specialQualities ? [...invItem.specialQualities] : [];
         newEq.primaryWeaponBaneTarget = invItem.baneTarget || invItem.weaponData?.baneTarget;
+        newEq.primaryWeaponMaterial = invItem.material || 'standard';
+        newEq.primaryWeaponMasterwork = invItem.isMasterwork || false;
 
         // Transfer weapon from other weapon slots if already equipped there
         if (newEq.secondaryWeaponItemId === invItem.id) {
@@ -568,6 +600,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.secondaryWeaponEnhancement = 0;
           newEq.secondaryWeaponQualities = [];
           newEq.secondaryWeaponBaneTarget = undefined;
+          newEq.secondaryWeaponMaterial = undefined;
+          newEq.secondaryWeaponMasterwork = false;
         }
         if (newEq.rangedWeaponItemId === invItem.id) {
           newEq.rangedWeapon = 'none';
@@ -575,6 +609,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.rangedWeaponEnhancement = 0;
           newEq.rangedWeaponQualities = [];
           newEq.rangedWeaponBaneTarget = undefined;
+          newEq.rangedWeaponMaterial = undefined;
+          newEq.rangedWeaponMasterwork = false;
         }
 
         const isTwoHanded = invItem.weaponData?.size === 'T' ||
@@ -588,12 +624,16 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             newEq.secondaryWeaponEnhancement = 0;
             newEq.secondaryWeaponQualities = [];
             newEq.secondaryWeaponBaneTarget = undefined;
+            newEq.secondaryWeaponMaterial = undefined;
+            newEq.secondaryWeaponMasterwork = false;
           }
           if (newEq.shield && newEq.shield !== 'none' && !newEq.shield.toLowerCase().includes('buckler')) {
             newEq.shield = 'none';
             newEq.shieldItemId = undefined;
             newEq.shieldEnhancement = 0;
             newEq.shieldQualities = [];
+            newEq.shieldMaterial = undefined;
+            newEq.shieldMasterwork = false;
           }
         }
       }
@@ -604,10 +644,14 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.secondaryWeaponEnhancement = 0;
         newEq.secondaryWeaponQualities = [];
         newEq.secondaryWeaponBaneTarget = undefined;
+        newEq.secondaryWeaponMaterial = undefined;
+        newEq.secondaryWeaponMasterwork = false;
       } else if (val === '__CUSTOM__') {
         newEq.secondaryWeapon = '__CUSTOM__';
         newEq.secondaryWeaponItemId = undefined;
         newEq.secondaryWeaponBaneTarget = undefined;
+        newEq.secondaryWeaponMaterial = undefined;
+        newEq.secondaryWeaponMasterwork = false;
       } else {
         const clean = (val || '').trim();
         if (!clean) return;
@@ -636,6 +680,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.secondaryWeaponEnhancement = invItem.enhancementBonus || 0;
         newEq.secondaryWeaponQualities = invItem.specialQualities ? [...invItem.specialQualities] : [];
         newEq.secondaryWeaponBaneTarget = invItem.baneTarget || invItem.weaponData?.baneTarget;
+        newEq.secondaryWeaponMaterial = invItem.material || 'standard';
+        newEq.secondaryWeaponMasterwork = invItem.isMasterwork || false;
 
         // Transfer weapon from other weapon slots if already equipped there
         if (newEq.primaryWeaponItemId === invItem.id) {
@@ -644,6 +690,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.primaryWeaponEnhancement = 0;
           newEq.primaryWeaponQualities = [];
           newEq.primaryWeaponBaneTarget = undefined;
+          newEq.primaryWeaponMaterial = undefined;
+          newEq.primaryWeaponMasterwork = false;
         }
         if (newEq.rangedWeaponItemId === invItem.id) {
           newEq.rangedWeapon = 'none';
@@ -651,6 +699,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.rangedWeaponEnhancement = 0;
           newEq.rangedWeaponQualities = [];
           newEq.rangedWeaponBaneTarget = undefined;
+          newEq.rangedWeaponMaterial = undefined;
+          newEq.rangedWeaponMasterwork = false;
         }
 
         if (newEq.primaryWeapon && newEq.primaryWeapon !== 'none') {
@@ -661,6 +711,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             newEq.primaryWeaponEnhancement = 0;
             newEq.primaryWeaponQualities = [];
             newEq.primaryWeaponBaneTarget = undefined;
+            newEq.primaryWeaponMaterial = undefined;
+            newEq.primaryWeaponMasterwork = false;
           }
         }
         if (newEq.shield && newEq.shield !== 'none' && !newEq.shield.toLowerCase().includes('buckler')) {
@@ -668,6 +720,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.shieldItemId = undefined;
           newEq.shieldEnhancement = 0;
           newEq.shieldQualities = [];
+          newEq.shieldMaterial = undefined;
+          newEq.shieldMasterwork = false;
         }
       }
     } else if (field === 'rangedWeapon') {
@@ -677,10 +731,14 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.rangedWeaponEnhancement = 0;
         newEq.rangedWeaponQualities = [];
         newEq.rangedWeaponBaneTarget = undefined;
+        newEq.rangedWeaponMaterial = undefined;
+        newEq.rangedWeaponMasterwork = false;
       } else if (val === '__CUSTOM__') {
         newEq.rangedWeapon = '__CUSTOM__';
         newEq.rangedWeaponItemId = undefined;
         newEq.rangedWeaponBaneTarget = undefined;
+        newEq.rangedWeaponMaterial = undefined;
+        newEq.rangedWeaponMasterwork = false;
       } else {
         const clean = (val || '').trim();
         if (!clean) return;
@@ -709,6 +767,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.rangedWeaponEnhancement = invItem.enhancementBonus || 0;
         newEq.rangedWeaponQualities = invItem.specialQualities ? [...invItem.specialQualities] : [];
         newEq.rangedWeaponBaneTarget = invItem.baneTarget || invItem.weaponData?.baneTarget;
+        newEq.rangedWeaponMaterial = invItem.material || 'standard';
+        newEq.rangedWeaponMasterwork = invItem.isMasterwork || false;
 
         // Transfer weapon from other weapon slots if already equipped there
         if (newEq.primaryWeaponItemId === invItem.id) {
@@ -717,6 +777,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.primaryWeaponEnhancement = 0;
           newEq.primaryWeaponQualities = [];
           newEq.primaryWeaponBaneTarget = undefined;
+          newEq.primaryWeaponMaterial = undefined;
+          newEq.primaryWeaponMasterwork = false;
         }
         if (newEq.secondaryWeaponItemId === invItem.id) {
           newEq.secondaryWeapon = 'none';
@@ -724,6 +786,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.secondaryWeaponEnhancement = 0;
           newEq.secondaryWeaponQualities = [];
           newEq.secondaryWeaponBaneTarget = undefined;
+          newEq.secondaryWeaponMaterial = undefined;
+          newEq.secondaryWeaponMasterwork = false;
         }
       }
     } else if (field === 'armor') {
@@ -732,6 +796,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.armorItemId = undefined;
         newEq.armorEnhancement = 0;
         newEq.armorQualities = [];
+        newEq.armorMaterial = undefined;
+        newEq.armorMasterwork = false;
       } else {
         const clean = (val || '').trim();
         if (!clean) return;
@@ -767,6 +833,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.armorItemId = invItem.id;
         newEq.armorEnhancement = invItem.enhancementBonus || 0;
         newEq.armorQualities = invItem.specialQualities ? [...invItem.specialQualities] : [];
+        newEq.armorMaterial = invItem.material || 'standard';
+        newEq.armorMasterwork = invItem.isMasterwork || false;
       }
     } else if (field === 'shield') {
       if (val === 'none') {
@@ -774,6 +842,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.shieldItemId = undefined;
         newEq.shieldEnhancement = 0;
         newEq.shieldQualities = [];
+        newEq.shieldMaterial = undefined;
+        newEq.shieldMasterwork = false;
       } else {
         const clean = (val || '').trim();
         if (!clean) return;
@@ -809,6 +879,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.shieldItemId = invItem.id;
         newEq.shieldEnhancement = invItem.enhancementBonus || 0;
         newEq.shieldQualities = invItem.specialQualities ? [...invItem.specialQualities] : [];
+        newEq.shieldMaterial = invItem.material || 'standard';
+        newEq.shieldMasterwork = invItem.isMasterwork || false;
 
         if (!invItem.name.toLowerCase().includes('buckler')) {
           if (newEq.primaryWeapon && newEq.primaryWeapon !== 'none') {
@@ -818,6 +890,9 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
               newEq.primaryWeaponItemId = undefined;
               newEq.primaryWeaponEnhancement = 0;
               newEq.primaryWeaponQualities = [];
+              newEq.primaryWeaponBaneTarget = undefined;
+              newEq.primaryWeaponMaterial = undefined;
+              newEq.primaryWeaponMasterwork = false;
             }
           }
           if (newEq.secondaryWeapon && newEq.secondaryWeapon !== 'none') {
@@ -825,6 +900,9 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             newEq.secondaryWeaponItemId = undefined;
             newEq.secondaryWeaponEnhancement = 0;
             newEq.secondaryWeaponQualities = [];
+            newEq.secondaryWeaponBaneTarget = undefined;
+            newEq.secondaryWeaponMaterial = undefined;
+            newEq.secondaryWeaponMasterwork = false;
           }
         }
       }
@@ -832,6 +910,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       const slotKey = field === 'primaryWeaponEnhancement' ? 'primaryWeapon' : (field === 'secondaryWeaponEnhancement' ? 'secondaryWeapon' : 'rangedWeapon');
       const idKey = `${slotKey}ItemId` as keyof Equipment;
       const qKey = `${slotKey}Qualities` as keyof Equipment;
+      const matKey = `${slotKey}Material` as keyof Equipment;
+      const mwkKey = `${slotKey}Masterwork` as keyof Equipment;
       const targetItemId = newEq[idKey] as string | undefined;
       const qualities = (newEq[qKey] as string[]) || [];
 
@@ -839,9 +919,12 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         const itemIdx = updatedInv.findIndex(i => i.id === targetItemId);
         if (itemIdx >= 0) {
           const item = updatedInv[itemIdx];
-          const baseName = parseMagicItemName(item.name).baseName;
-          const newName = formatMagicItemName(baseName, val, qualities);
-          updatedInv[itemIdx] = { ...item, name: newName, enhancementBonus: val };
+          const resolved = resolveWeapon(item.baseItemId || item.name, updatedCustoms, weaponsData);
+          const baseName = resolved.name;
+          const mat = item.material || (newEq as any)[matKey] || 'standard';
+          const isMwk = (newEq as any)[mwkKey] ?? item.isMasterwork ?? false;
+          const newName = formatMagicItemName(baseName, val, qualities, mat, isMwk);
+          updatedInv[itemIdx] = { ...item, name: newName, enhancementBonus: val, isMasterwork: isMwk };
           (newEq as any)[slotKey] = newName;
         }
       } else {
@@ -854,6 +937,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       const slotKey = field === 'armorEnhancement' ? 'armor' : 'shield';
       const idKey = `${slotKey}ItemId` as keyof Equipment;
       const qKey = `${slotKey}Qualities` as keyof Equipment;
+      const matKey = `${slotKey}Material` as keyof Equipment;
+      const mwkKey = `${slotKey}Masterwork` as keyof Equipment;
       const targetItemId = newEq[idKey] as string | undefined;
       const qualities = (newEq[qKey] as string[]) || [];
 
@@ -861,9 +946,14 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         const itemIdx = updatedInv.findIndex(i => i.id === targetItemId);
         if (itemIdx >= 0) {
           const item = updatedInv[itemIdx];
-          const baseName = parseMagicItemName(item.name, slotKey).baseName;
-          const newName = formatMagicItemName(baseName, val, qualities);
-          updatedInv[itemIdx] = { ...item, name: newName, enhancementBonus: val };
+          const resolved = slotKey === 'armor'
+            ? resolveArmor(item.baseItemId || item.name, updatedArmors)
+            : resolveShield(item.baseItemId || item.name, updatedArmors);
+          const baseName = resolved.name;
+          const mat = item.material || (newEq as any)[matKey] || 'standard';
+          const isMwk = (newEq as any)[mwkKey] ?? item.isMasterwork ?? false;
+          const newName = formatMagicItemName(baseName, val, qualities, mat, isMwk);
+          updatedInv[itemIdx] = { ...item, name: newName, enhancementBonus: val, isMasterwork: isMwk };
           (newEq as any)[slotKey] = newName;
         }
       } else {
@@ -885,6 +975,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         (field === 'armorQualities' ? 'armor' : 'shield')));
       const idKey = `${slotKey}ItemId` as keyof Equipment;
       const enhKey = `${slotKey}Enhancement` as keyof Equipment;
+      const matKey = `${slotKey}Material` as keyof Equipment;
+      const mwkKey = `${slotKey}Masterwork` as keyof Equipment;
       const targetItemId = newEq[idKey] as string | undefined;
       const enh = (newEq[enhKey] as number) || 0;
       const qList = (val || []) as string[];
@@ -893,10 +985,15 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         const itemIdx = updatedInv.findIndex(i => i.id === targetItemId);
         if (itemIdx >= 0) {
           const item = updatedInv[itemIdx];
-          const targetHint = (slotKey === 'armor' || slotKey === 'shield') ? slotKey : 'weapon';
-          const baseName = parseMagicItemName(item.name, targetHint).baseName;
-          const newName = formatMagicItemName(baseName, enh, qList);
-          updatedInv[itemIdx] = { ...item, name: newName, specialQualities: [...qList] };
+          const isArmorOrShield = slotKey === 'armor' || slotKey === 'shield';
+          const resolved = isArmorOrShield
+            ? (slotKey === 'armor' ? resolveArmor(item.baseItemId || item.name, updatedArmors) : resolveShield(item.baseItemId || item.name, updatedArmors))
+            : resolveWeapon(item.baseItemId || item.name, updatedCustoms, weaponsData);
+          const baseName = resolved.name;
+          const mat = item.material || (newEq as any)[matKey] || 'standard';
+          const isMwk = (newEq as any)[mwkKey] ?? item.isMasterwork ?? false;
+          const newName = formatMagicItemName(baseName, enh, qList, mat, isMwk);
+          updatedInv[itemIdx] = { ...item, name: newName, specialQualities: [...qList], isMasterwork: isMwk };
           (newEq as any)[slotKey] = newName;
         }
       } else {
@@ -908,6 +1005,238 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             }
             return i;
           });
+        }
+      }
+    } else if (field === 'armorMaterial') {
+      newEq.armorMaterial = val;
+      const targetItemId = newEq.armorItemId;
+      if (targetItemId) {
+        const itemIdx = updatedInv.findIndex(i => i.id === targetItemId);
+        if (itemIdx >= 0) {
+          const item = updatedInv[itemIdx];
+          const resolved = resolveArmor(item.baseItemId || item.name, updatedArmors);
+          const baseName = resolved.name;
+          const enh = item.enhancementBonus || 0;
+          const qList = item.specialQualities || [];
+          const isMwk = item.isMasterwork ?? newEq.armorMasterwork ?? false;
+          const newName = formatMagicItemName(baseName, enh, qList, val, isMwk);
+          const baseArmorData: ItemArmorData = {
+            type: (resolved.type as any) || 'medium',
+            acBonus: resolved.acBonus,
+            maxDex: resolved.maxDex ?? 99,
+            armorCheckPenalty: resolved.checkPenalty ?? 0,
+            spellFailure: resolved.spellFailure ?? 0,
+            speedPenalty: resolved.speedPenalty ?? (resolved.type === 'heavy' || resolved.type === 'medium')
+          };
+          const newArmorData = applyMaterialToArmorData(baseArmorData, val, isMwk);
+          const stdWeight = resolved.weight ?? (ARMOR_WEIGHT_MAP[resolved.name.toLowerCase()] ?? 20);
+          const newWeight = applyMaterialToWeight(stdWeight, val);
+
+          updatedInv[itemIdx] = {
+            ...item,
+            name: newName,
+            material: val,
+            weight: newWeight,
+            armorData: newArmorData,
+            isMasterwork: isMwk
+          };
+          newEq.armor = newName;
+        }
+      }
+    } else if (field === 'shieldMaterial') {
+      newEq.shieldMaterial = val;
+      const targetItemId = newEq.shieldItemId;
+      if (targetItemId) {
+        const itemIdx = updatedInv.findIndex(i => i.id === targetItemId);
+        if (itemIdx >= 0) {
+          const item = updatedInv[itemIdx];
+          const resolved = resolveShield(item.baseItemId || item.name, updatedArmors);
+          const baseName = resolved.name;
+          const enh = item.enhancementBonus || 0;
+          const qList = item.specialQualities || [];
+          const isMwk = item.isMasterwork ?? newEq.shieldMasterwork ?? false;
+          const newName = formatMagicItemName(baseName, enh, qList, val, isMwk);
+          const baseArmorData: ItemArmorData = {
+            type: 'shield',
+            acBonus: resolved.acBonus,
+            maxDex: 99,
+            armorCheckPenalty: resolved.checkPenalty ?? 0,
+            spellFailure: resolved.spellFailure ?? 0,
+            speedPenalty: false
+          };
+          const newArmorData = applyMaterialToArmorData(baseArmorData, val, isMwk);
+          const stdWeight = resolved.weight ?? (SHIELD_WEIGHT_MAP[resolved.name.toLowerCase()] ?? 10);
+          const newWeight = applyMaterialToWeight(stdWeight, val);
+
+          updatedInv[itemIdx] = {
+            ...item,
+            name: newName,
+            material: val,
+            weight: newWeight,
+            armorData: newArmorData,
+            isMasterwork: isMwk
+          };
+          newEq.shield = newName;
+        }
+      }
+    } else if (field === 'primaryWeaponMaterial' || field === 'secondaryWeaponMaterial' || field === 'rangedWeaponMaterial') {
+      const slotKey = field === 'primaryWeaponMaterial' ? 'primaryWeapon' : (field === 'secondaryWeaponMaterial' ? 'secondaryWeapon' : 'rangedWeapon');
+      const idKey = `${slotKey}ItemId` as keyof Equipment;
+      const enhKey = `${slotKey}Enhancement` as keyof Equipment;
+      const qKey = `${slotKey}Qualities` as keyof Equipment;
+      const mwkKey = `${slotKey}Masterwork` as keyof Equipment;
+      const targetItemId = newEq[idKey] as string | undefined;
+      const enh = (newEq[enhKey] as number) || 0;
+      const qList = (newEq[qKey] as string[]) || [];
+      (newEq as any)[field] = val;
+
+      if (targetItemId) {
+        const itemIdx = updatedInv.findIndex(i => i.id === targetItemId);
+        if (itemIdx >= 0) {
+          const item = updatedInv[itemIdx];
+          const resolved = resolveWeapon(item.baseItemId || item.name, updatedCustoms, weaponsData);
+          const baseName = resolved.name;
+          const isMwk = item.isMasterwork ?? (newEq as any)[mwkKey] ?? false;
+          const newName = formatMagicItemName(baseName, enh, qList, val, isMwk);
+          const stdWeight = resolved.weight ?? 4;
+          const newWeight = applyMaterialToWeight(stdWeight, val);
+
+          updatedInv[itemIdx] = {
+            ...item,
+            name: newName,
+            material: val,
+            weight: newWeight,
+            isMasterwork: isMwk
+          };
+          (newEq as any)[slotKey] = newName;
+        }
+      }
+    } else if (field === 'primaryWeaponMasterwork' || field === 'secondaryWeaponMasterwork' || field === 'rangedWeaponMasterwork') {
+      const slotKey = field === 'primaryWeaponMasterwork' ? 'primaryWeapon' : (field === 'secondaryWeaponMasterwork' ? 'secondaryWeapon' : 'rangedWeapon');
+      const idKey = `${slotKey}ItemId` as keyof Equipment;
+      const enhKey = `${slotKey}Enhancement` as keyof Equipment;
+      const qKey = `${slotKey}Qualities` as keyof Equipment;
+      const matKey = `${slotKey}Material` as keyof Equipment;
+      const targetItemId = newEq[idKey] as string | undefined;
+      const enh = (newEq[enhKey] as number) || 0;
+      const qList = (newEq[qKey] as string[]) || [];
+      const isMwk = Boolean(val);
+      (newEq as any)[field] = isMwk;
+
+      if (targetItemId) {
+        const itemIdx = updatedInv.findIndex(i => i.id === targetItemId);
+        if (itemIdx >= 0) {
+          const item = updatedInv[itemIdx];
+          const resolved = resolveWeapon(item.baseItemId || item.name, updatedCustoms, weaponsData);
+          const baseName = resolved.name;
+          const mat = item.material || (newEq as any)[matKey] || 'standard';
+          const newName = formatMagicItemName(baseName, enh, qList, mat, isMwk);
+          updatedInv[itemIdx] = {
+            ...item,
+            name: newName,
+            isMasterwork: isMwk,
+            weaponData: item.weaponData ? { ...item.weaponData, isMasterwork: isMwk } : undefined
+          };
+          (newEq as any)[slotKey] = newName;
+        }
+      } else {
+        const currentVal = (newEq as any)[slotKey];
+        if (currentVal && currentVal !== 'none') {
+          const resolved = resolveWeapon(currentVal, updatedCustoms, weaponsData);
+          const mat = (newEq as any)[matKey] || 'standard';
+          const newName = formatMagicItemName(resolved.name, enh, qList, mat, isMwk);
+          (newEq as any)[slotKey] = newName;
+          const invIdx = updatedInv.findIndex(i => matchesItemName(i.name, currentVal) || matchesItemName(i.name, resolved.name));
+          if (invIdx >= 0) {
+            const invItem = updatedInv[invIdx];
+            updatedInv[invIdx] = {
+              ...invItem,
+              name: newName,
+              isMasterwork: isMwk,
+              weaponData: invItem.weaponData ? { ...invItem.weaponData, isMasterwork: isMwk } : undefined
+            };
+          }
+        }
+      }
+    } else if (field === 'armorMasterwork' || field === 'shieldMasterwork') {
+      const slotKey = field === 'armorMasterwork' ? 'armor' : 'shield';
+      const idKey = `${slotKey}ItemId` as keyof Equipment;
+      const enhKey = `${slotKey}Enhancement` as keyof Equipment;
+      const qKey = `${slotKey}Qualities` as keyof Equipment;
+      const matKey = `${slotKey}Material` as keyof Equipment;
+      const targetItemId = newEq[idKey] as string | undefined;
+      const enh = (newEq[enhKey] as number) || 0;
+      const qList = (newEq[qKey] as string[]) || [];
+      const isMwk = Boolean(val);
+      (newEq as any)[field] = isMwk;
+
+      if (targetItemId) {
+        const itemIdx = updatedInv.findIndex(i => i.id === targetItemId);
+        if (itemIdx >= 0) {
+          const item = updatedInv[itemIdx];
+          const isArmor = slotKey === 'armor';
+          let baseName: string;
+          let baseArmorData: ItemArmorData;
+          if (isArmor) {
+            const resolved = resolveArmor(item.baseItemId || item.name, updatedArmors);
+            baseName = resolved.name;
+            baseArmorData = {
+              type: (resolved.type as any) || 'medium',
+              acBonus: resolved.acBonus,
+              maxDex: resolved.maxDex ?? 99,
+              armorCheckPenalty: resolved.checkPenalty ?? 0,
+              spellFailure: resolved.spellFailure ?? 0,
+              speedPenalty: resolved.speedPenalty ?? (resolved.type === 'heavy' || resolved.type === 'medium')
+            };
+          } else {
+            const resolved = resolveShield(item.baseItemId || item.name, updatedArmors);
+            baseName = resolved.name;
+            baseArmorData = {
+              type: 'shield',
+              acBonus: resolved.acBonus,
+              maxDex: 99,
+              armorCheckPenalty: resolved.checkPenalty ?? 0,
+              spellFailure: resolved.spellFailure ?? 0,
+              speedPenalty: false
+            };
+          }
+          const mat = item.material || (newEq as any)[matKey] || 'standard';
+          const newName = formatMagicItemName(baseName, enh, qList, mat, isMwk);
+          const newArmorData = applyMaterialToArmorData(baseArmorData, mat, isMwk);
+          updatedInv[itemIdx] = {
+            ...item,
+            name: newName,
+            isMasterwork: isMwk,
+            armorData: newArmorData
+          };
+          (newEq as any)[slotKey] = newName;
+        }
+      } else {
+        const currentVal = (newEq as any)[slotKey];
+        if (currentVal && currentVal !== 'none') {
+          const isArmor = slotKey === 'armor';
+          const resolved = isArmor ? resolveArmor(currentVal, updatedArmors) : resolveShield(currentVal, updatedArmors);
+          const mat = (newEq as any)[matKey] || 'standard';
+          const newName = formatMagicItemName(resolved.name, enh, qList, mat, isMwk);
+          (newEq as any)[slotKey] = newName;
+          const invIdx = updatedInv.findIndex(i => matchesItemName(i.name, currentVal) || matchesItemName(i.name, resolved.name));
+          if (invIdx >= 0) {
+            const item = updatedInv[invIdx];
+            const baseArmorData = item.armorData || {
+              type: (isArmor ? (resolved as any).type || 'medium' : 'shield') as any,
+              acBonus: resolved.acBonus,
+              maxDex: (resolved as any).maxDex ?? 99,
+              armorCheckPenalty: resolved.checkPenalty ?? 0,
+              spellFailure: resolved.spellFailure ?? 0,
+              speedPenalty: isArmor ? ((resolved as any).speedPenalty ?? ((resolved as any).type === 'heavy' || (resolved as any).type === 'medium')) : false
+            };
+            updatedInv[invIdx] = {
+              ...item,
+              name: newName,
+              isMasterwork: isMwk,
+              armorData: applyMaterialToArmorData(baseArmorData, mat, isMwk)
+            };
+          }
         }
       }
     }
@@ -949,6 +1278,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       newEq.primaryWeaponEnhancement = 0;
       newEq.primaryWeaponQualities = [];
       newEq.primaryWeaponBaneTarget = undefined;
+      newEq.primaryWeaponMaterial = undefined;
+      newEq.primaryWeaponMasterwork = false;
     }
     if (newEq.secondaryWeaponItemId === equippedItem.id && slot !== 'secondaryWeapon') {
       newEq.secondaryWeapon = 'none';
@@ -956,6 +1287,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       newEq.secondaryWeaponEnhancement = 0;
       newEq.secondaryWeaponQualities = [];
       newEq.secondaryWeaponBaneTarget = undefined;
+      newEq.secondaryWeaponMaterial = undefined;
+      newEq.secondaryWeaponMasterwork = false;
     }
     if (newEq.rangedWeaponItemId === equippedItem.id && slot !== 'rangedWeapon') {
       newEq.rangedWeapon = 'none';
@@ -963,18 +1296,24 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       newEq.rangedWeaponEnhancement = 0;
       newEq.rangedWeaponQualities = [];
       newEq.rangedWeaponBaneTarget = undefined;
+      newEq.rangedWeaponMaterial = undefined;
+      newEq.rangedWeaponMasterwork = false;
     }
     if (newEq.armorItemId === equippedItem.id && slot !== 'armor') {
       newEq.armor = 'none';
       newEq.armorItemId = undefined;
       newEq.armorEnhancement = 0;
       newEq.armorQualities = [];
+      newEq.armorMaterial = undefined;
+      newEq.armorMasterwork = false;
     }
     if (newEq.shieldItemId === equippedItem.id && slot !== 'shield') {
       newEq.shield = 'none';
       newEq.shieldItemId = undefined;
       newEq.shieldEnhancement = 0;
       newEq.shieldQualities = [];
+      newEq.shieldMaterial = undefined;
+      newEq.shieldMasterwork = false;
     }
 
     if (slot === 'primaryWeapon') {
@@ -983,6 +1322,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       newEq.primaryWeaponEnhancement = equippedItem.enhancementBonus || 0;
       newEq.primaryWeaponQualities = equippedItem.specialQualities ? [...equippedItem.specialQualities] : [];
       newEq.primaryWeaponBaneTarget = equippedItem.baneTarget || equippedItem.weaponData?.baneTarget;
+      newEq.primaryWeaponMaterial = equippedItem.material || 'standard';
+      newEq.primaryWeaponMasterwork = equippedItem.isMasterwork || false;
 
       const isTwoHanded = equippedItem.weaponData?.size === 'T' ||
         equippedItem.weaponData?.category === 'Two-Handed' ||
@@ -995,12 +1336,16 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.secondaryWeaponEnhancement = 0;
           newEq.secondaryWeaponQualities = [];
           newEq.secondaryWeaponBaneTarget = undefined;
+          newEq.secondaryWeaponMaterial = undefined;
+          newEq.secondaryWeaponMasterwork = false;
         }
         if (newEq.shield && newEq.shield !== 'none' && !newEq.shield.toLowerCase().includes('buckler')) {
           newEq.shield = 'none';
           newEq.shieldItemId = undefined;
           newEq.shieldEnhancement = 0;
           newEq.shieldQualities = [];
+          newEq.shieldMaterial = undefined;
+          newEq.shieldMasterwork = false;
         }
       }
     } else if (slot === 'secondaryWeapon') {
@@ -1009,6 +1354,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       newEq.secondaryWeaponEnhancement = equippedItem.enhancementBonus || 0;
       newEq.secondaryWeaponQualities = equippedItem.specialQualities ? [...equippedItem.specialQualities] : [];
       newEq.secondaryWeaponBaneTarget = equippedItem.baneTarget || equippedItem.weaponData?.baneTarget;
+      newEq.secondaryWeaponMaterial = equippedItem.material || 'standard';
+      newEq.secondaryWeaponMasterwork = equippedItem.isMasterwork || false;
 
       if (newEq.primaryWeapon && newEq.primaryWeapon !== 'none') {
         const primaryObj = resolveEquippedWeapon({ ...character, equipment: newEq }, 'primaryWeapon', weaponsData, customWeapons);
@@ -1018,6 +1365,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.primaryWeaponEnhancement = 0;
           newEq.primaryWeaponQualities = [];
           newEq.primaryWeaponBaneTarget = undefined;
+          newEq.primaryWeaponMaterial = undefined;
+          newEq.primaryWeaponMasterwork = false;
         }
       }
       if (newEq.shield && newEq.shield !== 'none' && !newEq.shield.toLowerCase().includes('buckler')) {
@@ -1025,6 +1374,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
         newEq.shieldItemId = undefined;
         newEq.shieldEnhancement = 0;
         newEq.shieldQualities = [];
+        newEq.shieldMaterial = undefined;
+        newEq.shieldMasterwork = false;
       }
     } else if (slot === 'rangedWeapon') {
       newEq.rangedWeapon = equippedItem.name;
@@ -1032,16 +1383,22 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       newEq.rangedWeaponEnhancement = equippedItem.enhancementBonus || 0;
       newEq.rangedWeaponQualities = equippedItem.specialQualities ? [...equippedItem.specialQualities] : [];
       newEq.rangedWeaponBaneTarget = equippedItem.baneTarget || equippedItem.weaponData?.baneTarget;
+      newEq.rangedWeaponMaterial = equippedItem.material || 'standard';
+      newEq.rangedWeaponMasterwork = equippedItem.isMasterwork || false;
     } else if (slot === 'armor') {
       newEq.armor = equippedItem.name;
       newEq.armorItemId = equippedItem.id;
       newEq.armorEnhancement = equippedItem.enhancementBonus || 0;
       newEq.armorQualities = equippedItem.specialQualities ? [...equippedItem.specialQualities] : [];
+      newEq.armorMaterial = equippedItem.material || 'standard';
+      newEq.armorMasterwork = equippedItem.isMasterwork || false;
     } else if (slot === 'shield') {
       newEq.shield = equippedItem.name;
       newEq.shieldItemId = equippedItem.id;
       newEq.shieldEnhancement = equippedItem.enhancementBonus || 0;
       newEq.shieldQualities = equippedItem.specialQualities ? [...equippedItem.specialQualities] : [];
+      newEq.shieldMaterial = equippedItem.material || 'standard';
+      newEq.shieldMasterwork = equippedItem.isMasterwork || false;
 
       if (!equippedItem.name.toLowerCase().includes('buckler')) {
         if (newEq.primaryWeapon && newEq.primaryWeapon !== 'none') {
@@ -1052,6 +1409,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             newEq.primaryWeaponEnhancement = 0;
             newEq.primaryWeaponQualities = [];
             newEq.primaryWeaponBaneTarget = undefined;
+            newEq.primaryWeaponMaterial = undefined;
+            newEq.primaryWeaponMasterwork = false;
           }
         }
         if (newEq.secondaryWeapon && newEq.secondaryWeapon !== 'none') {
@@ -1060,6 +1419,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           newEq.secondaryWeaponEnhancement = 0;
           newEq.secondaryWeaponQualities = [];
           newEq.secondaryWeaponBaneTarget = undefined;
+          newEq.secondaryWeaponMaterial = undefined;
+          newEq.secondaryWeaponMasterwork = false;
         }
       }
     }
@@ -1211,8 +1572,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const netWorthGP = calculateTotalNetWorthGP(funds);
   const encumbrance = getEncumbranceStatus(totalCarriedWeight, carryingCapacity);
 
-  const armorObj = resolveEquippedArmor(character, customArmors);
-  const shieldObj = resolveEquippedShield(character, customArmors);
+  const armorObj = resolveEquippedArmor({ ...character, equipment: eq }, customArmors);
+  const shieldObj = resolveEquippedShield({ ...character, equipment: eq }, customArmors);
   const armorAc = armorObj.acBonus + (eq.armorEnhancement || 0);
   const shieldAc = shieldObj.acBonus + (eq.shieldEnhancement || 0);
 
@@ -1225,26 +1586,19 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       if (!clean || clean.toLowerCase() === 'none' || knownNames.has(clean.toLowerCase())) return;
 
       // Check if it is genuinely a weapon:
-      // 1. Matches a standard weapon in weaponsData
+      const isWeaponType = item.itemType === 'weapon' || Boolean(item.weaponData);
       const isKnown = weaponsData.some(w => w.name.toLowerCase() === clean.toLowerCase());
-      // 2. Is a known themed weapon (e.g. "Nodachi") or aliased weapon (e.g. "Nodachi (Greatsword)")
       const themedBase = getThemedWeaponBase(clean, weaponsData);
       const isThemed = themedBase !== null;
-      // 3. Or matches an alias pattern "Custom Name (BaseWeapon)" where BaseWeapon is recognized
       const aliasMatch = clean.match(/^(.+?)\s*\((.+?)\)$/);
       const isAliasedWeapon = aliasMatch
         ? (STANDARD_BASE_WEAPONS[aliasMatch[2].trim().toLowerCase()] !== undefined ||
            weaponsData.some(w => w.name.toLowerCase() === aliasMatch[2].trim().toLowerCase()))
         : false;
+      const isMagicWeapon = (item.enhancementBonus || 0) > 0 || (item.specialQualities && item.specialQualities.length > 0);
 
-      // 4. Magic weapon name or item with magic properties
-      const parsedMagic = parseMagicItemName(clean);
-      const isMagicWeapon = (parsedMagic.enhancementBonus > 0 || parsedMagic.qualities.length > 0) &&
-        (weaponsData.some(w => w.name.toLowerCase() === parsedMagic.baseName.toLowerCase()) ||
-         getThemedWeaponBase(parsedMagic.baseName, weaponsData) !== null);
-
-      if (isKnown || isThemed || isAliasedWeapon || isMagicWeapon) {
-        const resolved = resolveWeapon(clean, customWeapons, weaponsData);
+      if (isWeaponType || isKnown || isThemed || isAliasedWeapon || isMagicWeapon) {
+        const resolved = resolveWeapon(item.baseItemId || clean, customWeapons, weaponsData);
         inventoryWeapons.push({
           ...resolved,
           name: clean,
@@ -1280,16 +1634,13 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     (character.inventory || []).forEach(invItem => {
       const clean = (invItem.name || '').trim();
       if (!clean || clean.toLowerCase() === 'none') return;
+      const isWeaponType = invItem.itemType === 'weapon' || Boolean(invItem.weaponData);
       const isKnown = weaponsData.some(w => w.name.toLowerCase() === clean.toLowerCase());
       const isThemed = getThemedWeaponBase(clean, weaponsData) !== null;
-      const isWeaponType = invItem.itemType === 'weapon' || Boolean(invItem.weaponData);
-      const parsedMagic = parseMagicItemName(clean);
-      const isMagicWeapon = (parsedMagic.enhancementBonus > 0 || parsedMagic.qualities.length > 0) &&
-        (weaponsData.some(w => w.name.toLowerCase() === parsedMagic.baseName.toLowerCase()) ||
-         getThemedWeaponBase(parsedMagic.baseName, weaponsData) !== null);
+      const isMagicWeapon = (invItem.enhancementBonus || 0) > 0 || (invItem.specialQualities && invItem.specialQualities.length > 0);
 
-      if (isKnown || isThemed || isWeaponType || isMagicWeapon) {
-        const resolved = resolveWeapon(clean, customWeapons, weaponsData);
+      if (isWeaponType || isKnown || isThemed || isMagicWeapon) {
+        const resolved = resolveWeapon(invItem.baseItemId || clean, customWeapons, weaponsData);
         const enh = invItem.enhancementBonus || 0;
         const qNames = (invItem.specialQualities || []).map(q => getQualityById(q)?.name || q).join(', ');
         const magicTag = enh > 0 || qNames ? `+${enh}${qNames ? ` ${qNames}` : ''} | ` : '';
@@ -1598,10 +1949,26 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const hideQualityBonus = getArmorSkillBonus(armorQualities, shieldQualities, 'Hide');
   const moveSilentlyQualityBonus = getArmorSkillBonus(armorQualities, shieldQualities, 'Move Silently');
 
+  // Masterwork Status & Inherency Flags
+  const isArmorInherentlyMwk = (eq.armorEnhancement || 0) > 0 || eq.armorMaterial === 'adamantine' || eq.armorMaterial === 'mithral';
+  const isArmorMwk = isArmorInherentlyMwk || !!eq.armorMasterwork;
+
+  const isShieldInherentlyMwk = (eq.shieldEnhancement || 0) > 0 || eq.shieldMaterial === 'adamantine' || eq.shieldMaterial === 'mithral' || eq.shieldMaterial === 'darkwood';
+  const isShieldMwk = isShieldInherentlyMwk || !!eq.shieldMasterwork;
+
+  const isPrimaryInherentlyMwk = (eq.primaryWeaponEnhancement || 0) > 0 || eq.primaryWeaponMaterial === 'adamantine';
+  const isPrimaryMwk = isPrimaryInherentlyMwk || !!eq.primaryWeaponMasterwork;
+
+  const isSecondaryInherentlyMwk = (eq.secondaryWeaponEnhancement || 0) > 0 || eq.secondaryWeaponMaterial === 'adamantine';
+  const isSecondaryMwk = isSecondaryInherentlyMwk || !!eq.secondaryWeaponMasterwork;
+
+  const isRangedInherentlyMwk = (eq.rangedWeaponEnhancement || 0) > 0 || eq.rangedWeaponMaterial === 'adamantine';
+  const isRangedMwk = isRangedInherentlyMwk || !!eq.rangedWeaponMasterwork;
+
   // Resolve Primary Weapon & Special Qualities
   const hasPrimary = Boolean(eq.primaryWeapon && eq.primaryWeapon !== 'none');
   const primaryQualities = eq.primaryWeaponQualities || [];
-  const primaryWpnObj = hasPrimary ? resolveEquippedWeapon(character, 'primaryWeapon', weaponsData, customWeapons) : null;
+  const primaryWpnObj = hasPrimary ? resolveEquippedWeapon({ ...character, equipment: eq }, 'primaryWeapon', weaponsData, customWeapons) : null;
   const primaryBaneTarget = eq.primaryWeaponBaneTarget || primaryWpnObj?.baneTarget;
   const primarySpecialDmg = getWeaponSpecialDamage(primaryQualities, primaryBaneTarget);
   const primaryHasKeen = hasKeenQuality(primaryQualities);
@@ -1610,8 +1977,10 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const primaryTacticalMods = primaryWpnObj ? calculateTacticalCombatModifiers(tcState, primaryWpnObj, false, false, character.activeBuffs) : null;
   const primaryFeatBonuses = primaryWpnObj ? calculateFeatCombatBonuses(character, primaryWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const primaryEnhancement = eq.primaryWeaponEnhancement || 0;
-  const primaryTotalAtk = primaryWpnObj ? (bab + effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + (primaryTacticalMods?.attackMod || 0)) : 0;
-  const primaryDmgVal = primaryWpnObj ? (effectiveStrMod + primaryEnhancement + primaryFeatBonuses.damageBonus + (primaryTacticalMods?.damageMod || 0)) : 0;
+  const primaryEffectiveAtkEnh = getWeaponEffectiveAttackEnhancement(primaryWpnObj?.material || eq.primaryWeaponMaterial, primaryEnhancement, isPrimaryMwk || Boolean(primaryWpnObj?.isMasterwork));
+  const primaryMatDmgMod = getWeaponMaterialDamageMod(primaryWpnObj?.material || eq.primaryWeaponMaterial);
+  const primaryTotalAtk = primaryWpnObj ? (bab + effectiveStrMod + primaryEffectiveAtkEnh + primaryFeatBonuses.attackBonus + (primaryTacticalMods?.attackMod || 0)) : 0;
+  const primaryDmgVal = primaryWpnObj ? (effectiveStrMod + primaryEnhancement + primaryFeatBonuses.damageBonus + (primaryTacticalMods?.damageMod || 0) + primaryMatDmgMod) : 0;
   const primaryDmgStr = primaryDmgVal >= 0 ? `+${primaryDmgVal}` : `${primaryDmgVal}`;
   const primaryBaseDmgFormula = primaryWpnObj ? `${primaryWpnObj.damageM}${primaryDmgVal !== 0 ? primaryDmgStr : ''}` : '';
   const primaryDamageDisplay = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceString}`;
@@ -1621,7 +1990,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const primaryCritInfo = primaryWpnObj ? calculateCritDamagePools(primaryWpnObj, primaryDmgVal, primaryQualities, primaryBaneTarget) : null;
   const primaryFullAttackSeq = primaryWpnObj ? generateFullAttackSequence(
     bab,
-    effectiveStrMod + primaryEnhancement + primaryFeatBonuses.attackBonus + (primaryTacticalMods?.attackMod || 0),
+    effectiveStrMod + primaryEffectiveAtkEnh + primaryFeatBonuses.attackBonus + (primaryTacticalMods?.attackMod || 0),
     tcState.haste || (generalTcMods.extraAttacks || 0) > 0,
     tcState.flurryOfBlows,
     tcState.whirlingFrenzy,
@@ -1631,7 +2000,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   // Resolve Secondary Weapon & Special Qualities
   const hasSecondary = eq.secondaryWeapon && eq.secondaryWeapon !== 'none';
   const secondaryQualities = eq.secondaryWeaponQualities || [];
-  const secondaryWpnObj = hasSecondary ? resolveEquippedWeapon(character, 'secondaryWeapon', weaponsData, customWeapons) : null;
+  const secondaryWpnObj = hasSecondary ? resolveEquippedWeapon({ ...character, equipment: eq }, 'secondaryWeapon', weaponsData, customWeapons) : null;
   const secondaryBaneTarget = eq.secondaryWeaponBaneTarget || secondaryWpnObj?.baneTarget;
   const secondarySpecialDmg = getWeaponSpecialDamage(secondaryQualities, secondaryBaneTarget);
   const secondaryHasKeen = hasKeenQuality(secondaryQualities);
@@ -1640,8 +2009,10 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const secondaryTacticalMods = secondaryWpnObj ? calculateTacticalCombatModifiers(tcState, secondaryWpnObj, true, false, character.activeBuffs) : null;
   const secondaryFeatBonuses = secondaryWpnObj ? calculateFeatCombatBonuses(character, secondaryWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const secondaryEnhancement = eq.secondaryWeaponEnhancement || 0;
-  const secondaryTotalAtk = secondaryWpnObj ? (bab + effectiveStrMod + secondaryEnhancement + secondaryFeatBonuses.attackBonus + (secondaryTacticalMods?.attackMod || 0)) : 0;
-  const secondaryDmgVal = secondaryWpnObj ? (Math.floor(effectiveStrMod / 2) + secondaryEnhancement + secondaryFeatBonuses.damageBonus + (secondaryTacticalMods?.damageMod || 0)) : 0;
+  const secondaryEffectiveAtkEnh = getWeaponEffectiveAttackEnhancement(secondaryWpnObj?.material || eq.secondaryWeaponMaterial, secondaryEnhancement, isSecondaryMwk || Boolean(secondaryWpnObj?.isMasterwork));
+  const secondaryMatDmgMod = getWeaponMaterialDamageMod(secondaryWpnObj?.material || eq.secondaryWeaponMaterial);
+  const secondaryTotalAtk = secondaryWpnObj ? (bab + effectiveStrMod + secondaryEffectiveAtkEnh + secondaryFeatBonuses.attackBonus + (secondaryTacticalMods?.attackMod || 0)) : 0;
+  const secondaryDmgVal = secondaryWpnObj ? (Math.floor(effectiveStrMod / 2) + secondaryEnhancement + secondaryFeatBonuses.damageBonus + (secondaryTacticalMods?.damageMod || 0) + secondaryMatDmgMod) : 0;
   const secondaryBaseDmgFormula = secondaryWpnObj ? `${secondaryWpnObj.damageM}${secondaryDmgVal >= 0 ? `+${secondaryDmgVal}` : secondaryDmgVal}` : '';
   const secondaryDamageDisplay = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceString}`;
   const secondaryRollDamageFormula = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceFormula}`;
@@ -1652,7 +2023,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   // Resolve Ranged Weapon & Special Qualities
   const hasRanged = eq.rangedWeapon && eq.rangedWeapon !== 'none';
   const rangedQualities = eq.rangedWeaponQualities || [];
-  const rangedWpnObj = hasRanged ? resolveEquippedWeapon(character, 'rangedWeapon', weaponsData, customWeapons) : null;
+  const rangedWpnObj = hasRanged ? resolveEquippedWeapon({ ...character, equipment: eq }, 'rangedWeapon', weaponsData, customWeapons) : null;
   const rangedBaneTarget = eq.rangedWeaponBaneTarget || rangedWpnObj?.baneTarget;
   const rangedSpecialDmg = getWeaponSpecialDamage(rangedQualities, rangedBaneTarget);
   const rangedHasKeen = hasKeenQuality(rangedQualities);
@@ -1661,8 +2032,10 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const rangedTacticalMods = rangedWpnObj ? calculateTacticalCombatModifiers(tcState, rangedWpnObj, false, true, character.activeBuffs) : null;
   const rangedFeatBonuses = rangedWpnObj ? calculateFeatCombatBonuses(character, rangedWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const rangedEnhancement = eq.rangedWeaponEnhancement || 0;
-  const rangedTotalAtk = rangedWpnObj ? (bab + effectiveDexMod + rangedEnhancement + rangedFeatBonuses.attackBonus + (rangedTacticalMods?.attackMod || 0)) : 0;
-  const rangedDmgVal = rangedWpnObj ? (rangedEnhancement + rangedFeatBonuses.damageBonus + (rangedTacticalMods?.damageMod || 0)) : 0;
+  const rangedEffectiveAtkEnh = getWeaponEffectiveAttackEnhancement(rangedWpnObj?.material || eq.rangedWeaponMaterial, rangedEnhancement, isRangedMwk || Boolean(rangedWpnObj?.isMasterwork));
+  const rangedMatDmgMod = getWeaponMaterialDamageMod(rangedWpnObj?.material || eq.rangedWeaponMaterial);
+  const rangedTotalAtk = rangedWpnObj ? (bab + effectiveDexMod + rangedEffectiveAtkEnh + rangedFeatBonuses.attackBonus + (rangedTacticalMods?.attackMod || 0)) : 0;
+  const rangedDmgVal = rangedWpnObj ? (rangedEnhancement + rangedFeatBonuses.damageBonus + (rangedTacticalMods?.damageMod || 0) + rangedMatDmgMod) : 0;
   const rangedDmgStr = rangedDmgVal > 0 ? `+${rangedDmgVal}` : (rangedDmgVal < 0 ? `${rangedDmgVal}` : '');
   const rangedBaseDmgFormula = rangedWpnObj ? `${rangedWpnObj.damageM}${rangedDmgStr}` : '';
   const rangedDamageDisplay = `${rangedBaseDmgFormula}${rangedSpecialDmg.damageDiceString}`;
@@ -2264,8 +2637,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             <i className="fa-solid fa-shield-cat text-amber-500"></i> Armor & Shield Configuration
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+            <div className="sm:col-span-5">
               <label className="label-text">Equipped Armor</label>
               <SearchableSelect
                 value={selectedArmorValue}
@@ -2274,8 +2647,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 placeholder="Select equipped armor..."
               />
             </div>
-            <div>
-              <label className="label-text">Armor Enhancement</label>
+            <div className="sm:col-span-2">
+              <label className="label-text">Enhancement</label>
               <SearchableSelect
                 value={String(eq.armorEnhancement || 0)}
                 options={armorEnhancementOptions}
@@ -2283,6 +2656,37 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 showSublabelInTrigger={false}
                 placeholder="Enh..."
               />
+            </div>
+            <div className="sm:col-span-3">
+              <label className="label-text">Armor Material</label>
+              <SearchableSelect
+                value={eq.armorMaterial || 'standard'}
+                options={ARMOR_MATERIAL_OPTIONS}
+                onChange={val => handleEqChange('armorMaterial', val)}
+                showSublabelInTrigger={false}
+                placeholder="Material..."
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="label-text">Masterwork</label>
+              <label className={`flex items-center gap-2 h-[38px] px-3 rounded-xl border text-xs select-none transition ${
+                !eq.armor || eq.armor === 'none'
+                  ? 'bg-slate-950/40 border-slate-800/40 text-slate-600 cursor-not-allowed'
+                  : isArmorInherentlyMwk
+                    ? 'bg-slate-950/40 border-slate-800/60 text-slate-400 cursor-not-allowed'
+                    : 'bg-slate-950/80 border-slate-800 hover:border-amber-500/50 text-slate-300 cursor-pointer'
+              }`}>
+                <input
+                  type="checkbox"
+                  checked={isArmorMwk}
+                  disabled={!eq.armor || eq.armor === 'none' || isArmorInherentlyMwk}
+                  onChange={e => handleEqChange('armorMasterwork', e.target.checked)}
+                  className="rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500"
+                />
+                <span className="font-medium text-[11px] truncate">
+                  {isArmorInherentlyMwk ? 'Mwk (Auto)' : 'Masterwork'}
+                </span>
+              </label>
             </div>
           </div>
 
@@ -2300,8 +2704,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             />
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+            <div className="sm:col-span-5">
               <label className="label-text">Equipped Shield</label>
               <SearchableSelect
                 value={selectedShieldValue}
@@ -2310,8 +2714,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 placeholder="Select equipped shield..."
               />
             </div>
-            <div>
-              <label className="label-text">Shield Enhancement</label>
+            <div className="sm:col-span-2">
+              <label className="label-text">Enhancement</label>
               <SearchableSelect
                 value={String(eq.shieldEnhancement || 0)}
                 options={armorEnhancementOptions}
@@ -2319,6 +2723,37 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 showSublabelInTrigger={false}
                 placeholder="Enh..."
               />
+            </div>
+            <div className="sm:col-span-3">
+              <label className="label-text">Shield Material</label>
+              <SearchableSelect
+                value={eq.shieldMaterial || 'standard'}
+                options={SHIELD_MATERIAL_OPTIONS}
+                onChange={val => handleEqChange('shieldMaterial', val)}
+                showSublabelInTrigger={false}
+                placeholder="Material..."
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="label-text">Masterwork</label>
+              <label className={`flex items-center gap-2 h-[38px] px-3 rounded-xl border text-xs select-none transition ${
+                !eq.shield || eq.shield === 'none'
+                  ? 'bg-slate-950/40 border-slate-800/40 text-slate-600 cursor-not-allowed'
+                  : isShieldInherentlyMwk
+                    ? 'bg-slate-950/40 border-slate-800/60 text-slate-400 cursor-not-allowed'
+                    : 'bg-slate-950/80 border-slate-800 hover:border-amber-500/50 text-slate-300 cursor-pointer'
+              }`}>
+                <input
+                  type="checkbox"
+                  checked={isShieldMwk}
+                  disabled={!eq.shield || eq.shield === 'none' || isShieldInherentlyMwk}
+                  onChange={e => handleEqChange('shieldMasterwork', e.target.checked)}
+                  className="rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500"
+                />
+                <span className="font-medium text-[11px] truncate">
+                  {isShieldInherentlyMwk ? 'Mwk (Auto)' : 'Masterwork'}
+                </span>
+              </label>
             </div>
           </div>
 
@@ -2438,8 +2873,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
               <label className="label-text">Primary Weapon</label>
               <span className="text-[10px] text-slate-400 italic">Supports aliasing e.g. Nodachi (Greatsword)</span>
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="col-span-2 space-y-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+              <div className="sm:col-span-5 space-y-1.5">
                 <SearchableSelect
                   value={selectedPrimaryWeaponValue}
                   options={primaryWeaponOptions}
@@ -2459,7 +2894,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                   />
                 )}
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <SearchableSelect
                   value={String(eq.primaryWeaponEnhancement || 0)}
                   options={weaponEnhancementOptions}
@@ -2467,6 +2902,35 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                   showSublabelInTrigger={false}
                   placeholder="Enh..."
                 />
+              </div>
+              <div className="sm:col-span-3">
+                <SearchableSelect
+                  value={eq.primaryWeaponMaterial || 'standard'}
+                  options={WEAPON_MATERIAL_OPTIONS}
+                  onChange={val => handleEqChange('primaryWeaponMaterial', val)}
+                  showSublabelInTrigger={false}
+                  placeholder="Material..."
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className={`flex items-center gap-2 h-[38px] px-3 rounded-xl border text-xs select-none transition ${
+                  !hasPrimary
+                    ? 'bg-slate-950/40 border-slate-800/40 text-slate-600 cursor-not-allowed'
+                    : isPrimaryInherentlyMwk
+                      ? 'bg-slate-950/40 border-slate-800/60 text-slate-400 cursor-not-allowed'
+                      : 'bg-slate-950/80 border-slate-800 hover:border-amber-500/50 text-slate-300 cursor-pointer'
+                }`}>
+                  <input
+                    type="checkbox"
+                    checked={isPrimaryMwk}
+                    disabled={!hasPrimary || isPrimaryInherentlyMwk}
+                    onChange={e => handleEqChange('primaryWeaponMasterwork', e.target.checked)}
+                    className="rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500"
+                  />
+                  <span className="font-medium text-[11px] truncate">
+                    {isPrimaryInherentlyMwk ? 'Mwk (Auto)' : 'Masterwork'}
+                  </span>
+                </label>
               </div>
             </div>
 
@@ -2517,6 +2981,11 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                           • Tactical ({activeCombatMods.map(m => m.name).join(', ')})
                         </span>
                       )}
+                      {getWeaponMaterialTraits(primaryWpnObj.material || eq.primaryWeaponMaterial, isPrimaryMwk || Boolean(primaryWpnObj.isMasterwork)).map(trait => (
+                        <span key={trait} className="text-[10px] text-zinc-300 font-semibold">
+                          • {trait}
+                        </span>
+                      ))}
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 flex-wrap justify-end">
@@ -2613,8 +3082,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           {/* Off-hand / Secondary Weapon */}
           <div className="border-t border-slate-800 pt-3 space-y-2">
             <label className="label-text">Secondary / Off-Hand Weapon</label>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="col-span-2 space-y-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+              <div className="sm:col-span-5 space-y-1.5">
                 <SearchableSelect
                   value={selectedSecondaryWeaponValue}
                   options={secondaryWeaponOptions}
@@ -2633,7 +3102,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                   />
                 )}
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <SearchableSelect
                   value={String(eq.secondaryWeaponEnhancement || 0)}
                   options={weaponEnhancementOptions}
@@ -2641,6 +3110,35 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                   showSublabelInTrigger={false}
                   placeholder="Enh..."
                 />
+              </div>
+              <div className="sm:col-span-3">
+                <SearchableSelect
+                  value={eq.secondaryWeaponMaterial || 'standard'}
+                  options={WEAPON_MATERIAL_OPTIONS}
+                  onChange={val => handleEqChange('secondaryWeaponMaterial', val)}
+                  showSublabelInTrigger={false}
+                  placeholder="Material..."
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className={`flex items-center gap-2 h-[38px] px-3 rounded-xl border text-xs select-none transition ${
+                  !hasSecondary
+                    ? 'bg-slate-950/40 border-slate-800/40 text-slate-600 cursor-not-allowed'
+                    : isSecondaryInherentlyMwk
+                      ? 'bg-slate-950/40 border-slate-800/60 text-slate-400 cursor-not-allowed'
+                      : 'bg-slate-950/80 border-slate-800 hover:border-amber-500/50 text-slate-300 cursor-pointer'
+                }`}>
+                  <input
+                    type="checkbox"
+                    checked={isSecondaryMwk}
+                    disabled={!hasSecondary || isSecondaryInherentlyMwk}
+                    onChange={e => handleEqChange('secondaryWeaponMasterwork', e.target.checked)}
+                    className="rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500"
+                  />
+                  <span className="font-medium text-[11px] truncate">
+                    {isSecondaryInherentlyMwk ? 'Mwk (Auto)' : 'Masterwork'}
+                  </span>
+                </label>
               </div>
             </div>
 
@@ -2675,6 +3173,11 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                         (Keen {secondaryThreat}-20)
                       </span>
                     )}
+                    {getWeaponMaterialTraits(secondaryWpnObj.material || eq.secondaryWeaponMaterial, isSecondaryMwk || Boolean(secondaryWpnObj.isMasterwork)).map(trait => (
+                      <span key={trait} className="text-[10px] text-zinc-300 font-semibold">
+                        ({trait})
+                      </span>
+                    ))}
                   </div>
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <button
@@ -2751,8 +3254,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
           {/* Ranged Weapon */}
           <div className="border-t border-slate-800 pt-3 space-y-2">
             <label className="label-text">Ranged Weapon</label>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="col-span-2 space-y-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+              <div className="sm:col-span-5 space-y-1.5">
                 <SearchableSelect
                   value={selectedRangedWeaponValue}
                   options={rangedWeaponOptions}
@@ -2771,7 +3274,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                   />
                 )}
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <SearchableSelect
                   value={String(eq.rangedWeaponEnhancement || 0)}
                   options={weaponEnhancementOptions}
@@ -2779,6 +3282,35 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                   showSublabelInTrigger={false}
                   placeholder="Enh..."
                 />
+              </div>
+              <div className="sm:col-span-3">
+                <SearchableSelect
+                  value={eq.rangedWeaponMaterial || 'standard'}
+                  options={WEAPON_MATERIAL_OPTIONS}
+                  onChange={val => handleEqChange('rangedWeaponMaterial', val)}
+                  showSublabelInTrigger={false}
+                  placeholder="Material..."
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className={`flex items-center gap-2 h-[38px] px-3 rounded-xl border text-xs select-none transition ${
+                  !hasRanged
+                    ? 'bg-slate-950/40 border-slate-800/40 text-slate-600 cursor-not-allowed'
+                    : isRangedInherentlyMwk
+                      ? 'bg-slate-950/40 border-slate-800/60 text-slate-400 cursor-not-allowed'
+                      : 'bg-slate-950/80 border-slate-800 hover:border-amber-500/50 text-slate-300 cursor-pointer'
+                }`}>
+                  <input
+                    type="checkbox"
+                    checked={isRangedMwk}
+                    disabled={!hasRanged || isRangedInherentlyMwk}
+                    onChange={e => handleEqChange('rangedWeaponMasterwork', e.target.checked)}
+                    className="rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500"
+                  />
+                  <span className="font-medium text-[11px] truncate">
+                    {isRangedInherentlyMwk ? 'Mwk (Auto)' : 'Masterwork'}
+                  </span>
+                </label>
               </div>
             </div>
 
@@ -2813,6 +3345,11 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                         (Keen {rangedThreat}-20)
                       </span>
                     )}
+                    {getWeaponMaterialTraits(rangedWpnObj.material || eq.rangedWeaponMaterial, isRangedMwk || Boolean(rangedWpnObj.isMasterwork)).map(trait => (
+                      <span key={trait} className="text-[10px] text-zinc-300 font-semibold">
+                        ({trait})
+                      </span>
+                    ))}
                   </div>
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <button

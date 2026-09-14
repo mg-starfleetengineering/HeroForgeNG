@@ -17,7 +17,8 @@ import {
   resolveWeapon, resolveArmor, resolveShield, calculateFeatCombatBonuses,
   calculateCarryingCapacity, calculateCoinWeight, calculateTotalNetWorthGP,
   calculateTotalCarriedWeight, getEncumbranceStatus,
-  resolveEquippedArmor, resolveEquippedShield, resolveEquippedWeapon
+  resolveEquippedArmor, resolveEquippedShield, resolveEquippedWeapon,
+  getWeaponEffectiveAttackEnhancement, getWeaponMaterialDamageMod, getWeaponMaterialTraits
 } from '../engine/equipment';
 import {
   getAvailableSkills,
@@ -336,10 +337,13 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const isMelee = !primaryWpn.category?.toLowerCase().includes('ranged');
     const netSmiteAtk = isMelee ? smiteAtkBonus : 0;
     const netSmiteDmg = isMelee ? smiteDmgBonus : 0;
-    const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
+    const isMwk = Boolean(primaryWpn.isMasterwork || eq.primaryWeaponMasterwork);
+    const effectiveAtkEnh = getWeaponEffectiveAttackEnhancement(primaryWpn.material || eq.primaryWeaponMaterial, enh, isMwk);
+    const matDmgMod = getWeaponMaterialDamageMod(primaryWpn.material || eq.primaryWeaponMaterial);
+    const netAtkBonus = effectiveStrMod + effectiveAtkEnh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
     const totalAtk = bab + netAtkBonus;
     const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste || (generalTcMods.extraAttacks || 0) > 0, tcState.flurryOfBlows, tcState.whirlingFrenzy, primaryHasSpeed);
-    const dmgVal = effectiveStrMod + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty;
+    const dmgVal = effectiveStrMod + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty + matDmgMod;
     const baseDmgStr = `${primaryWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`;
     const damageStr = `${baseDmgStr}${primarySpecialDmg.damageDiceString}`;
     const damageFormula = `${baseDmgStr}${primarySpecialDmg.damageDiceFormula}`;
@@ -350,6 +354,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
     const primaryNote = (() => {
       const notes: string[] = [];
+      const matTraits = getWeaponMaterialTraits(primaryWpn.material || eq.primaryWeaponMaterial, isMwk);
+      matTraits.forEach(t => notes.push(t));
       if (primaryHasSpeed) { notes.push('Speed: +1 Extra Atk'); }
       if (primarySpecialDmg.summaryLabels.length > 0) { notes.push(`Magic: ${primarySpecialDmg.summaryLabels.join(', ')}`); }
       if (tcState.whirlingFrenzy) { notes.push('Whirling Frenzy: +2 Str, -2 Flurry, +1 Extra Atk'); }
@@ -402,10 +408,13 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const isMelee = !secWpn.category?.toLowerCase().includes('ranged');
     const netSmiteAtk = isMelee ? smiteAtkBonus : 0;
     const netSmiteDmg = isMelee ? smiteDmgBonus : 0;
-    const netAtkBonus = effectiveStrMod + enh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
+    const isMwk = Boolean(secWpn.isMasterwork || eq.secondaryWeaponMasterwork);
+    const effectiveAtkEnh = getWeaponEffectiveAttackEnhancement(secWpn.material || eq.secondaryWeaponMaterial, enh, isMwk);
+    const matDmgMod = getWeaponMaterialDamageMod(secWpn.material || eq.secondaryWeaponMaterial);
+    const netAtkBonus = effectiveStrMod + effectiveAtkEnh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
     const totalAtk = bab + netAtkBonus;
     const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste || (generalTcMods.extraAttacks || 0) > 0, tcState.flurryOfBlows, tcState.whirlingFrenzy, secondaryHasSpeed);
-    const dmgVal = Math.floor(effectiveStrMod / 2) + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty;
+    const dmgVal = Math.floor(effectiveStrMod / 2) + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty + matDmgMod;
     const baseDmgStr = `${secWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`;
     const damageStr = `${baseDmgStr}${secondarySpecialDmg.damageDiceString}`;
     const damageFormula = `${baseDmgStr}${secondarySpecialDmg.damageDiceFormula}`;
@@ -416,6 +425,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
     const secNote = (() => {
       const notes: string[] = [];
+      const matTraits = getWeaponMaterialTraits(secWpn.material || eq.secondaryWeaponMaterial, isMwk);
+      matTraits.forEach(t => notes.push(t));
       if (secondaryHasSpeed) { notes.push('Speed: +1 Extra Atk'); }
       if (secondarySpecialDmg.summaryLabels.length > 0) { notes.push(`Magic: ${secondarySpecialDmg.summaryLabels.join(', ')}`); }
       if (tcState.whirlingFrenzy) { notes.push('Whirling Frenzy: +2 Str, -2 Flurry, +1 Extra Atk'); }
@@ -462,10 +473,13 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     const featBonuses = calculateFeatCombatBonuses(character, rngWpn);
     const wMods = calculateTacticalCombatModifiers(tcState, rngWpn, false, true, character.activeBuffs);
     const enh = eq.rangedWeaponEnhancement ?? rngWpn.enhancementBonus ?? 0;
-    const netAtkBonus = effectiveDexMod + enh + featBonuses.attackBonus + wMods.attackMod + conditionPenalties.attackPenalty + conditionPenalties.rangedAttackPenalty;
+    const isMwk = Boolean(rngWpn.isMasterwork || eq.rangedWeaponMasterwork);
+    const effectiveAtkEnh = getWeaponEffectiveAttackEnhancement(rngWpn.material || eq.rangedWeaponMaterial, enh, isMwk);
+    const matDmgMod = getWeaponMaterialDamageMod(rngWpn.material || eq.rangedWeaponMaterial);
+    const netAtkBonus = effectiveDexMod + effectiveAtkEnh + featBonuses.attackBonus + wMods.attackMod + conditionPenalties.attackPenalty + conditionPenalties.rangedAttackPenalty;
     const totalAtk = bab + netAtkBonus;
     const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste || (generalTcMods.extraAttacks || 0) > 0, tcState.flurryOfBlows, tcState.whirlingFrenzy, rangedHasSpeed);
-    const dmgVal = enh + wMods.damageMod + conditionPenalties.damagePenalty;
+    const dmgVal = enh + wMods.damageMod + conditionPenalties.damagePenalty + matDmgMod;
     const baseDmgStr = `${rngWpn.damageM}${dmgVal > 0 ? `+${dmgVal}` : (dmgVal < 0 ? `${dmgVal}` : '')}`;
     const damageStr = `${baseDmgStr}${rangedSpecialDmg.damageDiceString}`;
     const damageFormula = `${baseDmgStr}${rangedSpecialDmg.damageDiceFormula}`;
@@ -476,6 +490,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
     const rngNote = (() => {
       const notes: string[] = [];
+      const matTraits = getWeaponMaterialTraits(rngWpn.material || eq.rangedWeaponMaterial, isMwk);
+      matTraits.forEach(t => notes.push(t));
       if (rangedHasSpeed) { notes.push('Speed: +1 Extra Atk'); }
       if (rangedSpecialDmg.summaryLabels.length > 0) { notes.push(`Magic: ${rangedSpecialDmg.summaryLabels.join(', ')}`); }
       if (tcState.whirlingFrenzy) { notes.push('Whirling Frenzy: -2 Flurry, +1 Extra Atk'); }
@@ -1411,7 +1427,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                     })}
                   </div>
                 )}
-                <p><span className="font-bold text-slate-900 font-sans">Feats:</span> {(character.selectedFeats || []).join(', ') || 'None selected.'}</p>
+                <p><span className="font-bold text-slate-900 font-sans">Feats:</span> {(character.selectedFeatEntities || []).map(f => f.notes || (f.targetId ? `${f.featId.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')} (${f.targetId.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')})` : f.featId.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '))).join(', ') || 'None selected.'}</p>
               </div>
             </div>
 

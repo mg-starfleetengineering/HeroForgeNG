@@ -271,9 +271,11 @@ export function calculateWildShapeAttacks(
   effectiveDexMod: number,
   tcState: TacticalCombatState
 ): ActiveWildShapeAttackEntry[] {
-  const selectedFeats = character.selectedFeats || [];
-  const hasMultiattack = selectedFeats.some(f => f.toLowerCase().includes('multiattack'));
-  const hasWeaponFinesse = selectedFeats.some(f => f.toLowerCase().includes('weapon finesse'));
+  const featEntities = (character.selectedFeatEntities && character.selectedFeatEntities.length > 0)
+    ? character.selectedFeatEntities
+    : (((character as any).selectedFeats || []).map((f: string) => ({ id: f, featId: f.toLowerCase().replace(/[^a-z0-9]+/g, '_'), notes: f })));
+  const hasMultiattack = featEntities.some(f => f.featId === 'multiattack' || (f.notes && f.notes.toLowerCase().includes('multiattack')));
+  const hasWeaponFinesse = featEntities.some(f => f.featId === 'weapon_finesse' || (f.notes && f.notes.toLowerCase().includes('weapon finesse')));
 
   const sizeMod = getSizeAttackModifier(form.size);
   const useDex = hasWeaponFinesse && effectiveDexMod > effectiveStrMod;

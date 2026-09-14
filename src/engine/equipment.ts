@@ -1,5 +1,5 @@
-import { WeaponData, CustomArmorData, CharacterState, InventoryItem, ItemArmorData, ItemWeaponData, Equipment } from '../types/character';
-import { parseMagicItemName, formatMagicItemName } from './magicItems';
+import { WeaponData, CustomArmorData, CharacterState, InventoryItem, ItemArmorData, ItemWeaponData, Equipment, EquipmentMaterial } from '../types/character';
+import { parseMagicItemName, formatMagicItemName, parseItemMaterial, formatMaterialName } from './magicItems';
 
 export const DEFAULT_WEAPON: WeaponData = {
   id: 'unarmed',
@@ -211,18 +211,30 @@ export function resolveWeapon(
   }
 
   const cleanName = rawName.trim();
+  const lowerName = cleanName.toLowerCase();
+  const lowerWithSpaces = lowerName.replace(/_/g, ' ');
 
   // 1. Check direct match in customWeapons
   const customMatch = customWeapons.find(
-    w => w.name.toLowerCase() === cleanName.toLowerCase()
+    w => w.name.toLowerCase() === lowerName ||
+         (w.id && w.id.toLowerCase() === lowerName) ||
+         w.name.toLowerCase() === lowerWithSpaces
   );
   if (customMatch) return normalizeWeapon(customMatch);
 
   // 2. Check direct match in standard weaponsData
   const stdMatch = weaponsData.find(
-    w => w.name.toLowerCase() === cleanName.toLowerCase()
+    w => w.name.toLowerCase() === lowerName ||
+         (w.id && w.id.toLowerCase() === lowerName) ||
+         w.name.toLowerCase() === lowerWithSpaces ||
+         w.name.toLowerCase().replace(/[\s\/-]+/g, '_') === lowerName
   );
   if (stdMatch) return normalizeWeapon({ ...stdMatch, source: stdMatch.source || 'PHB' });
+
+  // 2b. Check in STANDARD_BASE_WEAPONS (e.g. "longsword", "bastard sword", "bastard_sword")
+  const stdBase = STANDARD_BASE_WEAPONS[lowerName] ||
+                  STANDARD_BASE_WEAPONS[lowerWithSpaces];
+  if (stdBase) return normalizeWeapon(stdBase);
 
   // 3. Check aliased pattern: "Custom Name (Base Weapon)" e.g. "Nodachi (Greatsword)"
   // or well-known themed weapon map: e.g. "Nodachi" -> "greatsword"
@@ -257,16 +269,18 @@ export function resolveWeapon(
     }
   }
 
-  // 4. Check if cleanName is a magic weapon name e.g. "+1 Flaming Longsword" or "+2 Keen Nodachi"
+  // 4. Check if cleanName is a magic or masterwork weapon name e.g. "+1 Flaming Longsword", "Masterwork Longsword"
   const parsedMagicWpn = parseMagicItemName(cleanName);
-  if (parsedMagicWpn.enhancementBonus > 0 || parsedMagicWpn.qualities.length > 0) {
+  if (parsedMagicWpn.enhancementBonus > 0 || parsedMagicWpn.qualities.length > 0 || parsedMagicWpn.isMasterwork) {
     const baseWpn = resolveWeapon(parsedMagicWpn.baseName, customWeapons, weaponsData);
     if (baseWpn && (baseWpn.id !== 'unarmed' || parsedMagicWpn.baseName.toLowerCase().includes('unarmed'))) {
+      const isMwk = Boolean(parsedMagicWpn.isMasterwork || parsedMagicWpn.enhancementBonus > 0 || (baseWpn as any).isMasterwork);
       return normalizeWeapon({
         ...baseWpn,
         name: cleanName,
         enhancementBonus: parsedMagicWpn.enhancementBonus,
-        specialQualities: parsedMagicWpn.qualities
+        specialQualities: parsedMagicWpn.qualities,
+        isMasterwork: isMwk
       });
     }
   }
@@ -298,6 +312,8 @@ export interface ResolvedArmor {
   enhancementBonus?: number;
   specialQualities?: string[];
   baseArmorId?: string;
+  material?: EquipmentMaterial | string;
+  isMasterwork?: boolean;
 }
 
 export interface ResolvedShield {
@@ -310,6 +326,72 @@ export interface ResolvedShield {
   enhancementBonus?: number;
   specialQualities?: string[];
   baseArmorId?: string;
+  material?: EquipmentMaterial | string;
+  isMasterwork?: boolean;
+}
+
+/**
+ * Applies material modifications to base armor data (e.g. Mithral reduces weight, check penalty, increases max dex).
+ * Also reduces Armor Check Penalty by 1 for masterwork armor or shield (min 0).
+ */
+export function applyMaterialToArmorData(
+  baseData: ItemArmorData,
+  material?: string,
+  isMasterwork?: boolean
+): ItemArmorData {
+  if (!material || material === 'standard') {
+    if (isMasterwork) {
+      return {
+        ...baseData,
+        armorCheckPenalty: Math.min(0, baseData.armorCheckPenalty + 1),
+        isMasterwork: true
+      };
+    }
+    return { ...baseData };
+  }
+  const mat = material.toLowerCase();
+  if (mat === 'mithral' || mat === 'mithril') {
+    const adjustedType = baseData.type === 'heavy' ? 'medium' : (baseData.type === 'medium' ? 'light' : baseData.type);
+    return {
+      ...baseData,
+      type: adjustedType,
+      maxDex: baseData.maxDex + 2,
+      armorCheckPenalty: Math.min(0, baseData.armorCheckPenalty + 3),
+      spellFailure: Math.max(0, (baseData.spellFailure ?? 0) - 10),
+      speedPenalty: adjustedType === 'medium',
+      isMasterwork: true
+    };
+  }
+  if (mat === 'darkwood' && baseData.type === 'shield') {
+    return {
+      ...baseData,
+      armorCheckPenalty: Math.min(0, baseData.armorCheckPenalty + 2),
+      isMasterwork: true
+    };
+  }
+  if (isMasterwork || mat === 'adamantine') {
+    return {
+      ...baseData,
+      armorCheckPenalty: Math.min(0, baseData.armorCheckPenalty + 1),
+      isMasterwork: true
+    };
+  }
+  return { ...baseData };
+}
+
+/**
+ * Applies material weight modifications (e.g. Mithral and Darkwood halve weight).
+ */
+export function applyMaterialToWeight(
+  baseWeight: number,
+  material?: string
+): number {
+  if (!material || material === 'standard') return baseWeight;
+  const mat = material.toLowerCase();
+  if (mat === 'mithral' || mat === 'mithril' || mat === 'darkwood') {
+    return Math.round(baseWeight * 0.5 * 10) / 10;
+  }
+  return baseWeight;
 }
 
 /**
@@ -364,25 +446,34 @@ export function resolveArmor(
   if (cleanMaterialKey !== keyLower) {
     const baseResolved = resolveArmor(cleanMaterialKey, customArmors);
     if (baseResolved && baseResolved.type !== 'none') {
+      const mat = keyLower.split(' ')[0].toLowerCase();
+      const isMwk = mat === 'mithral' || mat === 'mithril' || mat === 'adamantine';
       return {
         ...baseResolved,
         name: armorKey,
-        baseArmorId: baseResolved.baseArmorId || baseResolved.name
+        baseArmorId: baseResolved.baseArmorId || baseResolved.name,
+        isMasterwork: isMwk ? true : baseResolved.isMasterwork
       };
     }
   }
 
-  // 4. Magic armor name e.g. "+1 Chain Shirt", "+2 Shadow Leather Armor"
+  // 4. Magic armor name e.g. "+1 Chain Shirt", "+2 Shadow Leather Armor", "Masterwork Full Plate"
   const parsedMagicArmor = parseMagicItemName(armorKey, 'armor');
-  if (parsedMagicArmor.enhancementBonus > 0 || parsedMagicArmor.qualities.length > 0) {
+  if (parsedMagicArmor.enhancementBonus > 0 || parsedMagicArmor.qualities.length > 0 || parsedMagicArmor.isMasterwork) {
     const baseArmor = resolveArmor(parsedMagicArmor.baseName, customArmors);
     if (baseArmor && (baseArmor.name.toLowerCase() !== 'none' || parsedMagicArmor.baseName.toLowerCase() === 'none')) {
+      const isMwk = Boolean(parsedMagicArmor.isMasterwork || parsedMagicArmor.enhancementBonus > 0 || baseArmor.isMasterwork);
+      const checkPenalty = (isMwk && !baseArmor.isMasterwork)
+        ? Math.min(0, baseArmor.checkPenalty + 1)
+        : baseArmor.checkPenalty;
       return {
         ...baseArmor,
         name: armorKey,
         enhancementBonus: parsedMagicArmor.enhancementBonus,
         specialQualities: parsedMagicArmor.qualities,
-        baseArmorId: baseArmor.baseArmorId || baseArmor.name
+        baseArmorId: baseArmor.baseArmorId || baseArmor.name,
+        checkPenalty,
+        isMasterwork: isMwk
       };
     }
   }
@@ -420,7 +511,8 @@ export function resolveShield(
       spellFailure: 15,
       enhancementBonus: customMatch.enhancementBonus,
       specialQualities: customMatch.specialQualities,
-      baseArmorId: customMatch.baseArmorId || customMatch.id
+      baseArmorId: customMatch.baseArmorId || customMatch.id,
+      isMasterwork: customMatch.isMasterwork
     };
   }
 
@@ -440,25 +532,34 @@ export function resolveShield(
   if (cleanMaterialKey !== keyLower) {
     const baseResolved = resolveShield(cleanMaterialKey, customArmors);
     if (baseResolved && baseResolved.name.toLowerCase() !== 'none') {
+      const mat = keyLower.split(' ')[0].toLowerCase();
+      const isMwk = mat === 'mithral' || mat === 'mithril' || mat === 'darkwood' || mat === 'adamantine';
       return {
         ...baseResolved,
         name: shieldKey,
-        baseArmorId: baseResolved.baseArmorId || baseResolved.name
+        baseArmorId: baseResolved.baseArmorId || baseResolved.name,
+        isMasterwork: isMwk ? true : baseResolved.isMasterwork
       };
     }
   }
 
-  // 4. Magic shield name e.g. "+1 Heavy Shield"
+  // 4. Magic shield name e.g. "+1 Heavy Shield", "Masterwork Heavy Shield"
   const parsedMagicShield = parseMagicItemName(shieldKey, 'shield');
-  if (parsedMagicShield.enhancementBonus > 0 || parsedMagicShield.qualities.length > 0) {
+  if (parsedMagicShield.enhancementBonus > 0 || parsedMagicShield.qualities.length > 0 || parsedMagicShield.isMasterwork) {
     const baseShield = resolveShield(parsedMagicShield.baseName, customArmors);
     if (baseShield && (baseShield.name.toLowerCase() !== 'none' || parsedMagicShield.baseName.toLowerCase() === 'none')) {
+      const isMwk = Boolean(parsedMagicShield.isMasterwork || parsedMagicShield.enhancementBonus > 0 || baseShield.isMasterwork);
+      const checkPenalty = (isMwk && !baseShield.isMasterwork)
+        ? Math.min(0, baseShield.checkPenalty + 1)
+        : baseShield.checkPenalty;
       return {
         ...baseShield,
         name: shieldKey,
         enhancementBonus: parsedMagicShield.enhancementBonus,
         specialQualities: parsedMagicShield.qualities,
-        baseArmorId: baseShield.baseArmorId || baseShield.name
+        baseArmorId: baseShield.baseArmorId || baseShield.name,
+        checkPenalty,
+        isMasterwork: isMwk
       };
     }
   }
@@ -739,6 +840,7 @@ export function ensureEquippedItemInInventory(
     notes?: string;
     enhancementBonus?: number;
     specialQualities?: string[];
+    material?: EquipmentMaterial | string;
     baseItemId?: string;
     itemType?: 'weapon' | 'armor' | 'shield' | 'wondrous' | 'gear' | 'consumable';
     armorData?: ItemArmorData;
@@ -758,6 +860,7 @@ export function ensureEquippedItemInInventory(
     let newEnh = existing.enhancementBonus;
     let newQualities = existing.specialQualities;
     let newBaseId = existing.baseItemId;
+    let newMaterial = existing.material;
     let newType = existing.itemType;
     let newArmorData = existing.armorData;
     let newWeaponData = existing.weaponData;
@@ -772,6 +875,10 @@ export function ensureEquippedItemInInventory(
     }
     if (itemData.baseItemId && !existing.baseItemId) {
       newBaseId = itemData.baseItemId;
+      needsUpdate = true;
+    }
+    if (itemData.material && (!existing.material || existing.material === 'standard')) {
+      newMaterial = itemData.material;
       needsUpdate = true;
     }
     if (itemData.itemType && !existing.itemType) {
@@ -794,6 +901,7 @@ export function ensureEquippedItemInInventory(
         enhancementBonus: newEnh,
         specialQualities: newQualities,
         baseItemId: newBaseId,
+        material: newMaterial,
         itemType: newType,
         armorData: newArmorData,
         weaponData: newWeaponData
@@ -814,6 +922,7 @@ export function ensureEquippedItemInInventory(
     enhancementBonus: itemData.enhancementBonus,
     specialQualities: itemData.specialQualities ? [...itemData.specialQualities] : undefined,
     baseItemId: itemData.baseItemId,
+    material: itemData.material,
     itemType: itemData.itemType,
     armorData: itemData.armorData,
     weaponData: itemData.weaponData
@@ -835,6 +944,9 @@ export function createInventoryWeapon(
     specialQualities?: string[];
     baneTarget?: string;
     location?: string;
+    material?: EquipmentMaterial | string;
+    baseItemId?: string;
+    isMasterwork?: boolean;
   },
   arg3?: WeaponData[] | {
     id?: string;
@@ -844,6 +956,9 @@ export function createInventoryWeapon(
     specialQualities?: string[];
     baneTarget?: string;
     location?: string;
+    material?: EquipmentMaterial | string;
+    baseItemId?: string;
+    isMasterwork?: boolean;
   },
   arg4?: {
     id?: string;
@@ -853,6 +968,9 @@ export function createInventoryWeapon(
     specialQualities?: string[];
     baneTarget?: string;
     location?: string;
+    material?: EquipmentMaterial | string;
+    baseItemId?: string;
+    isMasterwork?: boolean;
   }
 ): InventoryItem {
   let resolved: WeaponData;
@@ -864,9 +982,14 @@ export function createInventoryWeapon(
     specialQualities?: string[];
     baneTarget?: string;
     location?: string;
+    material?: EquipmentMaterial | string;
+    baseItemId?: string;
+    isMasterwork?: boolean;
   } | undefined;
 
+  let parsedMagic: { material?: EquipmentMaterial | string; enhancementBonus: number; qualities: string[]; isMasterwork?: boolean; } = { material: 'standard', enhancementBonus: 0, qualities: [], isMasterwork: false };
   if (typeof baseWeapon === 'string') {
+    parsedMagic = parseMagicItemName(baseWeapon, 'weapon');
     const weaponsData = Array.isArray(arg2) ? arg2 : [];
     const customWeapons = Array.isArray(arg3) ? arg3 : [];
     resolved = resolveWeapon(baseWeapon, customWeapons, weaponsData);
@@ -875,14 +998,22 @@ export function createInventoryWeapon(
       : ((!Array.isArray(arg3) && typeof arg3 === 'object') ? arg3 : arg4);
   } else {
     resolved = baseWeapon;
+    parsedMagic = {
+      material: (baseWeapon as any).material || 'standard',
+      enhancementBonus: baseWeapon.enhancementBonus || 0,
+      qualities: baseWeapon.specialQualities || [],
+      isMasterwork: baseWeapon.isMasterwork || false
+    };
     options = (!Array.isArray(arg2) && typeof arg2 === 'object') ? arg2 : undefined;
   }
 
-  const enh = options?.enhancementBonus ?? resolved.enhancementBonus ?? 0;
-  const qualities = options?.specialQualities ?? resolved.specialQualities ?? [];
+  const mat = options?.material || parsedMagic.material || (resolved as any).material || 'standard';
+  const enh = options?.enhancementBonus ?? (parsedMagic.enhancementBonus > 0 ? parsedMagic.enhancementBonus : (resolved.enhancementBonus ?? 0));
+  const qualities = options?.specialQualities ?? (parsedMagic.qualities.length > 0 ? parsedMagic.qualities : (resolved.specialQualities ?? []));
   const baneTarget = options?.baneTarget ?? (resolved as any).baneTarget;
-  const name = options?.name || (enh > 0 || qualities.length > 0
-    ? formatMagicItemName(resolved.name, enh, qualities)
+  const isMwk = options?.isMasterwork ?? Boolean(parsedMagic.isMasterwork || (resolved as any).isMasterwork || enh > 0 || mat === 'adamantine');
+  const name = options?.name || (enh > 0 || qualities.length > 0 || (mat && mat !== 'standard') || isMwk
+    ? formatMagicItemName(resolved.name, enh, qualities, mat, isMwk)
     : resolved.name);
 
   return {
@@ -892,10 +1023,12 @@ export function createInventoryWeapon(
     weight: resolved.weight ?? 0,
     location: options?.location || 'Carried',
     itemType: 'weapon',
-    baseItemId: resolved.id,
+    material: mat,
+    baseItemId: options?.baseItemId || resolved.id,
     enhancementBonus: enh,
     specialQualities: qualities,
     baneTarget,
+    isMasterwork: isMwk,
     weaponData: {
       category: resolved.category,
       size: resolved.size,
@@ -906,7 +1039,8 @@ export function createInventoryWeapon(
       damageType: resolved.type,
       rangeIncrement: resolved.rangeIncrement,
       isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged',
-      baneTarget
+      baneTarget,
+      isMasterwork: isMwk
     }
   };
 }
@@ -924,36 +1058,50 @@ export function createInventoryArmor(
     enhancementBonus?: number;
     specialQualities?: string[];
     location?: string;
+    material?: EquipmentMaterial | string;
+    baseItemId?: string;
+    isMasterwork?: boolean;
   }
 ): InventoryItem {
-  const resolved = resolveArmor(armorKey, customArmors);
-  const enh = options?.enhancementBonus ?? resolved.enhancementBonus ?? 0;
-  const qualities = options?.specialQualities ?? resolved.specialQualities ?? [];
-  const baseName = resolved.baseArmorId || resolved.name;
-  const name = options?.name || (enh > 0 || qualities.length > 0
-    ? formatMagicItemName(baseName, enh, qualities)
-    : resolved.name);
+  const parsedMagic = parseMagicItemName(armorKey, 'armor');
+  const mat = options?.material || parsedMagic.material || 'standard';
+  const enh = options?.enhancementBonus ?? (parsedMagic.enhancementBonus > 0 ? parsedMagic.enhancementBonus : 0);
+  const qualities = options?.specialQualities ?? (parsedMagic.qualities.length > 0 ? parsedMagic.qualities : []);
+  const baseKey = options?.baseItemId || parsedMagic.baseName || armorKey;
 
+  const resolved = resolveArmor(baseKey, customArmors);
+  const isMwk = options?.isMasterwork ?? Boolean(parsedMagic.isMasterwork || resolved.isMasterwork || enh > 0 || mat === 'adamantine' || mat === 'mithral' || mat === 'mithril');
   const stdWeight = resolved.weight ?? (ARMOR_WEIGHT_MAP[resolved.name.toLowerCase()] ?? 20);
+  const finalWeight = applyMaterialToWeight(stdWeight, mat);
+
+  const baseArmorData: ItemArmorData = {
+    type: (resolved.type as any) || 'medium',
+    acBonus: resolved.acBonus,
+    maxDex: resolved.maxDex ?? 99,
+    armorCheckPenalty: resolved.checkPenalty ?? 0,
+    spellFailure: resolved.spellFailure ?? 0,
+    speedPenalty: resolved.speedPenalty ?? (resolved.type === 'heavy' || resolved.type === 'medium')
+  };
+  const finalArmorData = applyMaterialToArmorData(baseArmorData, mat, isMwk);
+
+  const baseName = resolved.name;
+  const name = options?.name || (enh > 0 || qualities.length > 0 || (mat && mat !== 'standard') || isMwk
+    ? formatMagicItemName(baseName, enh, qualities, mat, isMwk)
+    : resolved.name);
 
   return {
     id: options?.id || `inv_arm_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
     name,
     quantity: options?.quantity ?? 1,
-    weight: stdWeight,
+    weight: finalWeight,
     location: options?.location || 'Carried',
     itemType: 'armor',
-    baseItemId: resolved.baseArmorId || resolved.name.toLowerCase().replace(/\s+/g, '_'),
+    material: mat,
+    baseItemId: options?.baseItemId || resolved.baseArmorId || resolved.name.toLowerCase().replace(/\s+/g, '_'),
     enhancementBonus: enh,
     specialQualities: qualities,
-    armorData: {
-      type: (resolved.type as any) || 'medium',
-      acBonus: resolved.acBonus,
-      maxDex: resolved.maxDex ?? 99,
-      armorCheckPenalty: resolved.checkPenalty ?? 0,
-      spellFailure: resolved.spellFailure ?? 0,
-      speedPenalty: resolved.speedPenalty ?? (resolved.type === 'heavy' || resolved.type === 'medium')
-    }
+    isMasterwork: isMwk,
+    armorData: finalArmorData
   };
 }
 
@@ -970,36 +1118,50 @@ export function createInventoryShield(
     enhancementBonus?: number;
     specialQualities?: string[];
     location?: string;
+    material?: EquipmentMaterial | string;
+    baseItemId?: string;
+    isMasterwork?: boolean;
   }
 ): InventoryItem {
-  const resolved = resolveShield(shieldKey, customArmors);
-  const enh = options?.enhancementBonus ?? resolved.enhancementBonus ?? 0;
-  const qualities = options?.specialQualities ?? resolved.specialQualities ?? [];
-  const baseName = resolved.baseArmorId || resolved.name;
-  const name = options?.name || (enh > 0 || qualities.length > 0
-    ? formatMagicItemName(baseName, enh, qualities)
-    : resolved.name);
+  const parsedMagic = parseMagicItemName(shieldKey, 'shield');
+  const mat = options?.material || parsedMagic.material || 'standard';
+  const enh = options?.enhancementBonus ?? (parsedMagic.enhancementBonus > 0 ? parsedMagic.enhancementBonus : 0);
+  const qualities = options?.specialQualities ?? (parsedMagic.qualities.length > 0 ? parsedMagic.qualities : []);
+  const baseKey = options?.baseItemId || parsedMagic.baseName || shieldKey;
 
+  const resolved = resolveShield(baseKey, customArmors);
+  const isMwk = options?.isMasterwork ?? Boolean(parsedMagic.isMasterwork || resolved.isMasterwork || enh > 0 || mat === 'adamantine' || mat === 'mithral' || mat === 'mithril' || mat === 'darkwood');
   const stdWeight = resolved.weight ?? (SHIELD_WEIGHT_MAP[resolved.name.toLowerCase()] ?? 10);
+  const finalWeight = applyMaterialToWeight(stdWeight, mat);
+
+  const baseArmorData: ItemArmorData = {
+    type: 'shield',
+    acBonus: resolved.acBonus,
+    maxDex: 99,
+    armorCheckPenalty: resolved.checkPenalty ?? 0,
+    spellFailure: resolved.spellFailure ?? 0,
+    speedPenalty: false
+  };
+  const finalArmorData = applyMaterialToArmorData(baseArmorData, mat, isMwk);
+
+  const baseName = resolved.name;
+  const name = options?.name || (enh > 0 || qualities.length > 0 || (mat && mat !== 'standard') || isMwk
+    ? formatMagicItemName(baseName, enh, qualities, mat, isMwk)
+    : resolved.name);
 
   return {
     id: options?.id || `inv_shd_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
     name,
     quantity: options?.quantity ?? 1,
-    weight: stdWeight,
+    weight: finalWeight,
     location: options?.location || 'Carried',
     itemType: 'shield',
-    baseItemId: resolved.baseArmorId || resolved.name.toLowerCase().replace(/\s+/g, '_'),
+    material: mat,
+    baseItemId: options?.baseItemId || resolved.baseArmorId || resolved.name.toLowerCase().replace(/\s+/g, '_'),
     enhancementBonus: enh,
     specialQualities: qualities,
-    armorData: {
-      type: 'shield',
-      acBonus: resolved.acBonus,
-      maxDex: 99,
-      armorCheckPenalty: resolved.checkPenalty ?? 0,
-      spellFailure: resolved.spellFailure ?? 0,
-      speedPenalty: false
-    }
+    isMasterwork: isMwk,
+    armorData: finalArmorData
   };
 }
 
@@ -1038,21 +1200,39 @@ export function resolveEquippedArmor(
   if (eq.armorItemId && character.inventory) {
     const item = character.inventory.find(i => i.id === eq.armorItemId);
     if (item && item.armorData) {
+      const mat = item.material || eq.armorMaterial || 'standard';
+      const isMwk = Boolean(item.isMasterwork || eq.armorMasterwork || (item.enhancementBonus ? item.enhancementBonus > 0 : false) || mat === 'adamantine' || mat === 'mithral' || mat === 'mithril');
       return {
         name: item.name,
         acBonus: item.armorData.acBonus,
         checkPenalty: item.armorData.armorCheckPenalty,
         type: item.armorData.type,
         maxDex: item.armorData.maxDex,
+        weight: item.weight ?? 0,
         speedPenalty: item.armorData.speedPenalty,
         spellFailure: item.armorData.spellFailure,
         enhancementBonus: item.enhancementBonus || 0,
         specialQualities: item.specialQualities ? [...item.specialQualities] : [],
-        baseArmorId: item.baseItemId
+        baseArmorId: item.baseItemId,
+        material: mat,
+        isMasterwork: isMwk
       };
     }
   }
-  return resolveArmor(eq.armor, customArmors);
+  const resolved = resolveArmor(eq.armor, customArmors);
+  const mat = eq.armorMaterial || resolved.material;
+  const enh = eq.armorEnhancement || 0;
+  const isInherentlyMwk = enh > 0 || mat === 'adamantine' || mat === 'mithral' || mat === 'mithril';
+  const isMwk = isInherentlyMwk || (eq.armorMasterwork !== undefined ? eq.armorMasterwork : Boolean(resolved.isMasterwork));
+  const checkPenalty = (isMwk && !resolved.isMasterwork)
+    ? Math.min(0, resolved.checkPenalty + 1)
+    : resolved.checkPenalty;
+  return {
+    ...resolved,
+    checkPenalty,
+    material: mat,
+    isMasterwork: isMwk
+  };
 }
 
 export function resolveEquippedShield(
@@ -1064,19 +1244,39 @@ export function resolveEquippedShield(
   if (eq.shieldItemId && character.inventory) {
     const item = character.inventory.find(i => i.id === eq.shieldItemId);
     if (item && item.armorData) {
+      const mat = item.material || eq.shieldMaterial || 'standard';
+      const enh = item.enhancementBonus || 0;
+      const isInherentlyMwk = enh > 0 || mat === 'darkwood' || mat === 'adamantine' || mat === 'mithral' || mat === 'mithril';
+      const isMwk = isInherentlyMwk || (eq.shieldMasterwork !== undefined ? eq.shieldMasterwork : Boolean(item.isMasterwork));
       return {
         name: item.name,
         acBonus: item.armorData.acBonus,
         checkPenalty: item.armorData.armorCheckPenalty,
         type: 'shield',
+        weight: item.weight ?? 0,
         spellFailure: item.armorData.spellFailure,
         enhancementBonus: item.enhancementBonus || 0,
         specialQualities: item.specialQualities ? [...item.specialQualities] : [],
-        baseArmorId: item.baseItemId
+        baseArmorId: item.baseItemId,
+        material: mat,
+        isMasterwork: isMwk
       };
     }
   }
-  return resolveShield(eq.shield, customArmors);
+  const resolved = resolveShield(eq.shield, customArmors);
+  const mat = eq.shieldMaterial || resolved.material;
+  const enh = eq.shieldEnhancement || 0;
+  const isInherentlyMwk = enh > 0 || mat === 'darkwood' || mat === 'adamantine' || mat === 'mithral' || mat === 'mithril';
+  const isMwk = isInherentlyMwk || (eq.shieldMasterwork !== undefined ? eq.shieldMasterwork : Boolean(resolved.isMasterwork));
+  const checkPenalty = (isMwk && !resolved.isMasterwork)
+    ? Math.min(0, resolved.checkPenalty + 1)
+    : resolved.checkPenalty;
+  return {
+    ...resolved,
+    checkPenalty,
+    material: mat,
+    isMasterwork: isMwk
+  };
 }
 
 export function resolveEquippedWeapon(
@@ -1092,17 +1292,27 @@ export function resolveEquippedWeapon(
   }
   const idKey = `${slot}ItemId` as keyof Equipment;
   const baneKey = `${slot}BaneTarget` as keyof Equipment;
+  const mwkKey = `${slot}Masterwork` as keyof Equipment;
   const itemId = eq[idKey] as string | undefined;
   const eqBaneTarget = eq[baneKey] as string | undefined;
+  const eqMwk = eq[mwkKey] as boolean | undefined;
+  const matKey = `${slot}Material` as keyof Equipment;
+  const eqMaterial = eq?.[matKey] as EquipmentMaterial | undefined;
+
   if (itemId && character.inventory) {
     const item = character.inventory.find(i => i.id === itemId);
     if (item && item.weaponData) {
+      const mat = item.material || eqMaterial || 'standard';
+      const enh = item.enhancementBonus || 0;
+      const isInherentlyMwk = enh > 0 || mat === 'adamantine';
+      const isMwk = isInherentlyMwk || (eqMwk !== undefined ? eqMwk : Boolean(item.isMasterwork));
       return {
         id: item.baseItemId || item.id,
         name: item.name,
         category: item.weaponData.category || 'Martial',
         size: item.weaponData.size || 'M',
         damageM: item.weaponData.damageM || '1d8',
+        damageS: item.weaponData.damageS,
         threat: item.weaponData.threat ?? 20,
         critMultiplier: item.weaponData.critMultiplier ?? 2,
         weight: item.weight ?? 4,
@@ -1110,15 +1320,84 @@ export function resolveEquippedWeapon(
         enhancementBonus: item.enhancementBonus || 0,
         specialQualities: item.specialQualities ? [...item.specialQualities] : [],
         baneTarget: eqBaneTarget || item.weaponData.baneTarget || item.baneTarget,
+        material: mat,
+        isMasterwork: isMwk,
         source: 'Custom'
       };
     }
   }
   const resolved = resolveWeapon(slotName, customWeapons, weaponsData);
-  if (eqBaneTarget && !resolved.baneTarget) {
-    return { ...resolved, baneTarget: eqBaneTarget };
+  const finalMaterial = eqMaterial || resolved.material || 'standard';
+  const enhKey = `${slot}Enhancement` as keyof Equipment;
+  const eqEnh = (eq[enhKey] as number) || 0;
+  const isInherentlyMwk = (eqEnh > 0) || finalMaterial === 'adamantine';
+  const isMwk = isInherentlyMwk || (eqMwk !== undefined ? eqMwk : Boolean(resolved.isMasterwork));
+  return {
+    ...resolved,
+    baneTarget: eqBaneTarget || resolved.baneTarget,
+    material: finalMaterial,
+    isMasterwork: isMwk
+  };
+}
+
+/**
+ * In D&D 3.5e, Masterwork weapons and Adamantine weapons grant a +1 enhancement bonus on attack rolls.
+ * Because enhancement bonuses to attack do not stack, the effective attack enhancement is
+ * max(magicEnhancement, 1) for Masterwork or Adamantine weapons.
+ */
+export function getWeaponEffectiveAttackEnhancement(
+  material?: EquipmentMaterial | string,
+  enhancementBonus: number = 0,
+  isMasterwork?: boolean
+): number {
+  const isMwk = Boolean(isMasterwork || material === 'adamantine');
+  return Math.max(enhancementBonus, isMwk ? 1 : 0);
+}
+
+/**
+ * In D&D 3.5e, Alchemical Silver imposes a -1 penalty on damage rolls (min 1 total damage).
+ * Adamantine does NOT grant extra damage to weapons (damage is standard).
+ */
+export function getWeaponMaterialDamageMod(
+  material?: EquipmentMaterial | string
+): number {
+  if (material === 'alchemical_silver') return -1;
+  return 0;
+}
+
+/**
+ * Returns descriptive traits for weapon special materials (e.g. DR bypass, hardness bypass).
+ */
+export function getWeaponMaterialTraits(
+  material?: EquipmentMaterial | string,
+  isMasterwork?: boolean
+): string[] {
+  const traits: string[] = [];
+  if (material && material !== 'standard') {
+    switch (material) {
+      case 'adamantine':
+        traits.push(
+          'Adamantine (Bypasses DR/Adamantine & Hardness < 20)',
+          'Masterwork (+1 Atk)'
+        );
+        break;
+      case 'cold_iron':
+        traits.push('Cold Iron (Bypasses DR/Cold Iron)');
+        break;
+      case 'alchemical_silver':
+        traits.push('Silver (Bypasses DR/Silver, -1 Dmg)');
+        break;
+      case 'mithral':
+        traits.push('Mithral (Half Weight)');
+        break;
+      default:
+        break;
+    }
   }
-  return resolved;
+  if (isMasterwork && !traits.includes('Masterwork (+1 Atk)')) {
+    traits.push('Masterwork (+1 Atk)');
+  }
+  return traits;
 }
 
 /**
@@ -1150,9 +1429,22 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
   if (updatedEq.armorItemId) {
     const existing = currentInventory.find(i => i.id === updatedEq.armorItemId);
     if (existing) {
+      if (!existing.material) {
+        existing.material = parseMagicItemName(existing.name, 'armor').material || updatedEq.armorMaterial || 'standard';
+        modified = true;
+      }
+      if (!existing.baseItemId) {
+        existing.baseItemId = resolveArmor(existing.name, customArmors).baseArmorId || parseMagicItemName(existing.name, 'armor').baseName.toLowerCase().replace(/\s+/g, '_');
+        modified = true;
+      }
+      if (existing.isMasterwork === undefined) {
+        const parsed = parseMagicItemName(existing.name, 'armor');
+        existing.isMasterwork = updatedEq.armorMasterwork ?? parsed.isMasterwork ?? false;
+        modified = true;
+      }
       if (!existing.armorData) {
-        const resolved = resolveArmor(existing.name, customArmors);
-        existing.armorData = {
+        const resolved = resolveArmor(existing.baseItemId || existing.name, customArmors);
+        const baseArmorData: ItemArmorData = {
           type: (resolved.type as any) || 'medium',
           acBonus: resolved.acBonus,
           maxDex: resolved.maxDex ?? 99,
@@ -1160,7 +1452,39 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
           spellFailure: resolved.spellFailure ?? 0,
           speedPenalty: resolved.speedPenalty ?? (resolved.type === 'heavy' || resolved.type === 'medium')
         };
+        existing.armorData = applyMaterialToArmorData(baseArmorData, existing.material, existing.isMasterwork);
         existing.itemType = 'armor';
+        modified = true;
+      }
+      if (existing.weight === undefined) {
+        const resolved = resolveArmor(existing.baseItemId || existing.name, customArmors);
+        const stdWeight = resolved.weight ?? (ARMOR_WEIGHT_MAP[resolved.name.toLowerCase()] ?? 20);
+        existing.weight = applyMaterialToWeight(stdWeight, existing.material);
+        modified = true;
+      }
+      if (updatedEq.armorMaterial !== existing.material && existing.material && existing.material !== 'standard') {
+        updatedEq.armorMaterial = existing.material;
+        modified = true;
+      }
+      if (updatedEq.armorMasterwork !== undefined) {
+        if (existing.isMasterwork !== updatedEq.armorMasterwork) {
+          existing.isMasterwork = updatedEq.armorMasterwork;
+          const resolved = resolveArmor(existing.baseItemId || existing.name, customArmors);
+          const baseArmorData: ItemArmorData = {
+            type: (resolved.type as any) || 'medium',
+            acBonus: resolved.acBonus,
+            maxDex: resolved.maxDex ?? 99,
+            armorCheckPenalty: resolved.checkPenalty ?? 0,
+            spellFailure: resolved.spellFailure ?? 0,
+            speedPenalty: resolved.speedPenalty ?? (resolved.type === 'heavy' || resolved.type === 'medium')
+          };
+          existing.armorData = applyMaterialToArmorData(baseArmorData, existing.material, existing.isMasterwork);
+          existing.name = formatMagicItemName(resolved.name, existing.enhancementBonus || 0, existing.specialQualities || [], existing.material, existing.isMasterwork);
+          updatedEq.armor = existing.name;
+          modified = true;
+        }
+      } else if (existing.isMasterwork !== undefined) {
+        updatedEq.armorMasterwork = existing.isMasterwork;
         modified = true;
       }
       if (updatedEq.armor !== existing.name || updatedEq.armorEnhancement !== (existing.enhancementBonus || 0)) {
@@ -1174,11 +1498,23 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
       modified = true;
     }
   } else if (isValidEquippedName(updatedEq.armor)) {
-    const resolved = resolveArmor(updatedEq.armor, customArmors);
+    const parsed = parseMagicItemName(updatedEq.armor, 'armor');
+    const mat = (parsed.material && parsed.material !== 'standard' ? parsed.material : undefined) || updatedEq.armorMaterial || 'standard';
+    const isMwk = updatedEq.armorMasterwork ?? parsed.isMasterwork;
+    const resolved = resolveArmor(parsed.baseName || updatedEq.armor, customArmors);
     const existingMatch = currentInventory.find(i => matchesItemName(i.name, updatedEq.armor) || matchesItemName(i.name, resolved.name));
     if (existingMatch) {
+      if (!existingMatch.material) {
+        existingMatch.material = mat;
+      }
+      if (!existingMatch.baseItemId) {
+        existingMatch.baseItemId = resolved.baseArmorId || parsed.baseName.toLowerCase().replace(/\s+/g, '_');
+      }
+      if (existingMatch.isMasterwork === undefined && isMwk !== undefined) {
+        existingMatch.isMasterwork = isMwk;
+      }
       if (!existingMatch.armorData) {
-        existingMatch.armorData = {
+        const baseArmorData: ItemArmorData = {
           type: (resolved.type as any) || 'medium',
           acBonus: resolved.acBonus,
           maxDex: resolved.maxDex ?? 99,
@@ -1186,7 +1522,12 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
           spellFailure: resolved.spellFailure ?? 0,
           speedPenalty: resolved.speedPenalty ?? (resolved.type === 'heavy' || resolved.type === 'medium')
         };
+        existingMatch.armorData = applyMaterialToArmorData(baseArmorData, existingMatch.material, existingMatch.isMasterwork);
         existingMatch.itemType = 'armor';
+      }
+      if (existingMatch.weight === undefined) {
+        const stdWeight = resolved.weight ?? (ARMOR_WEIGHT_MAP[resolved.name.toLowerCase()] ?? 20);
+        existingMatch.weight = applyMaterialToWeight(stdWeight, existingMatch.material);
       }
       if (existingMatch.enhancementBonus === undefined && updatedEq.armorEnhancement) {
         existingMatch.enhancementBonus = updatedEq.armorEnhancement;
@@ -1195,14 +1536,24 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
         existingMatch.specialQualities = [...updatedEq.armorQualities];
       }
       updatedEq.armorItemId = existingMatch.id;
+      updatedEq.armorMaterial = existingMatch.material;
+      if (updatedEq.armorMasterwork !== undefined) {
+        existingMatch.isMasterwork = updatedEq.armorMasterwork;
+      } else if (existingMatch.isMasterwork !== undefined) {
+        updatedEq.armorMasterwork = existingMatch.isMasterwork;
+      }
       modified = true;
     } else {
       const newArm = createInventoryArmor(updatedEq.armor, customArmors, {
         enhancementBonus: updatedEq.armorEnhancement,
-        specialQualities: updatedEq.armorQualities
+        specialQualities: updatedEq.armorQualities,
+        material: mat,
+        isMasterwork: isMwk
       });
       currentInventory.push(newArm);
       updatedEq.armorItemId = newArm.id;
+      updatedEq.armorMaterial = newArm.material;
+      updatedEq.armorMasterwork = newArm.isMasterwork;
       modified = true;
     }
   }
@@ -1211,9 +1562,22 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
   if (updatedEq.shieldItemId) {
     const existing = currentInventory.find(i => i.id === updatedEq.shieldItemId);
     if (existing) {
+      if (!existing.material) {
+        existing.material = parseMagicItemName(existing.name, 'shield').material || updatedEq.shieldMaterial || 'standard';
+        modified = true;
+      }
+      if (!existing.baseItemId) {
+        existing.baseItemId = resolveShield(existing.name, customArmors).baseArmorId || parseMagicItemName(existing.name, 'shield').baseName.toLowerCase().replace(/\s+/g, '_');
+        modified = true;
+      }
+      if (existing.isMasterwork === undefined) {
+        const parsed = parseMagicItemName(existing.name, 'shield');
+        existing.isMasterwork = updatedEq.shieldMasterwork ?? parsed.isMasterwork ?? false;
+        modified = true;
+      }
       if (!existing.armorData) {
-        const resolved = resolveShield(existing.name, customArmors);
-        existing.armorData = {
+        const resolved = resolveShield(existing.baseItemId || existing.name, customArmors);
+        const baseArmorData: ItemArmorData = {
           type: 'shield',
           acBonus: resolved.acBonus,
           maxDex: 99,
@@ -1221,7 +1585,39 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
           spellFailure: resolved.spellFailure ?? 0,
           speedPenalty: false
         };
+        existing.armorData = applyMaterialToArmorData(baseArmorData, existing.material, existing.isMasterwork);
         existing.itemType = 'shield';
+        modified = true;
+      }
+      if (existing.weight === undefined) {
+        const resolved = resolveShield(existing.baseItemId || existing.name, customArmors);
+        const stdWeight = resolved.weight ?? (SHIELD_WEIGHT_MAP[resolved.name.toLowerCase()] ?? 10);
+        existing.weight = applyMaterialToWeight(stdWeight, existing.material);
+        modified = true;
+      }
+      if (updatedEq.shieldMaterial !== existing.material && existing.material && existing.material !== 'standard') {
+        updatedEq.shieldMaterial = existing.material;
+        modified = true;
+      }
+      if (updatedEq.shieldMasterwork !== undefined) {
+        if (existing.isMasterwork !== updatedEq.shieldMasterwork) {
+          existing.isMasterwork = updatedEq.shieldMasterwork;
+          const resolved = resolveShield(existing.baseItemId || existing.name, customArmors);
+          const baseArmorData: ItemArmorData = {
+            type: 'shield',
+            acBonus: resolved.acBonus,
+            maxDex: 99,
+            armorCheckPenalty: resolved.checkPenalty ?? 0,
+            spellFailure: resolved.spellFailure ?? 0,
+            speedPenalty: false
+          };
+          existing.armorData = applyMaterialToArmorData(baseArmorData, existing.material, existing.isMasterwork);
+          existing.name = formatMagicItemName(resolved.name, existing.enhancementBonus || 0, existing.specialQualities || [], existing.material, existing.isMasterwork);
+          updatedEq.shield = existing.name;
+          modified = true;
+        }
+      } else if (existing.isMasterwork !== undefined) {
+        updatedEq.shieldMasterwork = existing.isMasterwork;
         modified = true;
       }
       if (updatedEq.shield !== existing.name || updatedEq.shieldEnhancement !== (existing.enhancementBonus || 0)) {
@@ -1235,11 +1631,23 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
       modified = true;
     }
   } else if (isValidEquippedName(updatedEq.shield)) {
-    const resolved = resolveShield(updatedEq.shield, customArmors);
+    const parsed = parseMagicItemName(updatedEq.shield, 'shield');
+    const mat = (parsed.material && parsed.material !== 'standard' ? parsed.material : undefined) || updatedEq.shieldMaterial || 'standard';
+    const isMwk = updatedEq.shieldMasterwork ?? parsed.isMasterwork;
+    const resolved = resolveShield(parsed.baseName || updatedEq.shield, customArmors);
     const existingMatch = currentInventory.find(i => matchesItemName(i.name, updatedEq.shield) || matchesItemName(i.name, resolved.name));
     if (existingMatch) {
+      if (!existingMatch.material) {
+        existingMatch.material = mat;
+      }
+      if (!existingMatch.baseItemId) {
+        existingMatch.baseItemId = resolved.baseArmorId || parsed.baseName.toLowerCase().replace(/\s+/g, '_');
+      }
+      if (existingMatch.isMasterwork === undefined && isMwk !== undefined) {
+        existingMatch.isMasterwork = isMwk;
+      }
       if (!existingMatch.armorData) {
-        existingMatch.armorData = {
+        const baseArmorData: ItemArmorData = {
           type: 'shield',
           acBonus: resolved.acBonus,
           maxDex: 99,
@@ -1247,7 +1655,12 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
           spellFailure: resolved.spellFailure ?? 0,
           speedPenalty: false
         };
+        existingMatch.armorData = applyMaterialToArmorData(baseArmorData, existingMatch.material, existingMatch.isMasterwork);
         existingMatch.itemType = 'shield';
+      }
+      if (existingMatch.weight === undefined) {
+        const stdWeight = resolved.weight ?? (SHIELD_WEIGHT_MAP[resolved.name.toLowerCase()] ?? 10);
+        existingMatch.weight = applyMaterialToWeight(stdWeight, existingMatch.material);
       }
       if (existingMatch.enhancementBonus === undefined && updatedEq.shieldEnhancement) {
         existingMatch.enhancementBonus = updatedEq.shieldEnhancement;
@@ -1256,14 +1669,24 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
         existingMatch.specialQualities = [...updatedEq.shieldQualities];
       }
       updatedEq.shieldItemId = existingMatch.id;
+      updatedEq.shieldMaterial = existingMatch.material;
+      if (updatedEq.shieldMasterwork !== undefined) {
+        existingMatch.isMasterwork = updatedEq.shieldMasterwork;
+      } else if (existingMatch.isMasterwork !== undefined) {
+        updatedEq.shieldMasterwork = existingMatch.isMasterwork;
+      }
       modified = true;
     } else {
       const newShd = createInventoryShield(updatedEq.shield, customArmors, {
         enhancementBonus: updatedEq.shieldEnhancement,
-        specialQualities: updatedEq.shieldQualities
+        specialQualities: updatedEq.shieldQualities,
+        material: mat,
+        isMasterwork: isMwk
       });
       currentInventory.push(newShd);
       updatedEq.shieldItemId = newShd.id;
+      updatedEq.shieldMaterial = newShd.material;
+      updatedEq.shieldMasterwork = newShd.isMasterwork;
       modified = true;
     }
   }
@@ -1272,6 +1695,19 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
   if (updatedEq.primaryWeaponItemId) {
     const existing = currentInventory.find(i => i.id === updatedEq.primaryWeaponItemId);
     if (existing) {
+      if (!existing.material) {
+        existing.material = parseMagicItemName(existing.name, 'weapon').material || 'standard';
+        modified = true;
+      }
+      if (!existing.baseItemId) {
+        existing.baseItemId = resolveWeapon(existing.name, customWeapons, weaponsData).id;
+        modified = true;
+      }
+      if (existing.isMasterwork === undefined) {
+        const parsed = parseMagicItemName(existing.name, 'weapon');
+        existing.isMasterwork = updatedEq.primaryWeaponMasterwork ?? (parsed.isMasterwork || false);
+        modified = true;
+      }
       if (!existing.weaponData) {
         const resolved = resolveWeapon(existing.name, customWeapons, weaponsData);
         existing.weaponData = {
@@ -1283,21 +1719,39 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
           critMultiplier: resolved.critMultiplier ?? 2,
           damageType: resolved.type,
           rangeIncrement: resolved.rangeIncrement,
-          isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged'
+          isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged',
+          isMasterwork: existing.isMasterwork
         };
         existing.itemType = 'weapon';
         modified = true;
       }
       const existingBane = existing.weaponData?.baneTarget || existing.baneTarget;
+      if (updatedEq.primaryWeaponMasterwork !== undefined) {
+        if (existing.isMasterwork !== updatedEq.primaryWeaponMasterwork) {
+          existing.isMasterwork = updatedEq.primaryWeaponMasterwork;
+          if (existing.weaponData) {
+            existing.weaponData.isMasterwork = existing.isMasterwork;
+          }
+          const resolved = resolveWeapon(existing.baseItemId || existing.name, customWeapons, weaponsData);
+          existing.name = formatMagicItemName(resolved.name, existing.enhancementBonus || 0, existing.specialQualities || [], existing.material, existing.isMasterwork);
+          updatedEq.primaryWeapon = existing.name;
+          modified = true;
+        }
+      } else if (existing.isMasterwork !== undefined) {
+        updatedEq.primaryWeaponMasterwork = existing.isMasterwork;
+        modified = true;
+      }
       if (
         updatedEq.primaryWeapon !== existing.name ||
         updatedEq.primaryWeaponEnhancement !== (existing.enhancementBonus || 0) ||
-        updatedEq.primaryWeaponBaneTarget !== existingBane
+        updatedEq.primaryWeaponBaneTarget !== existingBane ||
+        updatedEq.primaryWeaponMaterial !== (existing.material || 'standard')
       ) {
         updatedEq.primaryWeapon = existing.name;
         updatedEq.primaryWeaponEnhancement = existing.enhancementBonus || 0;
         updatedEq.primaryWeaponQualities = existing.specialQualities || [];
         updatedEq.primaryWeaponBaneTarget = existingBane;
+        updatedEq.primaryWeaponMaterial = existing.material || 'standard';
         modified = true;
       }
     } else {
@@ -1305,9 +1759,21 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
       modified = true;
     }
   } else if (isValidEquippedName(updatedEq.primaryWeapon)) {
+    const parsed = parseMagicItemName(updatedEq.primaryWeapon, 'weapon');
+    const mat = parsed.material || 'standard';
+    const isMwk = updatedEq.primaryWeaponMasterwork ?? parsed.isMasterwork;
     const resolved = resolveWeapon(updatedEq.primaryWeapon, customWeapons, weaponsData);
     const existingMatch = currentInventory.find(i => matchesItemName(i.name, updatedEq.primaryWeapon) || matchesItemName(i.name, resolved.name));
     if (existingMatch) {
+      if (!existingMatch.material) {
+        existingMatch.material = mat;
+      }
+      if (!existingMatch.baseItemId) {
+        existingMatch.baseItemId = resolved.id;
+      }
+      if (existingMatch.isMasterwork === undefined && isMwk !== undefined) {
+        existingMatch.isMasterwork = isMwk;
+      }
       if (!existingMatch.weaponData) {
         existingMatch.weaponData = {
           category: resolved.category,
@@ -1318,7 +1784,8 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
           critMultiplier: resolved.critMultiplier ?? 2,
           damageType: resolved.type,
           rangeIncrement: resolved.rangeIncrement,
-          isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged'
+          isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged',
+          isMasterwork: existingMatch.isMasterwork
         };
         existingMatch.itemType = 'weapon';
       }
@@ -1333,16 +1800,29 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
         existingMatch.baneTarget = updatedEq.primaryWeaponBaneTarget;
       }
       updatedEq.primaryWeaponItemId = existingMatch.id;
+      updatedEq.primaryWeaponMaterial = existingMatch.material || 'standard';
+      if (updatedEq.primaryWeaponMasterwork !== undefined) {
+        existingMatch.isMasterwork = updatedEq.primaryWeaponMasterwork;
+        if (existingMatch.weaponData) {
+          existingMatch.weaponData.isMasterwork = updatedEq.primaryWeaponMasterwork;
+        }
+      } else if (existingMatch.isMasterwork !== undefined) {
+        updatedEq.primaryWeaponMasterwork = existingMatch.isMasterwork;
+      }
       modified = true;
     } else {
       const newWpn = createInventoryWeapon(resolved, {
         name: updatedEq.primaryWeapon,
         enhancementBonus: updatedEq.primaryWeaponEnhancement,
         specialQualities: updatedEq.primaryWeaponQualities,
-        baneTarget: updatedEq.primaryWeaponBaneTarget
+        baneTarget: updatedEq.primaryWeaponBaneTarget,
+        material: mat,
+        isMasterwork: isMwk
       });
       currentInventory.push(newWpn);
       updatedEq.primaryWeaponItemId = newWpn.id;
+      updatedEq.primaryWeaponMaterial = newWpn.material || 'standard';
+      updatedEq.primaryWeaponMasterwork = newWpn.isMasterwork;
       modified = true;
     }
   }
@@ -1351,6 +1831,19 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
   if (updatedEq.secondaryWeaponItemId) {
     const existing = currentInventory.find(i => i.id === updatedEq.secondaryWeaponItemId);
     if (existing) {
+      if (!existing.material) {
+        existing.material = parseMagicItemName(existing.name, 'weapon').material || 'standard';
+        modified = true;
+      }
+      if (!existing.baseItemId) {
+        existing.baseItemId = resolveWeapon(existing.name, customWeapons, weaponsData).id;
+        modified = true;
+      }
+      if (existing.isMasterwork === undefined) {
+        const parsed = parseMagicItemName(existing.name, 'weapon');
+        existing.isMasterwork = updatedEq.secondaryWeaponMasterwork ?? (parsed.isMasterwork || false);
+        modified = true;
+      }
       if (!existing.weaponData) {
         const resolved = resolveWeapon(existing.name, customWeapons, weaponsData);
         existing.weaponData = {
@@ -1362,21 +1855,39 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
           critMultiplier: resolved.critMultiplier ?? 2,
           damageType: resolved.type,
           rangeIncrement: resolved.rangeIncrement,
-          isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged'
+          isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged',
+          isMasterwork: existing.isMasterwork
         };
         existing.itemType = 'weapon';
         modified = true;
       }
       const existingBane = existing.weaponData?.baneTarget || existing.baneTarget;
+      if (updatedEq.secondaryWeaponMasterwork !== undefined) {
+        if (existing.isMasterwork !== updatedEq.secondaryWeaponMasterwork) {
+          existing.isMasterwork = updatedEq.secondaryWeaponMasterwork;
+          if (existing.weaponData) {
+            existing.weaponData.isMasterwork = existing.isMasterwork;
+          }
+          const resolved = resolveWeapon(existing.baseItemId || existing.name, customWeapons, weaponsData);
+          existing.name = formatMagicItemName(resolved.name, existing.enhancementBonus || 0, existing.specialQualities || [], existing.material, existing.isMasterwork);
+          updatedEq.secondaryWeapon = existing.name;
+          modified = true;
+        }
+      } else if (existing.isMasterwork !== undefined) {
+        updatedEq.secondaryWeaponMasterwork = existing.isMasterwork;
+        modified = true;
+      }
       if (
         updatedEq.secondaryWeapon !== existing.name ||
         updatedEq.secondaryWeaponEnhancement !== (existing.enhancementBonus || 0) ||
-        updatedEq.secondaryWeaponBaneTarget !== existingBane
+        updatedEq.secondaryWeaponBaneTarget !== existingBane ||
+        updatedEq.secondaryWeaponMaterial !== (existing.material || 'standard')
       ) {
         updatedEq.secondaryWeapon = existing.name;
         updatedEq.secondaryWeaponEnhancement = existing.enhancementBonus || 0;
         updatedEq.secondaryWeaponQualities = existing.specialQualities || [];
         updatedEq.secondaryWeaponBaneTarget = existingBane;
+        updatedEq.secondaryWeaponMaterial = existing.material || 'standard';
         modified = true;
       }
     } else {
@@ -1384,9 +1895,21 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
       modified = true;
     }
   } else if (isValidEquippedName(updatedEq.secondaryWeapon)) {
+    const parsed = parseMagicItemName(updatedEq.secondaryWeapon, 'weapon');
+    const mat = parsed.material || 'standard';
+    const isMwk = updatedEq.secondaryWeaponMasterwork ?? parsed.isMasterwork;
     const resolved = resolveWeapon(updatedEq.secondaryWeapon, customWeapons, weaponsData);
     const existingMatch = currentInventory.find(i => i.id !== updatedEq.primaryWeaponItemId && (matchesItemName(i.name, updatedEq.secondaryWeapon) || matchesItemName(i.name, resolved.name)));
     if (existingMatch) {
+      if (!existingMatch.material) {
+        existingMatch.material = mat;
+      }
+      if (!existingMatch.baseItemId) {
+        existingMatch.baseItemId = resolved.id;
+      }
+      if (existingMatch.isMasterwork === undefined && isMwk !== undefined) {
+        existingMatch.isMasterwork = isMwk;
+      }
       if (!existingMatch.weaponData) {
         existingMatch.weaponData = {
           category: resolved.category,
@@ -1397,7 +1920,8 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
           critMultiplier: resolved.critMultiplier ?? 2,
           damageType: resolved.type,
           rangeIncrement: resolved.rangeIncrement,
-          isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged'
+          isRanged: resolved.category === 'Ranged' || resolved.size === 'Ranged',
+          isMasterwork: existingMatch.isMasterwork
         };
         existingMatch.itemType = 'weapon';
       }
@@ -1412,16 +1936,29 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
         existingMatch.baneTarget = updatedEq.secondaryWeaponBaneTarget;
       }
       updatedEq.secondaryWeaponItemId = existingMatch.id;
+      updatedEq.secondaryWeaponMaterial = existingMatch.material || 'standard';
+      if (updatedEq.secondaryWeaponMasterwork !== undefined) {
+        existingMatch.isMasterwork = updatedEq.secondaryWeaponMasterwork;
+        if (existingMatch.weaponData) {
+          existingMatch.weaponData.isMasterwork = updatedEq.secondaryWeaponMasterwork;
+        }
+      } else if (existingMatch.isMasterwork !== undefined) {
+        updatedEq.secondaryWeaponMasterwork = existingMatch.isMasterwork;
+      }
       modified = true;
     } else {
       const newWpn = createInventoryWeapon(resolved, {
         name: updatedEq.secondaryWeapon,
         enhancementBonus: updatedEq.secondaryWeaponEnhancement,
         specialQualities: updatedEq.secondaryWeaponQualities,
-        baneTarget: updatedEq.secondaryWeaponBaneTarget
+        baneTarget: updatedEq.secondaryWeaponBaneTarget,
+        material: mat,
+        isMasterwork: isMwk
       });
       currentInventory.push(newWpn);
       updatedEq.secondaryWeaponItemId = newWpn.id;
+      updatedEq.secondaryWeaponMaterial = newWpn.material || 'standard';
+      updatedEq.secondaryWeaponMasterwork = newWpn.isMasterwork;
       modified = true;
     }
   }
@@ -1430,6 +1967,19 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
   if (updatedEq.rangedWeaponItemId) {
     const existing = currentInventory.find(i => i.id === updatedEq.rangedWeaponItemId);
     if (existing) {
+      if (!existing.material) {
+        existing.material = parseMagicItemName(existing.name, 'weapon').material || 'standard';
+        modified = true;
+      }
+      if (!existing.baseItemId) {
+        existing.baseItemId = resolveWeapon(existing.name, customWeapons, weaponsData).id;
+        modified = true;
+      }
+      if (existing.isMasterwork === undefined) {
+        const parsed = parseMagicItemName(existing.name, 'weapon');
+        existing.isMasterwork = updatedEq.rangedWeaponMasterwork ?? (parsed.isMasterwork || false);
+        modified = true;
+      }
       if (!existing.weaponData) {
         const resolved = resolveWeapon(existing.name, customWeapons, weaponsData);
         existing.weaponData = {
@@ -1441,21 +1991,39 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
           critMultiplier: resolved.critMultiplier ?? 2,
           damageType: resolved.type,
           rangeIncrement: resolved.rangeIncrement,
-          isRanged: true
+          isRanged: true,
+          isMasterwork: existing.isMasterwork
         };
         existing.itemType = 'weapon';
         modified = true;
       }
       const existingBane = existing.weaponData?.baneTarget || existing.baneTarget;
+      if (updatedEq.rangedWeaponMasterwork !== undefined) {
+        if (existing.isMasterwork !== updatedEq.rangedWeaponMasterwork) {
+          existing.isMasterwork = updatedEq.rangedWeaponMasterwork;
+          if (existing.weaponData) {
+            existing.weaponData.isMasterwork = existing.isMasterwork;
+          }
+          const resolved = resolveWeapon(existing.baseItemId || existing.name, customWeapons, weaponsData);
+          existing.name = formatMagicItemName(resolved.name, existing.enhancementBonus || 0, existing.specialQualities || [], existing.material, existing.isMasterwork);
+          updatedEq.rangedWeapon = existing.name;
+          modified = true;
+        }
+      } else if (existing.isMasterwork !== undefined) {
+        updatedEq.rangedWeaponMasterwork = existing.isMasterwork;
+        modified = true;
+      }
       if (
         updatedEq.rangedWeapon !== existing.name ||
         updatedEq.rangedWeaponEnhancement !== (existing.enhancementBonus || 0) ||
-        updatedEq.rangedWeaponBaneTarget !== existingBane
+        updatedEq.rangedWeaponBaneTarget !== existingBane ||
+        updatedEq.rangedWeaponMaterial !== (existing.material || 'standard')
       ) {
         updatedEq.rangedWeapon = existing.name;
         updatedEq.rangedWeaponEnhancement = existing.enhancementBonus || 0;
         updatedEq.rangedWeaponQualities = existing.specialQualities || [];
         updatedEq.rangedWeaponBaneTarget = existingBane;
+        updatedEq.rangedWeaponMaterial = existing.material || 'standard';
         modified = true;
       }
     } else {
@@ -1463,9 +2031,21 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
       modified = true;
     }
   } else if (isValidEquippedName(updatedEq.rangedWeapon)) {
+    const parsed = parseMagicItemName(updatedEq.rangedWeapon, 'weapon');
+    const mat = parsed.material || 'standard';
+    const isMwk = updatedEq.rangedWeaponMasterwork ?? parsed.isMasterwork;
     const resolved = resolveWeapon(updatedEq.rangedWeapon, customWeapons, weaponsData);
     const existingMatch = currentInventory.find(i => matchesItemName(i.name, updatedEq.rangedWeapon) || matchesItemName(i.name, resolved.name));
     if (existingMatch) {
+      if (!existingMatch.material) {
+        existingMatch.material = mat;
+      }
+      if (!existingMatch.baseItemId) {
+        existingMatch.baseItemId = resolved.id;
+      }
+      if (existingMatch.isMasterwork === undefined && isMwk !== undefined) {
+        existingMatch.isMasterwork = isMwk;
+      }
       if (!existingMatch.weaponData) {
         existingMatch.weaponData = {
           category: resolved.category,
@@ -1476,7 +2056,8 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
           critMultiplier: resolved.critMultiplier ?? 2,
           damageType: resolved.type,
           rangeIncrement: resolved.rangeIncrement,
-          isRanged: true
+          isRanged: true,
+          isMasterwork: existingMatch.isMasterwork
         };
         existingMatch.itemType = 'weapon';
       }
@@ -1491,16 +2072,29 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
         existingMatch.baneTarget = updatedEq.rangedWeaponBaneTarget;
       }
       updatedEq.rangedWeaponItemId = existingMatch.id;
+      updatedEq.rangedWeaponMaterial = existingMatch.material || 'standard';
+      if (updatedEq.rangedWeaponMasterwork !== undefined) {
+        existingMatch.isMasterwork = updatedEq.rangedWeaponMasterwork;
+        if (existingMatch.weaponData) {
+          existingMatch.weaponData.isMasterwork = updatedEq.rangedWeaponMasterwork;
+        }
+      } else if (existingMatch.isMasterwork !== undefined) {
+        updatedEq.rangedWeaponMasterwork = existingMatch.isMasterwork;
+      }
       modified = true;
     } else {
       const newWpn = createInventoryWeapon(resolved, {
         name: updatedEq.rangedWeapon,
         enhancementBonus: updatedEq.rangedWeaponEnhancement,
         specialQualities: updatedEq.rangedWeaponQualities,
-        baneTarget: updatedEq.rangedWeaponBaneTarget
+        baneTarget: updatedEq.rangedWeaponBaneTarget,
+        material: mat,
+        isMasterwork: isMwk
       });
       currentInventory.push(newWpn);
       updatedEq.rangedWeaponItemId = newWpn.id;
+      updatedEq.rangedWeaponMaterial = newWpn.material || 'standard';
+      updatedEq.rangedWeaponMasterwork = newWpn.isMasterwork;
       modified = true;
     }
   }

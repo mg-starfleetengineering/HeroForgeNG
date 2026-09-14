@@ -1,5 +1,26 @@
-import { CharacterSheetData, CharacterState } from '../types/character';
+import {
+  CharacterSheetData,
+  CharacterState,
+  migrateLegacyFeatStrings,
+  Equipment,
+  InventoryItem,
+  ItemArmorData
+} from '../types/character';
 import { migrateCharacterBuffs } from '../engine/combat';
+import {
+  resolveArmor,
+  resolveShield,
+  resolveWeapon,
+  createInventoryArmor,
+  createInventoryShield,
+  createInventoryWeapon,
+  applyMaterialToArmorData,
+  applyMaterialToWeight,
+  matchesItemName,
+  ARMOR_WEIGHT_MAP,
+  SHIELD_WEIGHT_MAP
+} from '../engine/equipment';
+import { parseMagicItemName } from '../engine/magicItems';
 import {
   getAllCharacters,
   saveCharacter,
@@ -11,6 +32,392 @@ import {
 
 const LEGACY_V2_KEY = 'heroforge_active_character_v2';
 const LEGACY_V1_KEY = 'heroforge_active_character';
+
+/**
+ * Migrates legacy equipment string names into structured InventoryItem entities in character.inventory
+ * with typed material, enhancementBonus, specialQualities, baseItemId, and itemType.
+ * Binds equipment.*ItemId pointers and preserves equipment.armorMaterial / item.material.
+ */
+export function migrateLegacyEquipmentToInventory(char: CharacterSheetData): CharacterSheetData {
+  if (!char || typeof char !== 'object') {
+    return char;
+  }
+
+  // Ensure inventory is an array
+  const inventory: InventoryItem[] = Array.isArray(char.inventory) ? [...char.inventory] : [];
+  const customArmors = char.customArmors || [];
+  const customWeapons = char.customWeapons || [];
+
+  if (!char.equipment) {
+    return {
+      ...char,
+      inventory
+    };
+  }
+
+  const equipment: Equipment = { ...char.equipment };
+
+  const isValidName = (name: string | undefined): boolean => {
+    if (!name) return false;
+    const clean = name.trim();
+    return clean !== '' && clean.toLowerCase() !== 'none' && clean !== '__CUSTOM__';
+  };
+
+  // 1. Armor
+  if (isValidName(equipment.armor)) {
+    const rawName = equipment.armor.trim();
+    const parsed = parseMagicItemName(rawName, 'armor');
+    const isMwk = Boolean(
+      parsed.isMasterwork ||
+      equipment.armorMasterwork ||
+      /\b(?:masterwork|mwk\.?)\b/i.test(rawName)
+    );
+    const mat = (parsed.material && parsed.material !== 'standard' ? parsed.material : undefined) ||
+      equipment.armorMaterial ||
+      'standard';
+    const enh = parsed.enhancementBonus || equipment.armorEnhancement || 0;
+    const qualities = parsed.qualities.length > 0 ? parsed.qualities : (equipment.armorQualities || []);
+    const resolved = resolveArmor(parsed.baseName || rawName, customArmors);
+    const baseId = resolved.baseArmorId || parsed.baseName.toLowerCase().replace(/\s+/g, '_');
+
+    let item: InventoryItem | undefined;
+    if (equipment.armorItemId) {
+      item = inventory.find(i => i.id === equipment.armorItemId);
+    }
+    if (!item) {
+      item = inventory.find(i =>
+        i.id !== equipment.shieldItemId &&
+        (i.itemType === 'armor' || i.armorData?.type !== 'shield' || !i.itemType) &&
+        (matchesItemName(i.name, rawName) || matchesItemName(i.name, resolved.name))
+      );
+    }
+
+    if (item) {
+      item.itemType = 'armor';
+      item.material = item.material && item.material !== 'standard' ? item.material : mat;
+      item.baseItemId = item.baseItemId || baseId;
+      if (item.enhancementBonus === undefined) item.enhancementBonus = enh;
+      if (!item.specialQualities || item.specialQualities.length === 0) item.specialQualities = [...qualities];
+      if (item.isMasterwork === undefined) item.isMasterwork = isMwk;
+      if (!item.armorData) {
+        const baseArmorData: ItemArmorData = {
+          type: (resolved.type as any) || 'medium',
+          acBonus: resolved.acBonus,
+          maxDex: resolved.maxDex ?? 99,
+          armorCheckPenalty: resolved.checkPenalty ?? 0,
+          spellFailure: resolved.spellFailure ?? 0,
+          speedPenalty: resolved.speedPenalty ?? (resolved.type === 'heavy' || resolved.type === 'medium')
+        };
+        item.armorData = applyMaterialToArmorData(baseArmorData, item.material, item.isMasterwork);
+      }
+      if (item.weight === undefined) {
+        const stdWeight = resolved.weight ?? (ARMOR_WEIGHT_MAP[resolved.name.toLowerCase()] ?? 20);
+        item.weight = applyMaterialToWeight(stdWeight, item.material);
+      }
+      equipment.armorItemId = item.id;
+      equipment.armorMaterial = item.material;
+      equipment.armorEnhancement = item.enhancementBonus || 0;
+      equipment.armorQualities = item.specialQualities || [];
+      equipment.armorMasterwork = item.isMasterwork ?? isMwk;
+    } else {
+      const newItem = createInventoryArmor(rawName, customArmors, {
+        name: rawName,
+        enhancementBonus: enh,
+        specialQualities: qualities,
+        material: mat,
+        baseItemId: baseId,
+        isMasterwork: isMwk
+      });
+      inventory.push(newItem);
+      equipment.armorItemId = newItem.id;
+      equipment.armorMaterial = newItem.material;
+      equipment.armorEnhancement = newItem.enhancementBonus || 0;
+      equipment.armorQualities = newItem.specialQualities || [];
+      equipment.armorMasterwork = newItem.isMasterwork;
+    }
+  } else if (equipment.armor === 'none') {
+    equipment.armorItemId = null;
+  }
+
+  // 2. Shield
+  if (isValidName(equipment.shield)) {
+    const rawName = equipment.shield.trim();
+    const parsed = parseMagicItemName(rawName, 'shield');
+    const isMwk = Boolean(
+      parsed.isMasterwork ||
+      equipment.shieldMasterwork ||
+      /\b(?:masterwork|mwk\.?)\b/i.test(rawName)
+    );
+    const mat = (parsed.material && parsed.material !== 'standard' ? parsed.material : undefined) ||
+      equipment.shieldMaterial ||
+      'standard';
+    const enh = parsed.enhancementBonus || equipment.shieldEnhancement || 0;
+    const qualities = parsed.qualities.length > 0 ? parsed.qualities : (equipment.shieldQualities || []);
+    const resolved = resolveShield(parsed.baseName || rawName, customArmors);
+    const baseId = resolved.baseArmorId || parsed.baseName.toLowerCase().replace(/\s+/g, '_');
+
+    let item: InventoryItem | undefined;
+    if (equipment.shieldItemId) {
+      item = inventory.find(i => i.id === equipment.shieldItemId);
+    }
+    if (!item) {
+      item = inventory.find(i =>
+        i.id !== equipment.armorItemId &&
+        (i.itemType === 'shield' || i.armorData?.type === 'shield' || !i.itemType) &&
+        (matchesItemName(i.name, rawName) || matchesItemName(i.name, resolved.name))
+      );
+    }
+
+    if (item) {
+      item.itemType = 'shield';
+      item.material = item.material && item.material !== 'standard' ? item.material : mat;
+      item.baseItemId = item.baseItemId || baseId;
+      if (item.enhancementBonus === undefined) item.enhancementBonus = enh;
+      if (!item.specialQualities || item.specialQualities.length === 0) item.specialQualities = [...qualities];
+      if (item.isMasterwork === undefined) item.isMasterwork = isMwk;
+      if (!item.armorData) {
+        const baseArmorData: ItemArmorData = {
+          type: 'shield',
+          acBonus: resolved.acBonus,
+          maxDex: 99,
+          armorCheckPenalty: resolved.checkPenalty ?? 0,
+          spellFailure: resolved.spellFailure ?? 0,
+          speedPenalty: false
+        };
+        item.armorData = applyMaterialToArmorData(baseArmorData, item.material, item.isMasterwork);
+      }
+      if (item.weight === undefined) {
+        const stdWeight = resolved.weight ?? (SHIELD_WEIGHT_MAP[resolved.name.toLowerCase()] ?? 10);
+        item.weight = applyMaterialToWeight(stdWeight, item.material);
+      }
+      equipment.shieldItemId = item.id;
+      equipment.shieldMaterial = item.material;
+      equipment.shieldEnhancement = item.enhancementBonus || 0;
+      equipment.shieldQualities = item.specialQualities || [];
+      equipment.shieldMasterwork = item.isMasterwork ?? isMwk;
+    } else {
+      const newItem = createInventoryShield(rawName, customArmors, {
+        name: rawName,
+        enhancementBonus: enh,
+        specialQualities: qualities,
+        material: mat,
+        baseItemId: baseId,
+        isMasterwork: isMwk
+      });
+      inventory.push(newItem);
+      equipment.shieldItemId = newItem.id;
+      equipment.shieldMaterial = newItem.material;
+      equipment.shieldEnhancement = newItem.enhancementBonus || 0;
+      equipment.shieldQualities = newItem.specialQualities || [];
+      equipment.shieldMasterwork = newItem.isMasterwork;
+    }
+  } else if (equipment.shield === 'none') {
+    equipment.shieldItemId = null;
+  }
+
+  // 3. Helper for Weapons (primary, secondary, ranged)
+  const migrateWeaponSlot = (
+    slot: 'primaryWeapon' | 'secondaryWeapon' | 'rangedWeapon',
+    isRangedSlot: boolean = false
+  ) => {
+    const slotName = equipment[slot];
+    const idKey = `${slot}ItemId` as keyof Equipment;
+    const enhKey = `${slot}Enhancement` as keyof Equipment;
+    const qKey = `${slot}Qualities` as keyof Equipment;
+    const baneKey = `${slot}BaneTarget` as keyof Equipment;
+    const mwkKey = `${slot}Masterwork` as keyof Equipment;
+
+    if (isValidName(slotName)) {
+      const rawName = slotName!.trim();
+      const parsed = parseMagicItemName(rawName, 'weapon');
+      const isMwk = Boolean(
+        parsed.isMasterwork ||
+        equipment[mwkKey] ||
+        /\b(?:masterwork|mwk\.?)\b/i.test(rawName)
+      );
+      const mat = parsed.material || 'standard';
+      const enh = parsed.enhancementBonus || (equipment[enhKey] as number) || 0;
+      const qualities = parsed.qualities.length > 0 ? parsed.qualities : ((equipment[qKey] as string[]) || []);
+      const bane = equipment[baneKey] as string | undefined;
+      const resolved = resolveWeapon(parsed.baseName || rawName, customWeapons);
+      const baseId = resolved.id;
+
+      let item: InventoryItem | undefined;
+      const currentId = equipment[idKey] as string | undefined;
+      if (currentId) {
+        item = inventory.find(i => i.id === currentId);
+      }
+      if (!item) {
+        // Exclude items already assigned to other equipped weapon slots
+        const otherIds = [
+          slot !== 'primaryWeapon' ? equipment.primaryWeaponItemId : null,
+          slot !== 'secondaryWeapon' ? equipment.secondaryWeaponItemId : null,
+          slot !== 'rangedWeapon' ? equipment.rangedWeaponItemId : null
+        ].filter(Boolean);
+
+        item = inventory.find(i =>
+          !otherIds.includes(i.id) &&
+          (i.itemType === 'weapon' || Boolean(i.weaponData) || !i.itemType) &&
+          (matchesItemName(i.name, rawName) || matchesItemName(i.name, resolved.name))
+        );
+      }
+
+      if (item) {
+        item.itemType = 'weapon';
+        item.material = item.material && item.material !== 'standard' ? item.material : mat;
+        item.baseItemId = item.baseItemId || baseId;
+        if (item.enhancementBonus === undefined) item.enhancementBonus = enh;
+        if (!item.specialQualities || item.specialQualities.length === 0) item.specialQualities = [...qualities];
+        if (bane && !item.baneTarget) item.baneTarget = bane;
+        if (item.isMasterwork === undefined) item.isMasterwork = isMwk;
+        if (!item.weaponData) {
+          item.weaponData = {
+            category: resolved.category,
+            size: resolved.size,
+            damageM: resolved.damageM,
+            damageS: resolved.damageS,
+            threat: resolved.threat ?? 20,
+            critMultiplier: resolved.critMultiplier ?? 2,
+            damageType: resolved.type,
+            rangeIncrement: resolved.rangeIncrement,
+            isRanged: isRangedSlot || resolved.category === 'Ranged' || resolved.size === 'Ranged',
+            baneTarget: item.baneTarget || bane,
+            isMasterwork: item.isMasterwork
+          };
+        }
+        const matKey = `${slot}Material` as keyof Equipment;
+        (equipment as any)[idKey] = item.id;
+        (equipment as any)[enhKey] = item.enhancementBonus || 0;
+        (equipment as any)[qKey] = item.specialQualities || [];
+        (equipment as any)[matKey] = item.material || 'standard';
+        (equipment as any)[mwkKey] = item.isMasterwork ?? isMwk;
+        if (item.baneTarget || item.weaponData?.baneTarget) {
+          (equipment as any)[baneKey] = item.baneTarget || item.weaponData?.baneTarget;
+        }
+      } else {
+        const newItem = createInventoryWeapon(resolved, {
+          name: rawName,
+          enhancementBonus: enh,
+          specialQualities: qualities,
+          baneTarget: bane,
+          material: mat,
+          baseItemId: baseId,
+          isMasterwork: isMwk
+        });
+        if (isRangedSlot && newItem.weaponData) {
+          newItem.weaponData.isRanged = true;
+        }
+        inventory.push(newItem);
+        const matKey = `${slot}Material` as keyof Equipment;
+        (equipment as any)[idKey] = newItem.id;
+        (equipment as any)[enhKey] = newItem.enhancementBonus || 0;
+        (equipment as any)[qKey] = newItem.specialQualities || [];
+        (equipment as any)[matKey] = newItem.material || 'standard';
+        (equipment as any)[mwkKey] = newItem.isMasterwork;
+        if (newItem.baneTarget || newItem.weaponData?.baneTarget) {
+          (equipment as any)[baneKey] = newItem.baneTarget || newItem.weaponData?.baneTarget;
+        }
+      }
+    } else if (slotName === 'none') {
+      (equipment as any)[idKey] = null;
+    }
+  };
+
+  migrateWeaponSlot('primaryWeapon', false);
+  migrateWeaponSlot('secondaryWeapon', false);
+  migrateWeaponSlot('rangedWeapon', true);
+
+  // 4. Normalize remaining unequipped inventory items
+  for (const invItem of inventory) {
+    if (invItem.isMasterwork === undefined) {
+      const p = parseMagicItemName(invItem.name);
+      if (p.isMasterwork || /\b(?:masterwork|mwk\.?)\b/i.test(invItem.name)) {
+        invItem.isMasterwork = true;
+      }
+    }
+    if (!invItem.material) {
+      const p = parseMagicItemName(invItem.name);
+      invItem.material = p.material || 'standard';
+      if (invItem.enhancementBonus === undefined && p.enhancementBonus > 0) {
+        invItem.enhancementBonus = p.enhancementBonus;
+      }
+      if ((!invItem.specialQualities || invItem.specialQualities.length === 0) && p.qualities.length > 0) {
+        invItem.specialQualities = [...p.qualities];
+      }
+    }
+    if (!invItem.itemType) {
+      if (invItem.weaponData) {
+        invItem.itemType = 'weapon';
+      } else if (invItem.armorData) {
+        invItem.itemType = invItem.armorData.type === 'shield' ? 'shield' : 'armor';
+      }
+    }
+    if (!invItem.baseItemId) {
+      if (invItem.itemType === 'weapon' || invItem.weaponData) {
+        invItem.baseItemId = resolveWeapon(invItem.name, customWeapons).id;
+      } else if (invItem.itemType === 'armor') {
+        invItem.baseItemId = resolveArmor(invItem.name, customArmors).baseArmorId || parseMagicItemName(invItem.name, 'armor').baseName.toLowerCase().replace(/\s+/g, '_');
+      } else if (invItem.itemType === 'shield') {
+        invItem.baseItemId = resolveShield(invItem.name, customArmors).baseArmorId || parseMagicItemName(invItem.name, 'shield').baseName.toLowerCase().replace(/\s+/g, '_');
+      }
+    }
+  }
+
+  return {
+    ...char,
+    equipment,
+    inventory
+  };
+}
+
+/**
+ * Centralized backwards compatibility normalizer for character data.
+ * Normalizes legacy data structures into canonical models on load / import:
+ * - Migrates tactical combat booleans to structured activeBuffs.
+ * - Migrates legacy feat strings to structured selectedFeatEntities.
+ */
+export function normalizeCharacterOnLoad(raw: any): CharacterSheetData {
+  if (!raw || typeof raw !== 'object') {
+    return raw;
+  }
+
+  // Clone raw to avoid direct unexpected mutations
+  const char: CharacterSheetData = { ...raw };
+
+  // a) Tactical combat booleans -> activeBuffs: ActiveCombatBuff[]
+  const withBuffs = migrateCharacterBuffs(char) as CharacterSheetData;
+
+  // b) Feat strings -> selectedFeatEntities: CharacterFeat[]
+  // If selectedFeatEntities is missing or empty, populate from legacy selectedFeats
+  if (!Array.isArray(withBuffs.selectedFeatEntities) || withBuffs.selectedFeatEntities.length === 0) {
+    if (Array.isArray(withBuffs.selectedFeats) && withBuffs.selectedFeats.length > 0) {
+      withBuffs.selectedFeatEntities = migrateLegacyFeatStrings(withBuffs.selectedFeats);
+    } else {
+      withBuffs.selectedFeatEntities = [];
+    }
+  } else {
+    // If selectedFeatEntities exists, but selectedFeats has extra unmigrated entries, merge them
+    if (Array.isArray(withBuffs.selectedFeats) && withBuffs.selectedFeats.length > 0) {
+      const existingKeys = new Set(withBuffs.selectedFeatEntities.map(e => `${e.featId}::${e.targetId || ''}`));
+      const migrated = migrateLegacyFeatStrings(withBuffs.selectedFeats);
+      for (const entity of migrated) {
+        const key = `${entity.featId}::${entity.targetId || ''}`;
+        if (!existingKeys.has(key)) {
+          existingKeys.add(key);
+          withBuffs.selectedFeatEntities.push(entity);
+        }
+      }
+    }
+  }
+
+  // Purge selectedFeats completely so loaded characters never have selectedFeats
+  delete (withBuffs as any).selectedFeats;
+
+  // Migrate legacy equipment strings (armor, shield, weapons) into structured InventoryItem entries
+  const withEquipment = migrateLegacyEquipmentToInventory(withBuffs);
+
+  return withEquipment;
+}
 
 export async function runLegacyMigrationIfNeeded(
   defaultBaseCharacter: CharacterState
@@ -31,8 +438,9 @@ export async function runLegacyMigrationIfNeeded(
       try {
         const parsedLegacy: CharacterState = JSON.parse(legacyRaw);
         if (parsedLegacy && typeof parsedLegacy === 'object' && parsedLegacy.name) {
+          const normalized = normalizeCharacterOnLoad(parsedLegacy);
           const migratedChar: CharacterSheetData = {
-            ...parsedLegacy,
+            ...normalized,
             id: generateCharacterId(),
             updatedAt: Date.now()
           };
@@ -65,7 +473,8 @@ export async function runLegacyMigrationIfNeeded(
       updatedAt: Date.now()
     };
 
-    const savedDefault = await saveCharacter(defaultChar);
+    const normalizedDefault = normalizeCharacterOnLoad(defaultChar);
+    const savedDefault = await saveCharacter(normalizedDefault);
     setActiveCharacterId(savedDefault.id);
 
     return {
@@ -96,7 +505,7 @@ export async function runLegacyMigrationIfNeeded(
   setActiveCharacterId(activeId);
 
   return {
-    activeCharacter: migrateCharacterBuffs(activeCharacter) as CharacterSheetData,
+    activeCharacter: normalizeCharacterOnLoad(activeCharacter),
     allCharacters: existingCharactersMap
   };
 }

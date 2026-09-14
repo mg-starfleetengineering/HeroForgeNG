@@ -11,6 +11,7 @@ import {
   getFortificationSummary,
   calculateTotalItemCost,
   formatMagicItemName,
+  parseMagicItemName,
   createMagicWeaponData,
   createMagicArmorData,
   getWeaponRollOptions,
@@ -297,6 +298,46 @@ describe('Magic Item Special Qualities Engine (3.5e DMG)', () => {
     it('formatMagicItemName cleans up previous enhancement prefix and duplicate quality names', () => {
       expect(formatMagicItemName('+1 Longsword', 2, ['keen'])).toBe('+2 Keen Longsword');
       expect(formatMagicItemName('+1 Flaming Longsword', 1, ['flaming'])).toBe('+1 Flaming Longsword');
+    });
+
+    it('formatMagicItemName formats masterwork prefix correctly without stacking with magic enhancement or special materials', () => {
+      expect(formatMagicItemName('Longsword', 0, [], 'standard', true)).toBe('Masterwork Longsword');
+      expect(formatMagicItemName('Masterwork Longsword', 0, [], 'standard', true)).toBe('Masterwork Longsword');
+      expect(formatMagicItemName('Mwk Longsword', 0, [], 'standard', true)).toBe('Masterwork Longsword');
+      // When magic enhancement >= 1, "Masterwork" prefix is omitted
+      expect(formatMagicItemName('Masterwork Longsword', 1, [], 'standard', true)).toBe('+1 Longsword');
+      expect(formatMagicItemName('Longsword', 1, ['flaming'], 'standard', true)).toBe('+1 Flaming Longsword');
+      // Special materials omit "Masterwork" prefix
+      expect(formatMagicItemName('Longsword', 0, [], 'adamantine', true)).toBe('Adamantine Longsword');
+      expect(formatMagicItemName('Chain Shirt', 0, [], 'mithral', true)).toBe('Mithral Chain Shirt');
+      // Non-masterwork item remains plain
+      expect(formatMagicItemName('Longsword', 0, [], 'standard', false)).toBe('Longsword');
+    });
+
+    it('parseMagicItemName extracts isMasterwork flag and canonical base name', () => {
+      const parsedMwk = parseMagicItemName('Masterwork Longsword');
+      expect(parsedMwk.isMasterwork).toBe(true);
+      expect(parsedMwk.baseName).toBe('Longsword');
+      expect(parsedMwk.enhancementBonus).toBe(0);
+
+      const parsedMwkShort = parseMagicItemName('Mwk. Chain Shirt');
+      expect(parsedMwkShort.isMasterwork).toBe(true);
+      expect(parsedMwkShort.baseName).toBe('Chain Shirt');
+
+      const parsedParen = parseMagicItemName('Heavy Steel Shield (Masterwork)');
+      expect(parsedParen.isMasterwork).toBe(true);
+      expect(parsedParen.baseName).toBe('Heavy Steel Shield');
+
+      const parsedMagic = parseMagicItemName('+1 Flaming Longsword');
+      expect(parsedMagic.isMasterwork).toBe(true); // >= +1 is inherently masterwork
+      expect(parsedMagic.enhancementBonus).toBe(1);
+      expect(parsedMagic.qualities).toEqual(['flaming']);
+      expect(parsedMagic.baseName).toBe('Longsword');
+
+      const parsedPlain = parseMagicItemName('Shortbow');
+      expect(parsedPlain.isMasterwork).toBe(false);
+      expect(parsedPlain.baseName).toBe('Shortbow');
+      expect(parsedPlain.enhancementBonus).toBe(0);
     });
 
     it('createMagicWeaponData instantiates custom weapon data with appropriate stats and cost', () => {

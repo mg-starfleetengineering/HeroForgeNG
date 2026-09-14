@@ -132,4 +132,149 @@ describe('characterStore Storage Helper & Summary Tests', () => {
     expect(result.importedCount).toBe(2);
     expect(result.lastImportedId).toBeTruthy();
   });
+
+  it('should automatically migrate legacy selectedFeats into selectedFeatEntities on load and purge selectedFeats', async () => {
+    const { saveCharacter, getCharacter } = await import('../../storage/characterStore');
+
+    const legacySheet: any = {
+      id: 'legacy_warrior_999',
+      name: 'Legacy Warrior',
+      selectedRace: 'Human',
+      levelProgression: [{ level: 1, primaryClass: 'Fighter', hpRoll: 10 }],
+      selectedFeats: ['Weapon Focus (Longsword)', 'Dodge']
+    };
+
+    await saveCharacter(legacySheet);
+    const loaded = await getCharacter('legacy_warrior_999');
+
+    expect(loaded).not.toBeNull();
+    expect(loaded?.selectedFeatEntities).toBeDefined();
+    expect(loaded?.selectedFeatEntities).toHaveLength(2);
+
+    const wf = loaded?.selectedFeatEntities?.find(e => e.featId === 'weapon_focus');
+    expect(wf).toBeDefined();
+    expect(wf?.targetId).toBe('longsword');
+    expect(wf?.targetType).toBe('weapon');
+
+    const dodge = loaded?.selectedFeatEntities?.find(e => e.featId === 'dodge');
+    expect(dodge).toBeDefined();
+    expect(dodge?.targetId).toBeUndefined();
+
+    // Verify selectedFeats is purged
+    expect((loaded as any)?.selectedFeats).toBeUndefined();
+  });
+
+  it('should normalize legacy characters when importing roster package', async () => {
+    const { importRosterPackage, getCharacter } = await import('../../storage/characterStore');
+
+    const backupPkg = {
+      version: '1.0',
+      exportType: 'heroforge_roster_backup',
+      exportedAt: Date.now(),
+      characters: [
+        {
+          id: 'roster_legacy_paladin',
+          name: 'Legacy Paladin',
+          selectedRace: 'Human',
+          levelProgression: [{ level: 1, primaryClass: 'Paladin', hpRoll: 10 }],
+          selectedFeats: ['Power Attack', 'Cleave']
+        }
+      ]
+    };
+
+    const importResult = await importRosterPackage(backupPkg);
+    expect(importResult.importedCount).toBe(1);
+    expect(importResult.lastImportedId).toBe('roster_legacy_paladin');
+
+    const imported = await getCharacter('roster_legacy_paladin');
+    expect(imported).not.toBeNull();
+    expect(imported?.selectedFeatEntities).toHaveLength(2);
+    expect(imported?.selectedFeatEntities?.map(e => e.featId)).toEqual(['power_attack', 'cleave']);
+    expect((imported as any)?.selectedFeats).toBeUndefined();
+  });
+
+  it('normalizeCharacterOnLoad should migrate combat buffs and legacy feat strings', async () => {
+    const { normalizeCharacterOnLoad } = await import('../../storage/migration');
+
+    const raw: any = {
+      name: 'Buffed Wizard',
+      selectedFeats: ['Spell Focus (Evocation)', 'Combat Casting'],
+      tacticalCombat: {
+        haste: true,
+        rage: true
+      }
+    };
+
+    const normalized = normalizeCharacterOnLoad(raw);
+    expect(normalized.selectedFeatEntities).toHaveLength(2);
+    expect(normalized.selectedFeatEntities[0]).toMatchObject({
+      featId: 'spell_focus',
+      targetId: 'evocation',
+      targetType: 'school'
+    });
+    expect(normalized.selectedFeatEntities[1]).toMatchObject({
+      featId: 'combat_casting'
+    });
+    // Checks buffs migration
+    expect(normalized.activeBuffs).toBeDefined();
+    expect(normalized.activeBuffs.length).toBeGreaterThanOrEqual(2);
+    expect(normalized.activeBuffs.some(b => b.id === 'haste' && b.active)).toBe(true);
+    expect(normalized.activeBuffs.some(b => b.id === 'rage' && b.active)).toBe(true);
+    // Checks selectedFeats purge
+    expect((normalized as any).selectedFeats).toBeUndefined();
+  });
+
+  it('normalizeCharacterOnLoad should migrate legacy equipment strings to structured inventory items', async () => {
+    const { normalizeCharacterOnLoad } = await import('../../storage/migration');
+
+    const raw: any = {
+      name: 'Legacy Knight',
+      equipment: {
+        primaryWeapon: '+2 Keen Longsword',
+        armor: 'Adamantine Full Plate',
+        shield: 'Mithral Heavy Shield',
+        secondaryWeapon: 'Cold Iron Dagger'
+      },
+      inventory: [
+        { id: 'inv_1', name: "Explorer's Pack", quantity: 1, weight: 10, location: 'Carried' }
+      ]
+    };
+
+    const normalized = normalizeCharacterOnLoad(raw);
+
+    // Primary weapon
+    expect(normalized.equipment.primaryWeaponItemId).toBeDefined();
+    const primaryItem = normalized.inventory.find(i => i.id === normalized.equipment.primaryWeaponItemId);
+    expect(primaryItem).toBeDefined();
+    expect(primaryItem?.itemType).toBe('weapon');
+    expect(primaryItem?.enhancementBonus).toBe(2);
+    expect(primaryItem?.specialQualities).toEqual(['keen']);
+    expect(primaryItem?.weaponData?.damageM).toBe('1d8');
+
+    // Armor
+    expect(normalized.equipment.armorItemId).toBeDefined();
+    expect(normalized.equipment.armorMaterial).toBe('adamantine');
+    const armorItem = normalized.inventory.find(i => i.id === normalized.equipment.armorItemId);
+    expect(armorItem).toBeDefined();
+    expect(armorItem?.itemType).toBe('armor');
+    expect(armorItem?.material).toBe('adamantine');
+    expect(armorItem?.baseItemId).toBe('full_plate');
+
+    // Shield
+    expect(normalized.equipment.shieldItemId).toBeDefined();
+    expect(normalized.equipment.shieldMaterial).toBe('mithral');
+    const shieldItem = normalized.inventory.find(i => i.id === normalized.equipment.shieldItemId);
+    expect(shieldItem).toBeDefined();
+    expect(shieldItem?.itemType).toBe('shield');
+    expect(shieldItem?.material).toBe('mithral');
+    expect(shieldItem?.weight).toBe(7.5); // 15 / 2
+
+    // Secondary weapon
+    expect(normalized.equipment.secondaryWeaponItemId).toBeDefined();
+    expect(normalized.equipment.secondaryWeaponMaterial).toBe('cold_iron');
+    const secItem = normalized.inventory.find(i => i.id === normalized.equipment.secondaryWeaponItemId);
+    expect(secItem).toBeDefined();
+    expect(secItem?.itemType).toBe('weapon');
+    expect(secItem?.material).toBe('cold_iron');
+  });
 });

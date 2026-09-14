@@ -215,8 +215,10 @@ export function getEffectiveDruidLevel(
   effective += otherLevels;
 
   // Natural Bond feat (+3 bonus)
-  const hasNaturalBondInFeats = (character.selectedFeats || []).some(
-    f => f.toLowerCase().includes('natural bond')
+  const hasNaturalBondInFeats = (character.selectedFeatEntities || []).some(
+    f => f.featId === 'natural_bond' || f.featId.includes('natural_bond')
+  ) || ((character as any).selectedFeats || []).some(
+    (f: string) => f.toLowerCase().includes('natural bond')
   );
   if (hasNaturalBondInFeats || hasNaturalBondToggle) {
     effective += 3;

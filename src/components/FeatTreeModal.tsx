@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   CharacterState,
+  CharacterFeat,
   FeatData,
   ClassData,
   RaceData,
@@ -13,7 +14,8 @@ import {
   buildCharacterPrereqContext,
   evaluateFeatPrerequisitesWithContext,
   normalizeFeatName,
-  aggregateAndDeduplicateFeats
+  aggregateAndDeduplicateFeats,
+  featNameToId
 } from '../engine/featPrereqs';
 import { getSourceBadgeInfo, getAllSourceBadges } from '../utils/sourceFilter';
 
@@ -601,7 +603,7 @@ export const FeatTreeModal: React.FC<FeatTreeModalProps> = ({
     [featsData]
   );
 
-  const selectedFeats = character.selectedFeats || [];
+  const selectedFeatEntities = character.selectedFeatEntities || [];
 
   // Find feat object from database
   const getFeatData = (nodeName: string): FeatData => {
@@ -621,8 +623,9 @@ export const FeatTreeModal: React.FC<FeatTreeModalProps> = ({
   };
 
   const getFeatStatus = (featName: string): 'owned' | 'qualified' | 'unmet' => {
-    const isOwned = selectedFeats.some(
-      sf => sf.toLowerCase() === featName.toLowerCase() || normalizeFeatName(sf) === normalizeFeatName(featName)
+    const featId = featNameToId(featName);
+    const isOwned = selectedFeatEntities.some(
+      e => e.featId === featId || featNameToId(e.featId) === featId
     );
     if (isOwned) return 'owned';
 
@@ -632,16 +635,22 @@ export const FeatTreeModal: React.FC<FeatTreeModalProps> = ({
   };
 
   const handleToggleFeat = (featName: string) => {
-    const isOwned = selectedFeats.some(
-      sf => sf.toLowerCase() === featName.toLowerCase() || normalizeFeatName(sf) === normalizeFeatName(featName)
+    const featId = featNameToId(featName);
+    const isOwned = selectedFeatEntities.some(
+      e => e.featId === featId || featNameToId(e.featId) === featId
     );
     if (isOwned) {
-      const updated = selectedFeats.filter(
-        sf => sf.toLowerCase() !== featName.toLowerCase() && normalizeFeatName(sf) !== normalizeFeatName(featName)
+      const updated = selectedFeatEntities.filter(
+        e => e.featId !== featId && featNameToId(e.featId) !== featId
       );
-      onChange({ selectedFeats: updated });
+      onChange({ selectedFeatEntities: updated });
     } else {
-      onChange({ selectedFeats: [...selectedFeats, featName] });
+      const newEntity: CharacterFeat = {
+        id: featId,
+        featId,
+        notes: featName
+      };
+      onChange({ selectedFeatEntities: [...selectedFeatEntities, newEntity] });
     }
   };
 
@@ -667,7 +676,7 @@ export const FeatTreeModal: React.FC<FeatTreeModalProps> = ({
     }
 
     return { owned, qualified, unmet, total: owned + qualified + unmet };
-  }, [activeChain, selectedFeats, prereqContext]);
+  }, [activeChain, selectedFeatEntities, prereqContext]);
 
   if (!isOpen) return null;
 
