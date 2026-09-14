@@ -21,6 +21,7 @@ import {
   applyHeal,
   toggleCondition
 } from '../engine/conditions';
+import { toCanonicalClassId } from '../engine/classes';
 import {
   calculateDailyResources,
   performLongRest,
@@ -138,12 +139,13 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
   );
 
   const casterEntries = Object.entries(classLevelsMap).filter(([clsName]) => {
-    const clsObj = classesData.find(c => c.name === clsName);
+    const clsObj = classesData.find(c => c.id === clsName || c.name.toLowerCase() === clsName.toLowerCase());
     return isSpellcastingClassName(clsName, clsObj);
   });
 
   const casterSlotTracks: Array<{
     className: string;
+    displayName: string;
     classLevel: number;
     spellLevel: number;
     spellLevelName: string;
@@ -158,14 +160,16 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
   }> = [];
 
   for (const [clsName, clsLvl] of casterEntries) {
-    const key = clsName.toLowerCase().replace(/[\s\/-]+/g, '_');
+    const key = toCanonicalClassId(clsName);
+    const clsObj = classesData.find(c => c.id === clsName || c.name.toLowerCase() === clsName.toLowerCase());
     const info = SPELLCASTING_CLASSES[key] || {
-      name: clsName,
+      name: clsObj?.name || clsName,
       keyAbility: 'int' as StatType,
       type: 'Arcane' as const,
       method: 'Prepared' as const,
       maxSpellLevel: 9
     };
+    const displayName = clsObj?.name || info.name || clsName;
     const totalScore = calculateTotalScore(
       info.keyAbility,
       character.baseStats,
@@ -182,7 +186,7 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
 
     const isPrepared = isPreparedCaster(clsName);
     const classPreparedSlots = (character.preparedSpells || []).filter(
-      s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === key
+      s => s.className === key || s.className === clsName
     );
 
     for (const slot of slotsData.slots) {
@@ -193,8 +197,8 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
       const castPreparedCount = isPrepared
         ? levelPreparedSpells.filter(s => s.isCast).length
         : 0;
-      const key = getSpellSlotUsageKey(clsName, slot.spellLevel);
-      const hasKey = character.expendedSpellSlots && character.expendedSpellSlots[key] !== undefined;
+      const usageKey = getSpellSlotUsageKey(clsName, slot.spellLevel);
+      const hasKey = character.expendedSpellSlots && character.expendedSpellSlots[usageKey] !== undefined;
       const expended = hasKey
         ? getExpendedSpellSlotsCount(character.expendedSpellSlots, clsName, slot.spellLevel)
         : castPreparedCount;
@@ -202,6 +206,7 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
 
       casterSlotTracks.push({
         className: clsName,
+        displayName,
         classLevel: clsLvl,
         spellLevel: slot.spellLevel,
         spellLevelName: slot.spellLevel === 0 ? 'Cantrips (0th Level)' : `Level ${slot.spellLevel} Spells`,
@@ -328,10 +333,11 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
   const handleExpendSpellSlot = (className: string, spellLevel: number, maxSlots: number) => {
     const key = getSpellSlotUsageKey(className, spellLevel);
     const hasKey = character.expendedSpellSlots && character.expendedSpellSlots[key] !== undefined;
+    const cKey = toCanonicalClassId(className);
     const currentExp = hasKey
       ? getExpendedSpellSlotsCount(character.expendedSpellSlots, className, spellLevel)
       : (character.preparedSpells || []).filter(
-          s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === className.toLowerCase().replace(/[\s\/-]+/g, '_') &&
+          s => (s.className === className || s.className === cKey) &&
                s.spellLevel === spellLevel &&
                s.isCast &&
                !!s.spellId
@@ -344,10 +350,11 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
   const handleRestoreSpellSlot = (className: string, spellLevel: number, maxSlots: number) => {
     const key = getSpellSlotUsageKey(className, spellLevel);
     const hasKey = character.expendedSpellSlots && character.expendedSpellSlots[key] !== undefined;
+    const cKey = toCanonicalClassId(className);
     const currentExp = hasKey
       ? getExpendedSpellSlotsCount(character.expendedSpellSlots, className, spellLevel)
       : (character.preparedSpells || []).filter(
-          s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === className.toLowerCase().replace(/[\s\/-]+/g, '_') &&
+          s => (s.className === className || s.className === cKey) &&
                s.spellLevel === spellLevel &&
                s.isCast &&
                !!s.spellId
@@ -359,9 +366,9 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
 
   const handleResetSpellLevelSlots = (className: string, spellLevel: number, maxSlots: number) => {
     const updatedExpended = setExpendedSpellSlots(character.expendedSpellSlots, className, spellLevel, 0, maxSlots);
-    const cKey = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+    const cKey = toCanonicalClassId(className);
     const updatedPrepared = (character.preparedSpells || []).map(s => {
-      if (s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey && s.spellLevel === spellLevel) {
+      if ((s.className === className || s.className === cKey) && s.spellLevel === spellLevel) {
         return { ...s, isCast: false };
       }
       return s;
@@ -383,18 +390,18 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
 
     const clsName = targetSlot.className;
     const spellLevel = targetSlot.spellLevel;
-    const cKey = clsName.toLowerCase().replace(/[\s\/-]+/g, '_');
+    const cKey = toCanonicalClassId(clsName);
 
     // Count how many prepared spells will be cast for this class and level
     const classLevelPrepared = updatedPrepared.filter(
-      s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey &&
+      s => (s.className === clsName || s.className === cKey) &&
            s.spellLevel === spellLevel &&
            !!s.spellId
     );
     const newCastCount = classLevelPrepared.filter(s => s.isCast).length;
 
     const track = casterSlotTracks.find(
-      t => t.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey && t.spellLevel === spellLevel
+      t => (t.className === clsName || t.className === cKey) && t.spellLevel === spellLevel
     );
     const maxSlots = track ? track.totalSlots : 99;
 
@@ -571,10 +578,10 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
                     ? 'bg-slate-800 text-slate-500 border-slate-700'
                     : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                 }`}
-                title={`${st.className} ${st.spellLevelName}: ${st.remainingSlots}/${st.totalSlots} slots left (DC ${st.saveDc})`}
+                title={`${st.displayName || st.className} ${st.spellLevelName}: ${st.remainingSlots}/${st.totalSlots} slots left (DC ${st.saveDc})`}
               >
                 <i className="fa-solid fa-wand-magic-sparkles mr-1 text-[9px]"></i>
-                {st.className} {st.spellLevel === 0 ? 'Cantrips' : `Lvl ${st.spellLevel}`}: {st.remainingSlots}/{st.totalSlots}
+                {st.displayName || st.className} {st.spellLevel === 0 ? 'Cantrips' : `Lvl ${st.spellLevel}`}: {st.remainingSlots}/{st.totalSlots}
               </span>
             ))}
             {activeConditions.map(condId => {
@@ -1084,8 +1091,8 @@ export const VitalsCombatTracker: React.FC<VitalsCombatTrackerProps> = ({
                         <div className="space-y-0.5 flex-1 min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <i className={`fa-solid fa-wand-magic-sparkles text-xs ${st.remainingSlots > 0 ? 'text-amber-400' : 'text-slate-500'}`}></i>
-                            <h4 className="font-bold text-xs text-slate-100 truncate">{st.className} {st.spellLevelName}</h4>
-                            <span className="badge text-[9px] font-mono px-1.5 py-0.2 rounded border bg-amber-500/20 text-amber-300 border-amber-500/30">{st.className} {st.classLevel}</span>
+                            <h4 className="font-bold text-xs text-slate-100 truncate">{st.displayName || st.className} {st.spellLevelName}</h4>
+                            <span className="badge text-[9px] font-mono px-1.5 py-0.2 rounded border bg-amber-500/20 text-amber-300 border-amber-500/30">{st.displayName || st.className} {st.classLevel}</span>
                             <span className="badge text-[9px] font-mono px-1.5 py-0.2 rounded border bg-emerald-950/80 text-emerald-300 border-emerald-500/30 font-bold">DC {st.saveDc}</span>
                           </div>
                           <p className="text-[10.5px] text-slate-400 leading-tight">Key: {st.keyAbility} ({st.abilityMod >= 0 ? `+${st.abilityMod}` : st.abilityMod}) • {st.isPrepared ? 'Prepared Slots' : 'Spontaneous Pool'}</p>

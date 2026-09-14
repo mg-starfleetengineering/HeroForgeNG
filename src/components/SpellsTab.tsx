@@ -10,6 +10,7 @@ import {
   PreparedSpellSlot,
   StatType
 } from '../types/character';
+import { toCanonicalClassId, toCanonicalDomainId } from '../engine/classes';
 import { calculateTotalScore, getAbilityMod, parseRaceMods, getCharacterLevel } from '../engine/stats';
 import {
   SPELLCASTING_CLASSES,
@@ -107,12 +108,12 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
   });
 
   const activeCasterClassNames = Object.keys(classLevelsMap).filter(clsName => {
-    const clsObj = classesData.find(c => c.name === clsName);
+    const clsObj = classesData.find(c => c.id === clsName || c.name.toLowerCase() === clsName.toLowerCase());
     return isSpellcastingClassName(clsName, clsObj);
   });
 
   const casterEntries = Object.entries(classLevelsMap).filter(([clsName]) => {
-    const clsObj = classesData.find(c => c.name === clsName);
+    const clsObj = classesData.find(c => c.id === clsName || c.name.toLowerCase() === clsName.toLowerCase());
     return isSpellcastingClassName(clsName, clsObj);
   });
 
@@ -175,8 +176,8 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
   const selectedDomainsList = (character.selectedDomains || []).filter(Boolean);
   const resolvedDomains = selectedDomainsList.map(domName => {
     return (
-      domainsData.find(d => d.name.toLowerCase() === domName.toLowerCase() || d.id === domName.toLowerCase()) || {
-        id: domName.toLowerCase().replace(/\s+/g, '_'),
+      domainsData.find(d => d.id === domName || d.name.toLowerCase() === domName.toLowerCase()) || {
+        id: toCanonicalDomainId(domName),
         name: domName,
         power: 'Custom domain power.',
         spells: []
@@ -198,9 +199,10 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
   // Active preparation class stats & calculation
   const currentPrepClassName = selectedPrepClass || preparedCasterEntries[0]?.[0] || casterEntries[0]?.[0] || '';
   const currentPrepClassLevel = classLevelsMap[currentPrepClassName] || 0;
-  const currentPrepClassKey = currentPrepClassName.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const currentPrepClassObj = classesData.find(c => c.id === currentPrepClassName || c.name.toLowerCase() === currentPrepClassName.toLowerCase());
+  const currentPrepClassKey = toCanonicalClassId(currentPrepClassName);
   const currentPrepClassInfo = SPELLCASTING_CLASSES[currentPrepClassKey] || {
-    name: currentPrepClassName,
+    name: currentPrepClassObj?.name || currentPrepClassName,
     keyAbility: 'int' as StatType,
     type: 'Arcane' as const,
     method: 'Prepared' as const,
@@ -248,7 +250,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
 
   // Total prepared count vs capacity
   const currentClassPreparedSlots = syncedPreparedSlots.filter(
-    s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === currentPrepClassKey
+    s => s.className === currentPrepClassName || s.className === currentPrepClassKey
   );
   const totalSlotsCapacity = currentClassPreparedSlots.length;
   const totalSlotsFilled = currentClassPreparedSlots.filter(s => !!s.spellId).length;
@@ -454,11 +456,11 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
 
     const clsName = targetSlot.className || currentPrepClassName;
     const spellLevel = targetSlot.spellLevel;
-    const cKey = clsName.toLowerCase().replace(/[\s\/-]+/g, '_');
+    const cKey = toCanonicalClassId(clsName);
 
     // Count how many prepared spells will be cast for this class and level
     const classLevelPrepared = updated.filter(
-      s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey &&
+      s => (s.className === clsName || s.className === cKey) &&
            s.spellLevel === spellLevel &&
            !!s.spellId
     );
@@ -526,10 +528,11 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
   const handleExpendSlot = (className: string, spellLevel: number, maxSlots: number) => {
     const key = getSpellSlotUsageKey(className, spellLevel);
     const hasKey = character.expendedSpellSlots && character.expendedSpellSlots[key] !== undefined;
+    const cKey = toCanonicalClassId(className);
     const currentExp = hasKey
       ? getExpendedSpellSlotsCount(character.expendedSpellSlots, className, spellLevel)
       : syncedPreparedSlots.filter(
-          s => (s.className || currentPrepClassName).toLowerCase().replace(/[\s\/-]+/g, '_') === className.toLowerCase().replace(/[\s\/-]+/g, '_') &&
+          s => ((s.className || currentPrepClassName) === className || (s.className || currentPrepClassName) === cKey) &&
                s.spellLevel === spellLevel &&
                s.isCast &&
                !!s.spellId
@@ -542,10 +545,11 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
   const handleRestoreSlot = (className: string, spellLevel: number, maxSlots: number) => {
     const key = getSpellSlotUsageKey(className, spellLevel);
     const hasKey = character.expendedSpellSlots && character.expendedSpellSlots[key] !== undefined;
+    const cKey = toCanonicalClassId(className);
     const currentExp = hasKey
       ? getExpendedSpellSlotsCount(character.expendedSpellSlots, className, spellLevel)
       : syncedPreparedSlots.filter(
-          s => (s.className || currentPrepClassName).toLowerCase().replace(/[\s\/-]+/g, '_') === className.toLowerCase().replace(/[\s\/-]+/g, '_') &&
+          s => ((s.className || currentPrepClassName) === className || (s.className || currentPrepClassName) === cKey) &&
                s.spellLevel === spellLevel &&
                s.isCast &&
                !!s.spellId
@@ -807,19 +811,24 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
                 <div className="flex items-center gap-2 bg-slate-900/60 p-2 rounded-2xl border border-slate-800">
                   <span className="text-xs text-slate-400 font-semibold px-2">Caster Class:</span>
                   <div className="flex flex-wrap gap-1.5">
-                    {preparedCasterEntries.map(([clsName, clsLvl]) => (
-                      <button
-                        key={clsName}
-                        onClick={() => setSelectedPrepClass(clsName)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-                          currentPrepClassName === clsName
-                            ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                            : 'bg-slate-950 border border-slate-800 text-slate-300 hover:text-slate-100'
-                        }`}
-                      >
-                        <i className="fa-solid fa-hat-wizard"></i> {clsName} {clsLvl}
-                      </button>
-                    ))}
+                    {preparedCasterEntries.map(([clsName, clsLvl]) => {
+                      const clsObj = classesData.find(c => c.id === clsName || c.name.toLowerCase() === clsName.toLowerCase());
+                      const info = SPELLCASTING_CLASSES[toCanonicalClassId(clsName)];
+                      const displayName = clsObj?.name || info?.name || clsName;
+                      return (
+                        <button
+                          key={clsName}
+                          onClick={() => setSelectedPrepClass(clsName)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                            currentPrepClassName === clsName
+                              ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                              : 'bg-slate-950 border border-slate-800 text-slate-300 hover:text-slate-100'
+                          }`}
+                        >
+                          <i className="fa-solid fa-hat-wizard"></i> {displayName} {clsLvl}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -830,7 +839,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <h3 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2">
-                        <i className="fa-solid fa-hat-wizard text-amber-400"></i> {currentPrepClassName} Preparation Workshop
+                        <i className="fa-solid fa-hat-wizard text-amber-400"></i> {currentPrepClassObj?.name || currentPrepClassInfo.name || currentPrepClassName} Preparation Workshop
                       </h3>
                       <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-lg bg-amber-950/80 text-amber-300 border border-amber-500/30">
                         Level {currentPrepClassLevel} (CL {currentPrepClassLevel})
@@ -1703,14 +1712,16 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
             </div>
           ) : (
             casterEntries.map(([clsName, clsLvl]) => {
-              const key = clsName.toLowerCase().replace(/[\s\/-]+/g, '_');
+              const key = toCanonicalClassId(clsName);
+              const clsObj = classesData.find(c => c.id === clsName || c.name.toLowerCase() === clsName.toLowerCase());
               const info = SPELLCASTING_CLASSES[key] || {
-                name: clsName,
+                name: clsObj?.name || clsName,
                 keyAbility: 'int' as const,
                 type: 'Arcane' as const,
                 method: 'Prepared' as const,
                 maxSpellLevel: 9
               };
+              const displayName = clsObj?.name || info.name || clsName;
 
               const abilityScore = calculateTotalScore(
                 info.keyAbility,
@@ -1731,7 +1742,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
                   <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
                     <div>
                       <h2 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2">
-                        <i className="fa-solid fa-hat-wizard text-amber-500"></i> {clsName} Spellcasting & Slot Tracker
+                        <i className="fa-solid fa-hat-wizard text-amber-500"></i> {displayName} Spellcasting & Slot Tracker
                       </h2>
                       <p className="text-xs text-slate-400">
                         {info.type} • {info.method} Caster • Level {clsLvl} (Caster Level {clsLvl})
@@ -1771,9 +1782,8 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5">
                         {spellSlotsData.slots.map(slot => {
                           const isPrep = isPreparedCaster(clsName);
-                          const cKey = clsName.toLowerCase().replace(/[\s\/-]+/g, '_');
                           const classPrep = (character.preparedSpells || []).filter(
-                            s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey && s.spellLevel === slot.spellLevel && !!s.spellId
+                            s => (s.className === clsName || s.className === key) && s.spellLevel === slot.spellLevel && !!s.spellId
                           );
                           const castPreparedCount = isPrep ? classPrep.filter(s => s.isCast).length : 0;
                           const mapExpended = getExpendedSpellSlotsCount(character.expendedSpellSlots, clsName, slot.spellLevel);

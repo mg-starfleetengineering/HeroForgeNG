@@ -1,9 +1,33 @@
 import { ClassData, LevelProgression } from '../types/character';
 
+/**
+ * Normalizes any class display name or ID to canonical snake_case identifier.
+ * e.g. 'Dragon Shaman' -> 'dragon_shaman', 'Wizard' -> 'wizard'
+ */
+export function toCanonicalClassId(className: string): string {
+  if (!className) return '';
+  return className.trim().toLowerCase().replace(/[\s\/-]+/g, '_');
+}
+
+/**
+ * Normalizes any domain display name or ID to canonical snake_case identifier.
+ * e.g. 'War' -> 'war', 'Magic' -> 'magic'
+ */
+export function toCanonicalDomainId(domainNameOrId: string): string {
+  if (!domainNameOrId) return '';
+  return domainNameOrId.trim().toLowerCase().replace(/[\s\/-]+/g, '_');
+}
+
 export function findClassInDatabase(classNameOrId: string | undefined, classDatabase: ClassData[]): ClassData | undefined {
   if (!classNameOrId) return undefined;
   const clean = classNameOrId.trim().toLowerCase();
-  return classDatabase.find(c => (c.id && c.id.toLowerCase() === clean) || c.name.toLowerCase() === clean);
+  const canonical = toCanonicalClassId(classNameOrId);
+  return classDatabase.find(
+    c =>
+      (c.id && (c.id.toLowerCase() === clean || c.id.toLowerCase() === canonical)) ||
+      c.name.toLowerCase() === clean ||
+      toCanonicalClassId(c.name) === canonical
+  );
 }
 
 export function calculateBAB(levelProgression: LevelProgression[], classDatabase: ClassData[]): number {

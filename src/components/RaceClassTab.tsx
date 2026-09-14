@@ -5,6 +5,7 @@ import { SearchableSelect, SearchableOption } from './SearchableSelect';
 import { TraitsFlawsSection } from './TraitsFlawsSection';
 import { WildShapeManager } from './WildShapeManager';
 import { getEffectiveRaceMods, getEffectiveLevelAdj, getEffectiveRaceType, getEffectiveSpeed } from '../engine/stats';
+import { toCanonicalClassId, toCanonicalDomainId } from '../engine/classes';
 
 interface RaceClassTabProps {
   character: CharacterState;
@@ -82,7 +83,7 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({
       ...sortedClasses.map(c => {
         const badge = getSourceBadgeInfo(c.source, character.allowedSources);
         return {
-          value: c.name,
+          value: c.id || toCanonicalClassId(c.name),
           label: c.name,
           sublabel: `(d${c.hitDie})`,
           badge: badge.sourceCode,
@@ -110,11 +111,13 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({
   }, [character.deity, deitiesData]);
 
   const domainOptions: SearchableOption[] = useMemo(() => {
-    const deityDomainSet = new Set((activeDeityObj?.domains || []).map(d => d.toLowerCase()));
+    const deityDomainSet = new Set((activeDeityObj?.domains || []).map(d => toCanonicalDomainId(d)));
     
     const sorted = [...domainsData].sort((a, b) => {
-      const aIsDeity = deityDomainSet.has(a.name.toLowerCase());
-      const bIsDeity = deityDomainSet.has(b.name.toLowerCase());
+      const aId = a.id || toCanonicalDomainId(a.name);
+      const bId = b.id || toCanonicalDomainId(b.name);
+      const aIsDeity = deityDomainSet.has(aId);
+      const bIsDeity = deityDomainSet.has(bId);
       if (aIsDeity && !bIsDeity) return -1;
       if (!aIsDeity && bIsDeity) return 1;
       return a.name.localeCompare(b.name);
@@ -123,10 +126,11 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({
     return [
       { value: '', label: '-- None --', isAllowed: true },
       ...sorted.map(d => {
-        const isDeityDomain = deityDomainSet.has(d.name.toLowerCase());
+        const canonicalId = d.id || toCanonicalDomainId(d.name);
+        const isDeityDomain = deityDomainSet.has(canonicalId);
         const badge = getSourceBadgeInfo(d.source, character.allowedSources);
         return {
-          value: d.name,
+          value: canonicalId,
           label: isDeityDomain ? `⭐ ${d.name} (Deity Domain)` : d.name,
           sublabel: `(L1: ${d.spells[0] || 'N/A'})`,
           badge: badge.sourceCode,
@@ -144,7 +148,10 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({
     
     // Automatically pre-populate default domains if choosing a deity with known domains
     if (foundDeity && foundDeity.domains && foundDeity.domains.length >= 2) {
-      updatedDomains = [foundDeity.domains[0], foundDeity.domains[1]];
+      updatedDomains = [
+        toCanonicalDomainId(foundDeity.domains[0]),
+        toCanonicalDomainId(foundDeity.domains[1])
+      ];
     }
 
     onChange({
@@ -404,8 +411,8 @@ export const RaceClassTab: React.FC<RaceClassTabProps> = ({
               <tbody className="divide-y divide-slate-800/40 font-mono">
                 {Array.from({ length: 20 }, (_, i) => i + 1).map(l => {
                   const lvlData = character.levelProgression.find(item => item.level === l) || { level: l, primaryClass: '', secondaryClass: '', hpRoll: 0 };
-                  const primaryClsObj = classesData.find(c => c.name === lvlData.primaryClass);
-                  const secondaryClsObj = classesData.find(c => c.name === lvlData.secondaryClass);
+                  const primaryClsObj = classesData.find(c => c.id === lvlData.primaryClass || c.name.toLowerCase() === (lvlData.primaryClass || '').toLowerCase());
+                  const secondaryClsObj = classesData.find(c => c.id === lvlData.secondaryClass || c.name.toLowerCase() === (lvlData.secondaryClass || '').toLowerCase());
 
                   let hd = primaryClsObj ? primaryClsObj.hitDie : 6;
                   if (character.isGestalt && secondaryClsObj) hd = Math.max(hd, secondaryClsObj.hitDie);

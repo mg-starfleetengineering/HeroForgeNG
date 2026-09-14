@@ -6,6 +6,7 @@ import {
   InventoryItem,
   ItemArmorData
 } from '../types/character';
+import { toCanonicalClassId, toCanonicalDomainId } from '../engine/classes';
 import { migrateCharacterBuffs } from '../engine/combat';
 import {
   resolveArmor,
@@ -371,10 +372,88 @@ export function migrateLegacyEquipmentToInventory(char: CharacterSheetData): Cha
 }
 
 /**
+ * Normalizes all class and domain identifiers in character state to canonical snake_case IDs.
+ * - char.levelProgression: primaryClass & secondaryClass normalized via toCanonicalClassId
+ * - char.preparedSpells: className & classId normalized to canonical class ID, domainId normalized via toCanonicalDomainId, slot.id reconciled with canonical class prefix
+ * - char.selectedDomains: domain IDs normalized via toCanonicalDomainId
+ * - char.expendedSpellSlots: keys normalized to canonical IDs (e.g. 'Wizard_lvl1' -> 'wizard_lvl1')
+ */
+export function migrateCanonicalIdentifiers(char: CharacterSheetData): CharacterSheetData {
+  if (!char || typeof char !== 'object') {
+    return char;
+  }
+
+  const updated: CharacterSheetData = { ...char };
+
+  // 1. Normalize levelProgression classes
+  if (Array.isArray(updated.levelProgression)) {
+    updated.levelProgression = updated.levelProgression.map(lvl => {
+      if (!lvl || typeof lvl !== 'object') return lvl;
+      const primary = lvl.primaryClass ? toCanonicalClassId(lvl.primaryClass) : '';
+      const secondary = lvl.secondaryClass ? toCanonicalClassId(lvl.secondaryClass) : (lvl.secondaryClass === '' ? '' : undefined);
+      return {
+        ...lvl,
+        primaryClass: primary,
+        ...(secondary !== undefined ? { secondaryClass: secondary } : {})
+      };
+    });
+  }
+
+  // 2. Normalize preparedSpells
+  if (Array.isArray(updated.preparedSpells)) {
+    updated.preparedSpells = updated.preparedSpells.map(slot => {
+      if (!slot || typeof slot !== 'object') return slot;
+      const canonicalClass = toCanonicalClassId(slot.className || slot.classId || '');
+      const domainId = slot.domainId ? toCanonicalDomainId(slot.domainId) : undefined;
+      let slotId = slot.id || '';
+      if (slotId) {
+        slotId = slotId.replace(/^.*?(?=_lvl\d+)/i, canonicalClass);
+      } else if (slot.spellLevel !== undefined && slot.slotIndex !== undefined) {
+        slotId = `${canonicalClass}_lvl${slot.spellLevel}_${slot.isDomain ? 'domain_' : 'slot_'}${slot.slotIndex}`;
+      }
+
+      return {
+        ...slot,
+        id: slotId,
+        className: canonicalClass,
+        classId: canonicalClass,
+        ...(slot.isDomain ? { domainId } : (domainId ? { domainId } : {}))
+      };
+    });
+  }
+
+  // 3. Normalize selectedDomains
+  if (Array.isArray(updated.selectedDomains)) {
+    updated.selectedDomains = updated.selectedDomains
+      .map(d => toCanonicalDomainId(d))
+      .filter(Boolean);
+  }
+
+  // 4. Normalize expendedSpellSlots keys
+  if (updated.expendedSpellSlots && typeof updated.expendedSpellSlots === 'object') {
+    const normalizedExpended: Record<string, number> = {};
+    for (const [key, count] of Object.entries(updated.expendedSpellSlots)) {
+      const match = key.match(/^(.*)_lvl(\d+)$/);
+      if (match) {
+        const canonicalKey = `${toCanonicalClassId(match[1])}_lvl${match[2]}`;
+        normalizedExpended[canonicalKey] = count;
+      } else {
+        normalizedExpended[key] = count;
+      }
+    }
+    updated.expendedSpellSlots = normalizedExpended;
+  }
+
+  return updated;
+}
+
+/**
  * Centralized backwards compatibility normalizer for character data.
  * Normalizes legacy data structures into canonical models on load / import:
  * - Migrates tactical combat booleans to structured activeBuffs.
  * - Migrates legacy feat strings to structured selectedFeatEntities.
+ * - Migrates legacy equipment strings into structured InventoryItem entries.
+ * - Migrates legacy class and domain identifiers to canonical snake_case IDs.
  */
 export function normalizeCharacterOnLoad(raw: any): CharacterSheetData {
   if (!raw || typeof raw !== 'object') {
@@ -416,7 +495,10 @@ export function normalizeCharacterOnLoad(raw: any): CharacterSheetData {
   // Migrate legacy equipment strings (armor, shield, weapons) into structured InventoryItem entries
   const withEquipment = migrateLegacyEquipmentToInventory(withBuffs);
 
-  return withEquipment;
+  // Phase 3: Migrate canonical identifiers for classes, domains, prepared spells, and expended slots
+  const withCanonical = migrateCanonicalIdentifiers(withEquipment);
+
+  return withCanonical;
 }
 
 export async function runLegacyMigrationIfNeeded(

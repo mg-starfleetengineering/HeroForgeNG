@@ -12,7 +12,7 @@ import {
   calculateTotalSpeed,
   calculateTraitFlawSkillMods
 } from '../engine/stats';
-import { calculateBAB, calculateBaseSave, calculateTotalHP } from '../engine/classes';
+import { calculateBAB, calculateBaseSave, calculateTotalHP, toCanonicalClassId } from '../engine/classes';
 import {
   resolveWeapon, resolveArmor, resolveShield, calculateFeatCombatBonuses,
   calculateCarryingCapacity, calculateCoinWeight, calculateTotalNetWorthGP,
@@ -1458,14 +1458,16 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         {sheetCasterEntries.length > 0 && (
           <div className="space-y-3 print:space-y-2 print:break-inside-avoid">
             {sheetCasterEntries.map(([clsName, clsLvl]) => {
-              const key = clsName.toLowerCase().replace(/[\s\/-]+/g, '_');
+              const key = toCanonicalClassId(clsName);
+              const clsObj = classesData.find(c => c.id === clsName || c.name.toLowerCase() === clsName.toLowerCase());
               const info = SPELLCASTING_CLASSES[key] || {
-                name: clsName,
+                name: clsObj?.name || clsName,
                 keyAbility: 'int' as const,
                 type: 'Arcane' as const,
                 method: 'Prepared' as const,
                 maxSpellLevel: 9
               };
+              const displayName = clsObj?.name || info.name || clsName;
               const abilityScore = calculateTotalScore(
                 info.keyAbility,
                 character.baseStats,
@@ -1481,7 +1483,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
 
               const isPrepared = isPreparedCaster(clsName);
               const classPreparedSlots = (character.preparedSpells || []).filter(
-                s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') === key
+                s => s.className === key || s.className === clsName
               );
 
               return (
@@ -1493,7 +1495,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                   <div className="flex flex-wrap items-center justify-between border-b border-slate-300 pb-1.5 print:pb-1 gap-2">
                     <div className="flex items-center gap-2">
                       <h3 className="text-xs print:text-[11px] font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5 font-heading">
-                        <i className="fa-solid fa-wand-magic-sparkles text-amber-600"></i> {clsName} Spellcasting & Spells
+                        <i className="fa-solid fa-wand-magic-sparkles text-amber-600"></i> {displayName} Spellcasting & Spells
                       </h3>
                       <span className="text-[10px] print:text-[9px] font-mono font-bold bg-slate-200 text-slate-800 border border-slate-300 px-1.5 py-0.2 rounded">
                         CL {clsLvl} &bull; {info.type} ({info.method})

@@ -7,6 +7,7 @@ import {
   SpellData,
   DomainData
 } from '../types/character';
+import { toCanonicalClassId, toCanonicalDomainId } from './classes';
 
 export interface SpellcastingClassInfo {
   name: string;
@@ -164,7 +165,7 @@ export function getSpellSlotsForClass(
   classLevel: number,
   abilityMod: number
 ): ClassSpellSlots | null {
-  const key = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const key = toCanonicalClassId(className);
   const info = SPELLCASTING_CLASSES[key] || {
     name: className,
     keyAbility: 'int' as StatType,
@@ -218,7 +219,7 @@ export function getSpellSlotsForClass(
 
 export function isSpellcastingClassName(className: string, classData?: ClassData): boolean {
   if (!className) return false;
-  const key = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const key = toCanonicalClassId(className);
   if (SPELLCASTING_CLASSES[key]) return true;
   if (classData && (classData.bonusCaster || classData.name.toLowerCase().includes('caster') || classData.name.toLowerCase().includes('mage') || classData.name.toLowerCase().includes('spell'))) {
     return true;
@@ -239,7 +240,7 @@ export function calculateSpellSaveDc(spellLevel: number, keyAbilityMod: number):
  */
 export function isPreparedCaster(className: string): boolean {
   if (!className) return false;
-  const key = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const key = toCanonicalClassId(className);
   const info = SPELLCASTING_CLASSES[key];
   if (info) {
     return info.method === 'Prepared';
@@ -281,7 +282,7 @@ export function getPreparedSlotsStructure(
   const classSlots = getSpellSlotsForClass(className, classLevel, abilityMod);
   if (!classSlots) return [];
 
-  const key = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const key = toCanonicalClassId(className);
   const isCleric = key === 'cleric';
 
   return classSlots.slots.map(slot => {
@@ -313,7 +314,7 @@ export function buildSlotId(
   slotIndex: number,
   isDomain: boolean = false
 ): string {
-  const cKey = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const cKey = toCanonicalClassId(className);
   return `${cKey}_lvl${spellLevel}_${isDomain ? 'domain_' : 'slot_'}${slotIndex}`;
 }
 
@@ -336,9 +337,9 @@ export function syncPreparedSlotsForCharacter(
   }
 
   // Preserve prepared slots from other classes
-  const cKey = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const cKey = toCanonicalClassId(className);
   const otherClassSlots = currentPreparedSpells.filter(
-    s => s.className.toLowerCase().replace(/[\s\/-]+/g, '_') !== cKey
+    s => s.className !== className && s.className !== cKey
   );
 
   const syncedForThisClass: PreparedSpellSlot[] = [];
@@ -352,7 +353,7 @@ export function syncPreparedSlotsForCharacter(
       const existing = existingMap.get(slotId);
       syncedForThisClass.push({
         id: slotId,
-        className,
+        className: cKey,
         classId: cKey,
         spellLevel: lvlGroup.spellLevel,
         slotIndex: idx,
@@ -369,7 +370,7 @@ export function syncPreparedSlotsForCharacter(
       const existingDom = existingMap.get(domSlotId);
       syncedForThisClass.push({
         id: domSlotId,
-        className,
+        className: cKey,
         classId: cKey,
         domainId: existingDom?.domainId || undefined,
         spellLevel: lvlGroup.spellLevel,
@@ -458,9 +459,9 @@ export function clearAllPreparedSlots(
   preparedSpells: PreparedSpellSlot[] = [],
   className?: string
 ): PreparedSpellSlot[] {
-  const cKey = className ? className.toLowerCase().replace(/[\s\/-]+/g, '_') : null;
+  const cKey = className ? toCanonicalClassId(className) : null;
   return preparedSpells.map(slot => {
-    if (!cKey || slot.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey) {
+    if (!className || slot.className === className || (cKey && slot.className === cKey)) {
       return {
         ...slot,
         spellId: null,
@@ -479,9 +480,9 @@ export function resetAllPreparedSlotsCast(
   preparedSpells: PreparedSpellSlot[] = [],
   className?: string
 ): PreparedSpellSlot[] {
-  const cKey = className ? className.toLowerCase().replace(/[\s\/-]+/g, '_') : null;
+  const cKey = className ? toCanonicalClassId(className) : null;
   return preparedSpells.map(slot => {
-    if (!cKey || slot.className.toLowerCase().replace(/[\s\/-]+/g, '_') === cKey) {
+    if (!className || slot.className === className || (cKey && slot.className === cKey)) {
       return {
         ...slot,
         isCast: false
@@ -534,13 +535,12 @@ export function getStarterWizardCantripIds(spellsData: SpellData[] = []): string
  */
 export function getSpellLevelForClass(spell: SpellData, className: string): number | undefined {
   if (!spell || !className) return undefined;
-  const target = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const target = toCanonicalClassId(className);
 
   // Check classLevels first
   if (spell.classLevels) {
     for (const [clsKey, lvl] of Object.entries(spell.classLevels)) {
-      const norm = clsKey.toLowerCase().replace(/[\s\/-]+/g, '_');
-      if (norm === target) return lvl;
+      if (toCanonicalClassId(clsKey) === target) return lvl;
     }
     return undefined;
   }
@@ -548,8 +548,7 @@ export function getSpellLevelForClass(spell: SpellData, className: string): numb
   // Backward compatibility fallback to spell.levels
   if (spell.levels) {
     for (const [clsKey, lvl] of Object.entries(spell.levels)) {
-      const norm = clsKey.toLowerCase().replace(/[\s\/-]+/g, '_');
-      if (norm === target) return lvl;
+      if (toCanonicalClassId(clsKey) === target) return lvl;
     }
   }
 
@@ -562,13 +561,12 @@ export function getSpellLevelForClass(spell: SpellData, className: string): numb
  */
 export function getSpellLevelForDomain(spell: SpellData, domainNameOrId: string): number | undefined {
   if (!spell || !domainNameOrId) return undefined;
-  const target = domainNameOrId.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const target = toCanonicalDomainId(domainNameOrId);
 
   // Check domainLevels first
   if (spell.domainLevels) {
     for (const [domKey, lvl] of Object.entries(spell.domainLevels)) {
-      const norm = domKey.toLowerCase().replace(/[\s\/-]+/g, '_');
-      if (norm === target) return lvl;
+      if (toCanonicalDomainId(domKey) === target) return lvl;
     }
     return undefined;
   }
@@ -576,8 +574,7 @@ export function getSpellLevelForDomain(spell: SpellData, domainNameOrId: string)
   // Backward compatibility fallback to spell.levels
   if (spell.levels) {
     for (const [domKey, lvl] of Object.entries(spell.levels)) {
-      const norm = domKey.toLowerCase().replace(/[\s\/-]+/g, '_');
-      if (norm === target) return lvl;
+      if (toCanonicalDomainId(domKey) === target) return lvl;
     }
   }
 
@@ -629,11 +626,9 @@ export function getAvailableSpellsForPreparation(
   if (isDomainSlot) {
     let selectedDomainKeys: string[] = [];
     if (specificDomainId) {
-      selectedDomainKeys = [specificDomainId.toLowerCase().replace(/[\s\/-]+/g, '_')];
+      selectedDomainKeys = [toCanonicalDomainId(specificDomainId)];
     } else if (character.selectedDomains && character.selectedDomains.length > 0) {
-      selectedDomainKeys = character.selectedDomains.map(d =>
-        d.toLowerCase().replace(/[\s\/-]+/g, '_')
-      );
+      selectedDomainKeys = character.selectedDomains.map(d => toCanonicalDomainId(d));
     }
 
     if (selectedDomainKeys.length > 0) {
@@ -643,9 +638,7 @@ export function getAvailableSpellsForPreparation(
 
       for (const domKey of selectedDomainKeys) {
         const domObj = domainsData.find(
-          d =>
-            d.id.toLowerCase().replace(/[\s\/-]+/g, '_') === domKey ||
-            d.name.toLowerCase().replace(/[\s\/-]+/g, '_') === domKey
+          d => d.id === domKey || d.name.toLowerCase() === domKey
         );
         if (domObj) {
           if (domObj.spellIds && domObj.spellIds[spellLevel - 1]) {
@@ -667,7 +660,7 @@ export function getAvailableSpellsForPreparation(
         // Match by spell.domainLevels
         if (spell.domainLevels) {
           for (const [domName, domLvl] of Object.entries(spell.domainLevels)) {
-            const norm = domName.toLowerCase().replace(/[\s\/-]+/g, '_');
+            const norm = toCanonicalDomainId(domName);
             if (selectedDomainKeys.includes(norm) && domLvl === spellLevel) {
               return true;
             }
@@ -675,7 +668,7 @@ export function getAvailableSpellsForPreparation(
         } else if (spell.levels) {
           // Backward compatibility if domainLevels not populated
           for (const [domName, domLvl] of Object.entries(spell.levels)) {
-            const norm = domName.toLowerCase().replace(/[\s\/-]+/g, '_');
+            const norm = toCanonicalDomainId(domName);
             if (selectedDomainKeys.includes(norm) && domLvl === spellLevel) {
               return true;
             }
@@ -709,12 +702,10 @@ export function getAvailableSpellsForPreparation(
       if (!spell.classLevels && spell.levels) {
         for (const [lvlKey, lvlVal] of Object.entries(spell.levels)) {
           if (lvlVal === spellLevel) {
-            const normKey = lvlKey.toLowerCase().replace(/[\s\/-]+/g, '_');
+            const normKey = toCanonicalDomainId(lvlKey);
             if (
               domainsData.some(
-                d =>
-                  d.id.toLowerCase().replace(/[\s\/-]+/g, '_') === normKey ||
-                  d.name.toLowerCase().replace(/[\s\/-]+/g, '_') === normKey
+                d => d.id === normKey || d.name.toLowerCase() === normKey
               )
             ) {
               return true;
@@ -744,7 +735,7 @@ export function getAvailableSpellsForPreparation(
  * Generates deterministic slot key for tracking active expended spell slots by class and level.
  */
 export function getSpellSlotUsageKey(className: string, spellLevel: number): string {
-  const cKey = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const cKey = toCanonicalClassId(className);
   return `${cKey}_lvl${spellLevel}`;
 }
 
@@ -832,7 +823,7 @@ export function resetExpendedSpellSlotsForClass(
   className: string
 ): Record<string, number> {
   if (!expendedMap) return {};
-  const cKey = className.toLowerCase().replace(/[\s\/-]+/g, '_');
+  const cKey = toCanonicalClassId(className);
   const prefix = `${cKey}_lvl`;
   const result: Record<string, number> = {};
   for (const [k, v] of Object.entries(expendedMap)) {

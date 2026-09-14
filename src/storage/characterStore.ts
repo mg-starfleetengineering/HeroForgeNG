@@ -12,8 +12,21 @@ const FALLBACK_STORE_KEY = 'heroforge_multi_characters_fallback';
 let memoryFallbackStore: Record<string, CharacterSheetData> = {};
 
 /**
+ * Format a canonical class ID or class name into a title-cased display name.
+ * e.g. 'fighter' -> 'Fighter', 'dragon_shaman' -> 'Dragon Shaman'
+ */
+export function formatClassNameToTitle(classIdOrName: string): string {
+  if (!classIdOrName) return '';
+  return classIdOrName
+    .trim()
+    .split(/[\s_]+/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
+/**
  * Format level progression into a readable class summary string.
- * e.g., [{primaryClass: 'Fighter'}, {primaryClass: 'Fighter'}, {primaryClass: 'Wizard'}] => "Fighter 2 / Wizard 1"
+ * e.g., [{primaryClass: 'fighter'}, {primaryClass: 'fighter'}, {primaryClass: 'wizard'}] => "Fighter 2 / Wizard 1"
  */
 export function formatClassesSummary(levelProgression: LevelProgression[]): string {
   if (!levelProgression || levelProgression.length === 0) {
@@ -23,7 +36,10 @@ export function formatClassesSummary(levelProgression: LevelProgression[]): stri
   const counts: Record<string, number> = {};
   for (const entry of levelProgression) {
     if (entry.primaryClass) {
-      counts[entry.primaryClass] = (counts[entry.primaryClass] || 0) + 1;
+      const displayName = formatClassNameToTitle(entry.primaryClass);
+      if (displayName) {
+        counts[displayName] = (counts[displayName] || 0) + 1;
+      }
     }
   }
 
