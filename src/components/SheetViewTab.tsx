@@ -18,7 +18,9 @@ import {
   calculateCarryingCapacity, calculateCoinWeight, calculateTotalNetWorthGP,
   calculateTotalCarriedWeight, getEncumbranceStatus,
   resolveEquippedArmor, resolveEquippedShield, resolveEquippedWeapon,
-  getWeaponEffectiveAttackEnhancement, getWeaponMaterialDamageMod, getWeaponMaterialTraits
+  getWeaponEffectiveAttackEnhancement, getWeaponMaterialDamageMod, getWeaponMaterialTraits,
+  decrementEquippedAmmunition, validateBodySlots, BODY_SLOT_MAP, getCharacterAmmunition,
+  getMatchingAmmoTypeForWeapon
 } from '../engine/equipment';
 import {
   getAvailableSkills,
@@ -235,6 +237,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
   const shieldEnhancement = eq.shieldEnhancement ?? shieldObj.enhancementBonus ?? 0;
   const armorQualities = (eq.armorQualities && eq.armorQualities.length > 0) ? eq.armorQualities : (armorObj.specialQualities || []);
   const shieldQualities = (eq.shieldQualities && eq.shieldQualities.length > 0) ? eq.shieldQualities : (shieldObj.specialQualities || []);
+  const sheetBodySlotReport = validateBodySlots(eq, customArmors);
 
   const effectiveAbilityMods: Record<string, number> = {
     str: effectiveStrMod,
@@ -506,6 +509,17 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       if (tcState.combatExpertise > 0) { notes.push(`Combat Exp: -${tcState.combatExpertise} Atk`); }
       if (tcState.fightingDefensively) { notes.push('Fight Defensively: -4 Atk'); }
       if (conditionPenalties.attackPenalty !== 0) { notes.push(`Condition: ${conditionPenalties.attackPenalty} Atk`); }
+      const activeAmmo = (() => {
+        if (eq.equippedAmmoId) {
+          return (character.inventory || []).find(i => i.id === eq.equippedAmmoId);
+        }
+        const ammos = getCharacterAmmunition(character);
+        const matchType = getMatchingAmmoTypeForWeapon(rngWpn.name);
+        return ammos.find(a => a.ammoType === matchType && (a.quantity || 0) > 0) || ammos.find(a => (a.quantity || 0) > 0);
+      })();
+      if (activeAmmo) {
+        notes.push(`Ammo: ${activeAmmo.name} [${activeAmmo.quantity || 0}]`);
+      }
       return notes.length > 0 ? `(${notes.join(' • ')})` : '';
     })();
 
@@ -880,6 +894,12 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                           damageBonus: item.damageBonus,
                           damageFormula: item.damageFormula || item.damageStr
                         };
+                        if (item.label === 'Ranged' && character.equipment?.autoDecrementAmmo && onChange) {
+                          const res = decrementEquippedAmmunition(character, 1);
+                          if (res.ammoItem) {
+                            onChange(res.updatedCharacter);
+                          }
+                        }
                         if (item.weapon.id === 'grapple_maneuver') {
                           rollGrappleCheck(item.attackBonus);
                         } else if (item.fullSeq && item.fullSeq.includes('/')) {
@@ -904,6 +924,13 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                           damageBonus: item.damageBonus,
                           damageFormula: item.damageFormula || item.damageStr
                         };
+                        if (item.label === 'Ranged' && character.equipment?.autoDecrementAmmo && onChange) {
+                          const count = item.fullSeq && item.fullSeq.includes('/') ? item.fullSeq.split('/').length : 1;
+                          const res = decrementEquippedAmmunition(character, count);
+                          if (res.ammoItem) {
+                            onChange(res.updatedCharacter);
+                          }
+                        }
                         if (item.weapon.id === 'grapple_maneuver') {
                           rollGrappleCheck(item.attackBonus);
                         } else if (item.fullSeq && item.fullSeq.includes('/')) {
@@ -926,6 +953,12 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                       <div
                         onClick={(e) => {
                           e.stopPropagation();
+                          if (item.label === 'Ranged' && character.equipment?.autoDecrementAmmo && onChange) {
+                            const res = decrementEquippedAmmunition(character, 1);
+                            if (res.ammoItem) {
+                              onChange(res.updatedCharacter);
+                            }
+                          }
                           rollAttack(item.baneAtk!.atkBonus, item.baneAtk!.label, item.weapon, {
                             threatMin: item.threatMin ?? item.weapon.threat ?? 20,
                             damageBonus: item.damageBonus,
@@ -1140,16 +1173,53 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
         </div>
 
         {/* Wondrous Items & Magic Gear Section */}
-        {(eq.wondrousItems || []).length > 0 && (
-          <div className="border border-slate-300 rounded-lg p-2.5 print:p-2 bg-slate-50 space-y-1 print:space-y-0.5 print:break-inside-avoid">
-            <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-slate-800 border-b border-slate-300 pb-1 print:pb-0.5">Wondrous Items & Magic Gear</h3>
+        {((eq.wondrousItems || []).length > 0 || sheetBodySlotReport.totalConflicts > 0) && (
+          <div className="border border-slate-300 rounded-lg p-2.5 print:p-2 bg-slate-50 space-y-1.5 print:space-y-1 print:break-inside-avoid">
+            <div className="flex items-center justify-between border-b border-slate-300 pb-1 print:pb-0.5">
+              <h3 className="text-xs print:text-[10.5px] font-bold uppercase tracking-wider text-slate-800">
+                Wondrous Items & Magic Gear ({eq.wondrousItems?.length || 0} Equipped)
+              </h3>
+              {sheetBodySlotReport.totalConflicts > 0 && (
+                <span className="text-[10px] font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded border border-red-300 animate-pulse">
+                  ⚠ {sheetBodySlotReport.totalConflicts} Slot Conflict{sheetBodySlotReport.totalConflicts > 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+
+            {sheetBodySlotReport.totalConflicts > 0 && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-[11px] print:text-[9.5px] p-2 rounded leading-tight">
+                <span className="font-bold">Slot Conflict Alert:</span> Multiple items occupy the same body slot ({sheetBodySlotReport.conflicts.map(c => c.slot.name).join(', ')}). Under D&D 3.5e rules (MIC p.218 / DMG p.214), excess items provide no magical benefits until unequipped.
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-2 print:gap-1 text-xs font-mono print:text-[10px]">
-              {eq.wondrousItems!.map(w => (
-                <div key={w.id} className="p-1.5 bg-white rounded border border-slate-200">
-                  <span className="font-bold text-slate-900 block">{w.name} <span className="text-[9px] text-purple-700 uppercase font-sans">({w.slot})</span></span>
-                  {w.effect && <p className="text-slate-600 text-[10px] print:text-[9px] leading-tight">{w.effect}</p>}
-                </div>
-              ))}
+              {(eq.wondrousItems || []).map(w => {
+                const isConflict = sheetBodySlotReport.conflicts.some(c => c.equippedItems.some(i => i.id === w.id));
+                const slotDef = BODY_SLOT_MAP[w.slot];
+                return (
+                  <div
+                    key={w.id}
+                    className={`p-1.5 bg-white rounded border ${
+                      isConflict ? 'border-red-400 bg-red-50/50' : 'border-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-1">
+                      <span className="font-bold text-slate-900 block leading-tight">
+                        {w.name}{' '}
+                        <span className="text-[9px] text-purple-700 uppercase font-sans font-medium">
+                          ({slotDef?.name || w.slot})
+                        </span>
+                      </span>
+                      {isConflict && (
+                        <span className="text-[8.5px] font-bold text-red-600 bg-red-100 px-1 py-0.5 rounded border border-red-200 shrink-0">
+                          Conflict
+                        </span>
+                      )}
+                    </div>
+                    {w.effect && <p className="text-slate-600 text-[10px] print:text-[9px] leading-tight mt-0.5">{w.effect}</p>}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

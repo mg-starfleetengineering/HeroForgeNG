@@ -1,4 +1,17 @@
-import { WeaponData, CustomArmorData, CharacterState, InventoryItem, ItemArmorData, ItemWeaponData, Equipment, EquipmentMaterial } from '../types/character';
+import {
+  WeaponData,
+  CustomArmorData,
+  CharacterState,
+  InventoryItem,
+  ItemArmorData,
+  ItemWeaponData,
+  Equipment,
+  EquipmentMaterial,
+  BodySlotId,
+  BodySlotDefinition,
+  AmmoCategory,
+  WondrousItem
+} from '../types/character';
 import { parseMagicItemName, formatMagicItemName, parseItemMaterial, formatMaterialName } from './magicItems';
 
 export const DEFAULT_WEAPON: WeaponData = {
@@ -2296,3 +2309,605 @@ export function getEncumbranceStatus(carriedWeight: number, capacity: CarryingCa
   }
 }
 
+// ======================================================================
+// 3.5e 12 BODY SLOT CATALOG & AFFINITY DEFINITIONS (DMG Table 7-33 & MIC Ch 6)
+// ======================================================================
+
+export const CANONICAL_BODY_SLOTS: BodySlotDefinition[] = [
+  {
+    id: 'head',
+    name: 'Head',
+    category: 'head_face',
+    description: 'Circlets, crowns, hats, helmets, phylacteries',
+    affinity: 'Mental acuity, intellect/wisdom boons, telepathy, mind-affecting effects',
+    icon: 'fa-solid fa-crown',
+    examples: ['Circlet of Blasting', 'Helm of Telepathy', 'Phylactery of Faithfulness', 'Hat of Disguise']
+  },
+  {
+    id: 'headband',
+    name: 'Headband / Eyes',
+    category: 'head_face',
+    description: 'Headbands, eye lenses, goggles, spectacles, masks',
+    affinity: 'Vision enhancements, perception, gaze attacks and gaze protection',
+    icon: 'fa-solid fa-glasses',
+    examples: ['Goggles of Minute Seeing', 'Eyes of the Eagle', 'Headband of Intellect', 'Lenses of Detection']
+  },
+  {
+    id: 'neck',
+    name: 'Neck',
+    category: 'torso',
+    description: 'Amulets, brooches, medallions, necklaces, periapts, scarabs',
+    affinity: 'Constitution, natural armor, health, adaptations, bodily warding',
+    icon: 'fa-solid fa-gem',
+    examples: ['Amulet of Health', 'Amulet of Natural Armor', 'Periapt of Wisdom', 'Medallion of Thoughts']
+  },
+  {
+    id: 'shoulders',
+    name: 'Shoulders',
+    category: 'torso',
+    description: 'Capes, cloaks, mantles, shawls',
+    affinity: 'Saving throw resistance bonuses, deflection AC, stealth, movement & flight',
+    icon: 'fa-solid fa-feather',
+    examples: ['Cloak of Resistance', 'Cloak of Elvenkind', 'Cloak of Displacement', 'Wings of Flying']
+  },
+  {
+    id: 'chest',
+    name: 'Chest',
+    category: 'torso',
+    description: 'Vests, vestments, shirts',
+    affinity: 'Armor bonuses, swift action utility, bodily resilience',
+    icon: 'fa-solid fa-vest',
+    examples: ['Vest of Health', 'Shirt of the Leech', 'Vestment of Many Styles']
+  },
+  {
+    id: 'body',
+    name: 'Body',
+    category: 'torso',
+    description: 'Robes, full-body vestments, suits of magical apparel',
+    affinity: 'Spellcasting enhancements, spell resistance, energy resistance',
+    icon: 'fa-solid fa-person-dress',
+    examples: ['Robe of the Archmagi', 'Robe of Eyes', 'Robe of Scintillating Colors', 'Monk\'s Robe']
+  },
+  {
+    id: 'armor',
+    name: 'Armor',
+    category: 'torso',
+    description: 'Suit of armor (padded, leather, chainmail, full plate, etc.)',
+    affinity: 'Armor Class enhancement bonuses, armor special qualities',
+    icon: 'fa-solid fa-shield-halved',
+    examples: ['Full Plate +1', 'Mithral Breastplate', 'Shadow Leather Armor']
+  },
+  {
+    id: 'hands',
+    name: 'Hands',
+    category: 'arms_hands',
+    description: 'Gloves, gauntlets',
+    affinity: 'Dexterity bonuses, unarmed/touch damage, weapon grip & sleight of hand',
+    icon: 'fa-solid fa-mitten',
+    examples: ['Gloves of Dexterity', 'Gauntlets of Ogre Power', 'Gloves of Arrow Snaring']
+  },
+  {
+    id: 'arms',
+    name: 'Arms',
+    category: 'arms_hands',
+    description: 'Bracers, armbands, bracelets',
+    affinity: 'Armor/shield bonuses, combat deflection, arm strength boons',
+    icon: 'fa-solid fa-hand-back-fist',
+    examples: ['Bracers of Armor', 'Armbands of Might', 'Bracers of Archery']
+  },
+  {
+    id: 'waist',
+    name: 'Waist',
+    category: 'waist_feet',
+    description: 'Belts, girdles, sashes',
+    affinity: 'Strength bonuses, constitution, healing reserves, carrying capacity',
+    icon: 'fa-solid fa-grip-lines',
+    examples: ['Belt of Giant Strength', 'Belt of Battle', 'Healing Belt', 'Monk\'s Belt']
+  },
+  {
+    id: 'feet',
+    name: 'Feet',
+    category: 'waist_feet',
+    description: 'Boots, shoes, slippers',
+    affinity: 'Speed increases, acrobatics, balance, movement, mobility & teleportation',
+    icon: 'fa-solid fa-shoe-prints',
+    examples: ['Boots of Speed', 'Boots of Striding and Springing', 'Winged Boots', 'Boots of the Winterlands']
+  },
+  {
+    id: 'ring1',
+    name: 'Ring 1',
+    category: 'rings',
+    description: 'Magic ring worn on right hand',
+    affinity: 'Diverse magical boons, deflection, energy resistance, spell storing',
+    icon: 'fa-solid fa-ring',
+    examples: ['Ring of Protection', 'Ring of Wizardry', 'Ring of Invisibility']
+  },
+  {
+    id: 'ring2',
+    name: 'Ring 2',
+    category: 'rings',
+    description: 'Magic ring worn on left hand',
+    affinity: 'Diverse magical boons, deflection, energy resistance, spell storing',
+    icon: 'fa-solid fa-ring',
+    examples: ['Ring of Protection', 'Ring of Sustenance', 'Ring of Feather Falling']
+  },
+  {
+    id: 'slotless',
+    name: 'Slotless / Other',
+    category: 'slotless',
+    description: 'Magic items that do not occupy a body slot (carried, activated, or floating)',
+    affinity: 'Ioun stones, portable containers, wondrous instruments',
+    icon: 'fa-solid fa-wand-magic-sparkles',
+    examples: ['Ioun Stone', 'Handy Haversack', 'Bag of Holding', 'Portable Hole']
+  }
+];
+
+export const BODY_SLOT_MAP: Record<BodySlotId, BodySlotDefinition> = CANONICAL_BODY_SLOTS.reduce(
+  (acc, slot) => {
+    acc[slot.id] = slot;
+    return acc;
+  },
+  {} as Record<BodySlotId, BodySlotDefinition>
+);
+
+export interface SlotItem {
+  id: string;
+  name: string;
+  slot: BodySlotId;
+  effect?: string;
+  source: 'armor' | 'wondrous';
+  weight?: number;
+  inventoryItemId?: string;
+}
+
+export interface SlotValidationReport {
+  slot: BodySlotDefinition;
+  equippedItems: SlotItem[];
+  isOccupied: boolean;
+  hasConflict: boolean;
+  conflictMessage?: string;
+}
+
+export interface BodySlotReport {
+  slots: Record<BodySlotId, SlotValidationReport>;
+  conflicts: SlotValidationReport[];
+  totalConflicts: number;
+  conflictSummary: string[];
+  totalOccupiedSlots: number;
+  isAllValid: boolean;
+}
+
+/**
+ * Validates equipped items across all 3.5e body slots.
+ * Detects multiple items assigned to the same slot (slot conflict) and evaluates
+ * armor occupancy between equipment.armor and wondrous items with slot='armor'.
+ */
+export function validateBodySlots(
+  equipment: Equipment | undefined,
+  customArmors: CustomArmorData[] = []
+): BodySlotReport {
+  const eq = equipment || { armor: 'none', armorEnhancement: 0, shield: 'none', shieldEnhancement: 0, deflection: 0, natural: 0, dodge: 0, primaryWeapon: 'none' };
+  const itemsBySlot: Record<BodySlotId, SlotItem[]> = {
+    head: [],
+    headband: [],
+    neck: [],
+    shoulders: [],
+    chest: [],
+    body: [],
+    armor: [],
+    hands: [],
+    arms: [],
+    waist: [],
+    feet: [],
+    ring1: [],
+    ring2: [],
+    slotless: []
+  };
+
+  // 1. Equipped Suit of Armor
+  if (eq.armor && eq.armor !== 'none' && eq.armor !== '__CUSTOM__') {
+    const resolved = resolveArmor(eq.armor, customArmors);
+    itemsBySlot.armor.push({
+      id: eq.armorItemId || 'equipped_armor',
+      name: resolved.name || eq.armor,
+      slot: 'armor',
+      source: 'armor',
+      inventoryItemId: eq.armorItemId || undefined
+    });
+  }
+
+  // 2. Equipped Wondrous Items
+  if (Array.isArray(eq.wondrousItems)) {
+    for (const item of eq.wondrousItems) {
+      const targetSlot = (itemsBySlot[item.slot] ? item.slot : 'slotless') as BodySlotId;
+      itemsBySlot[targetSlot].push({
+        id: item.id,
+        name: item.name,
+        slot: targetSlot,
+        effect: item.effect,
+        source: 'wondrous',
+        weight: item.weight,
+        inventoryItemId: item.inventoryItemId
+      });
+    }
+  }
+
+  const slotsReport: Partial<Record<BodySlotId, SlotValidationReport>> = {};
+  const conflicts: SlotValidationReport[] = [];
+  let totalConflicts = 0;
+  const conflictSummary: string[] = [];
+  let totalOccupiedSlots = 0;
+
+  for (const slotDef of CANONICAL_BODY_SLOTS) {
+    const items = itemsBySlot[slotDef.id] || [];
+    const isOccupied = items.length > 0;
+    // Slotless items never conflict
+    const hasConflict = slotDef.id !== 'slotless' && items.length > 1;
+
+    if (slotDef.id !== 'slotless' && isOccupied) {
+      totalOccupiedSlots++;
+    }
+
+    let conflictMessage: string | undefined;
+    if (hasConflict) {
+      totalConflicts++;
+      const itemNames = items.map(i => i.name).join(', ');
+      conflictMessage = `Slot Conflict: ${items.length} items equipped in ${slotDef.name} slot (${itemNames}). In 3.5e rules, only one item per body slot is functional.`;
+      conflictSummary.push(`${slotDef.name}: ${itemNames}`);
+    }
+
+    const reportItem: SlotValidationReport = {
+      slot: slotDef,
+      equippedItems: items,
+      isOccupied,
+      hasConflict,
+      conflictMessage
+    };
+
+    slotsReport[slotDef.id] = reportItem;
+    if (hasConflict) {
+      conflicts.push(reportItem);
+    }
+  }
+
+  return {
+    slots: slotsReport as Record<BodySlotId, SlotValidationReport>,
+    conflicts,
+    totalConflicts,
+    conflictSummary,
+    totalOccupiedSlots,
+    isAllValid: totalConflicts === 0
+  };
+}
+
+// ======================================================================
+// 3.5e AMMUNITION TRACKER & PRESETS
+// ======================================================================
+
+export interface AmmoPreset {
+  id: string;
+  name: string;
+  ammoType: AmmoCategory;
+  quantity: number;
+  weight: number; // total batch weight in lbs
+  value: string;
+  location: string;
+  notes?: string;
+  material?: EquipmentMaterial | string;
+  enhancementBonus?: number;
+  specialQualities?: string[];
+  isMasterwork?: boolean;
+}
+
+export const STANDARD_AMMO_PRESETS: AmmoPreset[] = [
+  {
+    id: 'arrows_20',
+    name: 'Arrows (20)',
+    ammoType: 'arrow',
+    quantity: 20,
+    weight: 3,
+    value: '1 gp',
+    location: 'Quiver',
+    notes: 'Standard arrows for bows (20)'
+  },
+  {
+    id: 'bolts_10',
+    name: 'Crossbow Bolts (10)',
+    ammoType: 'bolt',
+    quantity: 10,
+    weight: 1,
+    value: '1 gp',
+    location: 'Quiver',
+    notes: 'Standard bolts for crossbows (10)'
+  },
+  {
+    id: 'bullets_10',
+    name: 'Sling Bullets (10)',
+    ammoType: 'bullet',
+    quantity: 10,
+    weight: 5,
+    value: '1 sp',
+    location: 'Belt Pouch',
+    notes: 'Lead bullets for slings (10)'
+  },
+  {
+    id: 'mwk_arrows_20',
+    name: 'Masterwork Arrows (20)',
+    ammoType: 'arrow',
+    quantity: 20,
+    weight: 3,
+    value: '121 gp',
+    location: 'Quiver',
+    isMasterwork: true,
+    notes: '+1 enhancement bonus on attack rolls'
+  },
+  {
+    id: 'mwk_bolts_10',
+    name: 'Masterwork Bolts (10)',
+    ammoType: 'bolt',
+    quantity: 10,
+    weight: 1,
+    value: '61 gp',
+    location: 'Quiver',
+    isMasterwork: true,
+    notes: '+1 enhancement bonus on attack rolls'
+  },
+  {
+    id: 'silver_arrows_20',
+    name: 'Alchemical Silver Arrows (20)',
+    ammoType: 'arrow',
+    quantity: 20,
+    weight: 3,
+    value: '41 gp',
+    location: 'Quiver',
+    material: 'alchemical_silver',
+    notes: 'Bypasses Silver DR (-1 damage penalty)'
+  },
+  {
+    id: 'cold_iron_arrows_20',
+    name: 'Cold Iron Arrows (20)',
+    ammoType: 'arrow',
+    quantity: 20,
+    weight: 3,
+    value: '2 gp',
+    location: 'Quiver',
+    material: 'cold_iron',
+    notes: 'Bypasses Cold Iron DR'
+  },
+  {
+    id: 'adamantine_arrows_10',
+    name: 'Adamantine Arrows (10)',
+    ammoType: 'arrow',
+    quantity: 10,
+    weight: 1.5,
+    value: '601 gp',
+    location: 'Quiver',
+    material: 'adamantine',
+    notes: 'Bypasses Adamantine DR & ignores hardness < 20'
+  },
+  {
+    id: 'flaming_arrows_20',
+    name: '+1 Flaming Arrows (20)',
+    ammoType: 'arrow',
+    quantity: 20,
+    weight: 3,
+    value: '3,200 gp',
+    location: 'Quiver',
+    enhancementBonus: 1,
+    specialQualities: ['flaming'],
+    notes: '+1 attack & damage, +1d6 fire damage on hit'
+  },
+  {
+    id: 'screaming_bolts_5',
+    name: 'Screaming Bolts (5)',
+    ammoType: 'bolt',
+    quantity: 5,
+    weight: 0.5,
+    value: '1,335 gp',
+    location: 'Quiver',
+    enhancementBonus: 2,
+    notes: '+2 bolt, screams in flight forcing DC 14 Will save vs shaken'
+  },
+  {
+    id: 'sleep_arrows_5',
+    name: 'Sleep Arrows (5)',
+    ammoType: 'arrow',
+    quantity: 5,
+    weight: 0.5,
+    value: '660 gp',
+    location: 'Quiver',
+    notes: '+1 arrow, target must succeed DC 11 Will save or fall asleep for 5 minutes'
+  }
+];
+
+/**
+ * Maps a weapon name to its canonical 3.5e ammunition type.
+ */
+export function getMatchingAmmoTypeForWeapon(weaponName: string, category?: string): AmmoCategory {
+  const clean = (weaponName || '').toLowerCase();
+  if (clean.includes('crossbow') || clean.includes('arbalest')) {
+    return 'bolt';
+  }
+  if (clean.includes('sling') || clean.includes('warsling')) {
+    return 'bullet';
+  }
+  if (clean.includes('blowgun')) {
+    return 'needle';
+  }
+  if (clean.includes('shuriken')) {
+    return 'shuriken';
+  }
+  if (clean.includes('bow') || clean.includes('arrow')) {
+    return 'arrow';
+  }
+  return 'other';
+}
+
+/**
+ * Creates an InventoryItem representation from an AmmoPreset.
+ */
+export function createInventoryAmmo(preset: AmmoPreset, quantityOverride?: number): InventoryItem {
+  const qty = quantityOverride !== undefined ? quantityOverride : preset.quantity;
+  const unitWeight = preset.quantity > 0 ? preset.weight / preset.quantity : preset.weight;
+  return {
+    id: `ammo-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    name: preset.name,
+    quantity: qty,
+    weight: parseFloat(unitWeight.toFixed(3)),
+    location: preset.location || 'Quiver',
+    value: preset.value,
+    notes: preset.notes,
+    material: preset.material,
+    enhancementBonus: preset.enhancementBonus,
+    specialQualities: preset.specialQualities,
+    isMasterwork: preset.isMasterwork,
+    itemType: 'ammunition',
+    ammoType: preset.ammoType
+  };
+}
+
+/**
+ * Returns all ammunition items in a character's inventory.
+ */
+export function getCharacterAmmunition(character: CharacterState): InventoryItem[] {
+  const inv = character.inventory || [];
+  return inv.filter(i => {
+    if (i.itemType === 'ammunition') return true;
+    const clean = (i.name || '').toLowerCase();
+    return clean.includes('arrow') || clean.includes('bolt') || clean.includes('bullet') || clean.includes('needle') || clean.includes('shuriken');
+  });
+}
+
+export interface DecrementAmmoResult {
+  updatedCharacter: CharacterState;
+  ammoItem?: InventoryItem;
+  countDrawn: number;
+  remaining: number;
+  exhausted: boolean;
+  message: string;
+}
+
+/**
+ * Decrements the quantity of the character's active/equipped ammunition.
+ * If no explicit equippedAmmoId is set, attempts to auto-detect matching ammunition for the equipped ranged weapon.
+ */
+export function decrementEquippedAmmunition(
+  character: CharacterState,
+  count: number = 1,
+  force: boolean = false
+): DecrementAmmoResult {
+  const eq = character.equipment || { armor: 'none', armorEnhancement: 0, shield: 'none', shieldEnhancement: 0, deflection: 0, natural: 0, dodge: 0, primaryWeapon: 'none' };
+
+  if (!force && eq.autoDecrementAmmo === false) {
+    return {
+      updatedCharacter: character,
+      countDrawn: 0,
+      remaining: 0,
+      exhausted: false,
+      message: 'Auto-decrement ammunition is disabled.'
+    };
+  }
+
+  if (count <= 0) {
+    return {
+      updatedCharacter: character,
+      countDrawn: 0,
+      remaining: 0,
+      exhausted: false,
+      message: 'No ammunition drawn.'
+    };
+  }
+
+  const inventory = Array.isArray(character.inventory) ? [...character.inventory] : [];
+
+  // 1. Locate ammo item
+  let ammoIndex = -1;
+  if (eq.equippedAmmoId) {
+    ammoIndex = inventory.findIndex(i => i.id === eq.equippedAmmoId);
+  }
+
+  // 2. Fallback: match by equipped ranged weapon type
+  if (ammoIndex === -1 && eq.rangedWeapon && eq.rangedWeapon !== 'none') {
+    const expectedType = getMatchingAmmoTypeForWeapon(eq.rangedWeapon);
+    ammoIndex = inventory.findIndex(i =>
+      (i.itemType === 'ammunition' || (i.name && (i.name.toLowerCase().includes('arrow') || i.name.toLowerCase().includes('bolt') || i.name.toLowerCase().includes('bullet')))) &&
+      (i.ammoType === expectedType || (expectedType === 'arrow' && i.name.toLowerCase().includes('arrow')) || (expectedType === 'bolt' && i.name.toLowerCase().includes('bolt')) || (expectedType === 'bullet' && i.name.toLowerCase().includes('bullet'))) &&
+      (i.quantity || 0) > 0
+    );
+  }
+
+  // 3. Fallback: any available ammunition item with quantity > 0
+  if (ammoIndex === -1) {
+    ammoIndex = inventory.findIndex(i =>
+      (i.itemType === 'ammunition' || (i.name && (i.name.toLowerCase().includes('arrow') || i.name.toLowerCase().includes('bolt') || i.name.toLowerCase().includes('bullet')))) &&
+      (i.quantity || 0) > 0
+    );
+  }
+
+  if (ammoIndex === -1) {
+    return {
+      updatedCharacter: character,
+      countDrawn: 0,
+      remaining: 0,
+      exhausted: true,
+      message: 'No ammunition available in inventory!'
+    };
+  }
+
+  const currentAmmo = inventory[ammoIndex];
+  const currentQty = currentAmmo.quantity || 0;
+
+  if (currentQty <= 0) {
+    return {
+      updatedCharacter: character,
+      ammoItem: currentAmmo,
+      countDrawn: 0,
+      remaining: 0,
+      exhausted: true,
+      message: `Out of ammunition: ${currentAmmo.name} has 0 remaining!`
+    };
+  }
+
+  const countDrawn = Math.min(currentQty, count);
+  const remaining = currentQty - countDrawn;
+  const exhausted = remaining === 0;
+
+  const updatedAmmo: InventoryItem = {
+    ...currentAmmo,
+    quantity: remaining,
+    itemType: 'ammunition'
+  };
+
+  inventory[ammoIndex] = updatedAmmo;
+
+  const updatedEq: Equipment = {
+    ...eq,
+    equippedAmmoId: currentAmmo.id
+  };
+
+  const updatedCharacter: CharacterState = {
+    ...character,
+    inventory,
+    equipment: updatedEq
+  };
+
+  const message = exhausted
+    ? `Expended ${countDrawn} ${currentAmmo.name}. Ammunition is now completely exhausted (0 remaining)!`
+    : `Expended ${countDrawn} ${currentAmmo.name} (${remaining} remaining).`;
+
+  return {
+    updatedCharacter,
+    ammoItem: updatedAmmo,
+    countDrawn,
+    remaining,
+    exhausted,
+    message
+  };
+}
+
+export {
+  STANDARD_WONDROUS_ITEMS,
+  getPredefinedWondrousItems,
+  createWondrousItemFromPredefined
+} from './wondrousItems';
+export type { PredefinedWondrousItem } from './wondrousItems';

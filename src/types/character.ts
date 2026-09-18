@@ -33,12 +33,39 @@ export interface CustomArmorData {
   isMasterwork?: boolean;
 }
 
+export type BodySlotId =
+  | 'head'
+  | 'headband'
+  | 'neck'
+  | 'shoulders'
+  | 'chest'
+  | 'body'
+  | 'armor'
+  | 'hands'
+  | 'arms'
+  | 'waist'
+  | 'feet'
+  | 'ring1'
+  | 'ring2'
+  | 'slotless';
+
+export interface BodySlotDefinition {
+  id: BodySlotId;
+  name: string;
+  category: 'head_face' | 'torso' | 'arms_hands' | 'waist_feet' | 'rings' | 'slotless';
+  description: string;
+  affinity: string; // 3.5e standard item affinity according to DMG & MIC
+  icon: string; // FontAwesome icon class
+  examples: string[];
+}
+
 export interface WondrousItem {
   id: string;
   name: string;
-  slot: 'head' | 'headband' | 'neck' | 'shoulders' | 'chest' | 'body' | 'armor' | 'hands' | 'arms' | 'waist' | 'feet' | 'ring1' | 'ring2' | 'slotless';
+  slot: BodySlotId;
   effect: string;
   weight?: number;
+  source?: string;
   inventoryItemId?: string;
 }
 
@@ -108,7 +135,13 @@ export interface Equipment {
   primaryWeaponItemId?: string | null;
   secondaryWeaponItemId?: string | null;
   rangedWeaponItemId?: string | null;
+
+  // Ammunition tracking
+  equippedAmmoId?: string | null;
+  autoDecrementAmmo?: boolean;
 }
+
+export type AmmoCategory = 'arrow' | 'bolt' | 'bullet' | 'needle' | 'shuriken' | 'other';
 
 export interface InventoryItem {
   id: string;
@@ -125,7 +158,10 @@ export interface InventoryItem {
   baneTarget?: string;
   isMasterwork?: boolean;
 
-  itemType?: 'weapon' | 'armor' | 'shield' | 'wondrous' | 'gear' | 'consumable';
+  itemType?: 'weapon' | 'armor' | 'shield' | 'wondrous' | 'gear' | 'consumable' | 'ammunition';
+  ammoType?: AmmoCategory;
+  bodySlot?: BodySlotId;
+  source?: string;
   armorData?: ItemArmorData;
   weaponData?: ItemWeaponData;
 }

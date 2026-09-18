@@ -1,5 +1,20 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { CharacterState, WeaponData, RaceData, ClassData, Equipment, CustomArmorData, WondrousItem, InventoryItem, Funds, EquipmentMaterial, ItemArmorData } from '../types/character';
+import {
+  CharacterState,
+  WeaponData,
+  RaceData,
+  ClassData,
+  Equipment,
+  CustomArmorData,
+  WondrousItem,
+  InventoryItem,
+  Funds,
+  EquipmentMaterial,
+  ItemArmorData,
+  BodySlotId,
+  BodySlotDefinition,
+  AmmoCategory
+} from '../types/character';
 import { getSourceBadgeInfo, sortDropdownItems } from '../utils/sourceFilter';
 import { SearchableSelect, SearchableOption } from './SearchableSelect';
 import { calculateTotalScore, getAbilityMod, parseRaceMods } from '../engine/stats';
@@ -14,7 +29,11 @@ import {
   getEquippedArmorItem, getEquippedShieldItem, getEquippedWeaponItem,
   resolveEquippedArmor, resolveEquippedShield, resolveEquippedWeapon,
   applyMaterialToArmorData, applyMaterialToWeight,
-  getWeaponEffectiveAttackEnhancement, getWeaponMaterialDamageMod, getWeaponMaterialTraits
+  getWeaponEffectiveAttackEnhancement, getWeaponMaterialDamageMod, getWeaponMaterialTraits,
+  CANONICAL_BODY_SLOTS, BODY_SLOT_MAP, validateBodySlots, SlotItem, SlotValidationReport, BodySlotReport,
+  STANDARD_AMMO_PRESETS, createInventoryAmmo, getCharacterAmmunition, decrementEquippedAmmunition,
+  getMatchingAmmoTypeForWeapon, AmmoPreset,
+  STANDARD_WONDROUS_ITEMS, getPredefinedWondrousItems, createWondrousItemFromPredefined, PredefinedWondrousItem
 } from '../engine/equipment';
 import {
   getTacticalCombatState,
@@ -497,10 +516,66 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const [customArmorCheck, setCustomArmorCheck] = useState(-2);
   const [customArmorType, setCustomArmorType] = useState<'light' | 'medium' | 'heavy' | 'shield' | 'other'>('medium');
 
-  // New Wondrous Item Form State
+  // Wondrous Item Form & Predefined Catalog State
+  const [wondrousModalTab, setWondrousModalTab] = useState<'predefined' | 'custom'>('predefined');
+  const [wondrousPredefinedSearch, setWondrousPredefinedSearch] = useState('');
+  const [wondrousPredefinedSlotFilter, setWondrousPredefinedSlotFilter] = useState<BodySlotId | 'all'>('all');
+  const [wondrousOnlyAllowedSources, setWondrousOnlyAllowedSources] = useState<boolean>(false);
+  const [selectedPredefinedId, setSelectedPredefinedId] = useState<string | null>(null);
+  const [wondrousTargetSlot, setWondrousTargetSlot] = useState<BodySlotId>('shoulders');
   const [wondrousName, setWondrousName] = useState('');
-  const [wondrousSlot, setWondrousSlot] = useState<WondrousItem['slot']>('shoulders');
+  const [wondrousSlot, setWondrousSlot] = useState<BodySlotId>('shoulders');
   const [wondrousEffect, setWondrousEffect] = useState('');
+  const [wondrousWeight, setWondrousWeight] = useState<number | ''>('');
+  const [wondrousCost, setWondrousCost] = useState('');
+
+  const openWondrousModal = useCallback((slotId?: BodySlotId, initialTab: 'predefined' | 'custom' = 'predefined') => {
+    const target = slotId || 'shoulders';
+    setWondrousSlot(target);
+    setWondrousTargetSlot(target);
+    setWondrousPredefinedSlotFilter(slotId ? slotId : 'all');
+    setWondrousModalTab(initialTab);
+    setSelectedPredefinedId(null);
+    setWondrousPredefinedSearch('');
+    setShowWondrousModal(true);
+  }, []);
+
+  const filteredPredefinedItems = useMemo(() => {
+    const items = getPredefinedWondrousItems(
+      wondrousPredefinedSlotFilter,
+      wondrousPredefinedSearch,
+      character.allowedSources,
+      !wondrousOnlyAllowedSources
+    );
+    return sortDropdownItems(items, character.allowedSources);
+  }, [wondrousPredefinedSlotFilter, wondrousPredefinedSearch, character.allowedSources, wondrousOnlyAllowedSources]);
+
+  const selectedPredefinedItem = useMemo(() => {
+    if (!selectedPredefinedId) return null;
+    return STANDARD_WONDROUS_ITEMS.find(i => i.id === selectedPredefinedId) || null;
+  }, [selectedPredefinedId]);
+
+  // 12 Body Slot Validator View State
+  const [bodySlotViewMode, setBodySlotViewMode] = useState<'grid' | 'doll'>('grid');
+  const [bodySlotEquipPickerSlot, setBodySlotEquipPickerSlot] = useState<BodySlotId | null>(null);
+
+  // Ammunition State
+  const [showCustomAmmoModal, setShowCustomAmmoModal] = useState(false);
+  const [ammoPresetDropdownOpen, setAmmoPresetDropdownOpen] = useState(false);
+  const [ammoRollFeedback, setAmmoRollFeedback] = useState<string | null>(null);
+
+  // Custom Ammo Form State
+  const [customAmmoName, setCustomAmmoName] = useState('');
+  const [customAmmoType, setCustomAmmoType] = useState<AmmoCategory>('arrow');
+  const [customAmmoQuantity, setCustomAmmoQuantity] = useState(20);
+  const [customAmmoEnhancement, setCustomAmmoEnhancement] = useState(0);
+  const [customAmmoMaterial, setCustomAmmoMaterial] = useState<EquipmentMaterial | 'standard'>('standard');
+  const [customAmmoQualities, setCustomAmmoQualities] = useState<string[]>([]);
+  const [customAmmoWeight, setCustomAmmoWeight] = useState(3);
+  const [customAmmoValue, setCustomAmmoValue] = useState('1 gp');
+  const [customAmmoLocation, setCustomAmmoLocation] = useState('Quiver');
+  const [customAmmoNotes, setCustomAmmoNotes] = useState('');
+  const [customAmmoMasterwork, setCustomAmmoMasterwork] = useState(false);
 
   // General Inventory Form State
   const [invName, setInvName] = useState('');
@@ -540,6 +615,26 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const inventory: InventoryItem[] = character.inventory || [];
   const customWeapons = character.customWeapons || [];
   const customArmors = character.customArmors || [];
+
+  const bodySlotReport: BodySlotReport = useMemo(() => {
+    return validateBodySlots(eq, customArmors);
+  }, [eq, customArmors]);
+
+  const characterAmmunition: InventoryItem[] = useMemo(() => {
+    return getCharacterAmmunition(character);
+  }, [character.inventory]);
+
+  const activeAmmoItem: InventoryItem | undefined = useMemo(() => {
+    if (eq.equippedAmmoId) {
+      return inventory.find(i => i.id === eq.equippedAmmoId);
+    }
+    if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
+      const matchType = getMatchingAmmoTypeForWeapon(eq.rangedWeapon);
+      const match = characterAmmunition.find(a => a.ammoType === matchType && (a.quantity || 0) > 0);
+      if (match) return match;
+    }
+    return characterAmmunition.find(a => (a.quantity || 0) > 0);
+  }, [eq.equippedAmmoId, eq.rangedWeapon, inventory, characterAmmunition]);
 
   const handleEqChange = (field: keyof Equipment, val: any) => {
     const newEq = { ...eq, [field]: val };
@@ -2247,19 +2342,39 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     setShowCustomArmorModal(false);
   };
 
-  // Add Wondrous Item
+  // Equip Predefined Wondrous Item
+  const handleEquipPredefinedItem = (item: PredefinedWondrousItem, overrideSlot?: BodySlotId) => {
+    const targetSlot = overrideSlot || wondrousTargetSlot || item.slot;
+    const { wondrousItem, inventoryItem } = createWondrousItemFromPredefined(item, targetSlot);
+
+    const currentItems = eq.wondrousItems || [];
+    onChange({
+      equipment: { ...eq, wondrousItems: [...currentItems, wondrousItem] },
+      inventory: [...inventory, inventoryItem]
+    });
+
+    setShowWondrousModal(false);
+    setSelectedPredefinedId(null);
+  };
+
+  // Add Custom Wondrous Item
   const handleAddWondrousItem = (e: React.FormEvent) => {
     e.preventDefault();
     if (!wondrousName.trim()) return;
 
     const invItemId = `item-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const parsedWeight = typeof wondrousWeight === 'number' ? wondrousWeight : 0;
+    const finalSlot = wondrousTargetSlot || wondrousSlot || 'shoulders';
+
     const invItem: InventoryItem = {
       id: invItemId,
       name: wondrousName.trim(),
       quantity: 1,
-      weight: 0,
-      notes: wondrousEffect.trim(),
+      weight: parsedWeight,
+      value: wondrousCost.trim() || undefined,
+      notes: wondrousEffect.trim() || undefined,
       itemType: 'wondrous',
+      bodySlot: finalSlot,
       location: 'Carried'
     };
 
@@ -2267,9 +2382,9 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       id: `wondrous_${Date.now()}`,
       inventoryItemId: invItemId,
       name: wondrousName.trim(),
-      slot: wondrousSlot,
+      slot: finalSlot,
       effect: wondrousEffect.trim(),
-      weight: 0
+      weight: parsedWeight
     };
 
     const currentItems = eq.wondrousItems || [];
@@ -2280,6 +2395,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
 
     setWondrousName('');
     setWondrousEffect('');
+    setWondrousWeight('');
+    setWondrousCost('');
     setShowWondrousModal(false);
   };
 
@@ -2298,6 +2415,148 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
     onChange({
       equipment: { ...eq, wondrousItems: nextWondrous },
       inventory: nextInv
+    });
+  };
+
+  // Unequip item from a body slot without deleting it from inventory
+  const handleUnequipSlotItem = (slotItem: SlotItem) => {
+    if (slotItem.source === 'armor') {
+      onChange({
+        equipment: { ...eq, armor: 'none', armorItemId: undefined }
+      });
+      return;
+    }
+    const currentItems = eq.wondrousItems || [];
+    const nextWondrous = currentItems.filter(i => i.id !== slotItem.id);
+    onChange({
+      equipment: { ...eq, wondrousItems: nextWondrous }
+    });
+  };
+
+  // Equip an inventory item directly to a body slot
+  const handleEquipInventoryItemToSlot = (invItem: InventoryItem, slot: BodySlotId) => {
+    if (slot === 'armor') {
+      handleEquipInventoryItem(invItem, 'armor');
+      setBodySlotEquipPickerSlot(null);
+      return;
+    }
+
+    const currentItems = eq.wondrousItems || [];
+    // If the item was already equipped in another slot, remove it from that slot first
+    const filteredWondrous = currentItems.filter(i => i.inventoryItemId !== invItem.id && !matchesItemName(i.name, invItem.name));
+    const newWondrous: WondrousItem = {
+      id: `wondrous_${Date.now()}`,
+      inventoryItemId: invItem.id,
+      name: invItem.name,
+      slot,
+      effect: invItem.notes || '',
+      weight: invItem.weight || 0
+    };
+
+    const nextInv = inventory.map(i => {
+      if (i.id === invItem.id) {
+        return { ...i, itemType: 'wondrous' as const, bodySlot: slot };
+      }
+      return i;
+    });
+
+    onChange({
+      equipment: { ...eq, wondrousItems: [...filteredWondrous, newWondrous] },
+      inventory: nextInv
+    });
+    setBodySlotEquipPickerSlot(null);
+  };
+
+  // Ammunition Handlers
+  const handleSetActiveAmmo = (ammoId: string) => {
+    handleEqChange('equippedAmmoId', ammoId);
+  };
+
+  const handleUpdateAmmoQuantity = (ammoId: string, newQty: number) => {
+    const nextInv = inventory.map(i => {
+      if (i.id === ammoId) {
+        return { ...i, quantity: Math.max(0, newQty) };
+      }
+      return i;
+    });
+    onChange({ inventory: nextInv });
+  };
+
+  const handleAdjustAmmoQuantity = (ammoId: string, delta: number) => {
+    const item = inventory.find(i => i.id === ammoId);
+    if (!item) return;
+    const current = item.quantity || 0;
+    handleUpdateAmmoQuantity(ammoId, current + delta);
+  };
+
+  const handleAddAmmoPreset = (preset: AmmoPreset) => {
+    const newAmmo = createInventoryAmmo(preset);
+    const nextInv = [...inventory, newAmmo];
+    const nextEq = { ...eq };
+    if (!nextEq.equippedAmmoId) {
+      nextEq.equippedAmmoId = newAmmo.id;
+    }
+    onChange({
+      inventory: nextInv,
+      equipment: nextEq
+    });
+    setAmmoPresetDropdownOpen(false);
+  };
+
+  const handleCreateCustomAmmo = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customAmmoName.trim()) return;
+
+    const newAmmo: InventoryItem = {
+      id: `ammo-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      name: customAmmoName.trim(),
+      quantity: Math.max(1, customAmmoQuantity),
+      weight: customAmmoWeight,
+      location: customAmmoLocation || 'Quiver',
+      value: customAmmoValue,
+      notes: customAmmoNotes,
+      material: customAmmoMaterial !== 'standard' ? customAmmoMaterial : undefined,
+      enhancementBonus: customAmmoEnhancement > 0 ? customAmmoEnhancement : undefined,
+      specialQualities: customAmmoQualities.length > 0 ? customAmmoQualities : undefined,
+      isMasterwork: customAmmoMasterwork,
+      itemType: 'ammunition',
+      ammoType: customAmmoType
+    };
+
+    const nextInv = [...inventory, newAmmo];
+    const nextEq = { ...eq };
+    if (!nextEq.equippedAmmoId) {
+      nextEq.equippedAmmoId = newAmmo.id;
+    }
+
+    onChange({
+      inventory: nextInv,
+      equipment: nextEq
+    });
+
+    setCustomAmmoName('');
+    setCustomAmmoQuantity(20);
+    setCustomAmmoEnhancement(0);
+    setCustomAmmoMaterial('standard');
+    setCustomAmmoQualities([]);
+    setCustomAmmoWeight(3);
+    setCustomAmmoValue('1 gp');
+    setCustomAmmoLocation('Quiver');
+    setCustomAmmoNotes('');
+    setCustomAmmoMasterwork(false);
+    setShowCustomAmmoModal(false);
+  };
+
+  const handleRemoveAmmo = (ammoId: string) => {
+    const nextInv = inventory.filter(i => i.id !== ammoId);
+    const nextEq = { ...eq };
+    if (nextEq.equippedAmmoId === ammoId) {
+      const remainingAmmo = nextInv.find(i => i.itemType === 'ammunition');
+      nextEq.equippedAmmoId = remainingAmmo ? remainingAmmo.id : undefined;
+    }
+    onChange({
+      inventory: nextInv,
+      equipment: nextEq
     });
   };
 
@@ -2617,7 +2876,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             <i className="fa-solid fa-shield text-amber-400"></i> Custom Armor
           </button>
           <button
-            onClick={() => setShowWondrousModal(true)}
+            onClick={() => openWondrousModal()}
             className="btn btn-secondary text-xs flex items-center gap-1.5"
           >
             <i className="fa-solid fa-gem text-purple-400"></i> Add Wondrous Item
@@ -2831,36 +3090,472 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
             </div>
           </div>
 
-          {/* Wondrous Items & Magic Gear Section */}
-          <div className="border-t border-slate-800 pt-4 space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center justify-between">
-              <span><i className="fa-solid fa-gem mr-1"></i> Equipped Wondrous Items & Gear</span>
-              <span className="text-[10px] text-slate-400">({(eq.wondrousItems || []).length} items)</span>
-            </h3>
+          {/* 3.5e 12-Body-Slot Affinity Validator & Equipment Doll */}
+          <div className="border-t border-slate-800 pt-4 space-y-3.5">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                  <i className="fa-solid fa-gem"></i> 3.5e Body Slot Affinity & Equipment Doll
+                </h3>
+                <p className="text-[10px] text-slate-400">
+                  {bodySlotReport.totalOccupiedSlots} of 13 slots occupied
+                  {bodySlotReport.totalConflicts > 0 ? (
+                    <span className="text-rose-400 font-bold ml-1.5">• {bodySlotReport.totalConflicts} conflict{bodySlotReport.totalConflicts > 1 ? 's' : ''}!</span>
+                  ) : (
+                    <span className="text-emerald-400 font-medium ml-1.5">• All slots valid</span>
+                  )}
+                </p>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="bg-slate-950 p-0.5 rounded-lg border border-slate-800 flex items-center">
+                  <button
+                    type="button"
+                    onClick={() => setBodySlotViewMode('grid')}
+                    className={`px-2 py-1 rounded text-[10px] font-bold transition cursor-pointer flex items-center gap-1 ${
+                      bodySlotViewMode === 'grid'
+                        ? 'bg-purple-600 text-white shadow-xs'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                    title="Card Grid View"
+                  >
+                    <i className="fa-solid fa-table-cells-large"></i> Grid
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBodySlotViewMode('doll')}
+                    className={`px-2 py-1 rounded text-[10px] font-bold transition cursor-pointer flex items-center gap-1 ${
+                      bodySlotViewMode === 'doll'
+                        ? 'bg-purple-600 text-white shadow-xs'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                    title="Paper Doll Layout"
+                  >
+                    <i className="fa-solid fa-child text-xs"></i> Doll
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => openWondrousModal()}
+                  className="btn btn-secondary text-xs py-1 px-2.5 flex items-center gap-1.5 cursor-pointer"
+                  title="Add Magic Item to Body Slots"
+                >
+                  <i className="fa-solid fa-plus text-purple-400"></i> Add Item
+                </button>
+              </div>
+            </div>
 
-            {(eq.wondrousItems || []).length === 0 ? (
-              <p className="text-xs text-slate-500 italic p-3 text-center bg-slate-950/40 rounded-xl">No wondrous items equipped. Click 'Add Wondrous Item' to record magic gear.</p>
-            ) : (
-              <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-                {(eq.wondrousItems || []).map(item => (
-                  <div key={item.id} className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-amber-300 truncate">{item.name}</span>
-                        <span className="badge bg-purple-900/60 text-purple-300 text-[9px] uppercase font-mono px-1.5">{item.slot}</span>
+            {/* Slot Conflicts Alert Banner */}
+            {bodySlotReport.totalConflicts > 0 && (
+              <div className="p-3 bg-rose-950/70 border border-rose-500/70 rounded-xl text-xs space-y-2 shadow-lg animate-pulse">
+                <div className="flex items-center gap-2 text-rose-300 font-bold">
+                  <i className="fa-solid fa-triangle-exclamation text-rose-400 text-sm"></i>
+                  <span>Body Slot Conflicts Detected ({bodySlotReport.totalConflicts})</span>
+                </div>
+                <p className="text-rose-200/90 text-[11px] leading-relaxed">
+                  In D&D 3.5e rules (DMG p. 214 & MIC Ch. 6), a character can only wear <strong>one item per body slot</strong> (and two rings). Items in conflicting slots do not function simultaneously.
+                </p>
+                <div className="space-y-1 pt-1">
+                  {bodySlotReport.conflictSummary.map((conf, idx) => (
+                    <div key={idx} className="bg-rose-900/50 px-2.5 py-1 rounded text-rose-200 font-mono text-[10.5px] border border-rose-800 flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <i className="fa-solid fa-ban text-[10px] text-rose-400"></i>
+                        <span>{conf}</span>
                       </div>
-                      {item.effect && <p className="text-[11px] text-slate-400 truncate">{item.effect}</p>}
                     </div>
-                    <button
-                      onClick={() => handleRemoveWondrousItem(item.id)}
-                      className="text-slate-500 hover:text-rose-400 p-1 text-xs"
-                    >
-                      <i className="fa-solid fa-trash-can"></i>
-                    </button>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
+
+            {/* CARD GRID VIEW */}
+            {bodySlotViewMode === 'grid' && (
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[460px] overflow-y-auto pr-1">
+                  {CANONICAL_BODY_SLOTS.filter(s => s.id !== 'slotless').map(slotDef => {
+                    const report = bodySlotReport.slots[slotDef.id];
+                    const isConflict = report?.hasConflict;
+                    const isOccupied = report?.isOccupied;
+
+                    return (
+                      <div
+                        key={slotDef.id}
+                        className={`p-2.5 rounded-xl border transition flex flex-col justify-between text-xs gap-2 ${
+                          isConflict
+                            ? 'bg-rose-950/40 border-rose-500/80 ring-1 ring-rose-500/50 shadow-rose-950/40'
+                            : isOccupied
+                            ? 'bg-slate-950/80 border-purple-500/40'
+                            : 'bg-slate-950/30 border-slate-800/80 hover:border-slate-700'
+                        }`}
+                      >
+                        {/* Slot Header */}
+                        <div className="flex items-center justify-between gap-1.5 border-b border-slate-800/60 pb-1.5">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <i className={`${slotDef.icon} ${isConflict ? 'text-rose-400' : isOccupied ? 'text-purple-400' : 'text-slate-500'} text-xs`}></i>
+                            <span className="font-bold text-slate-200 text-xs truncate">{slotDef.name}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {isConflict ? (
+                              <span className="badge bg-rose-900 text-rose-200 text-[9px] font-mono font-bold">
+                                CONFLICT
+                              </span>
+                            ) : isOccupied ? (
+                              <span className="badge bg-purple-900/60 text-purple-300 text-[9px] font-mono">
+                                Equipped
+                              </span>
+                            ) : (
+                              <span className="badge bg-slate-900 text-slate-500 text-[9px] font-mono">
+                                Empty
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 3.5e Affinity Tooltip/Subtext */}
+                        <div className="text-[10px] text-slate-400 italic line-clamp-1" title={`3.5e Affinity: ${slotDef.affinity}\nExamples: ${slotDef.examples.join(', ')}`}>
+                          <span className="text-slate-500 not-italic mr-1">Affinity:</span>{slotDef.affinity}
+                        </div>
+
+                        {/* Slot Items / Content */}
+                        <div className="space-y-1.5 min-h-[38px] flex flex-col justify-center">
+                          {isOccupied ? (
+                            report.equippedItems.map(item => (
+                              <div
+                                key={item.id}
+                                className={`p-1.5 rounded-lg border flex items-center justify-between text-xs gap-2 ${
+                                  isConflict
+                                    ? 'bg-rose-950/60 border-rose-800/80 text-rose-200'
+                                    : 'bg-slate-900/90 border-slate-800 text-slate-200'
+                                }`}
+                              >
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className={`font-bold text-xs truncate ${item.source === 'armor' ? 'text-cyan-300' : 'text-amber-300'}`}>
+                                      {item.name}
+                                    </span>
+                                    <span className={`badge text-[8.5px] font-mono uppercase px-1 py-0 ${
+                                      item.source === 'armor' ? 'bg-cyan-950 text-cyan-400 border border-cyan-800/60' : 'bg-purple-950 text-purple-300 border border-purple-800/60'
+                                    }`}>
+                                      {item.source === 'armor' ? 'Armor' : 'Magic'}
+                                    </span>
+                                  </div>
+                                  {item.effect && (
+                                    <p className="text-[10px] text-slate-400 truncate" title={item.effect}>{item.effect}</p>
+                                  )}
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleUnequipSlotItem(item)}
+                                  className="text-slate-400 hover:text-rose-400 p-1 text-xs cursor-pointer"
+                                  title={`Unequip ${item.name}`}
+                                >
+                                  <i className="fa-solid fa-xmark"></i>
+                                </button>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="flex items-center justify-between text-slate-500 text-xs py-0.5">
+                              <span className="italic text-[11px]">No item equipped</span>
+                              <button
+                                type="button"
+                                onClick={() => openWondrousModal(slotDef.id)}
+                                className="text-[10.5px] text-purple-400 hover:text-purple-300 hover:underline font-mono flex items-center gap-1 cursor-pointer"
+                              >
+                                <i className="fa-solid fa-plus text-[9px]"></i> Equip
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* PAPER DOLL LAYOUT VIEW */}
+            {bodySlotViewMode === 'doll' && (
+              <div className="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-3">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 text-center border-b border-slate-800/80 pb-2 flex items-center justify-center gap-2">
+                  <i className="fa-solid fa-child text-purple-400"></i> Interactive 3.5e Anatomical Equipment Doll
+                </div>
+
+                <div className="max-w-md mx-auto space-y-2.5">
+                  {/* Row 1: Head & Eyes */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {['head', 'headband'].map(slotId => {
+                      const slotDef = BODY_SLOT_MAP[slotId as BodySlotId];
+                      const rep = bodySlotReport.slots[slotId as BodySlotId];
+                      return (
+                        <div
+                          key={slotId}
+                          onClick={() => {
+                            if (!rep?.isOccupied) {
+                              openWondrousModal(slotId as BodySlotId);
+                            }
+                          }}
+                          className={`p-2 rounded-xl border text-center cursor-pointer transition ${
+                            rep?.hasConflict
+                              ? 'bg-rose-950/60 border-rose-500 ring-1 ring-rose-500'
+                              : rep?.isOccupied
+                              ? 'bg-slate-900 border-purple-500/50 shadow-xs'
+                              : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center gap-1 text-slate-300 text-xs font-bold">
+                            <i className={`${slotDef.icon} ${rep?.hasConflict ? 'text-rose-400' : rep?.isOccupied ? 'text-purple-400' : 'text-slate-500'}`}></i>
+                            <span>{slotDef.name}</span>
+                          </div>
+                          <div className="mt-1 text-xs truncate">
+                            {rep?.isOccupied ? (
+                              <span className="font-bold text-amber-300 truncate block">
+                                {rep.equippedItems.map(i => i.name).join(', ')}
+                              </span>
+                            ) : (
+                              <span className="text-slate-500 italic text-[10.5px]">+ Equip</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Row 2: Shoulders & Neck */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {['shoulders', 'neck'].map(slotId => {
+                      const slotDef = BODY_SLOT_MAP[slotId as BodySlotId];
+                      const rep = bodySlotReport.slots[slotId as BodySlotId];
+                      return (
+                        <div
+                          key={slotId}
+                          onClick={() => {
+                            if (!rep?.isOccupied) {
+                              openWondrousModal(slotId as BodySlotId);
+                            }
+                          }}
+                          className={`p-2 rounded-xl border text-center cursor-pointer transition ${
+                            rep?.hasConflict
+                              ? 'bg-rose-950/60 border-rose-500 ring-1 ring-rose-500'
+                              : rep?.isOccupied
+                              ? 'bg-slate-900 border-purple-500/50 shadow-xs'
+                              : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center gap-1 text-slate-300 text-xs font-bold">
+                            <i className={`${slotDef.icon} ${rep?.hasConflict ? 'text-rose-400' : rep?.isOccupied ? 'text-purple-400' : 'text-slate-500'}`}></i>
+                            <span>{slotDef.name}</span>
+                          </div>
+                          <div className="mt-1 text-xs truncate">
+                            {rep?.isOccupied ? (
+                              <span className="font-bold text-amber-300 truncate block">
+                                {rep.equippedItems.map(i => i.name).join(', ')}
+                              </span>
+                            ) : (
+                              <span className="text-slate-500 italic text-[10.5px]">+ Equip</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Row 3: Armor, Chest & Body */}
+                  <div className="grid grid-cols-3 gap-2">
+                    {['armor', 'chest', 'body'].map(slotId => {
+                      const slotDef = BODY_SLOT_MAP[slotId as BodySlotId];
+                      const rep = bodySlotReport.slots[slotId as BodySlotId];
+                      return (
+                        <div
+                          key={slotId}
+                          onClick={() => {
+                            if (!rep?.isOccupied) {
+                              openWondrousModal(slotId as BodySlotId);
+                            }
+                          }}
+                          className={`p-2 rounded-xl border text-center cursor-pointer transition ${
+                            rep?.hasConflict
+                              ? 'bg-rose-950/60 border-rose-500 ring-1 ring-rose-500'
+                              : rep?.isOccupied
+                              ? 'bg-slate-900 border-purple-500/50 shadow-xs'
+                              : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center gap-1 text-slate-300 text-xs font-bold">
+                            <i className={`${slotDef.icon} ${rep?.hasConflict ? 'text-rose-400' : rep?.isOccupied ? 'text-purple-400' : 'text-slate-500'}`}></i>
+                            <span className="truncate">{slotDef.name}</span>
+                          </div>
+                          <div className="mt-1 text-xs truncate">
+                            {rep?.isOccupied ? (
+                              <span className="font-bold text-amber-300 truncate block text-[11px]">
+                                {rep.equippedItems.map(i => i.name).join(', ')}
+                              </span>
+                            ) : (
+                              <span className="text-slate-500 italic text-[10.5px]">+ Equip</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Row 4: Arms, Hands, Ring 1, Ring 2 */}
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {['arms', 'hands', 'ring1', 'ring2'].map(slotId => {
+                      const slotDef = BODY_SLOT_MAP[slotId as BodySlotId];
+                      const rep = bodySlotReport.slots[slotId as BodySlotId];
+                      return (
+                        <div
+                          key={slotId}
+                          onClick={() => {
+                            if (!rep?.isOccupied) {
+                              openWondrousModal(slotId as BodySlotId);
+                            }
+                          }}
+                          className={`p-1.5 rounded-xl border text-center cursor-pointer transition ${
+                            rep?.hasConflict
+                              ? 'bg-rose-950/60 border-rose-500 ring-1 ring-rose-500'
+                              : rep?.isOccupied
+                              ? 'bg-slate-900 border-purple-500/50 shadow-xs'
+                              : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center gap-1 text-slate-300 text-[11px] font-bold">
+                            <i className={`${slotDef.icon} ${rep?.hasConflict ? 'text-rose-400' : rep?.isOccupied ? 'text-purple-400' : 'text-slate-500'} text-[10px]`}></i>
+                            <span className="truncate">{slotDef.name}</span>
+                          </div>
+                          <div className="mt-1 text-[10.5px] truncate">
+                            {rep?.isOccupied ? (
+                              <span className="font-bold text-amber-300 truncate block">
+                                {rep.equippedItems.map(i => i.name).join(', ')}
+                              </span>
+                            ) : (
+                              <span className="text-slate-500 italic text-[10px]">+ Equip</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Row 5: Waist */}
+                  <div className="max-w-[200px] mx-auto">
+                    {['waist'].map(slotId => {
+                      const slotDef = BODY_SLOT_MAP[slotId as BodySlotId];
+                      const rep = bodySlotReport.slots[slotId as BodySlotId];
+                      return (
+                        <div
+                          key={slotId}
+                          onClick={() => {
+                            if (!rep?.isOccupied) {
+                              openWondrousModal(slotId as BodySlotId);
+                            }
+                          }}
+                          className={`p-2 rounded-xl border text-center cursor-pointer transition ${
+                            rep?.hasConflict
+                              ? 'bg-rose-950/60 border-rose-500 ring-1 ring-rose-500'
+                              : rep?.isOccupied
+                              ? 'bg-slate-900 border-purple-500/50 shadow-xs'
+                              : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center gap-1 text-slate-300 text-xs font-bold">
+                            <i className={`${slotDef.icon} ${rep?.hasConflict ? 'text-rose-400' : rep?.isOccupied ? 'text-purple-400' : 'text-slate-500'}`}></i>
+                            <span>{slotDef.name}</span>
+                          </div>
+                          <div className="mt-1 text-xs truncate">
+                            {rep?.isOccupied ? (
+                              <span className="font-bold text-amber-300 truncate block">
+                                {rep.equippedItems.map(i => i.name).join(', ')}
+                              </span>
+                            ) : (
+                              <span className="text-slate-500 italic text-[10.5px]">+ Equip</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Row 6: Feet */}
+                  <div className="max-w-[200px] mx-auto">
+                    {['feet'].map(slotId => {
+                      const slotDef = BODY_SLOT_MAP[slotId as BodySlotId];
+                      const rep = bodySlotReport.slots[slotId as BodySlotId];
+                      return (
+                        <div
+                          key={slotId}
+                          onClick={() => {
+                            if (!rep?.isOccupied) {
+                              openWondrousModal(slotId as BodySlotId);
+                            }
+                          }}
+                          className={`p-2 rounded-xl border text-center cursor-pointer transition ${
+                            rep?.hasConflict
+                              ? 'bg-rose-950/60 border-rose-500 ring-1 ring-rose-500'
+                              : rep?.isOccupied
+                              ? 'bg-slate-900 border-purple-500/50 shadow-xs'
+                              : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center gap-1 text-slate-300 text-xs font-bold">
+                            <i className={`${slotDef.icon} ${rep?.hasConflict ? 'text-rose-400' : rep?.isOccupied ? 'text-purple-400' : 'text-slate-500'}`}></i>
+                            <span>{slotDef.name}</span>
+                          </div>
+                          <div className="mt-1 text-xs truncate">
+                            {rep?.isOccupied ? (
+                              <span className="font-bold text-amber-300 truncate block">
+                                {rep.equippedItems.map(i => i.name).join(', ')}
+                              </span>
+                            ) : (
+                              <span className="text-slate-500 italic text-[10.5px]">+ Equip</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Slotless / Wondrous Gear Section */}
+            <div className="pt-2 border-t border-slate-800/80">
+              <div className="flex items-center justify-between text-xs pb-1.5">
+                <span className="font-bold text-slate-300 flex items-center gap-1.5">
+                  <i className="fa-solid fa-wand-magic-sparkles text-purple-400"></i> Slotless Items & Wondrous Instruments
+                </span>
+                <button
+                  type="button"
+                  onClick={() => openWondrousModal('slotless')}
+                  className="text-[10.5px] text-purple-400 hover:text-purple-300 font-mono flex items-center gap-1 cursor-pointer"
+                >
+                  <i className="fa-solid fa-plus"></i> Add Slotless
+                </button>
+              </div>
+              {((bodySlotReport.slots.slotless?.equippedItems) || []).length === 0 ? (
+                <p className="text-[11px] text-slate-500 italic p-2 text-center bg-slate-950/40 rounded-xl">
+                  No slotless items (e.g. Ioun Stones, Handy Haversack, Figurines of Wondrous Power).
+                </p>
+              ) : (
+                <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
+                  {bodySlotReport.slots.slotless.equippedItems.map(item => (
+                    <div key={item.id} className="p-2 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs gap-3">
+                      <div className="flex-1 min-w-0">
+                        <span className="font-bold text-amber-300 truncate block">{item.name}</span>
+                        {item.effect && <p className="text-[10.5px] text-slate-400 truncate">{item.effect}</p>}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleUnequipSlotItem(item)}
+                        className="text-slate-500 hover:text-rose-400 p-1 text-xs cursor-pointer"
+                        title="Remove Item"
+                      >
+                        <i className="fa-solid fa-trash-can"></i>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -3356,7 +4051,20 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                   </div>
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <button
-                      onClick={() => rollAttack(rangedTotalAtk, `${rangedWpnObj.name} Ranged Attack`, rangedWpnObj, { threatMin: rangedThreat, damageBonus: rangedDmgVal, damageFormula: rangedDamageFormula })}
+                      onClick={() => {
+                        if (eq.autoDecrementAmmo) {
+                          const result = decrementEquippedAmmunition(character, 1);
+                          if (result.ammoItem) {
+                            onChange(result.updatedCharacter);
+                            setAmmoRollFeedback(result.message);
+                            setTimeout(() => setAmmoRollFeedback(null), 4500);
+                          } else {
+                            setAmmoRollFeedback('⚠️ ' + result.message);
+                            setTimeout(() => setAmmoRollFeedback(null), 4500);
+                          }
+                        }
+                        rollAttack(rangedTotalAtk, `${rangedWpnObj.name} Ranged Attack`, rangedWpnObj, { threatMin: rangedThreat, damageBonus: rangedDmgVal, damageFormula: rangedDamageFormula });
+                      }}
                       className="font-mono text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/20 px-2 py-0.5 rounded border border-cyan-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
                       title={`Click to roll ${rangedWpnObj.name} Ranged Attack`}
                     >
@@ -3365,7 +4073,20 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                     </button>
                     {rangedBaneAtk && (
                       <button
-                        onClick={() => rollAttack(rangedBaneAtk.atkBonus, rangedBaneAtk.label, rangedWpnObj, { threatMin: rangedThreat, damageBonus: rangedDmgVal, damageFormula: rangedDamageFormula })}
+                        onClick={() => {
+                          if (eq.autoDecrementAmmo) {
+                            const result = decrementEquippedAmmunition(character, 1);
+                            if (result.ammoItem) {
+                              onChange(result.updatedCharacter);
+                              setAmmoRollFeedback(result.message);
+                              setTimeout(() => setAmmoRollFeedback(null), 4500);
+                            } else {
+                              setAmmoRollFeedback('⚠️ ' + result.message);
+                              setTimeout(() => setAmmoRollFeedback(null), 4500);
+                            }
+                          }
+                          rollAttack(rangedBaneAtk.atkBonus, rangedBaneAtk.label, rangedWpnObj, { threatMin: rangedThreat, damageBonus: rangedDmgVal, damageFormula: rangedDamageFormula });
+                        }}
                         className="font-mono text-red-400 hover:text-red-300 hover:bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30 font-bold text-[11px] transition flex items-center gap-1 cursor-pointer"
                         title={`Click to roll ${rangedBaneAtk.label}`}
                       >
@@ -3375,6 +4096,14 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                     )}
                   </div>
                 </div>
+
+                {/* Auto-Decrement Feedback Alert */}
+                {ammoRollFeedback && (
+                  <div className="p-2 rounded-lg bg-cyan-950/70 border border-cyan-500/50 text-cyan-200 text-xs flex items-center gap-2 animate-pulse">
+                    <i className="fa-solid fa-arrows-rotate text-cyan-400"></i>
+                    <span className="font-mono text-[11px]">{ammoRollFeedback}</span>
+                  </div>
+                )}
 
                 <div className="flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-slate-800/80">
                   {rangedRollOptions.map((opt) => (
@@ -3422,6 +4151,238 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                     </button>
                   )}
                 </div>
+              </div>
+            )}
+          </div>
+
+          {/* Ammunition Tracker & Quiver Section */}
+          <div className="border-t border-slate-800 pt-5 space-y-3.5">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400">
+                  <i className="fa-solid fa-bullseye text-sm"></i>
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                    Ammunition Tracker & Quiver
+                  </h3>
+                  <span className="text-[10px] text-slate-400">
+                    Arrows, Crossbow Bolts, Sling Bullets ({characterAmmunition.length} tracked)
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Auto-Decrement Toggle */}
+                <label className="flex items-center gap-1.5 cursor-pointer bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800 hover:border-slate-700 transition" title="Automatically subtracts 1 ammo when executing ranged attack rolls">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(eq.autoDecrementAmmo)}
+                    onChange={e => handleEqChange('autoDecrementAmmo', e.target.checked)}
+                    className="rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500/20 text-xs"
+                  />
+                  <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1">
+                    <i className="fa-solid fa-arrows-rotate text-[9px] text-cyan-400"></i> Auto-Decrement
+                  </span>
+                </label>
+
+                {/* Preset Dropdown */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setAmmoPresetDropdownOpen(!ammoPresetDropdownOpen)}
+                    className="btn btn-secondary text-[11px] py-1 px-2.5 flex items-center gap-1 cursor-pointer"
+                  >
+                    <i className="fa-solid fa-plus text-amber-400"></i> Standard Ammo <i className="fa-solid fa-chevron-down text-[9px] opacity-70"></i>
+                  </button>
+                  {ammoPresetDropdownOpen && (
+                    <div className="absolute right-0 mt-1 w-64 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl z-30 p-1.5 space-y-1 max-h-64 overflow-y-auto">
+                      <div className="text-[9px] font-bold uppercase text-slate-400 px-2 py-0.5 border-b border-slate-800">
+                        Select Standard Ammo Preset
+                      </div>
+                      {STANDARD_AMMO_PRESETS.map(preset => (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          onClick={() => handleAddAmmoPreset(preset)}
+                          className="w-full text-left px-2 py-1.5 rounded-lg hover:bg-slate-800/80 transition flex items-center justify-between text-xs cursor-pointer group"
+                        >
+                          <div>
+                            <div className="font-bold text-slate-200 group-hover:text-amber-300 text-[11px]">{preset.name}</div>
+                            <div className="text-[9.5px] text-slate-400">{preset.value} • {preset.weight} lb • {preset.location}</div>
+                          </div>
+                          <span className="badge bg-slate-800 text-amber-400 text-[9px] font-mono">+{preset.quantity}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Custom Ammo Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowCustomAmmoModal(true)}
+                  className="btn btn-secondary text-[11px] py-1 px-2.5 flex items-center gap-1 cursor-pointer"
+                >
+                  <i className="fa-solid fa-plus text-slate-400"></i> Custom
+                </button>
+              </div>
+            </div>
+
+            {/* List of Ammunition */}
+            {characterAmmunition.length === 0 ? (
+              <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-800/80 text-center space-y-1">
+                <p className="text-xs text-slate-400 italic">No ammunition currently in inventory.</p>
+                <p className="text-[10.5px] text-slate-500">Add Arrows, Crossbow Bolts, or Sling Bullets to track ammunition counts and enable auto-decrement on attack rolls.</p>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
+                {characterAmmunition.map(ammo => {
+                  const isActive = eq.equippedAmmoId === ammo.id;
+                  const qty = ammo.quantity || 0;
+                  const isDepleted = qty === 0;
+                  const isLow = qty > 0 && qty <= 5;
+
+                  return (
+                    <div
+                      key={ammo.id}
+                      className={`p-2.5 rounded-xl border transition flex items-center justify-between gap-3 ${
+                        isActive
+                          ? 'bg-amber-950/25 border-amber-500/50 shadow-xs'
+                          : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                        {/* Active Loaded Toggle Button */}
+                        <button
+                          type="button"
+                          onClick={() => handleSetActiveAmmo(ammo.id)}
+                          className={`p-1.5 rounded-lg border text-xs transition cursor-pointer ${
+                            isActive
+                              ? 'bg-amber-500 text-slate-950 border-amber-400 font-bold'
+                              : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-amber-400 hover:border-amber-500/40'
+                          }`}
+                          title={isActive ? 'Active ammunition loaded in quiver' : 'Click to set as active loaded ammunition'}
+                        >
+                          <i className="fa-solid fa-crosshairs"></i>
+                        </button>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className={`font-bold text-xs truncate ${isActive ? 'text-amber-300' : 'text-slate-200'}`}>
+                              {ammo.name}
+                            </span>
+                            {ammo.ammoType && (
+                              <span className="badge bg-slate-800 text-slate-400 text-[9px] font-mono uppercase">
+                                {ammo.ammoType}
+                              </span>
+                            )}
+                            {ammo.enhancementBonus ? (
+                              <span className="badge bg-amber-900/60 text-amber-300 text-[9px] font-mono font-bold">
+                                +{ammo.enhancementBonus}
+                              </span>
+                            ) : null}
+                            {ammo.isMasterwork && !ammo.enhancementBonus && (
+                              <span className="badge bg-blue-900/50 text-blue-300 text-[9px] font-mono">
+                                MWK
+                              </span>
+                            )}
+                            {ammo.material && ammo.material !== 'standard' && (
+                              <span className="badge bg-zinc-800 text-zinc-300 text-[9px] font-mono">
+                                {ammo.material.replace('_', ' ')}
+                              </span>
+                            )}
+                            {isActive && (
+                              <span className="badge bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-bold">
+                                ACTIVE
+                              </span>
+                            )}
+                            {isDepleted ? (
+                              <span className="badge bg-rose-900/80 text-rose-300 text-[9px] font-bold">
+                                DEPLETED
+                              </span>
+                            ) : isLow ? (
+                              <span className="badge bg-amber-900/80 text-amber-300 text-[9px] font-bold">
+                                LOW AMMO
+                              </span>
+                            ) : null}
+                          </div>
+                          <div className="text-[10px] text-slate-400 flex items-center gap-2 mt-0.5">
+                            <span>Loc: {ammo.location || 'Quiver'}</span>
+                            <span>•</span>
+                            <span>Weight: {(qty * (ammo.weight || 0)).toFixed(1)} lb</span>
+                            {ammo.notes && (
+                              <>
+                                <span>•</span>
+                                <span className="truncate text-slate-500">{ammo.notes}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Quantity Stepper Controls */}
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleAdjustAmmoQuantity(ammo.id, -5)}
+                          disabled={qty === 0}
+                          className="w-6 h-6 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-slate-300 border border-slate-800 text-[10px] font-bold transition flex items-center justify-center cursor-pointer"
+                          title="Decrease by 5"
+                        >
+                          -5
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleAdjustAmmoQuantity(ammo.id, -1)}
+                          disabled={qty === 0}
+                          className="w-6 h-6 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-slate-300 border border-slate-800 text-xs font-bold transition flex items-center justify-center cursor-pointer"
+                          title="Decrease by 1"
+                        >
+                          -1
+                        </button>
+                        <input
+                          type="number"
+                          min="0"
+                          value={qty}
+                          onChange={e => handleUpdateAmmoQuantity(ammo.id, parseInt(e.target.value) || 0)}
+                          className={`w-12 h-6 text-center font-mono font-bold text-xs rounded border bg-slate-950 px-1 ${
+                            isDepleted
+                              ? 'text-rose-400 border-rose-800'
+                              : isLow
+                              ? 'text-amber-400 border-amber-800'
+                              : 'text-slate-200 border-slate-800'
+                          }`}
+                          title="Direct Quantity Input"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleAdjustAmmoQuantity(ammo.id, 1)}
+                          className="w-6 h-6 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold transition flex items-center justify-center cursor-pointer"
+                          title="Increase by 1"
+                        >
+                          +1
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleAdjustAmmoQuantity(ammo.id, 5)}
+                          className="w-6 h-6 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-[10px] font-bold transition flex items-center justify-center cursor-pointer"
+                          title="Increase by 5"
+                        >
+                          +5
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAmmo(ammo.id)}
+                          className="text-slate-500 hover:text-rose-400 p-1 text-xs ml-1 cursor-pointer"
+                          title="Remove Ammunition"
+                        >
+                          <i className="fa-solid fa-trash-can"></i>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -3856,6 +4817,59 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                                     <i className="fa-solid fa-shield"></i> Equip
                                   </button>
                                 )}
+                                {(item.rawItem?.itemType === 'ammunition' || (!isEquippedGear && (item.name.toLowerCase().includes('arrow') || item.name.toLowerCase().includes('bolt') || item.name.toLowerCase().includes('bullet')))) && (
+                                  eq.equippedAmmoId === item.id ? (
+                                    <span className="text-amber-400 bg-amber-500/15 px-2 py-0.5 rounded text-[10px] font-sans font-bold border border-amber-500/30 inline-flex items-center gap-1">
+                                      <i className="fa-solid fa-crosshairs text-[9px]"></i> Active
+                                    </span>
+                                  ) : (
+                                    <button
+                                      onClick={() => handleSetActiveAmmo(item.id)}
+                                      className="text-amber-400 hover:text-amber-300 hover:bg-amber-500/20 px-2 py-0.5 rounded text-[10px] font-sans font-bold border border-amber-500/30 transition inline-flex items-center gap-1 cursor-pointer shadow-xs"
+                                      title={`Load ${item.name} as active ammunition in quiver`}
+                                    >
+                                      <i className="fa-solid fa-crosshairs text-[9px]"></i> Load
+                                    </button>
+                                  )
+                                )}
+                                {(item.rawItem?.itemType === 'wondrous' || item.rawItem?.bodySlot || (!isEquippedGear && !['weapon', 'armor', 'shield'].includes(getEquippableCategory(item.rawItem || item.name)) && item.rawItem?.itemType !== 'ammunition')) && (
+                                  equipSlotPickerItemId === item.id ? (
+                                    <div className="inline-flex items-center gap-1 bg-slate-900 border border-purple-500/50 rounded-md p-1 shadow-lg z-20">
+                                      <span className="text-[9px] uppercase font-bold text-purple-400 px-0.5">Slot:</span>
+                                      <select
+                                        onChange={e => {
+                                          const target = item.rawItem || inventory.find(i => i.id === item.id);
+                                          if (target && e.target.value) {
+                                            handleEquipInventoryItemToSlot(target, e.target.value as BodySlotId);
+                                          }
+                                          setEquipSlotPickerItemId(null);
+                                        }}
+                                        defaultValue=""
+                                        className="bg-slate-800 text-slate-200 text-[10px] rounded px-1 py-0.5 border border-slate-700 font-sans cursor-pointer"
+                                      >
+                                        <option value="" disabled>Choose slot...</option>
+                                        {CANONICAL_BODY_SLOTS.map(s => (
+                                          <option key={s.id} value={s.id}>{s.name}</option>
+                                        ))}
+                                      </select>
+                                      <button
+                                        onClick={() => setEquipSlotPickerItemId(null)}
+                                        className="text-slate-400 hover:text-slate-200 px-1 text-xs cursor-pointer"
+                                        title="Cancel"
+                                      >
+                                        <i className="fa-solid fa-xmark"></i>
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => setEquipSlotPickerItemId(item.id)}
+                                      className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 px-2 py-0.5 rounded text-[10px] font-sans font-bold border border-purple-500/30 transition inline-flex items-center gap-1 cursor-pointer shadow-xs"
+                                      title={`Equip ${item.name} to a body slot`}
+                                    >
+                                      <i className="fa-solid fa-gem text-[9px]"></i> Equip Slot
+                                    </button>
+                                  )
+                                )}
                               </>
                             )}
                             <button
@@ -4175,64 +5189,555 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
       )}
 
       {/* Modal: Add Wondrous Item */}
+      {/* Modal: Add Wondrous Item & Magic Gear (Predefined Catalog + Custom) */}
       {showWondrousModal && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <form onSubmit={handleAddWondrousItem} className="card bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-md w-full space-y-4">
-            <h3 className="text-base font-bold text-purple-400 flex items-center gap-2 border-b border-slate-800 pb-3">
-              <i className="fa-solid fa-gem"></i> Add Wondrous Item / Magic Gear
-            </h3>
-
-            <div>
-              <label className="label-text">Item Name</label>
-              <input
-                type="text"
-                required
-                value={wondrousName}
-                onChange={e => setWondrousName(e.target.value)}
-                placeholder="e.g. Cloak of Resistance +2, Belt of Giant Strength +4"
-                className="input-field text-xs"
-              />
-            </div>
-
-            <div>
-              <label className="label-text">Item Slot</label>
-              <select
-                value={wondrousSlot}
-                onChange={e => setWondrousSlot(e.target.value as any)}
-                className="input-field text-xs"
-              >
-                <option value="shoulders">Shoulders (Cloaks / Capes)</option>
-                <option value="head">Head (Helms / Hats)</option>
-                <option value="headband">Headband (Phylacteries / Headbands)</option>
-                <option value="neck">Neck (Amulets / Neclaces)</option>
-
-                <option value="chest">Chest (Vests / Mantles)</option>
-                <option value="body">Body (Robes / Vestments)</option>
-                <option value="hands">Hands (Gauntlets / Gloves)</option>
-                <option value="arms">Arms (Bracers / Armbands)</option>
-                <option value="waist">Waist (Belts / Girdles)</option>
-                <option value="feet">Feet (Boots / Shoes)</option>
-                <option value="ring1">Ring Slot 1</option>
-                <option value="ring2">Ring Slot 2</option>
-                <option value="slotless">Slotless / Wondrous Item</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="label-text">Effect / Property Description</label>
-              <input
-                type="text"
-                value={wondrousEffect}
-                onChange={e => setWondrousEffect(e.target.value)}
-                placeholder="e.g. +2 resistance bonus to all saving throws"
-                className="input-field text-xs"
-              />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+          <div className="card bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-2xl w-full space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <h3 className="text-base font-bold text-purple-400 flex items-center gap-2">
+                  <i className="fa-solid fa-gem"></i> Add Wondrous Item & Magic Gear
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Choose from 176 standard 3.5e predefined items (DMG / MIC) or define custom gear.
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowWondrousModal(false)}
+                className="text-slate-400 hover:text-slate-200 text-lg leading-none cursor-pointer p-1"
+                title="Close"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Mode Switcher Tabs */}
+            <div className="flex rounded-xl bg-slate-950/80 p-1 border border-slate-800 shrink-0">
+              <button
+                type="button"
+                onClick={() => setWondrousModalTab('predefined')}
+                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                  wondrousModalTab === 'predefined'
+                    ? 'bg-purple-600 text-white shadow-xs'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <i className="fa-solid fa-book-sparkles"></i>
+                <span>3.5e Predefined Catalog ({filteredPredefinedItems.length})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setWondrousModalTab('custom')}
+                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                  wondrousModalTab === 'custom'
+                    ? 'bg-purple-600 text-white shadow-xs'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <i className="fa-solid fa-pen-to-square"></i>
+                <span>Custom Item</span>
+              </button>
+            </div>
+
+            {/* TAB 1: PREDEFINED 3.5e ITEMS */}
+            {wondrousModalTab === 'predefined' && (
+              <div className="space-y-3 overflow-y-auto flex-1 pr-1">
+                {/* Search & Slot Filter Bar */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div className="sm:col-span-2 relative">
+                    <input
+                      type="text"
+                      value={wondrousPredefinedSearch}
+                      onChange={e => setWondrousPredefinedSearch(e.target.value)}
+                      placeholder="Search items by name, effect, or source..."
+                      className="input-field text-xs w-full pl-8 pr-7"
+                    />
+                    <i className="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                    {wondrousPredefinedSearch && (
+                      <button
+                        type="button"
+                        onClick={() => setWondrousPredefinedSearch('')}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-xs cursor-pointer"
+                      >
+                        &times;
+                      </button>
+                    )}
+                  </div>
+                  <div>
+                    <select
+                      value={wondrousPredefinedSlotFilter}
+                      onChange={e => setWondrousPredefinedSlotFilter(e.target.value as any)}
+                      className="input-field text-xs w-full"
+                    >
+                      <option value="all">All Body Slots (176)</option>
+                      <option value="head">Head (Helms / Hats) (11)</option>
+                      <option value="headband">Headband (Phylacteries / Eyes) (12)</option>
+                      <option value="neck">Neck (Amulets / Necklaces) (29)</option>
+                      <option value="shoulders">Shoulders (Cloaks / Capes) (16)</option>
+                      <option value="chest">Chest (Vests / Mantles) (5)</option>
+                      <option value="body">Body (Robes / Vestments) (6)</option>
+                      <option value="armor">Armor (Suit of Armor) (3)</option>
+                      <option value="hands">Hands (Gauntlets / Gloves) (8)</option>
+                      <option value="arms">Arms (Bracers / Armbands) (11)</option>
+                      <option value="waist">Waist (Belts / Girdles) (7)</option>
+                      <option value="feet">Feet (Boots / Shoes) (8)</option>
+                      <option value="ring1">Rings (Ring 1 & Ring 2) (23)</option>
+                      <option value="slotless">Slotless / Other (37)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Sourcebook Filter Control Bar */}
+                <div className="flex items-center justify-between gap-2 px-1 text-xs">
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-300 select-none">
+                    <input
+                      type="checkbox"
+                      checked={wondrousOnlyAllowedSources}
+                      onChange={e => setWondrousOnlyAllowedSources(e.target.checked)}
+                      className="rounded border-slate-700 bg-slate-800 text-purple-600 focus:ring-purple-500 h-3.5 w-3.5 cursor-pointer"
+                    />
+                    <span className="text-[11px] text-slate-300 flex items-center gap-1.5">
+                      <i className="fa-solid fa-book-bookmark text-purple-400 text-[10px]"></i>
+                      <span>Allowed sources only</span>
+                    </span>
+                  </label>
+                  <span className="text-[11px] text-slate-400 font-mono">
+                    Showing {filteredPredefinedItems.length} items
+                  </span>
+                </div>
+
+                {/* Predefined Items List */}
+                <div className="border border-slate-800 rounded-xl bg-slate-950/60 overflow-hidden">
+                  <div className="max-h-56 overflow-y-auto divide-y divide-slate-800/60 p-1">
+                    {filteredPredefinedItems.length === 0 ? (
+                      <div className="p-6 text-center text-slate-500 text-xs italic space-y-1">
+                        <p>No predefined items match your filter criteria.</p>
+                        {wondrousOnlyAllowedSources && (
+                          <button
+                            type="button"
+                            onClick={() => setWondrousOnlyAllowedSources(false)}
+                            className="text-purple-400 hover:text-purple-300 underline text-[11px] cursor-pointer"
+                          >
+                            Show items from all sourcebooks
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      filteredPredefinedItems.map(item => {
+                        const isSelected = selectedPredefinedId === item.id;
+                        const slotDef = BODY_SLOT_MAP[item.slot];
+                        const sourceBadge = getSourceBadgeInfo(item.source, character.allowedSources);
+
+                        return (
+                          <div
+                            key={item.id}
+                            onClick={() => {
+                              setSelectedPredefinedId(item.id);
+                              setWondrousTargetSlot(
+                                item.slot === 'ring1' && wondrousSlot === 'ring2'
+                                  ? 'ring2'
+                                  : item.slot
+                              );
+                            }}
+                            className={`p-2.5 rounded-lg cursor-pointer transition flex items-start justify-between gap-3 ${
+                              isSelected
+                                ? 'bg-purple-950/40 border border-purple-500/60 ring-1 ring-purple-500/40 shadow-xs'
+                                : !sourceBadge.isAllowed
+                                ? 'bg-slate-950/40 border border-rose-500/20 hover:border-rose-500/40'
+                                : 'hover:bg-slate-900 border border-transparent'
+                            }`}
+                          >
+                            <div className="min-w-0 flex-1 space-y-0.5">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span className="font-bold text-slate-100 text-xs leading-tight">
+                                  {item.name}
+                                </span>
+                                <span className="px-1.5 py-0.5 rounded text-[9.5px] font-medium bg-purple-500/15 border border-purple-500/30 text-purple-300 flex items-center gap-1">
+                                  <i className={`${slotDef?.icon || 'fa-solid fa-gem'} text-[8.5px]`}></i>
+                                  {slotDef?.name || item.slot}
+                                </span>
+                                {item.cost && (
+                                  <span className="text-[10px] text-amber-400 font-mono font-medium">
+                                    {item.cost}
+                                  </span>
+                                )}
+                                {item.weight !== undefined && (
+                                  <span className="text-[9.5px] text-slate-400 font-mono">
+                                    {item.weight > 0 ? `${item.weight} lb` : '—'}
+                                  </span>
+                                )}
+                                <span
+                                  className={`badge font-mono text-[9px] px-1.5 py-0.2 rounded border ${
+                                    sourceBadge.isAllowed
+                                      ? 'bg-slate-800 text-slate-300 border-slate-700'
+                                      : 'bg-rose-950/40 text-rose-400 border-rose-500/30'
+                                  }`}
+                                  title={`${sourceBadge.sourceName}${sourceBadge.isAllowed ? ' (Allowed)' : ' (Not Selected in Sourcebooks)'}`}
+                                >
+                                  {sourceBadge.sourceCode}
+                                </span>
+                                {!sourceBadge.isAllowed && (
+                                  <span
+                                    className="px-1 py-0.2 rounded text-[8.5px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/40"
+                                    title="Restricted Sourcebook: This item's sourcebook is not enabled in Allowed Sources"
+                                  >
+                                    ⚠️ Restricted
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-400 line-clamp-2 leading-tight">
+                                {item.effect}
+                              </p>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEquipPredefinedItem(item, wondrousTargetSlot);
+                              }}
+                              className="btn btn-primary text-xs py-1 px-2.5 shrink-0 self-center flex items-center gap-1"
+                              title={`Equip ${item.name}`}
+                            >
+                              <i className="fa-solid fa-plus text-[9px]"></i> Equip
+                            </button>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+
+                {/* Selected Item Details Preview & Slot Override */}
+                {selectedPredefinedItem && (() => {
+                  const selBadge = getSourceBadgeInfo(selectedPredefinedItem.source, character.allowedSources);
+                  return (
+                    <div className="p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/40 space-y-2">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-purple-300 text-xs">
+                            {selectedPredefinedItem.name}
+                          </span>
+                          {selectedPredefinedItem.cost && (
+                            <span className="text-[10.5px] text-amber-300 font-mono">
+                              ({selectedPredefinedItem.cost})
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] text-slate-400">Source:</span>
+                          <span
+                            className={`badge font-mono text-[9.5px] px-1.5 py-0.5 rounded border ${
+                              selBadge.isAllowed
+                                ? 'bg-slate-800 text-slate-200 border-slate-700'
+                                : 'bg-rose-950/50 text-rose-300 border-rose-500/40'
+                            }`}
+                            title={selBadge.sourceName}
+                          >
+                            {selBadge.sourceName} ({selBadge.sourceCode})
+                          </span>
+                          {!selBadge.isAllowed && (
+                            <span className="text-[9.5px] text-rose-400 font-semibold">
+                              (Restricted)
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <p className="text-[11px] text-slate-300 font-mono bg-slate-900/90 p-2 rounded-lg border border-slate-800 leading-relaxed">
+                        {selectedPredefinedItem.effect}
+                      </p>
+
+                      <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                        <div className="flex items-center gap-2">
+                          <label className="text-slate-400 text-[11px] font-medium whitespace-nowrap">
+                            Equip into Body Slot:
+                          </label>
+                          <select
+                            value={wondrousTargetSlot}
+                            onChange={e => setWondrousTargetSlot(e.target.value as any)}
+                            className="input-field text-xs py-1"
+                          >
+                            <option value="shoulders">Shoulders (Cloaks / Capes)</option>
+                            <option value="head">Head (Helms / Hats)</option>
+                            <option value="headband">Headband (Phylacteries / Eyes)</option>
+                            <option value="neck">Neck (Amulets / Necklaces)</option>
+                            <option value="chest">Chest (Vests / Mantles)</option>
+                            <option value="body">Body (Robes / Vestments)</option>
+                            <option value="armor">Armor (Suit of Armor)</option>
+                            <option value="hands">Hands (Gauntlets / Gloves)</option>
+                            <option value="arms">Arms (Bracers / Armbands)</option>
+                            <option value="waist">Waist (Belts / Girdles)</option>
+                            <option value="feet">Feet (Boots / Shoes)</option>
+                            <option value="ring1">Ring Slot 1</option>
+                            <option value="ring2">Ring Slot 2</option>
+                            <option value="slotless">Slotless / Other</option>
+                          </select>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleEquipPredefinedItem(selectedPredefinedItem, wondrousTargetSlot)}
+                          className="btn btn-primary text-xs py-1 px-4 flex items-center gap-1.5"
+                        >
+                          <i className="fa-solid fa-shield-halved text-[10px]"></i> Equip to {BODY_SLOT_MAP[wondrousTargetSlot]?.name || wondrousTargetSlot}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setShowWondrousModal(false)}
+                    className="btn btn-secondary text-xs"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: CUSTOM WONDROUS ITEM */}
+            {wondrousModalTab === 'custom' && (
+              <form onSubmit={handleAddWondrousItem} className="space-y-3 overflow-y-auto flex-1 pr-1">
+                <div>
+                  <label className="label-text">Item Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={wondrousName}
+                    onChange={e => setWondrousName(e.target.value)}
+                    placeholder="e.g. Cloak of Resistance +2, Belt of Giant Strength +4"
+                    className="input-field text-xs w-full"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div>
+                    <label className="label-text">Item Slot</label>
+                    <select
+                      value={wondrousTargetSlot}
+                      onChange={e => setWondrousTargetSlot(e.target.value as any)}
+                      className="input-field text-xs w-full"
+                    >
+                      <option value="shoulders">Shoulders (Cloaks / Capes)</option>
+                      <option value="head">Head (Helms / Hats)</option>
+                      <option value="headband">Headband (Phylacteries / Headbands)</option>
+                      <option value="neck">Neck (Amulets / Neclaces)</option>
+                      <option value="chest">Chest (Vests / Mantles)</option>
+                      <option value="body">Body (Robes / Vestments)</option>
+                      <option value="armor">Armor (Suit of Armor)</option>
+                      <option value="hands">Hands (Gauntlets / Gloves)</option>
+                      <option value="arms">Arms (Bracers / Armbands)</option>
+                      <option value="waist">Waist (Belts / Girdles)</option>
+                      <option value="feet">Feet (Boots / Shoes)</option>
+                      <option value="ring1">Ring Slot 1</option>
+                      <option value="ring2">Ring Slot 2</option>
+                      <option value="slotless">Slotless / Wondrous Item</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="label-text">Cost / Value (gp)</label>
+                    <input
+                      type="text"
+                      value={wondrousCost}
+                      onChange={e => setWondrousCost(e.target.value)}
+                      placeholder="e.g. 4,000 gp"
+                      className="input-field text-xs w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="label-text">Weight (lbs)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      value={wondrousWeight}
+                      onChange={e => setWondrousWeight(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                      placeholder="0"
+                      className="input-field text-xs w-full"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="label-text">Effect / Property Description</label>
+                  <textarea
+                    rows={3}
+                    value={wondrousEffect}
+                    onChange={e => setWondrousEffect(e.target.value)}
+                    placeholder="e.g. +2 resistance bonus on all saving throws"
+                    className="input-field text-xs w-full font-mono"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setShowWondrousModal(false)}
+                    className="btn btn-secondary text-xs"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary text-xs"
+                  >
+                    Add Custom Item
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Custom Ammunition */}
+      {showCustomAmmoModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <form onSubmit={handleCreateCustomAmmo} className="card bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-md w-full space-y-4">
+            <h3 className="text-base font-bold text-amber-400 flex items-center gap-2 border-b border-slate-800 pb-3">
+              <i className="fa-solid fa-bullseye"></i> Create Custom Ammunition
+            </h3>
+
+            <div>
+              <label className="label-text">Ammunition Name</label>
+              <input
+                type="text"
+                required
+                value={customAmmoName}
+                onChange={e => setCustomAmmoName(e.target.value)}
+                placeholder="e.g. +1 Flaming Arrows (20), Silver Bolts (10)"
+                className="input-field text-xs"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="label-text">Ammo Category</label>
+                <select
+                  value={customAmmoType}
+                  onChange={e => setCustomAmmoType(e.target.value as AmmoCategory)}
+                  className="input-field text-xs"
+                >
+                  <option value="arrow">Arrows (Bows)</option>
+                  <option value="bolt">Crossbow Bolts</option>
+                  <option value="bullet">Sling Bullets</option>
+                  <option value="needle">Blowgun Needles</option>
+                  <option value="shuriken">Shuriken</option>
+                  <option value="other">Other Ammunition</option>
+                </select>
+              </div>
+              <div>
+                <label className="label-text">Quantity</label>
+                <input
+                  type="number"
+                  min="1"
+                  required
+                  value={customAmmoQuantity}
+                  onChange={e => setCustomAmmoQuantity(parseInt(e.target.value) || 1)}
+                  className="input-field font-mono text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="label-text">Enhancement Bonus</label>
+                <select
+                  value={String(customAmmoEnhancement)}
+                  onChange={e => setCustomAmmoEnhancement(parseInt(e.target.value) || 0)}
+                  className="input-field font-mono text-xs"
+                >
+                  <option value="0">None (+0)</option>
+                  <option value="1">+1 Enhancement</option>
+                  <option value="2">+2 Enhancement</option>
+                  <option value="3">+3 Enhancement</option>
+                  <option value="4">+4 Enhancement</option>
+                  <option value="5">+5 Enhancement</option>
+                </select>
+              </div>
+              <div>
+                <label className="label-text">Special Material</label>
+                <select
+                  value={customAmmoMaterial}
+                  onChange={e => setCustomAmmoMaterial(e.target.value as any)}
+                  className="input-field text-xs"
+                >
+                  <option value="standard">Standard</option>
+                  <option value="cold_iron">Cold Iron</option>
+                  <option value="alchemical_silver">Alchemical Silver</option>
+                  <option value="adamantine">Adamantine</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <label className="label-text">Weight (lbs)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={customAmmoWeight}
+                  onChange={e => setCustomAmmoWeight(parseFloat(e.target.value) || 0)}
+                  className="input-field font-mono text-xs"
+                />
+              </div>
+              <div>
+                <label className="label-text">Value</label>
+                <input
+                  type="text"
+                  value={customAmmoValue}
+                  onChange={e => setCustomAmmoValue(e.target.value)}
+                  placeholder="e.g. 10 gp"
+                  className="input-field text-xs"
+                />
+              </div>
+              <div>
+                <label className="label-text">Location</label>
+                <input
+                  type="text"
+                  value={customAmmoLocation}
+                  onChange={e => setCustomAmmoLocation(e.target.value)}
+                  placeholder="Quiver"
+                  className="input-field text-xs"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="label-text">Special Qualities / Notes</label>
+              <input
+                type="text"
+                value={customAmmoNotes}
+                onChange={e => setCustomAmmoNotes(e.target.value)}
+                placeholder="e.g. Flaming, screaming, sleep save DC 11"
+                className="input-field text-xs"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={customAmmoMasterwork}
+                  onChange={e => setCustomAmmoMasterwork(e.target.checked)}
+                  className="rounded border-slate-700 bg-slate-950 text-amber-500"
+                />
+                <span>Masterwork Ammunition (+1 enhancement on attacks)</span>
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setShowCustomAmmoModal(false)}
                 className="btn btn-secondary text-xs"
               >
                 Cancel
@@ -4241,7 +5746,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                 type="submit"
                 className="btn btn-primary text-xs"
               >
-                Add Item
+                Save Ammunition
               </button>
             </div>
           </form>

@@ -727,6 +727,131 @@ export function migrateCompanionsAndWildShape(char: CharacterSheetData): Charact
 }
 
 /**
+ * Migrates ammunition and body slots in character inventory and equipment:
+ * - Identifies inventory items with ammunition names and sets itemType: 'ammunition' and ammoType.
+ * - Ensures wondrousItems have valid canonical body slot IDs.
+ * Strictly idempotent.
+ */
+export function migrateAmmunitionAndBodySlots(char: CharacterSheetData): CharacterSheetData {
+  if (!char || typeof char !== 'object') {
+    return char;
+  }
+
+  let modified = false;
+  let updatedInventory = char.inventory;
+  let updatedEquipment = char.equipment;
+
+  // 1. Inventory ammunition items
+  if (Array.isArray(char.inventory)) {
+    const nextInv = char.inventory.map(item => {
+      if (!item) return item;
+      const cleanName = (item.name || '').toLowerCase();
+      const isAmmoName =
+        cleanName.includes('arrow') ||
+        cleanName.includes('bolt') ||
+        cleanName.includes('bullet') ||
+        cleanName.includes('blowgun needle') ||
+        cleanName.includes('shuriken');
+
+      if (isAmmoName) {
+        let changed = false;
+        const newItem = { ...item };
+        if (newItem.itemType !== 'ammunition') {
+          newItem.itemType = 'ammunition';
+          changed = true;
+        }
+        if (!newItem.ammoType) {
+          if (cleanName.includes('arrow')) newItem.ammoType = 'arrow';
+          else if (cleanName.includes('bolt')) newItem.ammoType = 'bolt';
+          else if (cleanName.includes('bullet')) newItem.ammoType = 'bullet';
+          else if (cleanName.includes('needle')) newItem.ammoType = 'needle';
+          else if (cleanName.includes('shuriken')) newItem.ammoType = 'shuriken';
+          else newItem.ammoType = 'other';
+          changed = true;
+        }
+        if (changed) {
+          modified = true;
+          return newItem;
+        }
+      }
+      return item;
+    });
+
+    if (modified) {
+      updatedInventory = nextInv;
+    }
+  }
+
+  // 2. Equipment wondrous items slots
+  if (updatedEquipment && Array.isArray(updatedEquipment.wondrousItems)) {
+    const validSlots = new Set([
+      'head',
+      'headband',
+      'neck',
+      'shoulders',
+      'chest',
+      'body',
+      'armor',
+      'hands',
+      'arms',
+      'waist',
+      'feet',
+      'ring1',
+      'ring2',
+      'slotless'
+    ]);
+
+    let eqModified = false;
+    const nextWondrous = updatedEquipment.wondrousItems.map(w => {
+      if (!w) return w;
+      if (!validSlots.has(w.slot)) {
+        eqModified = true;
+        return { ...w, slot: 'slotless' as const };
+      }
+      return w;
+    });
+
+    if (eqModified) {
+      updatedEquipment = {
+        ...updatedEquipment,
+        wondrousItems: nextWondrous
+      };
+      modified = true;
+    }
+
+    // 3. Equipment ammunition settings
+    if (updatedEquipment.autoDecrementAmmo === undefined) {
+      updatedEquipment = {
+        ...updatedEquipment,
+        autoDecrementAmmo: false
+      };
+      modified = true;
+    }
+
+    if (!updatedEquipment.equippedAmmoId && Array.isArray(updatedInventory)) {
+      const firstAmmo = updatedInventory.find(
+        i => i && (i.itemType === 'ammunition' || (i.name && (i.name.toLowerCase().includes('arrow') || i.name.toLowerCase().includes('bolt') || i.name.toLowerCase().includes('bullet'))))
+      );
+      if (firstAmmo) {
+        updatedEquipment = {
+          ...updatedEquipment,
+          equippedAmmoId: firstAmmo.id
+        };
+        modified = true;
+      }
+    }
+  }
+
+  return modified
+    ? {
+        ...char,
+        inventory: updatedInventory,
+        equipment: updatedEquipment
+      }
+    : char;
+}
+
+/**
  * Centralized backwards compatibility normalizer for character data.
  * Normalizes legacy data structures into canonical models on load / import:
  * - Migrates tactical combat booleans to structured activeBuffs.
@@ -735,6 +860,7 @@ export function migrateCompanionsAndWildShape(char: CharacterSheetData): Charact
  * - Migrates legacy class and domain identifiers to canonical snake_case IDs.
  * - Migrates legacy DR/SR properties into structured arrays damageReduction and spellResistance.
  * - Migrates custom companion and wild shape flat models into structured entities.
+ * - Migrates inventory ammunition and body slot identifiers.
  */
 export function normalizeCharacterOnLoad(raw: any): CharacterSheetData {
   if (!raw || typeof raw !== 'object') {
@@ -783,7 +909,10 @@ export function normalizeCharacterOnLoad(raw: any): CharacterSheetData {
   const withDefenses = migrateDefenses(withCanonical);
   const withCompanions = migrateCompanionsAndWildShape(withDefenses);
 
-  return withCompanions;
+  // Phase 5: Migrate ammunition items and body slot assignments
+  const withAmmoAndSlots = migrateAmmunitionAndBodySlots(withCompanions);
+
+  return withAmmoAndSlots;
 }
 
 export async function runLegacyMigrationIfNeeded(

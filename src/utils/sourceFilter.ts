@@ -27,7 +27,7 @@ export function normalizeSourceCode(rawSource?: string): string {
   const clean = rawSource.trim().toUpperCase();
 
   if (['PH', 'PHB', 'PLAYERS HANDBOOK', 'PLAYER\'S HANDBOOK', 'CORE'].includes(clean)) return 'PHB';
-  if (['DMG', 'DUNGEON MASTER\'S GUIDE'].includes(clean)) return 'DMG';
+  if (['DMG', 'DUNGEON MASTER\'S GUIDE', 'D20SRD', 'D20SRD.ORG', 'SRD'].includes(clean)) return 'DMG';
   if (['MM', 'MONSTER MANUAL'].includes(clean)) return 'MM';
 
   // Map known alternate tags from dataset
@@ -46,7 +46,13 @@ export function normalizeSourceCode(rawSource?: string): string {
     'SH': 'CS',
     'MAG': 'Mag',
     'RVL': 'RCS',
-    'CR': 'RCS'
+    'CR': 'RCS',
+    'D20SRD.ORG': 'DMG',
+    'D20SRD': 'DMG',
+    'SRD': 'DMG',
+    'MAGIC ITEM COMPENDIUM': 'Mag',
+    'COMPLETE ARCANE': 'CAr',
+    'RACES OF DESTINY': 'RoD'
   };
 
   if (aliasMap[clean]) return aliasMap[clean];
@@ -70,7 +76,7 @@ export function isSourceAllowed(itemSource?: string, allowedSources?: string[]):
   if (!itemSource || itemSource === 'Custom' || itemSource === 'Core' || itemSource === 'Backpack' || itemSource === 'Inventory' || itemSource.toLowerCase().includes('custom') || normalized === 'Custom') return true;
 
   // If the normalized source is in the allowed list, return true
-  if (currentAllowed.includes(normalized)) return true;
+  if (currentAllowed.includes(normalized) || currentAllowed.some(a => normalizeSourceCode(a) === normalized)) return true;
 
   return false;
 }
@@ -98,7 +104,7 @@ export function getSourceBadgeInfo(itemSource?: string, allowedSources?: string[
   const isAllowed = isSourceAllowed(itemSource, allowedSources);
 
   return {
-    sourceCode: normalized,
+    sourceCode: sourceBook ? sourceBook.abbr : normalized,
     sourceName: sourceBook ? sourceBook.name : normalized,
     isCore: sourceBook ? sourceBook.isCore : (normalized === 'PHB' || normalized === 'DMG' || normalized === 'MM'),
     isAllowed
