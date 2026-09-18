@@ -52,6 +52,7 @@ export function normalizeSourceCode(rawSource?: string): string {
     'SRD': 'DMG',
     'MAGIC ITEM COMPENDIUM': 'Mag',
     'COMPLETE ARCANE': 'CAr',
+    'COMPLETE MAGE': 'CM',
     'RACES OF DESTINY': 'RoD'
   };
 
