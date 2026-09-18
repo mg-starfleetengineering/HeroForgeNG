@@ -4,9 +4,16 @@ import {
   migrateLegacyFeatStrings,
   Equipment,
   InventoryItem,
-  ItemArmorData
+  ItemArmorData,
+  DREntry,
+  SREntry,
+  FamiliarAttack,
+  AnimalCompanionAttack,
+  WildShapeAttack
 } from '../types/character';
 import { toCanonicalClassId, toCanonicalDomainId } from '../engine/classes';
+import { parseDRText } from '../engine/dr';
+import { parseSRText } from '../engine/sr';
 import { migrateCharacterBuffs } from '../engine/combat';
 import {
   resolveArmor,
@@ -447,6 +454,278 @@ export function migrateCanonicalIdentifiers(char: CharacterSheetData): Character
   return updated;
 }
 
+function splitDelimitedStrings(val: string | string[] | undefined | null): string[] {
+  if (!val) return [];
+  if (Array.isArray(val)) {
+    return val.map(s => String(s).trim()).filter(Boolean);
+  }
+  if (typeof val === 'string') {
+    const sep = val.includes(';') ? ';' : ',';
+    return val.split(sep).map(s => s.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+export function toCanonicalCompanionId(id: string | undefined | null): string {
+  if (!id) return '';
+  return id
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+/**
+ * Normalizes legacy DR strings ((char as any).dr or damageReduction as string) and
+ * legacy SR ((char as any).sr or spellResistance as string/number) into canonical
+ * structured arrays damageReduction: DREntry[] and spellResistance: SREntry[].
+ * Ensures damageReduction and spellResistance are arrays and purges legacy dr/sr properties.
+ */
+export function migrateDefenses(char: CharacterSheetData): CharacterSheetData {
+  if (!char || typeof char !== 'object') {
+    return char;
+  }
+
+  const updated: CharacterSheetData = { ...char };
+
+  // 1. Damage Reduction (DR)
+  let damageReduction: DREntry[] = [];
+  if (Array.isArray(updated.damageReduction)) {
+    damageReduction = [...updated.damageReduction];
+  } else if (typeof (updated as any).damageReduction === 'string' && (updated as any).damageReduction.trim()) {
+    damageReduction = parseDRText((updated as any).damageReduction);
+  }
+
+  const rawDr = (updated as any).dr;
+  if (rawDr !== undefined && rawDr !== null) {
+    if (typeof rawDr === 'string' && rawDr.trim() && rawDr.trim().toLowerCase() !== 'none') {
+      const parsed = parseDRText(rawDr);
+      for (const entry of parsed) {
+        if (!damageReduction.some(d => d.value === entry.value && d.bypass.toLowerCase() === entry.bypass.toLowerCase())) {
+          damageReduction.push(entry);
+        }
+      }
+    } else if (typeof rawDr === 'number' && rawDr > 0) {
+      if (!damageReduction.some(d => d.value === rawDr && d.bypass === '-')) {
+        damageReduction.push({ value: rawDr, bypass: '-', abilityType: 'Ex' });
+      }
+    }
+  }
+
+  updated.damageReduction = damageReduction;
+  delete (updated as any).dr;
+
+  // 2. Spell Resistance (SR)
+  let spellResistance: SREntry[] = [];
+  const charLevel = Array.isArray(updated.levelProgression) ? updated.levelProgression.length : 1;
+
+  if (Array.isArray(updated.spellResistance)) {
+    spellResistance = [...updated.spellResistance];
+  } else if (typeof (updated as any).spellResistance === 'number' && (updated as any).spellResistance > 0) {
+    spellResistance.push({ value: (updated as any).spellResistance });
+  } else if (typeof (updated as any).spellResistance === 'string' && (updated as any).spellResistance.trim()) {
+    const val = parseSRText((updated as any).spellResistance, charLevel);
+    if (val > 0) {
+      spellResistance.push({ value: val });
+    }
+  }
+
+  const rawSr = (updated as any).sr;
+  if (rawSr !== undefined && rawSr !== null) {
+    if (typeof rawSr === 'number' && rawSr > 0) {
+      if (!spellResistance.some(s => s.value === rawSr)) {
+        spellResistance.push({ value: rawSr });
+      }
+    } else if (typeof rawSr === 'string' && rawSr.trim() && rawSr.trim().toLowerCase() !== 'none') {
+      const val = parseSRText(rawSr, charLevel);
+      if (val > 0 && !spellResistance.some(s => s.value === val)) {
+        spellResistance.push({ value: val });
+      }
+    }
+  }
+
+  updated.spellResistance = spellResistance;
+  delete (updated as any).sr;
+
+  return updated;
+}
+
+/**
+ * Modernizes familiar, animal companion, and wild shape custom models:
+ * - Familiar: Synthesizes structured attacks, speed, specialAbilities: string[], and feats: string[].
+ *   Normalizes selectedFamiliarId to canonical snake_case.
+ * - Animal Companion: Synthesizes structured attacks, speed, specialAbilities: string[], and feats: string[].
+ *   Normalizes selectedCompanionId to canonical snake_case.
+ * - Wild Shape: Synthesizes structured attacks, speed, and specialQualities: string[].
+ *   Normalizes selectedFormId to canonical snake_case.
+ */
+export function migrateCompanionsAndWildShape(char: CharacterSheetData): CharacterSheetData {
+  if (!char || typeof char !== 'object') {
+    return char;
+  }
+
+  const updated: CharacterSheetData = { ...char };
+
+  // 1. Familiar
+  if (updated.familiar) {
+    const familiar = { ...updated.familiar };
+    if (familiar.selectedFamiliarId) {
+      familiar.selectedFamiliarId = toCanonicalCompanionId(familiar.selectedFamiliarId);
+    }
+
+    if (familiar.customFamiliar) {
+      const cf = { ...familiar.customFamiliar };
+
+      // Attacks
+      if (!Array.isArray(cf.attacks) || cf.attacks.length === 0) {
+        const attacks: FamiliarAttack[] = [];
+        if (cf.attack1Name) {
+          attacks.push({
+            name: cf.attack1Name,
+            damage: cf.attack1Damage || '1d3-4'
+          });
+        }
+        if (cf.attack2Name) {
+          attacks.push({
+            name: cf.attack2Name,
+            damage: cf.attack2Damage || '1d2'
+          });
+        }
+        cf.attacks = attacks;
+      }
+
+      // Speed
+      if (!cf.speed || typeof cf.speed !== 'object' || cf.speed.land === undefined) {
+        cf.speed = {
+          land: cf.speedLand ?? 30,
+          ...(cf.speedFly !== undefined ? { fly: cf.speedFly } : {}),
+          ...(cf.speedFlyManeuverability ? { flyManeuverability: cf.speedFlyManeuverability } : {}),
+          ...(cf.speedSwim !== undefined ? { swim: cf.speedSwim } : {}),
+          ...(cf.speedClimb !== undefined ? { climb: cf.speedClimb } : {}),
+          ...(cf.speedBurrow !== undefined ? { burrow: cf.speedBurrow } : {})
+        };
+      }
+
+      // Special Abilities & Feats
+      cf.specialAbilities = splitDelimitedStrings(cf.specialAbilities);
+      cf.feats = splitDelimitedStrings(cf.feats);
+
+      familiar.customFamiliar = cf;
+    }
+
+    updated.familiar = familiar;
+  }
+
+  // 2. Animal Companion
+  if (updated.animalCompanion) {
+    const ac = { ...updated.animalCompanion };
+    if (ac.selectedCompanionId) {
+      ac.selectedCompanionId = toCanonicalCompanionId(ac.selectedCompanionId);
+    }
+
+    if (ac.customCompanion) {
+      const cc = { ...ac.customCompanion };
+
+      // Attacks
+      if (!Array.isArray(cc.attacks) || cc.attacks.length === 0) {
+        const attacks: AnimalCompanionAttack[] = [];
+        if (cc.attack1Name) {
+          attacks.push({
+            name: cc.attack1Name,
+            damage: cc.attack1Damage || '1d6'
+          });
+        }
+        if (cc.attack2Name) {
+          attacks.push({
+            name: cc.attack2Name,
+            damage: cc.attack2Damage || '1d4'
+          });
+        }
+        cc.attacks = attacks;
+      }
+
+      // Speed
+      if (!cc.speed || typeof cc.speed !== 'object' || cc.speed.land === undefined) {
+        cc.speed = {
+          land: cc.speedLand ?? 30,
+          ...(cc.speedFly !== undefined ? { fly: cc.speedFly } : {}),
+          ...(cc.speedFlyManeuverability ? { flyManeuverability: cc.speedFlyManeuverability } : {}),
+          ...(cc.speedSwim !== undefined ? { swim: cc.speedSwim } : {}),
+          ...(cc.speedClimb !== undefined ? { climb: cc.speedClimb } : {}),
+          ...(cc.speedBurrow !== undefined ? { burrow: cc.speedBurrow } : {})
+        };
+      }
+
+      // Special Abilities & Feats
+      cc.specialAbilities = splitDelimitedStrings(cc.specialAbilities);
+      cc.feats = splitDelimitedStrings(cc.feats);
+
+      ac.customCompanion = cc;
+    }
+
+    updated.animalCompanion = ac;
+  }
+
+  // 3. Wild Shape
+  if (updated.wildShape) {
+    const ws = { ...updated.wildShape };
+    if (ws.selectedFormId) {
+      ws.selectedFormId = toCanonicalCompanionId(ws.selectedFormId);
+    }
+
+    if (ws.customForm) {
+      const form = { ...ws.customForm };
+
+      // Attacks
+      if (!Array.isArray(form.attacks) || form.attacks.length === 0) {
+        const attacks: WildShapeAttack[] = [];
+        if (form.attack1Name) {
+          attacks.push({
+            name: form.attack1Name,
+            damage: form.attack1Damage || '1d6',
+            attackCount: form.attack1Count || 1,
+            isPrimary: form.attack1IsPrimary ?? true,
+            strMultiplier: form.attack1IsPrimary ?? true ? 1.0 : 0.5,
+            special: form.attack1Special
+          });
+        }
+        if (form.attack2Name) {
+          attacks.push({
+            name: form.attack2Name,
+            damage: form.attack2Damage || '1d4',
+            attackCount: form.attack2Count || 1,
+            isPrimary: form.attack2IsPrimary ?? false,
+            strMultiplier: form.attack2IsPrimary ? 1.0 : 0.5,
+            special: form.attack2Special
+          });
+        }
+        form.attacks = attacks;
+      }
+
+      // Speed
+      if (!form.speed || typeof form.speed !== 'object' || form.speed.land === undefined) {
+        form.speed = {
+          land: form.speedLand || 30,
+          ...(form.speedFly !== undefined ? { fly: form.speedFly } : {}),
+          ...(form.speedFlyManeuverability ? { flyManeuverability: form.speedFlyManeuverability } : {}),
+          ...(form.speedSwim !== undefined ? { swim: form.speedSwim } : {}),
+          ...(form.speedClimb !== undefined ? { climb: form.speedClimb } : {}),
+          ...(form.speedBurrow !== undefined ? { burrow: form.speedBurrow } : {})
+        };
+      }
+
+      // Special Qualities
+      form.specialQualities = splitDelimitedStrings(form.specialQualities);
+
+      ws.customForm = form;
+    }
+
+    updated.wildShape = ws;
+  }
+
+  return updated;
+}
+
 /**
  * Centralized backwards compatibility normalizer for character data.
  * Normalizes legacy data structures into canonical models on load / import:
@@ -454,6 +733,8 @@ export function migrateCanonicalIdentifiers(char: CharacterSheetData): Character
  * - Migrates legacy feat strings to structured selectedFeatEntities.
  * - Migrates legacy equipment strings into structured InventoryItem entries.
  * - Migrates legacy class and domain identifiers to canonical snake_case IDs.
+ * - Migrates legacy DR/SR properties into structured arrays damageReduction and spellResistance.
+ * - Migrates custom companion and wild shape flat models into structured entities.
  */
 export function normalizeCharacterOnLoad(raw: any): CharacterSheetData {
   if (!raw || typeof raw !== 'object') {
@@ -498,7 +779,11 @@ export function normalizeCharacterOnLoad(raw: any): CharacterSheetData {
   // Phase 3: Migrate canonical identifiers for classes, domains, prepared spells, and expended slots
   const withCanonical = migrateCanonicalIdentifiers(withEquipment);
 
-  return withCanonical;
+  // Phase 4: Migrate defenses (DR/SR) and companion/wild shape models
+  const withDefenses = migrateDefenses(withCanonical);
+  const withCompanions = migrateCompanionsAndWildShape(withDefenses);
+
+  return withCompanions;
 }
 
 export async function runLegacyMigrationIfNeeded(

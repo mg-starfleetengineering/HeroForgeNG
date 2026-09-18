@@ -51,9 +51,32 @@ export const FamiliarTab: React.FC<FamiliarTabProps> = ({
     notes: ''
   };
 
+  const prepareCustomDraft = (raw?: CustomFamiliarData): CustomFamiliarData => {
+    const base = raw || familiarState.customFamiliar || DEFAULT_CUSTOM_FAMILIAR;
+    return {
+      ...base,
+      attack1Name: base.attack1Name || (base.attacks && base.attacks[0]?.name) || 'Bite',
+      attack1Damage: base.attack1Damage || (base.attacks && base.attacks[0]?.damage) || '1d3-4',
+      attack2Name: base.attack2Name || (base.attacks && base.attacks[1]?.name) || '',
+      attack2Damage: base.attack2Damage || (base.attacks && base.attacks[1]?.damage) || '',
+      speedLand: base.speedLand ?? base.speed?.land ?? 20,
+      speedFly: base.speedFly ?? base.speed?.fly,
+      speedFlyManeuverability: base.speedFlyManeuverability || base.speed?.flyManeuverability,
+      speedSwim: base.speedSwim ?? base.speed?.swim,
+      speedClimb: base.speedClimb ?? base.speed?.climb,
+      speedBurrow: base.speedBurrow ?? base.speed?.burrow,
+      specialAbilities: Array.isArray(base.specialAbilities)
+        ? base.specialAbilities.join('; ')
+        : (base.specialAbilities || ''),
+      feats: Array.isArray(base.feats)
+        ? base.feats.join('; ')
+        : (base.feats || '')
+    };
+  };
+
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [customDraft, setCustomDraft] = useState<CustomFamiliarData>(
-    familiarState.customFamiliar || DEFAULT_CUSTOM_FAMILIAR
+    prepareCustomDraft(familiarState.customFamiliar)
   );
 
   const stats = computeFamiliarStats(character, classesData, familiarsData, familiarState);
@@ -67,10 +90,42 @@ export const FamiliarTab: React.FC<FamiliarTabProps> = ({
     });
   };
 
+  const openCustomModal = () => {
+    setCustomDraft(prepareCustomDraft(familiarState.customFamiliar));
+    setShowCustomModal(true);
+  };
+
   const saveCustomFamiliar = () => {
+    const speed = {
+      land: customDraft.speedLand ?? 20,
+      ...(customDraft.speedFly !== undefined ? { fly: customDraft.speedFly } : {}),
+      ...(customDraft.speedFlyManeuverability ? { flyManeuverability: customDraft.speedFlyManeuverability } : {}),
+      ...(customDraft.speedSwim !== undefined ? { swim: customDraft.speedSwim } : {}),
+      ...(customDraft.speedClimb !== undefined ? { climb: customDraft.speedClimb } : {}),
+      ...(customDraft.speedBurrow !== undefined ? { burrow: customDraft.speedBurrow } : {})
+    };
+    const attacks = [
+      { name: customDraft.attack1Name || 'Bite', damage: customDraft.attack1Damage || '1d3-4' },
+      ...(customDraft.attack2Name ? [{ name: customDraft.attack2Name, damage: customDraft.attack2Damage || '1d2' }] : [])
+    ];
+    const specialAbilities = typeof customDraft.specialAbilities === 'string'
+      ? customDraft.specialAbilities.split(/[;,]/).map(s => s.trim()).filter(Boolean)
+      : (customDraft.specialAbilities || []);
+    const feats = typeof customDraft.feats === 'string'
+      ? customDraft.feats.split(/[;,]/).map(s => s.trim()).filter(Boolean)
+      : (customDraft.feats || []);
+
+    const updatedCustom: CustomFamiliarData = {
+      ...customDraft,
+      speed,
+      attacks,
+      specialAbilities,
+      feats
+    };
+
     updateFamiliarState({
       selectedFamiliarId: 'custom',
-      customFamiliar: customDraft
+      customFamiliar: updatedCustom
     });
     setShowCustomModal(false);
   };
@@ -165,7 +220,7 @@ export const FamiliarTab: React.FC<FamiliarTabProps> = ({
                   const val = e.target.value;
                   if (val === 'custom') {
                     updateFamiliarState({ selectedFamiliarId: 'custom' });
-                    setShowCustomModal(true);
+                    openCustomModal();
                   } else {
                     updateFamiliarState({ selectedFamiliarId: val });
                   }
@@ -219,7 +274,7 @@ export const FamiliarTab: React.FC<FamiliarTabProps> = ({
 
               {familiarState.selectedFamiliarId === 'custom' && (
                 <button
-                  onClick={() => setShowCustomModal(true)}
+                  onClick={openCustomModal}
                   className="btn btn-secondary text-xs px-3 py-2 flex items-center gap-1.5"
                 >
                   <i className="fa-solid fa-sliders text-amber-400"></i> Edit Custom Stats

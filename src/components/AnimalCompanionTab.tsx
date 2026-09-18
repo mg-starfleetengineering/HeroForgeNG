@@ -55,11 +55,34 @@ export const AnimalCompanionTab: React.FC<AnimalCompanionTabProps> = ({
     hasNaturalBondFeat: false
   };
 
+  const prepareCustomDraft = (raw?: CustomAnimalCompanionData): CustomAnimalCompanionData => {
+    const base = raw || companionState.customCompanion || DEFAULT_CUSTOM_COMPANION;
+    return {
+      ...base,
+      attack1Name: base.attack1Name || (base.attacks && base.attacks[0]?.name) || 'Bite',
+      attack1Damage: base.attack1Damage || (base.attacks && base.attacks[0]?.damage) || '1d6',
+      attack2Name: base.attack2Name || (base.attacks && base.attacks[1]?.name) || '',
+      attack2Damage: base.attack2Damage || (base.attacks && base.attacks[1]?.damage) || '',
+      speedLand: base.speedLand ?? base.speed?.land ?? 40,
+      speedFly: base.speedFly ?? base.speed?.fly,
+      speedFlyManeuverability: base.speedFlyManeuverability || base.speed?.flyManeuverability,
+      speedSwim: base.speedSwim ?? base.speed?.swim,
+      speedClimb: base.speedClimb ?? base.speed?.climb,
+      speedBurrow: base.speedBurrow ?? base.speed?.burrow,
+      specialAbilities: Array.isArray(base.specialAbilities)
+        ? base.specialAbilities.join('; ')
+        : (base.specialAbilities || ''),
+      feats: Array.isArray(base.feats)
+        ? base.feats.join('; ')
+        : (base.feats || '')
+    };
+  };
+
   const [minLevelFilter, setMinLevelFilter] = useState<number | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [customDraft, setCustomDraft] = useState<CustomAnimalCompanionData>(
-    companionState.customCompanion || DEFAULT_CUSTOM_COMPANION
+    prepareCustomDraft(companionState.customCompanion)
   );
   const [newFeatInput, setNewFeatInput] = useState('');
 
@@ -76,10 +99,42 @@ export const AnimalCompanionTab: React.FC<AnimalCompanionTabProps> = ({
     });
   };
 
+  const openCustomModal = () => {
+    setCustomDraft(prepareCustomDraft(companionState.customCompanion));
+    setShowCustomModal(true);
+  };
+
   const saveCustomCompanion = () => {
+    const speed = {
+      land: customDraft.speedLand ?? 40,
+      ...(customDraft.speedFly !== undefined ? { fly: customDraft.speedFly } : {}),
+      ...(customDraft.speedFlyManeuverability ? { flyManeuverability: customDraft.speedFlyManeuverability } : {}),
+      ...(customDraft.speedSwim !== undefined ? { swim: customDraft.speedSwim } : {}),
+      ...(customDraft.speedClimb !== undefined ? { climb: customDraft.speedClimb } : {}),
+      ...(customDraft.speedBurrow !== undefined ? { burrow: customDraft.speedBurrow } : {})
+    };
+    const attacks = [
+      { name: customDraft.attack1Name || 'Bite', damage: customDraft.attack1Damage || '1d6' },
+      ...(customDraft.attack2Name ? [{ name: customDraft.attack2Name, damage: customDraft.attack2Damage || '1d4' }] : [])
+    ];
+    const specialAbilities = typeof customDraft.specialAbilities === 'string'
+      ? customDraft.specialAbilities.split(/[;,]/).map(s => s.trim()).filter(Boolean)
+      : (customDraft.specialAbilities || []);
+    const feats = typeof customDraft.feats === 'string'
+      ? customDraft.feats.split(/[;,]/).map(s => s.trim()).filter(Boolean)
+      : (customDraft.feats || []);
+
+    const updatedCustom: CustomAnimalCompanionData = {
+      ...customDraft,
+      speed,
+      attacks,
+      specialAbilities,
+      feats
+    };
+
     updateCompanionState({
       selectedCompanionId: 'custom',
-      customCompanion: customDraft
+      customCompanion: updatedCustom
     });
     setShowCustomModal(false);
   };
@@ -221,7 +276,7 @@ export const AnimalCompanionTab: React.FC<AnimalCompanionTabProps> = ({
 
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setShowCustomModal(true)}
+                onClick={openCustomModal}
                 className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600/50 transition flex items-center gap-1.5"
               >
                 <i className="fa-solid fa-plus text-xs"></i> Create Custom Companion
@@ -302,10 +357,18 @@ export const AnimalCompanionTab: React.FC<AnimalCompanionTabProps> = ({
               </div>
 
               {/* Species Select Dropdown */}
-              <div>
+              <div className="space-y-2">
                 <select
                   value={companionState.selectedCompanionId}
-                  onChange={e => updateCompanionState({ selectedCompanionId: e.target.value })}
+                  onChange={e => {
+                    const val = e.target.value;
+                    if (val === 'custom') {
+                      updateCompanionState({ selectedCompanionId: 'custom' });
+                      openCustomModal();
+                    } else {
+                      updateCompanionState({ selectedCompanionId: val });
+                    }
+                  }}
                   className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
                 >
                   <optgroup label="Custom Companion">
@@ -321,6 +384,15 @@ export const AnimalCompanionTab: React.FC<AnimalCompanionTabProps> = ({
                     ))}
                   </optgroup>
                 </select>
+
+                {companionState.selectedCompanionId === 'custom' && (
+                  <button
+                    onClick={openCustomModal}
+                    className="w-full py-2 px-3 text-xs font-semibold rounded-lg bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600/30 transition flex items-center justify-center gap-1.5"
+                  >
+                    <i className="fa-solid fa-sliders text-emerald-400"></i> Edit Custom Companion Stats
+                  </button>
+                )}
               </div>
 
               {/* Name Override & Custom HP */}

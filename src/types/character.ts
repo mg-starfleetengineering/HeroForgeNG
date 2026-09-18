@@ -292,6 +292,22 @@ export type VitalsHealthStatus =
   | 'staggered'
   | 'unconscious';
 
+export interface DREntry {
+  value: number;
+  bypass: string;
+  abilityType?: 'Ex' | 'Su';
+  source?: string;
+  notes?: string;
+  stacks?: boolean;
+}
+
+export interface SREntry {
+  value: number;
+  source?: string;
+  notes?: string;
+  stacks?: boolean;
+}
+
 export interface CharacterState {
   id?: string;
   updatedAt?: number;
@@ -345,6 +361,8 @@ export interface CharacterState {
   spellbookSpells?: string[];
   preparedSpells?: PreparedSpellSlot[];
   expendedSpellSlots?: Record<string, number>;
+  damageReduction?: DREntry[];
+  spellResistance?: SREntry[];
 }
 
 export interface DailyResourceTrack {
@@ -852,23 +870,32 @@ export interface CustomFamiliarData {
   wis: number;
   cha: number;
   naturalArmor: number;
-  dr: string;
-  sr: number;
-  speedLand: number;
+  dr?: string;
+  sr?: number;
+  attacks?: FamiliarAttack[];
+  speed?: {
+    land: number;
+    fly?: number;
+    flyManeuverability?: string;
+    swim?: number;
+    climb?: number;
+    burrow?: number;
+  };
+  specialAbilities?: string[] | string;
+  feats?: string[] | string;
+  speedLand?: number;
   speedFly?: number;
   speedFlyManeuverability?: string;
   speedSwim?: number;
   speedClimb?: number;
   speedBurrow?: number;
-  baseFort: number;
-  baseRef: number;
-  baseWill: number;
-  baseBab: number;
-  masterBonus: string;
-  specialAbilities: string;
-  feats: string;
-  attack1Name: string;
-  attack1Damage: string;
+  baseFort?: number;
+  baseRef?: number;
+  baseWill?: number;
+  baseBab?: number;
+  masterBonus?: string;
+  attack1Name?: string;
+  attack1Damage?: string;
   attack2Name?: string;
   attack2Damage?: string;
   skillBonus?: Record<string, number>;
@@ -921,10 +948,10 @@ export interface AnimalCompanionData {
 
 export interface CustomAnimalCompanionData {
   name: string;
-  minLevel: number;
+  minLevel?: number;
   size: string;
   creatureType: string;
-  hd: number;
+  hd?: number;
   str: number;
   dex: number;
   con: number;
@@ -932,20 +959,29 @@ export interface CustomAnimalCompanionData {
   wis: number;
   cha: number;
   naturalArmor: number;
-  speedLand: number;
+  attacks?: AnimalCompanionAttack[];
+  speed?: {
+    land: number;
+    fly?: number;
+    flyManeuverability?: string;
+    swim?: number;
+    climb?: number;
+    burrow?: number;
+  };
+  specialAbilities?: string[] | string;
+  feats?: string[] | string;
+  isQuadruped?: boolean;
+  notes?: string;
+  speedLand?: number;
   speedFly?: number;
   speedFlyManeuverability?: string;
   speedSwim?: number;
   speedClimb?: number;
   speedBurrow?: number;
-  attack1Name: string;
-  attack1Damage: string;
+  attack1Name?: string;
+  attack1Damage?: string;
   attack2Name?: string;
   attack2Damage?: string;
-  specialAbilities: string;
-  feats: string;
-  isQuadruped?: boolean;
-  notes?: string;
 }
 
 export interface AnimalCompanionState {
@@ -1003,21 +1039,32 @@ export interface CustomWildShapeData {
   category: string;
   size: string;
   creatureType: string;
-  minDruidLevel: number;
+  minDruidLevel?: number;
   str: number;
   dex: number;
   con: number;
   naturalArmor: number;
   space?: number;
   reach?: number;
-  speedLand: number;
+  attacks?: WildShapeAttack[];
+  speed?: {
+    land: number;
+    fly?: number;
+    flyManeuverability?: string;
+    swim?: number;
+    climb?: number;
+    burrow?: number;
+  };
+  specialQualities?: string[] | string;
+  notes?: string;
+  speedLand?: number;
   speedFly?: number;
   speedFlyManeuverability?: string;
   speedSwim?: number;
   speedClimb?: number;
   speedBurrow?: number;
-  attack1Name: string;
-  attack1Damage: string;
+  attack1Name?: string;
+  attack1Damage?: string;
   attack1Count?: number;
   attack1IsPrimary?: boolean;
   attack1Special?: string;
@@ -1026,8 +1073,6 @@ export interface CustomWildShapeData {
   attack2Count?: number;
   attack2IsPrimary?: boolean;
   attack2Special?: string;
-  specialQualities?: string;
-  notes?: string;
 }
 
 export interface WildShapeState {
@@ -1052,6 +1097,8 @@ export interface CharacterSummary {
 export interface CharacterSheetData extends CharacterState {
   id: string;
   updatedAt: number;
+  damageReduction?: DREntry[];
+  spellResistance?: SREntry[];
 }
 
 export interface MultiCharacterStore {

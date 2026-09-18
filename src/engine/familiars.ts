@@ -244,24 +244,43 @@ export function computeFamiliarStats(
       naturalArmor: custom.naturalArmor ?? 0,
       dr: custom.dr || 'None',
       sr: custom.sr ?? 0,
-      speed: {
-        land: custom.speedLand ?? 30,
-        fly: custom.speedFly,
-        flyManeuverability: custom.speedFlyManeuverability,
-        swim: custom.speedSwim,
-        climb: custom.speedClimb,
-        burrow: custom.speedBurrow
-      },
+      speed: (custom.speed && typeof custom.speed === 'object' && custom.speed.land !== undefined)
+        ? {
+            land: custom.speed.land,
+            fly: custom.speed.fly ?? custom.speedFly,
+            flyManeuverability: custom.speed.flyManeuverability ?? custom.speedFlyManeuverability,
+            swim: custom.speed.swim ?? custom.speedSwim,
+            climb: custom.speed.climb ?? custom.speedClimb,
+            burrow: custom.speed.burrow ?? custom.speedBurrow
+          }
+        : {
+            land: custom.speedLand ?? 30,
+            fly: custom.speedFly,
+            flyManeuverability: custom.speedFlyManeuverability,
+            swim: custom.speedSwim,
+            climb: custom.speedClimb,
+            burrow: custom.speedBurrow
+          },
       baseFort: custom.baseFort ?? 2,
       baseRef: custom.baseRef ?? 2,
       baseWill: custom.baseWill ?? 0,
       masterBonus: custom.masterBonus || 'Custom bonus to master',
-      specialAbilities: custom.specialAbilities ? custom.specialAbilities.split(';').map(s => s.trim()).filter(Boolean) : [],
-      feats: custom.feats ? custom.feats.split(';').map(s => s.trim()).filter(Boolean) : [],
-      attacks: [
-        { name: custom.attack1Name || 'Bite', damage: custom.attack1Damage || '1d3-4' },
-        ...(custom.attack2Name ? [{ name: custom.attack2Name, damage: custom.attack2Damage || '1d2' }] : [])
-      ],
+      specialAbilities: Array.isArray(custom.specialAbilities)
+        ? custom.specialAbilities
+        : (typeof custom.specialAbilities === 'string'
+            ? custom.specialAbilities.split(/[;,]/).map(s => s.trim()).filter(Boolean)
+            : []),
+      feats: Array.isArray(custom.feats)
+        ? custom.feats
+        : (typeof custom.feats === 'string'
+            ? custom.feats.split(/[;,]/).map(s => s.trim()).filter(Boolean)
+            : []),
+      attacks: Array.isArray(custom.attacks) && custom.attacks.length > 0
+        ? custom.attacks.map(a => ({ name: a.name, damage: a.damage }))
+        : [
+            { name: custom.attack1Name || 'Bite', damage: custom.attack1Damage || '1d3-4' },
+            ...(custom.attack2Name ? [{ name: custom.attack2Name, damage: custom.attack2Damage || '1d2' }] : [])
+          ],
       skillBonus: custom.skillBonus || {}
     };
   } else {

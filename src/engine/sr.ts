@@ -1,5 +1,7 @@
-import { CharacterState, RaceData, ClassData, TemplateData, FeatData } from '../types/character';
+import { CharacterState, RaceData, ClassData, TemplateData, FeatData, SREntry } from '../types/character';
 import { getCharacterLevel } from './stats';
+
+export type { SREntry };
 
 export interface SRSource {
   name: string;
@@ -270,6 +272,19 @@ export function collectSRSources(
     }
   }
 
+  // 7. Custom / Character SR
+  (character.spellResistance || []).forEach(entry => {
+    if (entry && entry.value > 0) {
+      sources.push({
+        name: entry.source || `Custom SR (${entry.value})`,
+        category: 'custom',
+        value: entry.value,
+        notes: entry.notes,
+        stacks: entry.stacks ?? false
+      });
+    }
+  });
+
   return sources;
 }
 
@@ -322,22 +337,26 @@ export function calculateTotalSR(
     };
   }
 
-  // Find the highest base SR
+  // Find the highest base SR from non-stacking sources, and sum any stacking sources
   let maxBaseSR = 0;
+  let customStackingSR = 0;
   sources.forEach(s => {
-    if (s.value > maxBaseSR) {
+    if (s.stacks) {
+      customStackingSR += s.value;
+    } else if (s.value > maxBaseSR) {
       maxBaseSR = s.value;
     }
   });
 
-  const totalSR = maxBaseSR + stackingBonus;
+  const totalBonus = stackingBonus + customStackingSR;
+  const totalSR = (maxBaseSR > 0 || customStackingSR > 0) ? maxBaseSR + totalBonus : 0;
 
   return {
     bestSR: totalSR,
-    bestSRString: `SR ${totalSR}`,
+    bestSRString: totalSR > 0 ? `SR ${totalSR}` : 'None',
     hasSR: totalSR > 0,
     baseSR: maxBaseSR,
-    bonusSR: stackingBonus,
+    bonusSR: totalBonus,
     sources
   };
 }

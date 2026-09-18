@@ -1,7 +1,7 @@
 import { CharacterSheetData, CharacterState, CharacterSummary, LevelProgression } from '../types/character';
-import { normalizeCharacterOnLoad } from './migration';
+import { normalizeCharacterOnLoad, migrateDefenses, migrateCompanionsAndWildShape } from './migration';
 
-export { normalizeCharacterOnLoad };
+export { normalizeCharacterOnLoad, migrateDefenses, migrateCompanionsAndWildShape };
 
 const DB_NAME = 'HeroForgeDB';
 const DB_VERSION = 1;

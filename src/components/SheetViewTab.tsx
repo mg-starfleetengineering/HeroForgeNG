@@ -298,6 +298,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
     fullSeq: string;
     damageStr: string;
     damageFormula?: string;
+    damageBonus?: number;
+    threatMin?: number;
     critStr: string;
     type: string;
     featAtkBonus: number;
@@ -382,6 +384,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       fullSeq,
       damageStr,
       damageFormula,
+      damageBonus: dmgVal,
+      threatMin: primaryThreat,
       critStr: `${primaryThreat < 20 ? `${primaryThreat}-20` : '20'}/x${primaryWpn.critMultiplier || 2}${primaryHasKeen ? ' (Keen)' : ''}`,
       type: primaryWpn.type || 'Slashing',
       featAtkBonus: featBonuses.attackBonus,
@@ -450,6 +454,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       fullSeq,
       damageStr,
       damageFormula,
+      damageBonus: dmgVal,
+      threatMin: secThreat,
       critStr: `${secThreat < 20 ? `${secThreat}-20` : '20'}/x${secWpn.critMultiplier || 2}${secondaryHasKeen ? ' (Keen)' : ''}`,
       type: secWpn.type || 'Slashing',
       featAtkBonus: featBonuses.attackBonus,
@@ -510,6 +516,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
       fullSeq,
       damageStr,
       damageFormula,
+      damageBonus: dmgVal,
+      threatMin: rngThreat,
       critStr: `${rngThreat < 20 ? `${rngThreat}-20` : '20'}/x${rngWpn.critMultiplier || 2}${rangedHasKeen ? ' (Keen)' : ''}`,
       type: rngWpn.type || 'Piercing',
       featAtkBonus: featBonuses.attackBonus,
@@ -867,12 +875,17 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                   <td className="py-1 font-bold text-slate-900">
                     <div
                       onClick={() => {
+                        const attackRollOpts = {
+                          threatMin: item.threatMin ?? item.weapon.threat ?? 20,
+                          damageBonus: item.damageBonus,
+                          damageFormula: item.damageFormula || item.damageStr
+                        };
                         if (item.weapon.id === 'grapple_maneuver') {
                           rollGrappleCheck(item.attackBonus);
                         } else if (item.fullSeq && item.fullSeq.includes('/')) {
-                          rollAttackSequence(item.fullSeq, `${item.weapon.name} Attack`, item.weapon);
+                          rollAttackSequence(item.fullSeq, `${item.weapon.name} Attack`, item.weapon, attackRollOpts);
                         } else {
-                          rollAttack(item.attackBonus, `${item.weapon.name} Attack`, item.weapon);
+                          rollAttack(item.attackBonus, `${item.weapon.name} Attack`, item.weapon, attackRollOpts);
                         }
                       }}
                       className="cursor-pointer hover:text-amber-800 transition inline-flex items-center gap-1 group"
@@ -886,12 +899,17 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                   <td className="py-1 text-center font-bold text-slate-900">
                     <div
                       onClick={() => {
+                        const attackRollOpts = {
+                          threatMin: item.threatMin ?? item.weapon.threat ?? 20,
+                          damageBonus: item.damageBonus,
+                          damageFormula: item.damageFormula || item.damageStr
+                        };
                         if (item.weapon.id === 'grapple_maneuver') {
                           rollGrappleCheck(item.attackBonus);
                         } else if (item.fullSeq && item.fullSeq.includes('/')) {
-                          rollAttackSequence(item.fullSeq, `${item.weapon.name} Attack`, item.weapon);
+                          rollAttackSequence(item.fullSeq, `${item.weapon.name} Attack`, item.weapon, attackRollOpts);
                         } else {
-                          rollAttack(item.attackBonus, `${item.weapon.name} Attack`, item.weapon);
+                          rollAttack(item.attackBonus, `${item.weapon.name} Attack`, item.weapon, attackRollOpts);
                         }
                       }}
                       className="cursor-pointer hover:bg-slate-200/80 px-1.5 py-0.5 rounded transition inline-block group"
@@ -908,7 +926,11 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                       <div
                         onClick={(e) => {
                           e.stopPropagation();
-                          rollAttack(item.baneAtk!.atkBonus, item.baneAtk!.label, item.weapon);
+                          rollAttack(item.baneAtk!.atkBonus, item.baneAtk!.label, item.weapon, {
+                            threatMin: item.threatMin ?? item.weapon.threat ?? 20,
+                            damageBonus: item.damageBonus,
+                            damageFormula: item.damageFormula || item.damageStr
+                          });
                         }}
                         className="mt-0.5 text-[9px] text-red-600 hover:text-red-800 hover:underline cursor-pointer flex items-center justify-center gap-0.5"
                         title={`Click to roll ${item.baneAtk.label}`}
@@ -1094,8 +1116,16 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = ({
                   <span className="font-bold text-slate-700">Sources: </span>
                   {[
                     ...(fortificationSummary.hasFortification ? [`${fortificationSummary.source} (${fortificationSummary.percentage}% Fortification)`] : []),
-                    ...drSummary.sources.map(s => `${s.name} (${s.value}/${s.bypass})`),
-                    ...srSummary.sources.map(s => `${s.name} (SR ${s.value})`)
+                    ...drSummary.sources.map(s =>
+                      s.name.includes(`(${s.value}/${s.bypass})`) || s.name.includes(`/${s.bypass}`)
+                        ? s.name
+                        : `${s.name} (${s.value}/${s.bypass})`
+                    ),
+                    ...srSummary.sources.map(s =>
+                      s.name.includes(`SR ${s.value}`) || s.name.includes(`(${s.value})`)
+                        ? s.name
+                        : `${s.name} (SR ${s.value})`
+                    )
                   ].join(', ')}
                 </div>
               </div>

@@ -140,31 +140,63 @@ export function getWildShapeProgression(druidLevel: number): WildShapeProgressio
  * Converts a CustomWildShapeData object into a WildShapeFormData object.
  */
 export function customDataToFormData(custom: CustomWildShapeData): WildShapeFormData {
-  const attacks: WildShapeAttack[] = [];
-  if (custom.attack1Name) {
-    attacks.push({
-      name: custom.attack1Name,
-      damage: custom.attack1Damage || '1d6',
-      attackCount: custom.attack1Count || 1,
-      isPrimary: custom.attack1IsPrimary ?? true,
-      strMultiplier: custom.attack1IsPrimary ? 1.0 : 0.5,
-      special: custom.attack1Special
-    });
-  }
-  if (custom.attack2Name) {
-    attacks.push({
-      name: custom.attack2Name,
-      damage: custom.attack2Damage || '1d4',
-      attackCount: custom.attack2Count || 1,
-      isPrimary: custom.attack2IsPrimary ?? false,
-      strMultiplier: custom.attack2IsPrimary ? 1.0 : 0.5,
-      special: custom.attack2Special
-    });
+  let attacks: WildShapeAttack[] = [];
+  if (Array.isArray(custom.attacks) && custom.attacks.length > 0) {
+    attacks = custom.attacks.map(atk => ({
+      name: atk.name,
+      damage: atk.damage || '1d6',
+      attackCount: atk.attackCount || 1,
+      isPrimary: atk.isPrimary ?? true,
+      strMultiplier: atk.strMultiplier ?? (atk.isPrimary ? 1.0 : 0.5),
+      special: atk.special,
+      damageType: atk.damageType
+    }));
+  } else {
+    if (custom.attack1Name) {
+      attacks.push({
+        name: custom.attack1Name,
+        damage: custom.attack1Damage || '1d6',
+        attackCount: custom.attack1Count || 1,
+        isPrimary: custom.attack1IsPrimary ?? true,
+        strMultiplier: custom.attack1IsPrimary ? 1.0 : 0.5,
+        special: custom.attack1Special
+      });
+    }
+    if (custom.attack2Name) {
+      attacks.push({
+        name: custom.attack2Name,
+        damage: custom.attack2Damage || '1d4',
+        attackCount: custom.attack2Count || 1,
+        isPrimary: custom.attack2IsPrimary ?? false,
+        strMultiplier: custom.attack2IsPrimary ? 1.0 : 0.5,
+        special: custom.attack2Special
+      });
+    }
   }
 
-  const specialList = custom.specialQualities
-    ? custom.specialQualities.split(';').map(s => s.trim()).filter(Boolean)
-    : [];
+  const speed = (custom.speed && typeof custom.speed === 'object' && custom.speed.land !== undefined)
+    ? {
+        land: custom.speed.land,
+        fly: custom.speed.fly ?? custom.speedFly,
+        flyManeuverability: custom.speed.flyManeuverability ?? custom.speedFlyManeuverability,
+        swim: custom.speed.swim ?? custom.speedSwim,
+        climb: custom.speed.climb ?? custom.speedClimb,
+        burrow: custom.speed.burrow ?? custom.speedBurrow
+      }
+    : {
+        land: custom.speedLand || 30,
+        fly: custom.speedFly,
+        flyManeuverability: custom.speedFlyManeuverability,
+        swim: custom.speedSwim,
+        climb: custom.speedClimb,
+        burrow: custom.speedBurrow
+      };
+
+  const specialList = Array.isArray(custom.specialQualities)
+    ? custom.specialQualities
+    : (typeof custom.specialQualities === 'string'
+        ? custom.specialQualities.split(/[;,]/).map(s => s.trim()).filter(Boolean)
+        : []);
 
   return {
     id: 'custom',
@@ -179,14 +211,7 @@ export function customDataToFormData(custom: CustomWildShapeData): WildShapeForm
     naturalArmor: custom.naturalArmor || 0,
     space: custom.space || 5,
     reach: custom.reach || 5,
-    speed: {
-      land: custom.speedLand || 30,
-      fly: custom.speedFly,
-      flyManeuverability: custom.speedFlyManeuverability,
-      swim: custom.speedSwim,
-      climb: custom.speedClimb,
-      burrow: custom.speedBurrow
-    },
+    speed,
     attacks,
     specialQualities: specialList,
     source: 'Custom',
@@ -251,6 +276,9 @@ export interface ActiveWildShapeAttackEntry {
   attackBonus: number;
   fullSeq: string;
   damageStr: string;
+  damageBonus?: number;
+  damageFormula?: string;
+  threatMin?: number;
   critStr: string;
   type: string;
   featAtkBonus: number;
@@ -383,6 +411,9 @@ export function calculateWildShapeAttacks(
       attackBonus: totalAttack,
       fullSeq,
       damageStr,
+      damageBonus: dmgBonus,
+      damageFormula: damageStr,
+      threatMin: 20,
       critStr: '20/x2',
       type: pseudoWeapon.type,
       featAtkBonus: 0,

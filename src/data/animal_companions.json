@@ -19,8 +19,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d6"
       }
     ],
     "specialAbilities": [],
@@ -47,12 +47,12 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+3+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d2"
       },
       {
-        "name": "Bite+4+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d3"
       }
     ],
     "specialAbilities": [],
@@ -123,8 +123,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d4"
       }
     ],
     "specialAbilities": [],
@@ -150,8 +150,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d4"
       }
     ],
     "specialAbilities": [],
@@ -177,8 +177,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d6"
       }
     ],
     "specialAbilities": [],
@@ -206,12 +206,12 @@
     },
     "attacks": [
       {
-        "name": "Talons+5+0+1",
-        "damage": ""
+        "name": "Talons",
+        "damage": "1d4"
       },
       {
-        "name": "Bite+5+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d4"
       }
     ],
     "specialAbilities": [],
@@ -239,7 +239,7 @@
     },
     "attacks": [
       {
-        "name": "Slam;",
+        "name": "Slam",
         "damage": "1d4"
       }
     ],
@@ -273,7 +273,7 @@
     },
     "attacks": [
       {
-        "name": "Slam;",
+        "name": "Slam",
         "damage": "1d6"
       }
     ],
@@ -304,7 +304,7 @@
     },
     "attacks": [
       {
-        "name": "Slam;",
+        "name": "Slam",
         "damage": "1d4+1d4 fire"
       }
     ],
@@ -335,7 +335,7 @@
     },
     "attacks": [
       {
-        "name": "Slam;",
+        "name": "Slam",
         "damage": "1d6"
       }
     ],
@@ -367,7 +367,7 @@
     },
     "attacks": [
       {
-        "name": "Bite;",
+        "name": "Bite",
         "damage": "1d8"
       }
     ],
@@ -402,7 +402,7 @@
     },
     "attacks": [
       {
-        "name": "Talons+6+0+2",
+        "name": "Talons",
         "damage": "1d4"
       }
     ],
@@ -479,7 +479,7 @@
     },
     "attacks": [
       {
-        "name": "Talons+6+0+2",
+        "name": "Talons",
         "damage": "1d4"
       }
     ],
@@ -511,8 +511,8 @@
     },
     "attacks": [
       {
-        "name": "2 Hooves+3+0+1",
-        "damage": ""
+        "name": "2 Hooves",
+        "damage": "1d3"
       }
     ],
     "specialAbilities": [],
@@ -539,8 +539,8 @@
     },
     "attacks": [
       {
-        "name": "Slam+9+0+2",
-        "damage": ""
+        "name": "Slam",
+        "damage": "2d4"
       }
     ],
     "specialAbilities": [],
@@ -589,8 +589,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d6"
       }
     ],
     "specialAbilities": [],
@@ -618,8 +618,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+4+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d4"
       }
     ],
     "specialAbilities": [],
@@ -647,8 +647,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+3+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d2"
       }
     ],
     "specialAbilities": [],
@@ -698,8 +698,8 @@
     },
     "attacks": [
       {
-        "name": "Touch;",
-        "damage": ""
+        "name": "Touch",
+        "damage": "attach"
       }
     ],
     "specialAbilities": [
@@ -731,8 +731,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d6"
       }
     ],
     "specialAbilities": [],
@@ -781,12 +781,12 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+4+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d6"
       },
       {
-        "name": "Bite+4+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d6"
       }
     ],
     "specialAbilities": [
@@ -817,11 +817,11 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+4+0+1",
+        "name": "2 Claws",
         "damage": "1d4"
       },
       {
-        "name": "Bite+5+0+0",
+        "name": "Bite",
         "damage": "1d6"
       }
     ],
@@ -870,7 +870,7 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+2",
+        "name": "Bite",
         "damage": "1d6"
       }
     ],
@@ -905,8 +905,8 @@
     },
     "attacks": [
       {
-        "name": "Gore+6+0+2",
-        "damage": ""
+        "name": "Gore",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -932,12 +932,12 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+1",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d6"
       },
       {
-        "name": "2 Claws+2+0+0",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d2"
       }
     ],
     "specialAbilities": [],
@@ -964,12 +964,12 @@
     },
     "attacks": [
       {
-        "name": "Bite+6+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       },
       {
-        "name": "Tail Slap+8+0+2",
-        "damage": ""
+        "name": "Tail Slap",
+        "damage": "1d12"
       }
     ],
     "specialAbilities": [],
@@ -996,12 +996,12 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+4+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d4"
       },
       {
-        "name": "Bite+5+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d6"
       }
     ],
     "specialAbilities": [],
@@ -1029,8 +1029,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -1056,8 +1056,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d6"
       }
     ],
     "specialAbilities": [],
@@ -1195,7 +1195,11 @@
     },
     "attacks": [
       {
-        "name": "2 Claws;Bite;",
+        "name": "2 Claws",
+        "damage": "1d4"
+      },
+      {
+        "name": "Bite",
         "damage": "1d4"
       }
     ],
@@ -1228,16 +1232,16 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+1",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d6"
       },
       {
-        "name": "2 Claws+3+0+0",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d3"
       },
       {
-        "name": "Rake+3+0+0",
-        "damage": ""
+        "name": "Rake",
+        "damage": "1d3"
       }
     ],
     "specialAbilities": [],
@@ -1264,8 +1268,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+6+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -1292,8 +1296,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -1321,7 +1325,7 @@
     },
     "attacks": [
       {
-        "name": "Bite;",
+        "name": "Bite",
         "damage": "1d4"
       }
     ],
@@ -1356,8 +1360,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+3+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d3"
       }
     ],
     "specialAbilities": [],
@@ -1385,8 +1389,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+3+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d4"
       }
     ],
     "specialAbilities": [],
@@ -1478,12 +1482,12 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+5+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d8"
       },
       {
-        "name": "Bite+6-1+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "2d6"
       }
     ],
     "specialAbilities": [],
@@ -1554,12 +1558,12 @@
     },
     "attacks": [
       {
-        "name": "Bite+14+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "2d8"
       },
       {
-        "name": "Tail Slap+13+0+2",
-        "damage": ""
+        "name": "Tail Slap",
+        "damage": "1d12"
       }
     ],
     "specialAbilities": [],
@@ -1585,16 +1589,16 @@
     },
     "attacks": [
       {
-        "name": "Talons+6+0+1",
-        "damage": ""
+        "name": "Talons",
+        "damage": "2d6"
       },
       {
-        "name": "2 Foreclaws+3+0+0",
-        "damage": ""
+        "name": "2 Foreclaws",
+        "damage": "1d3"
       },
       {
-        "name": "Bite+9+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "2d4"
       }
     ],
     "specialAbilities": [],
@@ -1621,12 +1625,12 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+4+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d6"
       },
       {
-        "name": "Bite+5+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -1652,8 +1656,8 @@
     },
     "attacks": [
       {
-        "name": "Gore+5+0+2",
-        "damage": ""
+        "name": "Gore",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -1701,8 +1705,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -1729,12 +1733,12 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+4+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d6"
       },
       {
-        "name": "Bite+5+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -1762,12 +1766,12 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+4+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d6"
       },
       {
-        "name": "Bite+5+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -1794,8 +1798,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+14+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "2d8"
       }
     ],
     "specialAbilities": [],
@@ -1843,16 +1847,16 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+3+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d4"
       },
       {
-        "name": "Bite+5+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       },
       {
-        "name": "Rake+3+0+0",
-        "damage": ""
+        "name": "Rake",
+        "damage": "1d4"
       }
     ],
     "specialAbilities": [],
@@ -1880,12 +1884,12 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+4+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d6"
       },
       {
-        "name": "Bite+5+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -1911,12 +1915,12 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+4+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d6"
       },
       {
-        "name": "Bite+5+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -1944,12 +1948,12 @@
     },
     "attacks": [
       {
-        "name": "2 Hooves+4+0+1",
-        "damage": ""
+        "name": "2 Hooves",
+        "damage": "1d6"
       },
       {
-        "name": "Bite+2+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d4"
       }
     ],
     "specialAbilities": [],
@@ -1975,8 +1979,8 @@
     },
     "attacks": [
       {
-        "name": "Gore+6+0+2",
-        "damage": ""
+        "name": "Gore",
+        "damage": "2d6"
       }
     ],
     "specialAbilities": [],
@@ -2026,8 +2030,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+3+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d6"
       }
     ],
     "specialAbilities": [],
@@ -2053,16 +2057,16 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+5+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d8"
       },
       {
-        "name": "Bite+6+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "2d6"
       },
       {
-        "name": "Rake+5+0+0",
-        "damage": ""
+        "name": "Rake",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -2088,11 +2092,11 @@
     },
     "attacks": [
       {
-        "name": "Horn+5+0+2",
+        "name": "Horn",
         "damage": "1d8"
       },
       {
-        "name": "2 Hooves+3+0+0",
+        "name": "2 Hooves",
         "damage": "1d4"
       }
     ],
@@ -2142,11 +2146,11 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+5+0+1",
+        "name": "2 Claws",
         "damage": "1d8"
       },
       {
-        "name": "Bite+7+0+0",
+        "name": "Bite",
         "damage": "2d8"
       }
     ],
@@ -2217,16 +2221,16 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+4+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "1d6"
       },
       {
-        "name": "Bite+5+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       },
       {
-        "name": "Rake+4+0+0",
-        "damage": ""
+        "name": "Rake",
+        "damage": "1d6"
       }
     ],
     "specialAbilities": [],
@@ -2362,16 +2366,16 @@
     },
     "attacks": [
       {
-        "name": "Talons+6+0+1",
-        "damage": ""
+        "name": "Talons",
+        "damage": "2d8"
       },
       {
-        "name": "2 Foreclaws+3+0+0",
-        "damage": ""
+        "name": "2 Foreclaws",
+        "damage": "1d4"
       },
       {
-        "name": "Bite+5+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "2d6"
       }
     ],
     "specialAbilities": [],
@@ -2398,8 +2402,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+5+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "2d6"
       }
     ],
     "specialAbilities": [],
@@ -2427,8 +2431,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+4+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -2542,12 +2546,12 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+15+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "2d4"
       },
       {
-        "name": "Bite+7+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "2d8"
       }
     ],
     "specialAbilities": [],
@@ -2573,20 +2577,20 @@
     },
     "attacks": [
       {
-        "name": "Gore+14+0+2",
-        "damage": ""
+        "name": "Gore",
+        "damage": "2d8"
       },
       {
-        "name": "Slam+5+0+1",
-        "damage": ""
+        "name": "Slam",
+        "damage": "2d6"
       },
       {
-        "name": "2 Stamps+5+0+0",
-        "damage": ""
+        "name": "2 Stamps",
+        "damage": "2d6"
       },
       {
-        "name": "Trample+14+0+2",
-        "damage": ""
+        "name": "Trample",
+        "damage": "2d8"
       }
     ],
     "specialAbilities": [],
@@ -2613,12 +2617,12 @@
     },
     "attacks": [
       {
-        "name": "8 Tentacles+3+0+1",
-        "damage": ""
+        "name": "8 Tentacles",
+        "damage": "1d4"
       },
       {
-        "name": "Bite+5+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "1d8"
       }
     ],
     "specialAbilities": [],
@@ -2667,8 +2671,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+14+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "2d8"
       }
     ],
     "specialAbilities": [],
@@ -2694,16 +2698,16 @@
     },
     "attacks": [
       {
-        "name": "2 Claws+15+0+1",
-        "damage": ""
+        "name": "2 Claws",
+        "damage": "2d4"
       },
       {
-        "name": "Bite+6+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "2d6"
       },
       {
-        "name": "Rake+15+0+0",
-        "damage": ""
+        "name": "Rake",
+        "damage": "2d4"
       }
     ],
     "specialAbilities": [],
@@ -2862,12 +2866,12 @@
     },
     "attacks": [
       {
-        "name": "10 Tentacles+3+0+1",
-        "damage": ""
+        "name": "10 Tentacles",
+        "damage": "1d6"
       },
       {
-        "name": "Bite+14+0+0",
-        "damage": ""
+        "name": "Bite",
+        "damage": "2d8"
       }
     ],
     "specialAbilities": [],
@@ -2893,12 +2897,12 @@
     },
     "attacks": [
       {
-        "name": "Gore+14+0+2",
-        "damage": ""
+        "name": "Gore",
+        "damage": "2d8"
       },
       {
-        "name": "Trample+16+0+2",
-        "damage": ""
+        "name": "Trample",
+        "damage": "2d12"
       }
     ],
     "specialAbilities": [],
@@ -2924,8 +2928,8 @@
     },
     "attacks": [
       {
-        "name": "Bite+6+0+2",
-        "damage": ""
+        "name": "Bite",
+        "damage": "3d6"
       }
     ],
     "specialAbilities": [],

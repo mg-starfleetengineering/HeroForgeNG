@@ -1985,6 +1985,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const primaryBaseDmgFormula = primaryWpnObj ? `${primaryWpnObj.damageM}${primaryDmgVal !== 0 ? primaryDmgStr : ''}` : '';
   const primaryDamageDisplay = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceString}`;
   const primaryRollDamageFormula = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceFormula}`;
+  const primaryDamageFormula = primaryRollDamageFormula;
   const primaryRollOptions = primaryWpnObj ? getWeaponRollOptions(primaryWpnObj, primaryBaseDmgFormula, primaryDmgVal, primaryTotalAtk, primaryQualities, primaryBaneTarget) : [];
   const primaryBaneAtk = primarySpecialDmg.hasBane && primaryWpnObj ? getBaneAttackOption(primaryTotalAtk, primaryWpnObj.name, primaryBaneTarget) : null;
   const primaryCritInfo = primaryWpnObj ? calculateCritDamagePools(primaryWpnObj, primaryDmgVal, primaryQualities, primaryBaneTarget) : null;
@@ -2016,6 +2017,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const secondaryBaseDmgFormula = secondaryWpnObj ? `${secondaryWpnObj.damageM}${secondaryDmgVal >= 0 ? `+${secondaryDmgVal}` : secondaryDmgVal}` : '';
   const secondaryDamageDisplay = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceString}`;
   const secondaryRollDamageFormula = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceFormula}`;
+  const secondaryDamageFormula = secondaryRollDamageFormula;
   const secondaryRollOptions = secondaryWpnObj ? getWeaponRollOptions(secondaryWpnObj, secondaryBaseDmgFormula, secondaryDmgVal, secondaryTotalAtk, secondaryQualities, secondaryBaneTarget) : [];
   const secondaryBaneAtk = secondarySpecialDmg.hasBane && secondaryWpnObj ? getBaneAttackOption(secondaryTotalAtk, secondaryWpnObj.name, secondaryBaneTarget) : null;
   const secondaryCritInfo = secondaryWpnObj ? calculateCritDamagePools(secondaryWpnObj, secondaryDmgVal, secondaryQualities, secondaryBaneTarget) : null;
@@ -2040,6 +2042,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
   const rangedBaseDmgFormula = rangedWpnObj ? `${rangedWpnObj.damageM}${rangedDmgStr}` : '';
   const rangedDamageDisplay = `${rangedBaseDmgFormula}${rangedSpecialDmg.damageDiceString}`;
   const rangedRollDamageFormula = `${rangedBaseDmgFormula}${rangedSpecialDmg.damageDiceFormula}`;
+  const rangedDamageFormula = rangedRollDamageFormula;
   const rangedRollOptions = rangedWpnObj ? getWeaponRollOptions(rangedWpnObj, rangedBaseDmgFormula, rangedDmgVal, rangedTotalAtk, rangedQualities, rangedBaneTarget) : [];
   const rangedBaneAtk = rangedSpecialDmg.hasBane && rangedWpnObj ? getBaneAttackOption(rangedTotalAtk, rangedWpnObj.name, rangedBaneTarget) : null;
   const rangedCritInfo = rangedWpnObj ? calculateCritDamagePools(rangedWpnObj, rangedDmgVal, rangedQualities, rangedBaneTarget) : null;
@@ -2990,7 +2993,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                   </div>
                   <div className="flex items-center gap-1.5 flex-wrap justify-end">
                     <button
-                      onClick={() => rollAttack(primaryTotalAtk, `${primaryWpnObj.name} Attack`, primaryWpnObj, { threatMin: primaryThreat })}
+                      onClick={() => rollAttack(primaryTotalAtk, `${primaryWpnObj.name} Attack`, primaryWpnObj, { threatMin: primaryThreat, damageBonus: primaryDmgVal, damageFormula: primaryDamageFormula })}
                       className="font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/30 font-bold text-sm transition flex items-center gap-1.5 cursor-pointer shadow-xs"
                       title={`Click to roll ${primaryWpnObj.name} Attack`}
                     >
@@ -2999,7 +3002,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                     </button>
                     {primaryBaneAtk && (
                       <button
-                        onClick={() => rollAttack(primaryBaneAtk.atkBonus, primaryBaneAtk.label, primaryWpnObj, { threatMin: primaryThreat })}
+                        onClick={() => rollAttack(primaryBaneAtk.atkBonus, primaryBaneAtk.label, primaryWpnObj, { threatMin: primaryThreat, damageBonus: primaryDmgVal, damageFormula: primaryDamageFormula })}
                         className="font-mono text-red-400 hover:text-red-300 hover:bg-red-500/20 px-2 py-1 rounded-lg border border-red-500/30 font-bold text-xs transition flex items-center gap-1 cursor-pointer shadow-xs"
                         title={`Click to roll ${primaryBaneAtk.label}`}
                       >
@@ -3181,7 +3184,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                   </div>
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <button
-                      onClick={() => rollAttack(secondaryTotalAtk, `${secondaryWpnObj.name} Off-Hand Attack`, secondaryWpnObj, { threatMin: secondaryThreat })}
+                      onClick={() => rollAttack(secondaryTotalAtk, `${secondaryWpnObj.name} Off-Hand Attack`, secondaryWpnObj, { threatMin: secondaryThreat, damageBonus: secondaryDmgVal, damageFormula: secondaryDamageFormula })}
                       className="font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
                       title={`Click to roll ${secondaryWpnObj.name} Off-Hand Attack`}
                     >
@@ -3190,7 +3193,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                     </button>
                     {secondaryBaneAtk && (
                       <button
-                        onClick={() => rollAttack(secondaryBaneAtk.atkBonus, secondaryBaneAtk.label, secondaryWpnObj, { threatMin: secondaryThreat })}
+                        onClick={() => rollAttack(secondaryBaneAtk.atkBonus, secondaryBaneAtk.label, secondaryWpnObj, { threatMin: secondaryThreat, damageBonus: secondaryDmgVal, damageFormula: secondaryDamageFormula })}
                         className="font-mono text-red-400 hover:text-red-300 hover:bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30 font-bold text-[11px] transition flex items-center gap-1 cursor-pointer"
                         title={`Click to roll ${secondaryBaneAtk.label}`}
                       >
@@ -3353,7 +3356,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                   </div>
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <button
-                      onClick={() => rollAttack(rangedTotalAtk, `${rangedWpnObj.name} Ranged Attack`, rangedWpnObj, { threatMin: rangedThreat })}
+                      onClick={() => rollAttack(rangedTotalAtk, `${rangedWpnObj.name} Ranged Attack`, rangedWpnObj, { threatMin: rangedThreat, damageBonus: rangedDmgVal, damageFormula: rangedDamageFormula })}
                       className="font-mono text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/20 px-2 py-0.5 rounded border border-cyan-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
                       title={`Click to roll ${rangedWpnObj.name} Ranged Attack`}
                     >
@@ -3362,7 +3365,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = ({
                     </button>
                     {rangedBaneAtk && (
                       <button
-                        onClick={() => rollAttack(rangedBaneAtk.atkBonus, rangedBaneAtk.label, rangedWpnObj, { threatMin: rangedThreat })}
+                        onClick={() => rollAttack(rangedBaneAtk.atkBonus, rangedBaneAtk.label, rangedWpnObj, { threatMin: rangedThreat, damageBonus: rangedDmgVal, damageFormula: rangedDamageFormula })}
                         className="font-mono text-red-400 hover:text-red-300 hover:bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30 font-bold text-[11px] transition flex items-center gap-1 cursor-pointer"
                         title={`Click to roll ${rangedBaneAtk.label}`}
                       >

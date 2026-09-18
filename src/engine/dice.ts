@@ -68,6 +68,8 @@ export interface RollOptions {
   metadata?: Record<string, unknown>;
   damagePools?: DamagePoolInput[];
   isNonlethal?: boolean;
+  damageBonus?: number;
+  damageFormula?: string;
 }
 
 export interface RollResult {
@@ -96,6 +98,9 @@ export interface RollResult {
   targetDamageTotal?: number;
   isNonlethal?: boolean;
   weapon?: Partial<WeaponData>;
+  damageBonus?: number;
+  damageFormula?: string;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -508,7 +513,10 @@ export function rollDice(
     recoilTotal,
     targetDamageTotal,
     isNonlethal: options.isNonlethal,
-    weapon: options.weapon
+    weapon: options.weapon,
+    damageBonus: options.damageBonus,
+    damageFormula: options.damageFormula,
+    metadata: options.metadata
   };
 
   // Add to in-memory history

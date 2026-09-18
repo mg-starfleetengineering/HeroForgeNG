@@ -81,6 +81,8 @@ export const DiceTrayWidget: React.FC = () => {
       rollType: roll.rollType,
       components: roll.components,
       weapon: roll.weapon,
+      damageBonus: roll.damageBonus,
+      damageFormula: roll.damageFormula,
       damagePools: roll.damagePools?.map(p => ({
         label: p.label,
         damageType: p.damageType,
@@ -96,7 +98,16 @@ export const DiceTrayWidget: React.FC = () => {
   const handleRollCritDamageFromAttack = (roll: RollResult) => {
     if (!roll.weapon) return;
     const w = roll.weapon;
-    const critInfo = calculateCritDamagePools(w, 0, w.specialQualities || []);
+    let dmgVal = roll.damageBonus ?? (typeof roll.metadata?.damageBonus === 'number' ? roll.metadata.damageBonus : undefined);
+    if (dmgVal === undefined && roll.damageFormula) {
+      // Fallback: parse flat modifier from formula (e.g. "1d6+3" -> 3, "2d4-1" -> -1)
+      const match = roll.damageFormula.match(/([+-]\s*\d+)(?!.*d)/i);
+      if (match) {
+        dmgVal = parseInt(match[1].replace(/\s+/g, ''), 10) || 0;
+      }
+    }
+    const finalDmgVal = dmgVal || 0;
+    const critInfo = calculateCritDamagePools(w, finalDmgVal, w.specialQualities || [], w.baneTarget);
     rollDice(critInfo.rollFormula, `${w.name || 'Weapon'} Crit Damage (Confirmed)`, {
       rollType: 'damage',
       weapon: w,

@@ -1,6 +1,8 @@
-import { CharacterState, RaceData, ClassData, TemplateData, FeatData, Equipment } from '../types/character';
+import { CharacterState, RaceData, ClassData, TemplateData, FeatData, Equipment, DREntry } from '../types/character';
 import { getCharacterLevel, parseVal } from './stats';
 import { resolveArmor } from './equipment';
+
+export type { DREntry };
 
 export interface DRSource {
   name: string;
@@ -8,12 +10,6 @@ export interface DRSource {
   value: number;
   bypass: string;
   stacks: boolean;
-  abilityType?: 'Ex' | 'Su';
-}
-
-export interface DREntry {
-  value: number;
-  bypass: string;
   abilityType?: 'Ex' | 'Su';
 }
 
@@ -473,6 +469,20 @@ export function collectDRSources(
       });
     });
   }
+
+  // 7. Custom / Character DR
+  (character.damageReduction || []).forEach(entry => {
+    if (entry && entry.value > 0) {
+      sources.push({
+        name: entry.source || `Custom DR (${entry.value}/${entry.bypass || '-'})`,
+        category: 'custom',
+        value: entry.value,
+        bypass: entry.bypass || '-',
+        stacks: entry.stacks ?? false,
+        abilityType: entry.abilityType || GetDRAbilityType(entry.bypass || '-')
+      });
+    }
+  });
 
   return sources;
 }

@@ -21,6 +21,7 @@ import {
   DamagePoolInput
 } from '../dice';
 import { WeaponData } from '../../types/character';
+import { calculateCritDamagePools } from '../magicItems';
 
 describe('Interactive Dice Engine (src/engine/dice.ts)', () => {
   beforeEach(() => {
@@ -508,6 +509,106 @@ describe('Interactive Dice Engine (src/engine/dice.ts)', () => {
 
       expect(result.isNonlethal).toBe(true);
       expect(result.summary).toContain('[NONLETHAL]');
+    });
+  });
+
+  describe('Attack Roll damageBonus and Critical Damage Computation', () => {
+    const mockWeapon: WeaponData = {
+      id: 'wpn_test_bite',
+      name: 'Bite',
+      category: 'Natural Weapon',
+      size: 'Medium',
+      damageM: '1d6',
+      threat: 20,
+      critMultiplier: 2,
+      type: 'Piercing/Slashing',
+      weight: 0
+    };
+
+    it('rollAttack preserves damageBonus and damageFormula on RollResult', () => {
+      const result = rollAttack(8, 'Bite Attack', mockWeapon, {
+        damageBonus: 4,
+        damageFormula: '1d6+4'
+      });
+
+      expect(result.damageBonus).toBe(4);
+      expect(result.damageFormula).toBe('1d6+4');
+      expect(result.weapon?.name).toBe('Bite');
+    });
+
+    it('rollAttackSequence preserves damageBonus and damageFormula on each RollResult', () => {
+      const results = rollAttackSequence('+8/+3', 'Full Bite Attack', mockWeapon, {
+        damageBonus: 4,
+        damageFormula: '1d6+4'
+      });
+
+      expect(results).toHaveLength(2);
+      expect(results[0].damageBonus).toBe(4);
+      expect(results[0].damageFormula).toBe('1d6+4');
+      expect(results[1].damageBonus).toBe(4);
+      expect(results[1].damageFormula).toBe('1d6+4');
+    });
+
+    it('correctly multiplies flat damage bonus alongside base dice for critical damage', () => {
+      const roll = rollAttack(8, 'Bite Attack', mockWeapon, {
+        damageBonus: 4,
+        damageFormula: '1d6+4'
+      });
+
+      const dmgVal = roll.damageBonus ?? 0;
+      const critInfo = calculateCritDamagePools(roll.weapon!, dmgVal, roll.weapon!.specialQualities || []);
+
+      // Base: 1d6 + 4, Crit Multiplier x2 -> 2d6 + (4 * 2) = 2d6+8
+      expect(critInfo.multiplier).toBe(2);
+      expect(critInfo.rollFormula).toBe('2d6+8');
+      expect(critInfo.damagePools[0].formula).toBe('2d6+8');
+    });
+
+    it('correctly multiplies flat damage bonus with x3 weapon multiplier (Battleaxe)', () => {
+      const battleaxe: WeaponData = {
+        id: 'wpn_battleaxe',
+        name: 'Battleaxe',
+        category: 'Martial Weapons',
+        size: 'Medium',
+        damageM: '1d8',
+        threat: 20,
+        critMultiplier: 3,
+        type: 'Slashing',
+        weight: 6
+      };
+
+      const roll = rollAttack(7, 'Battleaxe Attack', battleaxe, {
+        damageBonus: 5,
+        damageFormula: '1d8+5'
+      });
+
+      const dmgVal = roll.damageBonus ?? 0;
+      const critInfo = calculateCritDamagePools(roll.weapon!, dmgVal, roll.weapon!.specialQualities || []);
+
+      // Base: 1d8 + 5, Crit Multiplier x3 -> 3d8 + (5 * 3) = 3d8+15
+      expect(critInfo.multiplier).toBe(3);
+      expect(critInfo.rollFormula).toBe('3d8+15');
+      expect(critInfo.damagePools[0].formula).toBe('3d8+15');
+    });
+
+    it('falls back to regex parsing of damageFormula when damageBonus is omitted', () => {
+      const roll = rollAttack(8, 'Bite Attack', mockWeapon, {
+        damageFormula: '1d6+6'
+      });
+
+      let dmgVal = roll.damageBonus ?? (typeof roll.metadata?.damageBonus === 'number' ? roll.metadata.damageBonus : undefined);
+      if (dmgVal === undefined && roll.damageFormula) {
+        const match = roll.damageFormula.match(/([+-]\s*\d+)(?!.*d)/i);
+        if (match) {
+          dmgVal = parseInt(match[1].replace(/\s+/g, ''), 10) || 0;
+        }
+      }
+      const finalDmgVal = dmgVal || 0;
+      expect(finalDmgVal).toBe(6);
+
+      const critInfo = calculateCritDamagePools(roll.weapon!, finalDmgVal, roll.weapon!.specialQualities || []);
+      // 1d6+6 x2 -> 2d6+12
+      expect(critInfo.rollFormula).toBe('2d6+12');
     });
   });
 });

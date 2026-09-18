@@ -3,7 +3,8 @@ import {
   CharacterState,
   WildShapeFormData,
   CustomWildShapeData,
-  WildShapeState
+  WildShapeState,
+  WildShapeAttack
 } from '../types/character';
 import {
   getEffectiveDruidLevel,
@@ -35,12 +36,43 @@ export const WildShapeManager: React.FC<WildShapeManagerProps> = ({
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [sizeFilter, setSizeFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const prepareCustomDraft = (raw?: CustomWildShapeData): CustomWildShapeData => {
+    const base = raw || character.wildShape?.customForm || DEFAULT_CUSTOM_WILDSHAPE;
+    return {
+      ...base,
+      attack1Name: base.attack1Name || (base.attacks && base.attacks[0]?.name) || 'Bite',
+      attack1Damage: base.attack1Damage || (base.attacks && base.attacks[0]?.damage) || '1d8',
+      attack1Count: base.attack1Count ?? (base.attacks && base.attacks[0]?.attackCount) ?? 1,
+      attack1IsPrimary: base.attack1IsPrimary ?? (base.attacks && base.attacks[0]?.isPrimary) ?? true,
+      attack1Special: base.attack1Special ?? (base.attacks && base.attacks[0]?.special) ?? '',
+      attack2Name: base.attack2Name || (base.attacks && base.attacks[1]?.name) || '',
+      attack2Damage: base.attack2Damage || (base.attacks && base.attacks[1]?.damage) || '',
+      attack2Count: base.attack2Count ?? (base.attacks && base.attacks[1]?.attackCount) ?? 1,
+      attack2IsPrimary: base.attack2IsPrimary ?? (base.attacks && base.attacks[1]?.isPrimary) ?? false,
+      attack2Special: base.attack2Special ?? (base.attacks && base.attacks[1]?.special) ?? '',
+      speedLand: base.speedLand ?? base.speed?.land ?? 40,
+      speedFly: base.speedFly ?? base.speed?.fly,
+      speedFlyManeuverability: base.speedFlyManeuverability || base.speed?.flyManeuverability,
+      speedSwim: base.speedSwim ?? base.speed?.swim,
+      speedClimb: base.speedClimb ?? base.speed?.climb,
+      speedBurrow: base.speedBurrow ?? base.speed?.burrow,
+      specialQualities: Array.isArray(base.specialQualities)
+        ? base.specialQualities.join('; ')
+        : (base.specialQualities || '')
+    };
+  };
+
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [customDraft, setCustomDraft] = useState<CustomWildShapeData>(
-    character.wildShape?.customForm || DEFAULT_CUSTOM_WILDSHAPE
+    prepareCustomDraft(character.wildShape?.customForm)
   );
   const isCapable = druidLevel >= 5 || Boolean(character.wildShape?.isActive);
   const [isManuallyExpanded, setIsManuallyExpanded] = useState(false);
+
+  const openCustomModal = () => {
+    setCustomDraft(prepareCustomDraft(character.wildShape?.customForm));
+    setShowCustomModal(true);
+  };
 
   const handleToggleWildShape = (formId: string) => {
     if (activeForm && character.wildShape?.selectedFormId === formId && character.wildShape?.isActive) {
@@ -73,12 +105,52 @@ export const WildShapeManager: React.FC<WildShapeManagerProps> = ({
   };
 
   const handleSaveCustomForm = () => {
+    const speed = {
+      land: customDraft.speedLand ?? 40,
+      ...(customDraft.speedFly !== undefined ? { fly: customDraft.speedFly } : {}),
+      ...(customDraft.speedFlyManeuverability ? { flyManeuverability: customDraft.speedFlyManeuverability } : {}),
+      ...(customDraft.speedSwim !== undefined ? { swim: customDraft.speedSwim } : {}),
+      ...(customDraft.speedClimb !== undefined ? { climb: customDraft.speedClimb } : {}),
+      ...(customDraft.speedBurrow !== undefined ? { burrow: customDraft.speedBurrow } : {})
+    };
+    const attacks: WildShapeAttack[] = [];
+    if (customDraft.attack1Name) {
+      attacks.push({
+        name: customDraft.attack1Name,
+        damage: customDraft.attack1Damage || '1d8',
+        attackCount: customDraft.attack1Count || 1,
+        isPrimary: customDraft.attack1IsPrimary ?? true,
+        strMultiplier: customDraft.attack1IsPrimary ?? true ? 1.0 : 0.5,
+        special: customDraft.attack1Special
+      });
+    }
+    if (customDraft.attack2Name) {
+      attacks.push({
+        name: customDraft.attack2Name,
+        damage: customDraft.attack2Damage || '1d6',
+        attackCount: customDraft.attack2Count || 1,
+        isPrimary: customDraft.attack2IsPrimary ?? false,
+        strMultiplier: customDraft.attack2IsPrimary ? 1.0 : 0.5,
+        special: customDraft.attack2Special
+      });
+    }
+    const specialQualities = typeof customDraft.specialQualities === 'string'
+      ? customDraft.specialQualities.split(/[;,]/).map(s => s.trim()).filter(Boolean)
+      : (customDraft.specialQualities || []);
+
+    const updatedCustom: CustomWildShapeData = {
+      ...customDraft,
+      speed,
+      attacks,
+      specialQualities
+    };
+
     onChange({
       wildShape: {
         ...(character.wildShape || { isActive: true }),
         isActive: true,
         selectedFormId: 'custom',
-        customForm: customDraft
+        customForm: updatedCustom
       }
     });
     setShowCustomModal(false);
@@ -171,7 +243,7 @@ export const WildShapeManager: React.FC<WildShapeManagerProps> = ({
 
           <button
             type="button"
-            onClick={() => setShowCustomModal(true)}
+            onClick={openCustomModal}
             className="btn btn-secondary text-xs flex items-center gap-1.5"
           >
             <i className="fa-solid fa-plus text-emerald-400"></i> Custom Form
@@ -213,13 +285,24 @@ export const WildShapeManager: React.FC<WildShapeManagerProps> = ({
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={handleRevert}
-              className="btn btn-secondary text-xs border-rose-500/40 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 flex items-center gap-1.5 self-start sm:self-center"
-            >
-              <i className="fa-solid fa-arrow-rotate-left text-rose-400"></i> Revert to Humanoid Form
-            </button>
+            <div className="flex items-center gap-2 self-start sm:self-center">
+              {character.wildShape?.selectedFormId === 'custom' && (
+                <button
+                  type="button"
+                  onClick={openCustomModal}
+                  className="btn btn-secondary text-xs border-emerald-500/40 hover:bg-emerald-500/20 text-emerald-300 hover:text-emerald-200 flex items-center gap-1.5"
+                >
+                  <i className="fa-solid fa-sliders text-emerald-400"></i> Edit Custom Form
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handleRevert}
+                className="btn btn-secondary text-xs border-rose-500/40 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 flex items-center gap-1.5"
+              >
+                <i className="fa-solid fa-arrow-rotate-left text-rose-400"></i> Revert to Humanoid Form
+              </button>
+            </div>
           </div>
 
           {/* Form Quick Stats Strip */}

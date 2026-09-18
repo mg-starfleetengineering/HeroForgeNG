@@ -320,6 +320,85 @@ export const STANDARD_COMPANION_SKILLS = [
   'Survival'
 ];
 
+/**
+ * Infers canonical natural attack damage based on attack type and creature size (D&D 3.5e Monster Manual).
+ */
+export function inferCompanionAttackDamage(attackName: string, size: string = 'Medium'): string {
+  const norm = (attackName || '').toLowerCase();
+  const s = (size || 'Medium').toLowerCase();
+
+  if (norm.includes('touch') || norm.includes('attach')) {
+    return 'attach';
+  }
+
+  const isFine = s === 'fine';
+  const isDiminutive = s === 'diminutive';
+  const isTiny = s === 'tiny';
+  const isSmall = s === 'small';
+  const isLarge = s === 'large';
+  const isHuge = s === 'huge';
+  const isGargantuan = s === 'gargantuan';
+  const isColossal = s === 'colossal';
+
+  if (norm.includes('claw') || norm.includes('talon') || norm.includes('foreclaw') || norm.includes('rake')) {
+    if (isFine || isDiminutive) return '1';
+    if (isTiny) return '1d2';
+    if (isSmall) return '1d3';
+    if (isLarge) return '1d6';
+    if (isHuge) return '1d8';
+    if (isGargantuan) return '2d6';
+    if (isColossal) return '2d8';
+    return '1d4'; // Medium
+  }
+
+  if (norm.includes('bite')) {
+    if (isFine) return '1';
+    if (isDiminutive) return '1d2';
+    if (isTiny) return '1d3';
+    if (isSmall) return '1d4';
+    if (isLarge) return '1d8';
+    if (isHuge) return '2d6';
+    if (isGargantuan) return '2d8';
+    if (isColossal) return '4d6';
+    return '1d6'; // Medium
+  }
+
+  if (norm.includes('gore') || norm.includes('horn')) {
+    if (isFine) return '1';
+    if (isDiminutive) return '1d2';
+    if (isTiny) return '1d3';
+    if (isSmall) return '1d4';
+    if (isLarge) return '1d8';
+    if (isHuge) return '2d6';
+    if (isGargantuan) return '2d8';
+    if (isColossal) return '3d6';
+    return '1d6'; // Medium
+  }
+
+  if (norm.includes('slam') || norm.includes('hoof') || norm.includes('hooves') || norm.includes('stamp') || norm.includes('tentacle')) {
+    if (isFine) return '1';
+    if (isDiminutive) return '1d2';
+    if (isTiny) return '1d3';
+    if (isSmall) return '1d4';
+    if (isLarge) return '1d6';
+    if (isHuge) return '2d4';
+    if (isGargantuan) return '2d6';
+    if (isColossal) return '2d8';
+    return '1d4'; // Medium
+  }
+
+  // General fallback by size
+  if (isFine) return '1';
+  if (isDiminutive) return '1d2';
+  if (isTiny) return '1d3';
+  if (isSmall) return '1d4';
+  if (isLarge) return '1d8';
+  if (isHuge) return '2d6';
+  if (isGargantuan) return '2d8';
+  if (isColossal) return '4d6';
+  return '1d6'; // Medium
+}
+
 export function computeAnimalCompanionStats(
   character: CharacterState,
   companionsData: AnimalCompanionData[],
@@ -368,20 +447,39 @@ export function computeAnimalCompanionStats(
       wis: custom.wis ?? 12,
       cha: custom.cha ?? 6,
       naturalArmor: custom.naturalArmor ?? 2,
-      speed: {
-        land: custom.speedLand ?? 30,
-        fly: custom.speedFly,
-        flyManeuverability: custom.speedFlyManeuverability,
-        swim: custom.speedSwim,
-        climb: custom.speedClimb,
-        burrow: custom.speedBurrow
-      },
-      specialAbilities: custom.specialAbilities ? custom.specialAbilities.split(';').map(s => s.trim()).filter(Boolean) : [],
-      feats: custom.feats ? custom.feats.split(';').map(s => s.trim()).filter(Boolean) : [],
-      attacks: [
-        { name: custom.attack1Name || 'Bite', damage: custom.attack1Damage || '1d6' },
-        ...(custom.attack2Name ? [{ name: custom.attack2Name, damage: custom.attack2Damage || '1d4' }] : [])
-      ],
+      speed: (custom.speed && typeof custom.speed === 'object' && custom.speed.land !== undefined)
+        ? {
+            land: custom.speed.land,
+            fly: custom.speed.fly ?? custom.speedFly,
+            flyManeuverability: custom.speed.flyManeuverability ?? custom.speedFlyManeuverability,
+            swim: custom.speed.swim ?? custom.speedSwim,
+            climb: custom.speed.climb ?? custom.speedClimb,
+            burrow: custom.speed.burrow ?? custom.speedBurrow
+          }
+        : {
+            land: custom.speedLand ?? 30,
+            fly: custom.speedFly,
+            flyManeuverability: custom.speedFlyManeuverability,
+            swim: custom.speedSwim,
+            climb: custom.speedClimb,
+            burrow: custom.speedBurrow
+          },
+      specialAbilities: Array.isArray(custom.specialAbilities)
+        ? custom.specialAbilities
+        : (typeof custom.specialAbilities === 'string'
+            ? custom.specialAbilities.split(/[;,]/).map(s => s.trim()).filter(Boolean)
+            : []),
+      feats: Array.isArray(custom.feats)
+        ? custom.feats
+        : (typeof custom.feats === 'string'
+            ? custom.feats.split(/[;,]/).map(s => s.trim()).filter(Boolean)
+            : []),
+      attacks: Array.isArray(custom.attacks) && custom.attacks.length > 0
+        ? custom.attacks.map(a => ({ name: a.name, damage: a.damage }))
+        : [
+            { name: custom.attack1Name || 'Bite', damage: custom.attack1Damage || '1d6' },
+            ...(custom.attack2Name ? [{ name: custom.attack2Name, damage: custom.attack2Damage || '1d4' }] : [])
+          ],
       isQuadruped: custom.isQuadruped ?? true
     };
   } else {
@@ -400,7 +498,7 @@ export function computeAnimalCompanionStats(
       cha: 6,
       naturalArmor: 2,
       speed: { land: 50 },
-      attacks: [{ name: 'Bite+5+0+2', damage: '1d6' }],
+      attacks: [{ name: 'Bite', damage: '1d6' }],
       specialAbilities: [],
       feats: []
     };
@@ -486,11 +584,23 @@ export function computeAnimalCompanionStats(
   const meleeAttackBonus = bab + (hasFinesse ? dexMod : strMod) + sizeMod;
   const rangedAttackBonus = bab + dexMod + sizeMod;
 
-  const attacks = baseData.attacks.map(atk => ({
-    name: atk.name,
-    damage: atk.damage,
-    attackBonus: meleeAttackBonus
-  }));
+  const attacks = baseData.attacks.map(atk => {
+    let cleanName = (atk.name || '').trim();
+    cleanName = cleanName.replace(/[;:]+$/, '').trim();
+    cleanName = cleanName.replace(/[\+\-]\d+[\+\-\d]*$/, '').trim();
+    cleanName = cleanName.replace(/[;:]+$/, '').trim();
+
+    let damage = (atk.damage || '').trim();
+    if (!damage) {
+      damage = inferCompanionAttackDamage(cleanName, baseData.size);
+    }
+
+    return {
+      name: cleanName,
+      damage,
+      attackBonus: meleeAttackBonus
+    };
+  });
 
   // Feat allowance: 1 + floor((totalHD - 1) / 3)
   const maxFeatsAllowed = 1 + Math.floor((totalHD - 1) / 3);
