@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { CharacterState } from '../types/character';
 import { ALL_SOURCES, CORE_SOURCES, SourceBook } from '../utils/sourceFilter';
-import { BookOpen, CheckSquare, Square, ShieldAlert, Sparkles, RefreshCw, CheckCircle2, Sliders } from 'lucide-react';
+import { BookOpen, SquareCheck, Square, ShieldAlert, Sparkles, RefreshCw, CircleCheck, SlidersHorizontal } from 'lucide-react';
 
 interface SourceBooksTabProps {
   character: CharacterState;
@@ -120,7 +120,7 @@ export const SourceBooksTab: React.FC<SourceBooksTabProps> = ({ character, onCha
         {/* Preset Quick Actions */}
         <div className="mt-6 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-xs text-slate-400">
-            <Sliders className="w-4 h-4 text-amber-400" />
+            <SlidersHorizontal className="w-4 h-4 text-amber-400" />
             <span className="font-semibold text-slate-300">Quick Presets:</span>
           </div>
 
@@ -133,7 +133,7 @@ export const SourceBooksTab: React.FC<SourceBooksTabProps> = ({ character, onCha
                   : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700'
               }`}
             >
-              <CheckCircle2 className="w-3.5 h-3.5" />
+              <CircleCheck className="w-3.5 h-3.5" />
               Core Only (PHB / DMG / MM)
             </button>
 
@@ -153,7 +153,7 @@ export const SourceBooksTab: React.FC<SourceBooksTabProps> = ({ character, onCha
                   : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700'
               }`}
             >
-              <CheckSquare className="w-3.5 h-3.5 text-emerald-400" />
+              <SquareCheck className="w-3.5 h-3.5 text-emerald-400" />
               Enable All 3.5e Sources
             </button>
 
@@ -247,7 +247,7 @@ export const SourceBooksTab: React.FC<SourceBooksTabProps> = ({ character, onCha
 
                       <div className="shrink-0 mt-0.5">
                         {isAllowed ? (
-                          <CheckSquare className="w-5 h-5 text-amber-400" />
+                          <SquareCheck className="w-5 h-5 text-amber-400" />
                         ) : (
                           <Square className="w-5 h-5 text-slate-700" />
                         )}
