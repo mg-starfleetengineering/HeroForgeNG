@@ -99,7 +99,8 @@ export default defineConfig({
     watch: {
       usePolling: true,
       interval: 100,
-      binaryInterval: 300
+      binaryInterval: 300,
+      ignored: ['**/dist/**', '**/.git/**']
     }
   }
 })

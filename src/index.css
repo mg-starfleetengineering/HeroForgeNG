@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
+@source "../index.html";
+@source "./**/*.{ts,tsx}";
 
 @theme {
   --color-brand-primary: #f59e0b;
@@ -31,6 +33,13 @@ body {
 
 .font-mono {
   font-family: var(--font-mono);
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
 @layer components {
@@ -159,6 +168,7 @@ body {
   border-radius: 0.5rem;
   transition: all 0.2s ease;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 @media (min-width: 1280px) {
