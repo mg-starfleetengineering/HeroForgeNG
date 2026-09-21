@@ -1,0 +1,6576 @@
+[
+  {
+    "id": "burning_hands",
+    "name": "Burning Hands",
+    "source": "PHB",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 8
+    },
+    "domains": [
+      {
+        "domain": "Fire",
+        "level": 1,
+        "domainPower": "You can turn or destroy water creatures; rebuke, command, or bolster fire creatures 0 times per day as a Supernatural Ability.",
+        "source": "PHB"
+      }
+    ],
+    "levels": {
+      "Fire": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Fire": 1
+    }
+  },
+  {
+    "id": "claws_of_the_savage",
+    "name": "Claws of the Savage",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 24
+    },
+    "domains": [
+      {
+        "domain": "Bestial",
+        "level": 4,
+        "domainPower": "Character gains the Scent extraordinary ability.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Bestial": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Bestial": 4
+    }
+  },
+  {
+    "id": "whirlwind_of_teeth",
+    "name": "Whirlwind of Teeth",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 24
+    },
+    "domains": [
+      {
+        "domain": "Bestial",
+        "level": 7,
+        "domainPower": "Character gains the Scent extraordinary ability.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Bestial": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Bestial": 7
+    }
+  },
+  {
+    "id": "spread_of_savagery",
+    "name": "Spread of Savagery",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 24
+    },
+    "domains": [
+      {
+        "domain": "Bestial",
+        "level": 8,
+        "domainPower": "Character gains the Scent extraordinary ability.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Bestial": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Bestial": 8
+    }
+  },
+  {
+    "id": "were_doom",
+    "name": "Were-doom",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 24
+    },
+    "domains": [
+      {
+        "domain": "Bestial",
+        "level": 9,
+        "domainPower": "Character gains the Scent extraordinary ability.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Bestial": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Bestial": 9
+    }
+  },
+  {
+    "id": "demonflesh",
+    "name": "Demonflesh",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 25
+    },
+    "domains": [
+      {
+        "domain": "Demonic",
+        "level": 1,
+        "domainPower": "Character gains +1 divine bonus on attack and damage rolls for unarmed attacks and attacks with natural weapons.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Demonic": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Demonic": 1
+    }
+  },
+  {
+    "id": "demoncall",
+    "name": "Demoncall",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 25
+    },
+    "domains": [
+      {
+        "domain": "Demonic",
+        "level": 2,
+        "domainPower": "Character gains +1 divine bonus on attack and damage rolls for unarmed attacks and attacks with natural weapons.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Demonic": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Demonic": 2
+    }
+  },
+  {
+    "id": "demon_wings",
+    "name": "Demon Wings",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 25
+    },
+    "domains": [
+      {
+        "domain": "Demonic",
+        "level": 3,
+        "domainPower": "Character gains +1 divine bonus on attack and damage rolls for unarmed attacks and attacks with natural weapons.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Demonic": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Demonic": 3
+    }
+  },
+  {
+    "id": "fiendish_clarity",
+    "name": "Fiendish Clarity",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 25
+    },
+    "domains": [
+      {
+        "domain": "Demonic",
+        "level": 7,
+        "domainPower": "Character gains +1 divine bonus on attack and damage rolls for unarmed attacks and attacks with natural weapons.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Demonic": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Demonic": 7
+    }
+  },
+  {
+    "id": "utterdark",
+    "name": "Utterdark",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 25
+    },
+    "domains": [
+      {
+        "domain": "Demonic",
+        "level": 8,
+        "domainPower": "Character gains +1 divine bonus on attack and damage rolls for unarmed attacks and attacks with natural weapons.",
+        "source": "VD"
+      },
+      {
+        "domain": "Vile Darkness",
+        "level": 8,
+        "domainPower": "Free Blind-Fight feat.",
+        "source": "LM"
+      }
+    ],
+    "levels": {
+      "Demonic": 8,
+      "Vile Darkness": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Demonic": 8,
+      "Vile Darkness": 8
+    }
+  },
+  {
+    "id": "devil_s_tail",
+    "name": "Devil's Tail",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 26
+    },
+    "domains": [
+      {
+        "domain": "Diabolic",
+        "level": 1,
+        "domainPower": "Once per day, character can add her class level as a bonus on a Bluff, Diplomacy, Intimidate or Sense Motive check.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Diabolic": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Diabolic": 1
+    }
+  },
+  {
+    "id": "devil_s_eye",
+    "name": "Devil's Eye",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 26
+    },
+    "domains": [
+      {
+        "domain": "Diabolic",
+        "level": 2,
+        "domainPower": "Once per day, character can add her class level as a bonus on a Bluff, Diplomacy, Intimidate or Sense Motive check.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Diabolic": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Diabolic": 2
+    }
+  },
+  {
+    "id": "devil_s_ego",
+    "name": "Devil's Ego",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 26
+    },
+    "domains": [
+      {
+        "domain": "Diabolic",
+        "level": 3,
+        "domainPower": "Once per day, character can add her class level as a bonus on a Bluff, Diplomacy, Intimidate or Sense Motive check.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Diabolic": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Diabolic": 3
+    }
+  },
+  {
+    "id": "hellfire",
+    "name": "Hellfire",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 26
+    },
+    "domains": [
+      {
+        "domain": "Diabolic",
+        "level": 4,
+        "domainPower": "Once per day, character can add her class level as a bonus on a Bluff, Diplomacy, Intimidate or Sense Motive check.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Diabolic": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Diabolic": 4
+    }
+  },
+  {
+    "id": "hellfire_storm",
+    "name": "Hellfire Storm",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 26
+    },
+    "domains": [
+      {
+        "domain": "Diabolic",
+        "level": 7,
+        "domainPower": "Once per day, character can add her class level as a bonus on a Bluff, Diplomacy, Intimidate or Sense Motive check.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Diabolic": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Diabolic": 7
+    }
+  },
+  {
+    "id": "angry_ache",
+    "name": "Angry Ache",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 27
+    },
+    "domains": [
+      {
+        "domain": "Pain",
+        "level": 1,
+        "domainPower": "Character converts damage that he deals in one blow per day into healing for himself, up to 1  point of damage per level.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Pain": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 1
+    }
+  },
+  {
+    "id": "sadism",
+    "name": "Sadism",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 27
+    },
+    "domains": [
+      {
+        "domain": "Pain",
+        "level": 2,
+        "domainPower": "Character converts damage that he deals in one blow per day into healing for himself, up to 1  point of damage per level.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Pain": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 2
+    }
+  },
+  {
+    "id": "wrack",
+    "name": "Wrack",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 27
+    },
+    "domains": [
+      {
+        "domain": "Pain",
+        "level": 3,
+        "domainPower": "Character converts damage that he deals in one blow per day into healing for himself, up to 1  point of damage per level.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Pain": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 3
+    }
+  },
+  {
+    "id": "liquid_pain",
+    "name": "Liquid Pain",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 27
+    },
+    "domains": [
+      {
+        "domain": "Pain",
+        "level": 4,
+        "domainPower": "Character converts damage that he deals in one blow per day into healing for himself, up to 1  point of damage per level.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Pain": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 4
+    }
+  },
+  {
+    "id": "thousand_needles",
+    "name": "Thousand Needles",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 27
+    },
+    "domains": [
+      {
+        "domain": "Pain",
+        "level": 5,
+        "domainPower": "Character converts damage that he deals in one blow per day into healing for himself, up to 1  point of damage per level.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Pain": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 5
+    }
+  },
+  {
+    "id": "pox",
+    "name": "Pox",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 27
+    },
+    "domains": [
+      {
+        "domain": "Pain",
+        "level": 6,
+        "domainPower": "Character converts damage that he deals in one blow per day into healing for himself, up to 1  point of damage per level.",
+        "source": "VD"
+      },
+      {
+        "domain": "Corruption",
+        "level": 6,
+        "domainPower": "Once per day, make a melee touch attack to deal 0d6 damage and sicken target for 1 round.",
+        "source": "LM"
+      }
+    ],
+    "levels": {
+      "Pain": 6,
+      "Corruption": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 6,
+      "Corruption": 6
+    }
+  },
+  {
+    "id": "wave_of_pain",
+    "name": "Wave of Pain",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 27
+    },
+    "domains": [
+      {
+        "domain": "Pain",
+        "level": 7,
+        "domainPower": "Character converts damage that he deals in one blow per day into healing for himself, up to 1  point of damage per level.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Pain": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 7
+    }
+  },
+  {
+    "id": "symbol",
+    "name": "Symbol",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 27
+    },
+    "domains": [
+      {
+        "domain": "Pain",
+        "level": 8,
+        "domainPower": "Character converts damage that he deals in one blow per day into healing for himself, up to 1  point of damage per level.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Pain": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 8
+    }
+  },
+  {
+    "id": "eternity_of_torture",
+    "name": "Eternity of Torture",
+    "source": "VD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 27
+    },
+    "domains": [
+      {
+        "domain": "Pain",
+        "level": 9,
+        "domainPower": "Character converts damage that he deals in one blow per day into healing for himself, up to 1  point of damage per level.",
+        "source": "VD"
+      }
+    ],
+    "levels": {
+      "Pain": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pain": 9
+    }
+  },
+  {
+    "id": "vision_of_heaven",
+    "name": "Vision of Heaven",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 29
+    },
+    "domains": [
+      {
+        "domain": "Celestial",
+        "level": 1,
+        "domainPower": "You can smite evil once per day, gaining a +4 bonus to your attack and +0 to damage.",
+        "source": "ED"
+      },
+      {
+        "domain": "Joy",
+        "level": 1,
+        "domainPower": "You gain a +4 sacred bonus on Diplomacy checks.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Celestial": 1,
+      "Joy": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Celestial": 1,
+      "Joy": 1
+    }
+  },
+  {
+    "id": "blessed_sight",
+    "name": "Blessed Sight",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 29
+    },
+    "domains": [
+      {
+        "domain": "Celestial",
+        "level": 3,
+        "domainPower": "You can smite evil once per day, gaining a +4 bonus to your attack and +0 to damage.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Celestial": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Celestial": 3
+    }
+  },
+  {
+    "id": "heavenly_lightning",
+    "name": "Heavenly Lightning",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 29
+    },
+    "domains": [
+      {
+        "domain": "Celestial",
+        "level": 5,
+        "domainPower": "You can smite evil once per day, gaining a +4 bonus to your attack and +0 to damage.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Celestial": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Celestial": 5
+    }
+  },
+  {
+    "id": "call_faithful_servants",
+    "name": "Call Faithful Servants",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 29
+    },
+    "domains": [
+      {
+        "domain": "Celestial",
+        "level": 6,
+        "domainPower": "You can smite evil once per day, gaining a +4 bonus to your attack and +0 to damage.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Celestial": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Celestial": 6
+    }
+  },
+  {
+    "id": "heavenly_lightning_storm",
+    "name": "Heavenly Lightning Storm",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 29
+    },
+    "domains": [
+      {
+        "domain": "Celestial",
+        "level": 7,
+        "domainPower": "You can smite evil once per day, gaining a +4 bonus to your attack and +0 to damage.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Celestial": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Celestial": 7
+    }
+  },
+  {
+    "id": "refreshment",
+    "name": "Refreshment",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 30
+    },
+    "domains": [
+      {
+        "domain": "Endurance",
+        "level": 3,
+        "domainPower": "You can perform a feat of endurance once per day, adding +0 to your Constitution score for one minute as a free action.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Endurance": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Endurance": 3
+    }
+  },
+  {
+    "id": "sustain",
+    "name": "Sustain",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 30
+    },
+    "domains": [
+      {
+        "domain": "Endurance",
+        "level": 4,
+        "domainPower": "You can perform a feat of endurance once per day, adding +0 to your Constitution score for one minute as a free action.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Endurance": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Endurance": 4
+    }
+  },
+  {
+    "id": "inspired_aim",
+    "name": "Inspired Aim",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 31
+    },
+    "domains": [
+      {
+        "domain": "Fey",
+        "level": 3,
+        "domainPower": "Gain a +4 bonus on saving throws against the spell-like abilities of feys.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Fey": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Fey": 3
+    }
+  },
+  {
+    "id": "blinding_beauty",
+    "name": "Blinding Beauty",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 31
+    },
+    "domains": [
+      {
+        "domain": "Fey",
+        "level": 4,
+        "domainPower": "Gain a +4 bonus on saving throws against the spell-like abilities of feys.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Fey": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Fey": 4
+    }
+  },
+  {
+    "id": "unearthly_beauty",
+    "name": "Unearthly Beauty",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 31
+    },
+    "domains": [
+      {
+        "domain": "Fey",
+        "level": 8,
+        "domainPower": "Gain a +4 bonus on saving throws against the spell-like abilities of feys.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Fey": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Fey": 8
+    }
+  },
+  {
+    "id": "aspect_of_the_deity",
+    "name": "Aspect of the Deity",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 32
+    },
+    "domains": [
+      {
+        "domain": "Herald",
+        "level": 7,
+        "domainPower": "Intimidate is a class skill.  You gain a +4 sacred bonus on Diplomacy and Intimidate checks.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Herald": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Herald": 7
+    }
+  },
+  {
+    "id": "crown_of_glory",
+    "name": "Crown of Glory",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 32
+    },
+    "domains": [
+      {
+        "domain": "Herald",
+        "level": 8,
+        "domainPower": "Intimidate is a class skill.  You gain a +4 sacred bonus on Diplomacy and Intimidate checks.",
+        "source": "ED"
+      },
+      {
+        "domain": "Glory",
+        "level": 8,
+        "domainPower": "Turn undead with a +2 bonus on turning check and +1d6 on the turning damage roll.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Herald": 8,
+      "Glory": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Herald": 8,
+      "Glory": 8
+    }
+  },
+  {
+    "id": "visage_of_the_deity_greater",
+    "name": "Visage of the Deity, Greater",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 32
+    },
+    "domains": [
+      {
+        "domain": "Herald",
+        "level": 9,
+        "domainPower": "Intimidate is a class skill.  You gain a +4 sacred bonus on Diplomacy and Intimidate checks.",
+        "source": "ED"
+      },
+      {
+        "domain": "Competition",
+        "level": 9,
+        "domainPower": "As an extraordinary ability you gain a +1 bonus on all opposed checks you make.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Mysticism",
+        "level": 9,
+        "domainPower": "As a supernatural ability, once per day you can use a free action to grant yourself a +-1 luck bonus on your saving throws for 0 rounds.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Purification",
+        "level": 9,
+        "domainPower": "You cast abjuration spells at +1 caster level.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Herald": 9,
+      "Competition": 9,
+      "Mysticism": 9,
+      "Purification": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Herald": 9,
+      "Competition": 9,
+      "Mysticism": 9,
+      "Purification": 9
+    }
+  },
+  {
+    "id": "elation",
+    "name": "Elation",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 33
+    },
+    "domains": [
+      {
+        "domain": "Joy",
+        "level": 2,
+        "domainPower": "You gain a +4 sacred bonus on Diplomacy checks.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Joy": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Joy": 2
+    }
+  },
+  {
+    "id": "distilled_joy",
+    "name": "Distilled Joy",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 33
+    },
+    "domains": [
+      {
+        "domain": "Joy",
+        "level": 3,
+        "domainPower": "You gain a +4 sacred bonus on Diplomacy checks.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Joy": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Joy": 3
+    }
+  },
+  {
+    "id": "chaav_s_laugh",
+    "name": "Chaav's Laugh",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 33
+    },
+    "domains": [
+      {
+        "domain": "Joy",
+        "level": 5,
+        "domainPower": "You gain a +4 sacred bonus on Diplomacy checks.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Joy": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Joy": 5
+    }
+  },
+  {
+    "id": "starmantle",
+    "name": "Starmantle",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 33
+    },
+    "domains": [
+      {
+        "domain": "Joy",
+        "level": 7,
+        "domainPower": "You gain a +4 sacred bonus on Diplomacy checks.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Joy": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Joy": 7
+    }
+  },
+  {
+    "id": "sympathy",
+    "name": "Sympathy",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 33
+    },
+    "domains": [
+      {
+        "domain": "Joy",
+        "level": 8,
+        "domainPower": "You gain a +4 sacred bonus on Diplomacy checks.",
+        "source": "ED"
+      },
+      {
+        "domain": "Greed",
+        "level": 9,
+        "domainPower": "You gain a +2 Competence bonus on Appraise, Open Lock, and Sleight of Hand checks.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Lust",
+        "level": 8,
+        "domainPower": "Once per day for 1 round, as a free action you gain a bonus of 0  to your charisma. This granted power is a supernatural abiity.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Joy": 8,
+      "Greed": 9,
+      "Lust": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Joy": 8,
+      "Greed": 9,
+      "Lust": 8
+    }
+  },
+  {
+    "id": "lastai_s_caress",
+    "name": "Lastai's Caress",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 34
+    },
+    "domains": [
+      {
+        "domain": "Pleasure",
+        "level": 2,
+        "domainPower": "You are immune to any effect that damages or drains your Charisma.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Pleasure": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pleasure": 2
+    }
+  },
+  {
+    "id": "heart_s_ease",
+    "name": "Heart's Ease",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 34
+    },
+    "domains": [
+      {
+        "domain": "Pleasure",
+        "level": 3,
+        "domainPower": "You are immune to any effect that damages or drains your Charisma.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Pleasure": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pleasure": 3
+    }
+  },
+  {
+    "id": "remove_fatigue",
+    "name": "Remove Fatigue",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 34
+    },
+    "domains": [
+      {
+        "domain": "Pleasure",
+        "level": 4,
+        "domainPower": "You are immune to any effect that damages or drains your Charisma.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Pleasure": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pleasure": 4
+    }
+  },
+  {
+    "id": "celestial_blood",
+    "name": "Celestial Blood",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 34
+    },
+    "domains": [
+      {
+        "domain": "Pleasure",
+        "level": 6,
+        "domainPower": "You are immune to any effect that damages or drains your Charisma.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Pleasure": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pleasure": 6
+    }
+  },
+  {
+    "id": "empyreal_ecstacy",
+    "name": "Empyreal Ecstacy",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 34
+    },
+    "domains": [
+      {
+        "domain": "Pleasure",
+        "level": 7,
+        "domainPower": "You are immune to any effect that damages or drains your Charisma.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Pleasure": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pleasure": 7
+    }
+  },
+  {
+    "id": "spread_of_contentment",
+    "name": "Spread of Contentment",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 34
+    },
+    "domains": [
+      {
+        "domain": "Pleasure",
+        "level": 8,
+        "domainPower": "You are immune to any effect that damages or drains your Charisma.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Pleasure": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pleasure": 8
+    }
+  },
+  {
+    "id": "sublime_revelry",
+    "name": "Sublime Revelry",
+    "source": "ED",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 34
+    },
+    "domains": [
+      {
+        "domain": "Pleasure",
+        "level": 9,
+        "domainPower": "You are immune to any effect that damages or drains your Charisma.",
+        "source": "ED"
+      }
+    ],
+    "levels": {
+      "Pleasure": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pleasure": 9
+    }
+  },
+  {
+    "id": "hardening",
+    "name": "Hardening",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 36
+    },
+    "domains": [
+      {
+        "domain": "Artifice",
+        "level": 7,
+        "domainPower": "Gain +4 competence bonus on Craft check.  You cast creation spells at +1 caster level.",
+        "source": "ES"
+      },
+      {
+        "domain": "Forge",
+        "level": 7,
+        "domainPower": "You gain a +2 insight bonus on Craft and Appraise checks releated to stone or metal items.",
+        "source": "DragonLance"
+      }
+    ],
+    "levels": {
+      "Artifice": 7,
+      "Forge": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Artifice": 7,
+      "Forge": 7
+    }
+  },
+  {
+    "id": "true_creation",
+    "name": "True Creation",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 36
+    },
+    "domains": [
+      {
+        "domain": "Artifice",
+        "level": 8,
+        "domainPower": "Gain +4 competence bonus on Craft check.  You cast creation spells at +1 caster level.",
+        "source": "ES"
+      },
+      {
+        "domain": "Creation",
+        "level": 8,
+        "domainPower": "You cast Conjuration (creation) spells at +1 caster level.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Artifice": 8,
+      "Creation": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Artifice": 8,
+      "Creation": 8
+    }
+  },
+  {
+    "id": "zone_of_truth",
+    "name": "Zone of Truth",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 37
+    },
+    "domains": [
+      {
+        "domain": "Commerce",
+        "level": 2,
+        "domainPower": "You gain a +10 competence bonus on Profession checks made to earn a living.  Add appraise to your list of cleric class skills.",
+        "source": "ES"
+      },
+      {
+        "domain": "Inquisition",
+        "level": 2,
+        "domainPower": "Gain a +4 bonus on all dispel checks.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Commerce": 2,
+      "Inquisition": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Commerce": 2,
+      "Inquisition": 2
+    }
+  },
+  {
+    "id": "halt_deathless",
+    "name": "Halt Deathless",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 38
+    },
+    "domains": [
+      {
+        "domain": "Deathless",
+        "level": 3,
+        "domainPower": "Once per day, you can perform a greater rebuking against deathless creatures in place of a regular turning attempt.  Any deathless creatures affected by this are commanded instead of rebuked.",
+        "source": "ES"
+      }
+    ],
+    "levels": {
+      "Deathless": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathless": 3
+    }
+  },
+  {
+    "id": "spirit_steed",
+    "name": "Spirit Steed",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 38
+    },
+    "domains": [
+      {
+        "domain": "Deathless",
+        "level": 4,
+        "domainPower": "Once per day, you can perform a greater rebuking against deathless creatures in place of a regular turning attempt.  Any deathless creatures affected by this are commanded instead of rebuked.",
+        "source": "ES"
+      }
+    ],
+    "levels": {
+      "Deathless": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathless": 4
+    }
+  },
+  {
+    "id": "create_deathless",
+    "name": "Create Deathless",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 38
+    },
+    "domains": [
+      {
+        "domain": "Deathless",
+        "level": 6,
+        "domainPower": "Once per day, you can perform a greater rebuking against deathless creatures in place of a regular turning attempt.  Any deathless creatures affected by this are commanded instead of rebuked.",
+        "source": "ES"
+      }
+    ],
+    "levels": {
+      "Deathless": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathless": 6
+    }
+  },
+  {
+    "id": "control_deathless",
+    "name": "Control Deathless",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 38
+    },
+    "domains": [
+      {
+        "domain": "Deathless",
+        "level": 7,
+        "domainPower": "Once per day, you can perform a greater rebuking against deathless creatures in place of a regular turning attempt.  Any deathless creatures affected by this are commanded instead of rebuked.",
+        "source": "ES"
+      }
+    ],
+    "levels": {
+      "Deathless": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathless": 7
+    }
+  },
+  {
+    "id": "create_greater_deathless",
+    "name": "Create Greater Deathless",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 38
+    },
+    "domains": [
+      {
+        "domain": "Deathless",
+        "level": 8,
+        "domainPower": "Once per day, you can perform a greater rebuking against deathless creatures in place of a regular turning attempt.  Any deathless creatures affected by this are commanded instead of rebuked.",
+        "source": "ES"
+      }
+    ],
+    "levels": {
+      "Deathless": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathless": 8
+    }
+  },
+  {
+    "id": "hero_s_blade",
+    "name": "Hero's Blade",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 38
+    },
+    "domains": [
+      {
+        "domain": "Deathless",
+        "level": 9,
+        "domainPower": "Once per day, you can perform a greater rebuking against deathless creatures in place of a regular turning attempt.  Any deathless creatures affected by this are commanded instead of rebuked.",
+        "source": "ES"
+      }
+    ],
+    "levels": {
+      "Deathless": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathless": 9
+    }
+  },
+  {
+    "id": "withering_palm",
+    "name": "Withering Palm",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 39
+    },
+    "domains": [
+      {
+        "domain": "Decay",
+        "level": 7,
+        "domainPower": "You may use a touch of decay once per day.  You must succeed on a melee touch attack to deal 1d4 points of Constitution damage to living creatures, or 2d6+0 damage to undead, constructs or objects.",
+        "source": "ES"
+      }
+    ],
+    "levels": {
+      "Decay": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Decay": 7
+    }
+  },
+  {
+    "id": "detoxify",
+    "name": "Detoxify",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 42
+    },
+    "domains": [
+      {
+        "domain": "Feast",
+        "level": 8,
+        "domainPower": "You have immunity to ingested poisons and to diseases spread by ingestion.",
+        "source": "ES"
+      }
+    ],
+    "levels": {
+      "Feast": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Feast": 8
+    }
+  },
+  {
+    "id": "feast_of_champions",
+    "name": "Feast of Champions",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 42
+    },
+    "domains": [
+      {
+        "domain": "Feast",
+        "level": 9,
+        "domainPower": "You have immunity to ingested poisons and to diseases spread by ingestion.",
+        "source": "ES"
+      }
+    ],
+    "levels": {
+      "Feast": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Feast": 9
+    }
+  },
+  {
+    "id": "eyebite",
+    "name": "Eyebite",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 45
+    },
+    "domains": [
+      {
+        "domain": "Necromancer",
+        "level": 6,
+        "domainPower": "You cast necromancy spells at +1 caster level.",
+        "source": "ES"
+      },
+      {
+        "domain": "Orc",
+        "level": 6,
+        "domainPower": "Once per day, as a supernatural ability, you can make a single melee attack with a damage bonus of +0.  If used against a dwarf or an elf you get +4 to the attack roll.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Scalykind",
+        "level": 6,
+        "domainPower": "You can rebuke or command animals(reptilian/snakes) 0 times per day as a Supernatural Ability.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Suffering",
+        "level": 7,
+        "domainPower": "Once per day you can make a melee touch attack against a living creature subject to critical hits, which bestows on that creature a -2 enhancement penalty to Str and Dex for 1 minute.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Treachery",
+        "level": 7,
+        "domainPower": "Once a day when you attack a flat-footed opponent, you deal additional damage equal to 0d6 with a single melee attack. You must declare the use of the ability before the attack and if you miss it is wasted.",
+        "source": "DragonLance"
+      }
+    ],
+    "levels": {
+      "Necromancer": 6,
+      "Orc": 6,
+      "Scalykind": 6,
+      "Suffering": 7,
+      "Treachery": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Necromancer": 6,
+      "Orc": 6,
+      "Scalykind": 6,
+      "Suffering": 7,
+      "Treachery": 7
+    }
+  },
+  {
+    "id": "otto_s_irresistable_dance",
+    "name": "Otto's Irresistable Dance",
+    "source": "ES",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 46
+    },
+    "domains": [
+      {
+        "domain": "Passion",
+        "level": 8,
+        "domainPower": "For a total time per day of 0 rounds, as a free action you can act as if under the effect of the Rage spell.  This granted power is a supernatural abiity.",
+        "source": "ES"
+      },
+      {
+        "domain": "Gnome",
+        "level": 8,
+        "domainPower": "You cast all illusion spells at +1 caster level.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Limbo-2",
+        "level": 8,
+        "domainPower": "No domain power listed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Passion": 8,
+      "Gnome": 8,
+      "Limbo-2": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Passion": 8,
+      "Gnome": 8,
+      "Limbo-2": 8
+    }
+  },
+  {
+    "id": "snowsight",
+    "name": "Snowsight",
+    "source": "FB",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 50
+    },
+    "domains": [
+      {
+        "domain": "Winter",
+        "level": 1,
+        "domainPower": "You gain a +2 Sacred bonus to all wisdom-based skills (during the winter season).",
+        "source": "FB"
+      }
+    ],
+    "levels": {
+      "Winter": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Winter": 1
+    }
+  },
+  {
+    "id": "snow_walk",
+    "name": "Snow Walk",
+    "source": "FB",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 50
+    },
+    "domains": [
+      {
+        "domain": "Winter",
+        "level": 2,
+        "domainPower": "You gain a +2 Sacred bonus to all wisdom-based skills (during the winter season).",
+        "source": "FB"
+      }
+    ],
+    "levels": {
+      "Winter": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Winter": 2
+    }
+  },
+  {
+    "id": "winter_s_embrace",
+    "name": "Winter's Embrace",
+    "source": "FB",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 50
+    },
+    "domains": [
+      {
+        "domain": "Winter",
+        "level": 3,
+        "domainPower": "You gain a +2 Sacred bonus to all wisdom-based skills (during the winter season).",
+        "source": "FB"
+      }
+    ],
+    "levels": {
+      "Winter": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Winter": 3
+    }
+  },
+  {
+    "id": "blizzard",
+    "name": "Blizzard",
+    "source": "FB",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 50
+    },
+    "domains": [
+      {
+        "domain": "Winter",
+        "level": 5,
+        "domainPower": "You gain a +2 Sacred bonus to all wisdom-based skills (during the winter season).",
+        "source": "FB"
+      }
+    ],
+    "levels": {
+      "Winter": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Winter": 5
+    }
+  },
+  {
+    "id": "death_hail",
+    "name": "Death Hail",
+    "source": "FB",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 50
+    },
+    "domains": [
+      {
+        "domain": "Winter",
+        "level": 6,
+        "domainPower": "You gain a +2 Sacred bonus to all wisdom-based skills (during the winter season).",
+        "source": "FB"
+      }
+    ],
+    "levels": {
+      "Winter": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Winter": 6
+    }
+  },
+  {
+    "id": "summon_giants",
+    "name": "Summon Giants",
+    "source": "FB",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 50
+    },
+    "domains": [
+      {
+        "domain": "Winter",
+        "level": 8,
+        "domainPower": "You gain a +2 Sacred bonus to all wisdom-based skills (during the winter season).",
+        "source": "FB"
+      }
+    ],
+    "levels": {
+      "Winter": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Winter": 8
+    }
+  },
+  {
+    "id": "fimbulwinter",
+    "name": "Fimbulwinter",
+    "source": "FB",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 50
+    },
+    "domains": [
+      {
+        "domain": "Winter",
+        "level": 9,
+        "domainPower": "You gain a +2 Sacred bonus to all wisdom-based skills (during the winter season).",
+        "source": "FB"
+      }
+    ],
+    "levels": {
+      "Winter": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Winter": 9
+    }
+  },
+  {
+    "id": "rooftop_strider",
+    "name": "Rooftop Strider",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 52
+    },
+    "domains": [
+      {
+        "domain": "City",
+        "level": 1,
+        "domainPower": "Add Gather Info and Knowledge: Local to your cleric skill list.",
+        "source": "RD"
+      }
+    ],
+    "levels": {
+      "City": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 1
+    }
+  },
+  {
+    "id": "city_lights",
+    "name": "City Lights",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 52
+    },
+    "domains": [
+      {
+        "domain": "City",
+        "level": 2,
+        "domainPower": "Add Gather Info and Knowledge: Local to your cleric skill list.",
+        "source": "RD"
+      }
+    ],
+    "levels": {
+      "City": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 2
+    }
+  },
+  {
+    "id": "winding_alleys",
+    "name": "Winding Alleys",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 52
+    },
+    "domains": [
+      {
+        "domain": "City",
+        "level": 3,
+        "domainPower": "Add Gather Info and Knowledge: Local to your cleric skill list.",
+        "source": "RD"
+      }
+    ],
+    "levels": {
+      "City": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 3
+    }
+  },
+  {
+    "id": "commune_with_city",
+    "name": "Commune with City",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 52
+    },
+    "domains": [
+      {
+        "domain": "City",
+        "level": 4,
+        "domainPower": "Add Gather Info and Knowledge: Local to your cleric skill list.",
+        "source": "RD"
+      }
+    ],
+    "levels": {
+      "City": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 4
+    }
+  },
+  {
+    "id": "skyline_runner",
+    "name": "Skyline Runner",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 52
+    },
+    "domains": [
+      {
+        "domain": "City",
+        "level": 5,
+        "domainPower": "Add Gather Info and Knowledge: Local to your cleric skill list.",
+        "source": "RD"
+      }
+    ],
+    "levels": {
+      "City": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 5
+    }
+  },
+  {
+    "id": "city_stride",
+    "name": "City Stride",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 52
+    },
+    "domains": [
+      {
+        "domain": "City",
+        "level": 6,
+        "domainPower": "Add Gather Info and Knowledge: Local to your cleric skill list.",
+        "source": "RD"
+      }
+    ],
+    "levels": {
+      "City": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 6
+    }
+  },
+  {
+    "id": "urban_shield",
+    "name": "Urban Shield",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 52
+    },
+    "domains": [
+      {
+        "domain": "City",
+        "level": 7,
+        "domainPower": "Add Gather Info and Knowledge: Local to your cleric skill list.",
+        "source": "RD"
+      }
+    ],
+    "levels": {
+      "City": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 7
+    }
+  },
+  {
+    "id": "city_s_might",
+    "name": "City's Might",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 52
+    },
+    "domains": [
+      {
+        "domain": "City",
+        "level": 8,
+        "domainPower": "Add Gather Info and Knowledge: Local to your cleric skill list.",
+        "source": "RD"
+      }
+    ],
+    "levels": {
+      "City": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 8
+    }
+  },
+  {
+    "id": "animate_city",
+    "name": "Animate City",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 52
+    },
+    "domains": [
+      {
+        "domain": "City",
+        "level": 9,
+        "domainPower": "Add Gather Info and Knowledge: Local to your cleric skill list.",
+        "source": "RD"
+      }
+    ],
+    "levels": {
+      "City": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "City": 9
+    }
+  },
+  {
+    "id": "omen_of_peril",
+    "name": "Omen of Peril",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 53
+    },
+    "domains": [
+      {
+        "domain": "Destiny",
+        "level": 1,
+        "domainPower": "Grant a reroll (attack, save, ability check, or skill check to a willing creature (not you) within 30 ft.",
+        "source": "RD"
+      },
+      {
+        "domain": "Liberation",
+        "level": 1,
+        "domainPower": "As a supernatural ability, if affected by a charm, compulsion, or fear effect as a result of a failed save, you can attempt the save 1 round later at the same DC.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Destiny": 1,
+      "Liberation": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Destiny": 1,
+      "Liberation": 1
+    }
+  },
+  {
+    "id": "delay_death",
+    "name": "Delay Death",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 53
+    },
+    "domains": [
+      {
+        "domain": "Destiny",
+        "level": 3,
+        "domainPower": "Grant a reroll (attack, save, ability check, or skill check to a willing creature (not you) within 30 ft.",
+        "source": "RD"
+      }
+    ],
+    "levels": {
+      "Destiny": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Destiny": 3
+    }
+  },
+  {
+    "id": "stalwart_pact",
+    "name": "Stalwart Pact",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 53
+    },
+    "domains": [
+      {
+        "domain": "Destiny",
+        "level": 5,
+        "domainPower": "Grant a reroll (attack, save, ability check, or skill check to a willing creature (not you) within 30 ft.",
+        "source": "RD"
+      },
+      {
+        "domain": "Pact",
+        "level": 5,
+        "domainPower": "Add Appraise, Intimidate, and Sense Motive to your list of cleric class skills.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Destiny": 5,
+      "Pact": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Destiny": 5,
+      "Pact": 5
+    }
+  },
+  {
+    "id": "warp_destiny",
+    "name": "Warp Destiny",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 53
+    },
+    "domains": [
+      {
+        "domain": "Destiny",
+        "level": 6,
+        "domainPower": "Grant a reroll (attack, save, ability check, or skill check to a willing creature (not you) within 30 ft.",
+        "source": "RD"
+      }
+    ],
+    "levels": {
+      "Destiny": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Destiny": 6
+    }
+  },
+  {
+    "id": "bestow_curse_greater",
+    "name": "Bestow Curse, Greater",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 53
+    },
+    "domains": [
+      {
+        "domain": "Destiny",
+        "level": 7,
+        "domainPower": "Grant a reroll (attack, save, ability check, or skill check to a willing creature (not you) within 30 ft.",
+        "source": "RD"
+      }
+    ],
+    "levels": {
+      "Destiny": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Destiny": 7
+    }
+  },
+  {
+    "id": "choose_destiny",
+    "name": "Choose Destiny",
+    "source": "RD",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 53
+    },
+    "domains": [
+      {
+        "domain": "Destiny",
+        "level": 9,
+        "domainPower": "Grant a reroll (attack, save, ability check, or skill check to a willing creature (not you) within 30 ft.",
+        "source": "RD"
+      }
+    ],
+    "levels": {
+      "Destiny": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Destiny": 9
+    }
+  },
+  {
+    "id": "raptor_s_sight",
+    "name": "Raptor's Sight",
+    "source": "RW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 55
+    },
+    "domains": [
+      {
+        "domain": "Sky",
+        "level": 1,
+        "domainPower": "Fly speed improves by 5 ft.  Add Spot to your list of cleric skills",
+        "source": "RW"
+      }
+    ],
+    "levels": {
+      "Sky": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sky": 1
+    }
+  },
+  {
+    "id": "summon_dire_hawk",
+    "name": "Summon Dire Hawk",
+    "source": "RW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 55
+    },
+    "domains": [
+      {
+        "domain": "Sky",
+        "level": 2,
+        "domainPower": "Fly speed improves by 5 ft.  Add Spot to your list of cleric skills",
+        "source": "RW"
+      }
+    ],
+    "levels": {
+      "Sky": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sky": 2
+    }
+  },
+  {
+    "id": "enduring_flight",
+    "name": "Enduring Flight",
+    "source": "RW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 55
+    },
+    "domains": [
+      {
+        "domain": "Sky",
+        "level": 3,
+        "domainPower": "Fly speed improves by 5 ft.  Add Spot to your list of cleric skills",
+        "source": "RW"
+      }
+    ],
+    "levels": {
+      "Sky": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sky": 3
+    }
+  },
+  {
+    "id": "aerial_alacrity",
+    "name": "Aerial Alacrity",
+    "source": "RW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 55
+    },
+    "domains": [
+      {
+        "domain": "Sky",
+        "level": 4,
+        "domainPower": "Fly speed improves by 5 ft.  Add Spot to your list of cleric skills",
+        "source": "RW"
+      }
+    ],
+    "levels": {
+      "Sky": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sky": 4
+    }
+  },
+  {
+    "id": "mastery_of_the_sky",
+    "name": "Mastery of the Sky",
+    "source": "RW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 55
+    },
+    "domains": [
+      {
+        "domain": "Sky",
+        "level": 8,
+        "domainPower": "Fly speed improves by 5 ft.  Add Spot to your list of cleric skills",
+        "source": "RW"
+      }
+    ],
+    "levels": {
+      "Sky": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sky": 8
+    }
+  },
+  {
+    "id": "summon_devoted_roc",
+    "name": "Summon Devoted Roc",
+    "source": "RW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 55
+    },
+    "domains": [
+      {
+        "domain": "Sky",
+        "level": 9,
+        "domainPower": "Fly speed improves by 5 ft.  Add Spot to your list of cleric skills",
+        "source": "RW"
+      }
+    ],
+    "levels": {
+      "Sky": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sky": 9
+    }
+  },
+  {
+    "id": "surelife",
+    "name": "Surelife",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 57
+    },
+    "domains": [
+      {
+        "domain": "Repose",
+        "level": 8,
+        "domainPower": "You may use death touch once per day.  If you touch your victim, roll 0d6.  If this at least equals the victim's hit points, it dies.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Repose": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Repose": 8
+    }
+  },
+  {
+    "id": "waste_strider",
+    "name": "Waste Strider",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 58
+    },
+    "domains": [
+      {
+        "domain": "Sand",
+        "level": 1,
+        "domainPower": "Once per day you can shape a small amount of sand into any solid object you can imagine, up to 8 cubic feet in volume.  This effect lasts for 0 minutes.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Sand": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sand": 1
+    }
+  },
+  {
+    "id": "black_sand",
+    "name": "Black Sand",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 58
+    },
+    "domains": [
+      {
+        "domain": "Sand",
+        "level": 2,
+        "domainPower": "Once per day you can shape a small amount of sand into any solid object you can imagine, up to 8 cubic feet in volume.  This effect lasts for 0 minutes.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Sand": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sand": 2
+    }
+  },
+  {
+    "id": "haboob",
+    "name": "Haboob",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 58
+    },
+    "domains": [
+      {
+        "domain": "Sand",
+        "level": 3,
+        "domainPower": "Once per day you can shape a small amount of sand into any solid object you can imagine, up to 8 cubic feet in volume.  This effect lasts for 0 minutes.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Sand": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sand": 3
+    }
+  },
+  {
+    "id": "blast_of_sand",
+    "name": "Blast of Sand",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 58
+    },
+    "domains": [
+      {
+        "domain": "Sand",
+        "level": 4,
+        "domainPower": "Once per day you can shape a small amount of sand into any solid object you can imagine, up to 8 cubic feet in volume.  This effect lasts for 0 minutes.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Sand": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sand": 4
+    }
+  },
+  {
+    "id": "flaywind_burst",
+    "name": "Flaywind Burst",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 58
+    },
+    "domains": [
+      {
+        "domain": "Sand",
+        "level": 5,
+        "domainPower": "Once per day you can shape a small amount of sand into any solid object you can imagine, up to 8 cubic feet in volume.  This effect lasts for 0 minutes.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Sand": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sand": 5
+    }
+  },
+  {
+    "id": "awaken_sand",
+    "name": "Awaken Sand",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 58
+    },
+    "domains": [
+      {
+        "domain": "Sand",
+        "level": 6,
+        "domainPower": "Once per day you can shape a small amount of sand into any solid object you can imagine, up to 8 cubic feet in volume.  This effect lasts for 0 minutes.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Sand": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sand": 6
+    }
+  },
+  {
+    "id": "vitrify",
+    "name": "Vitrify",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 58
+    },
+    "domains": [
+      {
+        "domain": "Sand",
+        "level": 7,
+        "domainPower": "Once per day you can shape a small amount of sand into any solid object you can imagine, up to 8 cubic feet in volume.  This effect lasts for 0 minutes.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Sand": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sand": 7
+    }
+  },
+  {
+    "id": "desert_binding",
+    "name": "Desert Binding",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 58
+    },
+    "domains": [
+      {
+        "domain": "Sand",
+        "level": 8,
+        "domainPower": "Once per day you can shape a small amount of sand into any solid object you can imagine, up to 8 cubic feet in volume.  This effect lasts for 0 minutes.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Sand": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sand": 8
+    }
+  },
+  {
+    "id": "summon_desert_ally_ix",
+    "name": "Summon Desert Ally IX",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 58
+    },
+    "domains": [
+      {
+        "domain": "Sand",
+        "level": 9,
+        "domainPower": "Once per day you can shape a small amount of sand into any solid object you can imagine, up to 8 cubic feet in volume.  This effect lasts for 0 minutes.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Sand": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sand": 9
+    }
+  },
+  {
+    "id": "impede_sun_s_brilliance",
+    "name": "Impede Sun's Brilliance",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 59
+    },
+    "domains": [
+      {
+        "domain": "Summer",
+        "level": 1,
+        "domainPower": "You are considered a native of the waste for purposes of heat resistance.  During the summer season, you gain +2 bonus on al Wisdom-based skill checks.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Summer": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Summer": 1
+    }
+  },
+  {
+    "id": "sunstroke",
+    "name": "Sunstroke",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 59
+    },
+    "domains": [
+      {
+        "domain": "Summer",
+        "level": 2,
+        "domainPower": "You are considered a native of the waste for purposes of heat resistance.  During the summer season, you gain +2 bonus on al Wisdom-based skill checks.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Summer": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Summer": 2
+    }
+  },
+  {
+    "id": "protection_from_dessication",
+    "name": "Protection from Dessication",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 59
+    },
+    "domains": [
+      {
+        "domain": "Summer",
+        "level": 3,
+        "domainPower": "You are considered a native of the waste for purposes of heat resistance.  During the summer season, you gain +2 bonus on al Wisdom-based skill checks.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Summer": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Summer": 3
+    }
+  },
+  {
+    "id": "skin_of_the_cactus",
+    "name": "Skin of the Cactus",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 59
+    },
+    "domains": [
+      {
+        "domain": "Summer",
+        "level": 4,
+        "domainPower": "You are considered a native of the waste for purposes of heat resistance.  During the summer season, you gain +2 bonus on al Wisdom-based skill checks.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Summer": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Summer": 4
+    }
+  },
+  {
+    "id": "unearthly_heat",
+    "name": "Unearthly Heat",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 59
+    },
+    "domains": [
+      {
+        "domain": "Summer",
+        "level": 5,
+        "domainPower": "You are considered a native of the waste for purposes of heat resistance.  During the summer season, you gain +2 bonus on al Wisdom-based skill checks.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Summer": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Summer": 5
+    }
+  },
+  {
+    "id": "parching_touch",
+    "name": "Parching Touch",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 60
+    },
+    "domains": [
+      {
+        "domain": "Thirst",
+        "level": 1,
+        "domainPower": "Rebuke or command oozes as an evil cleric rebukes or commands undead. 2 times per day as a supernatural ability. You also gain a +2 bonus on Constitution checks to avoid dehydration.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Thirst": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Thirst": 1
+    }
+  },
+  {
+    "id": "desiccate",
+    "name": "Desiccate",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 60
+    },
+    "domains": [
+      {
+        "domain": "Thirst",
+        "level": 2,
+        "domainPower": "Rebuke or command oozes as an evil cleric rebukes or commands undead. 2 times per day as a supernatural ability. You also gain a +2 bonus on Constitution checks to avoid dehydration.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Thirst": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Thirst": 2
+    }
+  },
+  {
+    "id": "torment_thirst",
+    "name": "Torment Thirst",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 60
+    },
+    "domains": [
+      {
+        "domain": "Thirst",
+        "level": 3,
+        "domainPower": "Rebuke or command oozes as an evil cleric rebukes or commands undead. 2 times per day as a supernatural ability. You also gain a +2 bonus on Constitution checks to avoid dehydration.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Thirst": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Thirst": 3
+    }
+  },
+  {
+    "id": "dispel_water",
+    "name": "Dispel Water",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 60
+    },
+    "domains": [
+      {
+        "domain": "Thirst",
+        "level": 4,
+        "domainPower": "Rebuke or command oozes as an evil cleric rebukes or commands undead. 2 times per day as a supernatural ability. You also gain a +2 bonus on Constitution checks to avoid dehydration.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Thirst": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Thirst": 4
+    }
+  },
+  {
+    "id": "desiccate_mass",
+    "name": "Desiccate, Mass",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 60
+    },
+    "domains": [
+      {
+        "domain": "Thirst",
+        "level": 5,
+        "domainPower": "Rebuke or command oozes as an evil cleric rebukes or commands undead. 2 times per day as a supernatural ability. You also gain a +2 bonus on Constitution checks to avoid dehydration.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Thirst": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Thirst": 5
+    }
+  },
+  {
+    "id": "symbol_of_thirst",
+    "name": "Symbol of Thirst",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 60
+    },
+    "domains": [
+      {
+        "domain": "Thirst",
+        "level": 6,
+        "domainPower": "Rebuke or command oozes as an evil cleric rebukes or commands undead. 2 times per day as a supernatural ability. You also gain a +2 bonus on Constitution checks to avoid dehydration.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Thirst": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Thirst": 6
+    }
+  },
+  {
+    "id": "mephit_mob",
+    "name": "Mephit Mob",
+    "source": "SS",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 60
+    },
+    "domains": [
+      {
+        "domain": "Thirst",
+        "level": 7,
+        "domainPower": "Rebuke or command oozes as an evil cleric rebukes or commands undead. 2 times per day as a supernatural ability. You also gain a +2 bonus on Constitution checks to avoid dehydration.",
+        "source": "SS"
+      }
+    ],
+    "levels": {
+      "Thirst": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Thirst": 7
+    }
+  },
+  {
+    "id": "morality_undone",
+    "name": "Morality Undone",
+    "source": "LM",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 62
+    },
+    "domains": [
+      {
+        "domain": "Corruption",
+        "level": 4,
+        "domainPower": "Once per day, make a melee touch attack to deal 0d6 damage and sicken target for 1 round.",
+        "source": "LM"
+      }
+    ],
+    "levels": {
+      "Corruption": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Corruption": 4
+    }
+  },
+  {
+    "id": "befoul",
+    "name": "Befoul",
+    "source": "LM",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 62
+    },
+    "domains": [
+      {
+        "domain": "Corruption",
+        "level": 8,
+        "domainPower": "Once per day, make a melee touch attack to deal 0d6 damage and sicken target for 1 round.",
+        "source": "LM"
+      }
+    ],
+    "levels": {
+      "Corruption": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Corruption": 8
+    }
+  },
+  {
+    "id": "despoil",
+    "name": "Despoil",
+    "source": "LM",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 62
+    },
+    "domains": [
+      {
+        "domain": "Corruption",
+        "level": 9,
+        "domainPower": "Once per day, make a melee touch attack to deal 0d6 damage and sicken target for 1 round.",
+        "source": "LM"
+      }
+    ],
+    "levels": {
+      "Corruption": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Corruption": 9
+    }
+  },
+  {
+    "id": "darkbolt",
+    "name": "Darkbolt",
+    "source": "LM",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 63
+    },
+    "domains": [
+      {
+        "domain": "Vile Darkness",
+        "level": 2,
+        "domainPower": "Free Blind-Fight feat.",
+        "source": "LM"
+      },
+      {
+        "domain": "Darkness",
+        "level": 5,
+        "domainPower": "Free Blind-Fight feat.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Vile Darkness": 2,
+      "Darkness": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Vile Darkness": 2,
+      "Darkness": 5
+    }
+  },
+  {
+    "id": "damning_darkness",
+    "name": "Damning Darkness",
+    "source": "LM",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 63
+    },
+    "domains": [
+      {
+        "domain": "Vile Darkness",
+        "level": 4,
+        "domainPower": "Free Blind-Fight feat.",
+        "source": "LM"
+      }
+    ],
+    "levels": {
+      "Vile Darkness": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Vile Darkness": 4
+    }
+  },
+  {
+    "id": "pressure_sphere",
+    "name": "Pressure Sphere",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 65
+    },
+    "domains": [
+      {
+        "domain": "Blackwater",
+        "level": 2,
+        "domainPower": "You are immune to pressure damage from descending into even the greatest of oceanic depths.",
+        "source": "SW"
+      }
+    ],
+    "levels": {
+      "Blackwater": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Blackwater": 2
+    }
+  },
+  {
+    "id": "transformation_of_the_deeps",
+    "name": "Transformation of the Deeps",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 65
+    },
+    "domains": [
+      {
+        "domain": "Blackwater",
+        "level": 4,
+        "domainPower": "You are immune to pressure damage from descending into even the greatest of oceanic depths.",
+        "source": "SW"
+      }
+    ],
+    "levels": {
+      "Blackwater": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Blackwater": 4
+    }
+  },
+  {
+    "id": "blackwater_tentacle",
+    "name": "Blackwater Tentacle",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 65
+    },
+    "domains": [
+      {
+        "domain": "Blackwater",
+        "level": 5,
+        "domainPower": "You are immune to pressure damage from descending into even the greatest of oceanic depths.",
+        "source": "SW"
+      }
+    ],
+    "levels": {
+      "Blackwater": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Blackwater": 5
+    }
+  },
+  {
+    "id": "blackwater_taint",
+    "name": "Blackwater Taint",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 65
+    },
+    "domains": [
+      {
+        "domain": "Blackwater",
+        "level": 6,
+        "domainPower": "You are immune to pressure damage from descending into even the greatest of oceanic depths.",
+        "source": "SW"
+      }
+    ],
+    "levels": {
+      "Blackwater": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Blackwater": 6
+    }
+  },
+  {
+    "id": "dark_tide",
+    "name": "Dark Tide",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 65
+    },
+    "domains": [
+      {
+        "domain": "Blackwater",
+        "level": 7,
+        "domainPower": "You are immune to pressure damage from descending into even the greatest of oceanic depths.",
+        "source": "SW"
+      }
+    ],
+    "levels": {
+      "Blackwater": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Blackwater": 7
+    }
+  },
+  {
+    "id": "maelstrom",
+    "name": "Maelstrom",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 65
+    },
+    "domains": [
+      {
+        "domain": "Blackwater",
+        "level": 8,
+        "domainPower": "You are immune to pressure damage from descending into even the greatest of oceanic depths.",
+        "source": "SW"
+      },
+      {
+        "domain": "Ocean",
+        "level": 8,
+        "domainPower": "You have the supernatural ability to breathe water as water breathing spell for up to 0 rounds.  This effect occurs automatically as soon as it applies, lasts until it runs out or is no longer needed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Blackwater": 8,
+      "Ocean": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Blackwater": 8,
+      "Ocean": 8
+    }
+  },
+  {
+    "id": "doom_of_the_seas",
+    "name": "Doom of the Seas",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 65
+    },
+    "domains": [
+      {
+        "domain": "Blackwater",
+        "level": 9,
+        "domainPower": "You are immune to pressure damage from descending into even the greatest of oceanic depths.",
+        "source": "SW"
+      }
+    ],
+    "levels": {
+      "Blackwater": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Blackwater": 9
+    }
+  },
+  {
+    "id": "quickswim",
+    "name": "Quickswim",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 66
+    },
+    "domains": [
+      {
+        "domain": "Seafolk",
+        "level": 1,
+        "domainPower": "You gain Expert Swimmer or Rapid Swimming (your choice) as a bonus feat.",
+        "source": "SW"
+      }
+    ],
+    "levels": {
+      "Seafolk": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Seafolk": 1
+    }
+  },
+  {
+    "id": "fins_to_feet",
+    "name": "Fins to Feet",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 66
+    },
+    "domains": [
+      {
+        "domain": "Seafolk",
+        "level": 2,
+        "domainPower": "You gain Expert Swimmer or Rapid Swimming (your choice) as a bonus feat.",
+        "source": "SW"
+      }
+    ],
+    "levels": {
+      "Seafolk": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Seafolk": 2
+    }
+  },
+  {
+    "id": "scales_of_the_sealord",
+    "name": "Scales of the Sealord",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 66
+    },
+    "domains": [
+      {
+        "domain": "Seafolk",
+        "level": 3,
+        "domainPower": "You gain Expert Swimmer or Rapid Swimming (your choice) as a bonus feat.",
+        "source": "SW"
+      }
+    ],
+    "levels": {
+      "Seafolk": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Seafolk": 3
+    }
+  },
+  {
+    "id": "siren_s_call",
+    "name": "Siren's Call",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 66
+    },
+    "domains": [
+      {
+        "domain": "Seafolk",
+        "level": 4,
+        "domainPower": "You gain Expert Swimmer or Rapid Swimming (your choice) as a bonus feat.",
+        "source": "SW"
+      }
+    ],
+    "levels": {
+      "Seafolk": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Seafolk": 4
+    }
+  },
+  {
+    "id": "airy_water",
+    "name": "Airy Water",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 66
+    },
+    "domains": [
+      {
+        "domain": "Seafolk",
+        "level": 6,
+        "domainPower": "You gain Expert Swimmer or Rapid Swimming (your choice) as a bonus feat.",
+        "source": "SW"
+      }
+    ],
+    "levels": {
+      "Seafolk": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Seafolk": 6
+    }
+  },
+  {
+    "id": "megalodon_empowerment",
+    "name": "Megalodon Empowerment",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 66
+    },
+    "domains": [
+      {
+        "domain": "Seafolk",
+        "level": 7,
+        "domainPower": "You gain Expert Swimmer or Rapid Swimming (your choice) as a bonus feat.",
+        "source": "SW"
+      }
+    ],
+    "levels": {
+      "Seafolk": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Seafolk": 7
+    }
+  },
+  {
+    "id": "depthsurge",
+    "name": "Depthsurge",
+    "source": "SW",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 66
+    },
+    "domains": [
+      {
+        "domain": "Seafolk",
+        "level": 8,
+        "domainPower": "You gain Expert Swimmer or Rapid Swimming (your choice) as a bonus feat.",
+        "source": "SW"
+      }
+    ],
+    "levels": {
+      "Seafolk": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Seafolk": 8
+    }
+  },
+  {
+    "id": "bestow_wound",
+    "name": "Bestow Wound",
+    "source": "Heroes of Horror",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 68
+    },
+    "domains": [
+      {
+        "domain": "Spite",
+        "level": 1,
+        "domainPower": "Once per day, make a melee touch attack to deal damage equal to the damage the target dealt to you in the last round, to a mximum of 5 hp per divine caster level you possess",
+        "source": "Heroes of Horror"
+      }
+    ],
+    "levels": {
+      "Spite": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spite": 1
+    }
+  },
+  {
+    "id": "procouncement_of_fate",
+    "name": "Procouncement of Fate",
+    "source": "Heroes of Horror",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 68
+    },
+    "domains": [
+      {
+        "domain": "Spite",
+        "level": 4,
+        "domainPower": "Once per day, make a melee touch attack to deal damage equal to the damage the target dealt to you in the last round, to a mximum of 5 hp per divine caster level you possess",
+        "source": "Heroes of Horror"
+      }
+    ],
+    "levels": {
+      "Spite": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spite": 4
+    }
+  },
+  {
+    "id": "fire_in_the_blood",
+    "name": "Fire in the Blood",
+    "source": "Heroes of Horror",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 68
+    },
+    "domains": [
+      {
+        "domain": "Spite",
+        "level": 5,
+        "domainPower": "Once per day, make a melee touch attack to deal damage equal to the damage the target dealt to you in the last round, to a mximum of 5 hp per divine caster level you possess",
+        "source": "Heroes of Horror"
+      }
+    ],
+    "levels": {
+      "Spite": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spite": 5
+    }
+  },
+  {
+    "id": "cloak_of_hate",
+    "name": "Cloak of Hate",
+    "source": "Heroes of Horror",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 68
+    },
+    "domains": [
+      {
+        "domain": "Spite",
+        "level": 6,
+        "domainPower": "Once per day, make a melee touch attack to deal damage equal to the damage the target dealt to you in the last round, to a mximum of 5 hp per divine caster level you possess",
+        "source": "Heroes of Horror"
+      }
+    ],
+    "levels": {
+      "Spite": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spite": 6
+    }
+  },
+  {
+    "id": "pact_of_return",
+    "name": "Pact of Return",
+    "source": "Heroes of Horror",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 68
+    },
+    "domains": [
+      {
+        "domain": "Spite",
+        "level": 7,
+        "domainPower": "Once per day, make a melee touch attack to deal damage equal to the damage the target dealt to you in the last round, to a mximum of 5 hp per divine caster level you possess",
+        "source": "Heroes of Horror"
+      }
+    ],
+    "levels": {
+      "Spite": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spite": 7
+    }
+  },
+  {
+    "id": "mantle_of_pure_spite",
+    "name": "Mantle of Pure Spite",
+    "source": "Heroes of Horror",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 68
+    },
+    "domains": [
+      {
+        "domain": "Spite",
+        "level": 8,
+        "domainPower": "Once per day, make a melee touch attack to deal damage equal to the damage the target dealt to you in the last round, to a mximum of 5 hp per divine caster level you possess",
+        "source": "Heroes of Horror"
+      }
+    ],
+    "levels": {
+      "Spite": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spite": 8
+    }
+  },
+  {
+    "id": "imprison_soul",
+    "name": "Imprison Soul",
+    "source": "Heroes of Horror",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 68
+    },
+    "domains": [
+      {
+        "domain": "Spite",
+        "level": 9,
+        "domainPower": "Once per day, make a melee touch attack to deal damage equal to the damage the target dealt to you in the last round, to a mximum of 5 hp per divine caster level you possess",
+        "source": "Heroes of Horror"
+      }
+    ],
+    "levels": {
+      "Spite": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spite": 9
+    }
+  },
+  {
+    "id": "clarity_of_mind",
+    "name": "Clarity of Mind",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 70
+    },
+    "domains": [
+      {
+        "domain": "Balance",
+        "level": 3,
+        "domainPower": "Once per day, as a free action, you may add your Wisdom modifier(-1) to your Armor Class. This bonus lasts for 0 rounds.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Balance": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Balance": 3
+    }
+  },
+  {
+    "id": "sanctuary_mass",
+    "name": "Sanctuary, Mass",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 70
+    },
+    "domains": [
+      {
+        "domain": "Balance",
+        "level": 5,
+        "domainPower": "Once per day, as a free action, you may add your Wisdom modifier(-1) to your Armor Class. This bonus lasts for 0 rounds.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Balance": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Balance": 5
+    }
+  },
+  {
+    "id": "word_of_balance",
+    "name": "Word of Balance",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 70
+    },
+    "domains": [
+      {
+        "domain": "Balance",
+        "level": 7,
+        "domainPower": "Once per day, as a free action, you may add your Wisdom modifier(-1) to your Armor Class. This bonus lasts for 0 rounds.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Balance": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Balance": 7
+    }
+  },
+  {
+    "id": "weighed_in_the_balance",
+    "name": "Weighed in the Balance",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 70
+    },
+    "domains": [
+      {
+        "domain": "Balance",
+        "level": 9,
+        "domainPower": "Once per day, as a free action, you may add your Wisdom modifier(-1) to your Armor Class. This bonus lasts for 0 rounds.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Balance": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Balance": 9
+    }
+  },
+  {
+    "id": "maw_of_stone",
+    "name": "Maw of Stone",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 71
+    },
+    "domains": [
+      {
+        "domain": "Cavern",
+        "level": 7,
+        "domainPower": "You gain the dwarf ability of stonecunning. If you already have stonecunning, your racial bonus for stonecunning increases to +4 on checks to notice unusual stonework.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Cavern": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Cavern": 7
+    }
+  },
+  {
+    "id": "blink_greater",
+    "name": "Blink, Greater",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 72
+    },
+    "domains": [
+      {
+        "domain": "Celerity",
+        "level": 8,
+        "domainPower": "Your land speed is faster than the normal for your race by 10 ft. This benefit is lost if you are wearing medium or heavy armor or carrying a medium or heavy load.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Celerity": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Celerity": 8
+    }
+  },
+  {
+    "id": "obedient_avalanche",
+    "name": "Obedient Avalanche",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 74
+    },
+    "domains": [
+      {
+        "domain": "Cold",
+        "level": 9,
+        "domainPower": "As a supernatural ability you can turn/destroy fire creatures and rebuke/command cold creatures 0 times per day.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Cold": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Cold": 9
+    }
+  },
+  {
+    "id": "morenkainen_s_magnificent_mansion",
+    "name": "Morenkainen's Magnificent Mansion",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 75
+    },
+    "domains": [
+      {
+        "domain": "Community",
+        "level": 8,
+        "domainPower": "You can use the calm emotions spell as a spell-like ability once per day.  You also gain a +2 bonus on Diplomacy checks.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Community": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Community": 8
+    }
+  },
+  {
+    "id": "zeal",
+    "name": "Zeal",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 76
+    },
+    "domains": [
+      {
+        "domain": "Competition",
+        "level": 2,
+        "domainPower": "As an extraordinary ability you gain a +1 bonus on all opposed checks you make.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Competition": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Competition": 2
+    }
+  },
+  {
+    "id": "zealot_pact",
+    "name": "Zealot Pact",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 76
+    },
+    "domains": [
+      {
+        "domain": "Competition",
+        "level": 6,
+        "domainPower": "As an extraordinary ability you gain a +1 bonus on all opposed checks you make.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Pact",
+        "level": 6,
+        "domainPower": "Add Appraise, Intimidate, and Sense Motive to your list of cleric class skills.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Competition": 6,
+      "Pact": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Competition": 6,
+      "Pact": 6
+    }
+  },
+  {
+    "id": "cloak_of_bravery",
+    "name": "Cloak of Bravery",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 77
+    },
+    "domains": [
+      {
+        "domain": "Courage",
+        "level": 3,
+        "domainPower": "Your radiate an aura of courage that grants all allies within 10 feet (including yourself) a +4 morale bonus on saving throws against fear effects. This supernatural ability functions while you are conscious.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Courage": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Courage": 3
+    }
+  },
+  {
+    "id": "valiant_fury",
+    "name": "Valiant Fury",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 77
+    },
+    "domains": [
+      {
+        "domain": "Courage",
+        "level": 5,
+        "domainPower": "Your radiate an aura of courage that grants all allies within 10 feet (including yourself) a +4 morale bonus on saving throws against fear effects. This supernatural ability functions while you are conscious.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Courage": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Courage": 5
+    }
+  },
+  {
+    "id": "lion_s_roar",
+    "name": "Lion's Roar",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 77
+    },
+    "domains": [
+      {
+        "domain": "Courage",
+        "level": 8,
+        "domainPower": "Your radiate an aura of courage that grants all allies within 10 feet (including yourself) a +4 morale bonus on saving throws against fear effects. This supernatural ability functions while you are conscious.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Courage": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Courage": 8
+    }
+  },
+  {
+    "id": "cloak_of_bravery_greater",
+    "name": "Cloak of Bravery, Greater",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 77
+    },
+    "domains": [
+      {
+        "domain": "Courage",
+        "level": 9,
+        "domainPower": "Your radiate an aura of courage that grants all allies within 10 feet (including yourself) a +4 morale bonus on saving throws against fear effects. This supernatural ability functions while you are conscious.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Courage": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Courage": 9
+    }
+  },
+  {
+    "id": "fantastic_machine",
+    "name": "Fantastic Machine",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 78
+    },
+    "domains": [
+      {
+        "domain": "Craft",
+        "level": 6,
+        "domainPower": "You cast Conjuration (creation) spells at +1 caster level and gain Skill Focus in the Craft skill of your choice.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Gnome",
+        "level": 6,
+        "domainPower": "You cast all illusion spells at +1 caster level.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Craft": 6,
+      "Gnome": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Craft": 6,
+      "Gnome": 6
+    }
+  },
+  {
+    "id": "fantastic_machine_greater",
+    "name": "Fantastic Machine, Greater",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 78
+    },
+    "domains": [
+      {
+        "domain": "Craft",
+        "level": 9,
+        "domainPower": "You cast Conjuration (creation) spells at +1 caster level and gain Skill Focus in the Craft skill of your choice.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Craft": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Craft": 9
+    }
+  },
+  {
+    "id": "pavilion_of_grandeur",
+    "name": "Pavilion of Grandeur",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 79
+    },
+    "domains": [
+      {
+        "domain": "Creation",
+        "level": 9,
+        "domainPower": "You cast Conjuration (creation) spells at +1 caster level.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Creation": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Creation": 9
+    }
+  },
+  {
+    "id": "blacklight",
+    "name": "Blacklight",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 80
+    },
+    "domains": [
+      {
+        "domain": "Darkness",
+        "level": 3,
+        "domainPower": "Free Blind-Fight feat.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Darkness": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Darkness": 3
+    }
+  },
+  {
+    "id": "armor_of_darkness",
+    "name": "Armor of Darkness",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 80
+    },
+    "domains": [
+      {
+        "domain": "Darkness",
+        "level": 4,
+        "domainPower": "Free Blind-Fight feat.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Darkness": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Darkness": 4
+    }
+  },
+  {
+    "id": "chill_of_the_grave",
+    "name": "Chill of the Grave",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 81
+    },
+    "domains": [
+      {
+        "domain": "Deathbound",
+        "level": 1,
+        "domainPower": "Your limit for creating undead animated with spells increases to three times your caster level instead of the normal two times caster level",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Deathbound": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathbound": 1
+    }
+  },
+  {
+    "id": "blade_of_pain_and_fear",
+    "name": "Blade of Pain and Fear",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 81
+    },
+    "domains": [
+      {
+        "domain": "Deathbound",
+        "level": 2,
+        "domainPower": "Your limit for creating undead animated with spells increases to three times your caster level instead of the normal two times caster level",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Deathbound": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathbound": 2
+    }
+  },
+  {
+    "id": "fangs_of_the_vampire_king",
+    "name": "Fangs of the Vampire King",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 81
+    },
+    "domains": [
+      {
+        "domain": "Deathbound",
+        "level": 3,
+        "domainPower": "Your limit for creating undead animated with spells increases to three times your caster level instead of the normal two times caster level",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Deathbound": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathbound": 3
+    }
+  },
+  {
+    "id": "wither_limb",
+    "name": "Wither Limb",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 81
+    },
+    "domains": [
+      {
+        "domain": "Deathbound",
+        "level": 4,
+        "domainPower": "Your limit for creating undead animated with spells increases to three times your caster level instead of the normal two times caster level",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Deathbound": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathbound": 4
+    }
+  },
+  {
+    "id": "revive_undead",
+    "name": "Revive Undead",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 81
+    },
+    "domains": [
+      {
+        "domain": "Deathbound",
+        "level": 5,
+        "domainPower": "Your limit for creating undead animated with spells increases to three times your caster level instead of the normal two times caster level",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Deathbound": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathbound": 5
+    }
+  },
+  {
+    "id": "awaken_undead",
+    "name": "Awaken Undead",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 81
+    },
+    "domains": [
+      {
+        "domain": "Deathbound",
+        "level": 6,
+        "domainPower": "Your limit for creating undead animated with spells increases to three times your caster level instead of the normal two times caster level",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Deathbound": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathbound": 6
+    }
+  },
+  {
+    "id": "avasculate",
+    "name": "Avasculate",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 81
+    },
+    "domains": [
+      {
+        "domain": "Deathbound",
+        "level": 7,
+        "domainPower": "Your limit for creating undead animated with spells increases to three times your caster level instead of the normal two times caster level",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Deathbound": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathbound": 7
+    }
+  },
+  {
+    "id": "avascular_mass",
+    "name": "Avascular, Mass",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 81
+    },
+    "domains": [
+      {
+        "domain": "Deathbound",
+        "level": 8,
+        "domainPower": "Your limit for creating undead animated with spells increases to three times your caster level instead of the normal two times caster level",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Deathbound": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Deathbound": 8
+    }
+  },
+  {
+    "id": "true_domination",
+    "name": "True Domination",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 82
+    },
+    "domains": [
+      {
+        "domain": "Domination",
+        "level": 8,
+        "domainPower": "You gain the Spell Focus(Enchantment) Feat.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Domination": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Domination": 8
+    }
+  },
+  {
+    "id": "monstrous_thrall",
+    "name": "Monstrous Thrall",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 82
+    },
+    "domains": [
+      {
+        "domain": "Domination",
+        "level": 9,
+        "domainPower": "You gain the Spell Focus(Enchantment) Feat.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Domination": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Domination": 9
+    }
+  },
+  {
+    "id": "voice_of_the_dragon",
+    "name": "Voice of the Dragon",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 83
+    },
+    "domains": [
+      {
+        "domain": "Dragon",
+        "level": 4,
+        "domainPower": "Add Bluff and Intimidate to your list of cleric class skills.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Dragon": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Dragon": 4
+    }
+  },
+  {
+    "id": "dragon_ally",
+    "name": "Dragon Ally",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 83
+    },
+    "domains": [
+      {
+        "domain": "Dragon",
+        "level": 7,
+        "domainPower": "Add Bluff and Intimidate to your list of cleric class skills.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Dragon": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Dragon": 7
+    }
+  },
+  {
+    "id": "dream_sight",
+    "name": "Dream Sight",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 84
+    },
+    "domains": [
+      {
+        "domain": "Dream",
+        "level": 6,
+        "domainPower": "You are immune to fear effects.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Dream": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Dream": 6
+    }
+  },
+  {
+    "id": "cloak_of_dark_power",
+    "name": "Cloak of Dark Power",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 85
+    },
+    "domains": [
+      {
+        "domain": "Drow",
+        "level": 1,
+        "domainPower": "Free Lightning Reflexes feat.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Drow": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Drow": 1
+    }
+  },
+  {
+    "id": "spiderform",
+    "name": "Spiderform",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 85
+    },
+    "domains": [
+      {
+        "domain": "Drow",
+        "level": 5,
+        "domainPower": "Free Lightning Reflexes feat.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Drow": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Drow": 5
+    }
+  },
+  {
+    "id": "blast_of_force",
+    "name": "Blast of Force",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 91
+    },
+    "domains": [
+      {
+        "domain": "Force",
+        "level": 3,
+        "domainPower": "As a supernatural ability, once per day you can reroll any damage roll and take the better of the two rolls.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Force": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Force": 3
+    }
+  },
+  {
+    "id": "bolt_of_glory",
+    "name": "Bolt of Glory",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 92
+    },
+    "domains": [
+      {
+        "domain": "Glory",
+        "level": 6,
+        "domainPower": "Turn undead with a +2 bonus on turning check and +1d6 on the turning damage roll.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Glory": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Glory": 6
+    }
+  },
+  {
+    "id": "bite_of_the_king",
+    "name": "Bite of the King",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 93
+    },
+    "domains": [
+      {
+        "domain": "Gluttony",
+        "level": 8,
+        "domainPower": "For a total time per day of 0 rounds, as a free action you can act as if under the effect of the Enlarge Person spell.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Hunger",
+        "level": 8,
+        "domainPower": "You gain a bite attack. If you are Small, your bite attack deals 1d4 points of damage; Medium, 1d6; or Large, 1d8. You are proficient with your bite, and considered armed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Gluttony": 8,
+      "Hunger": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Gluttony": 8,
+      "Hunger": 8
+    }
+  },
+  {
+    "id": "gembomb",
+    "name": "Gembomb",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 94
+    },
+    "domains": [
+      {
+        "domain": "Gnome",
+        "level": 2,
+        "domainPower": "You cast all illusion spells at +1 caster level.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Trade",
+        "level": 2,
+        "domainPower": "You may use detect thoughts once per day as a spell-like ability, affecting one target and lasting 1 minutes.  Activating this power is a free action.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Gnome": 2,
+      "Trade": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Gnome": 2,
+      "Trade": 2
+    }
+  },
+  {
+    "id": "cheat",
+    "name": "Cheat",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 95
+    },
+    "domains": [
+      {
+        "domain": "Greed",
+        "level": 1,
+        "domainPower": "You gain a +2 Competence bonus on Appraise, Open Lock, and Sleight of Hand checks.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Greed": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Greed": 1
+    }
+  },
+  {
+    "id": "entice_gift",
+    "name": "Entice Gift",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 95
+    },
+    "domains": [
+      {
+        "domain": "Greed",
+        "level": 2,
+        "domainPower": "You gain a +2 Competence bonus on Appraise, Open Lock, and Sleight of Hand checks.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Greed": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Greed": 2
+    }
+  },
+  {
+    "id": "phantasmal_thief",
+    "name": "Phantasmal Thief",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 95
+    },
+    "domains": [
+      {
+        "domain": "Greed",
+        "level": 8,
+        "domainPower": "You gain a +2 Competence bonus on Appraise, Open Lock, and Sleight of Hand checks.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Greed": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Greed": 8
+    }
+  },
+  {
+    "id": "ghoul_light",
+    "name": "Ghoul Light",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 98
+    },
+    "domains": [
+      {
+        "domain": "Hunger",
+        "level": 1,
+        "domainPower": "You gain a bite attack. If you are Small, your bite attack deals 1d4 points of damage; Medium, 1d6; or Large, 1d8. You are proficient with your bite, and considered armed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Hunger": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Hunger": 1
+    }
+  },
+  {
+    "id": "ghoul_glyph",
+    "name": "Ghoul Glyph",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 98
+    },
+    "domains": [
+      {
+        "domain": "Hunger",
+        "level": 2,
+        "domainPower": "You gain a bite attack. If you are Small, your bite attack deals 1d4 points of damage; Medium, 1d6; or Large, 1d8. You are proficient with your bite, and considered armed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Hunger": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Hunger": 2
+    }
+  },
+  {
+    "id": "ghoul_gesture",
+    "name": "Ghoul Gesture",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 98
+    },
+    "domains": [
+      {
+        "domain": "Hunger",
+        "level": 3,
+        "domainPower": "You gain a bite attack. If you are Small, your bite attack deals 1d4 points of damage; Medium, 1d6; or Large, 1d8. You are proficient with your bite, and considered armed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Hunger": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Hunger": 3
+    }
+  },
+  {
+    "id": "ghoul_gauntlet",
+    "name": "Ghoul Gauntlet",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 98
+    },
+    "domains": [
+      {
+        "domain": "Hunger",
+        "level": 5,
+        "domainPower": "You gain a bite attack. If you are Small, your bite attack deals 1d4 points of damage; Medium, 1d6; or Large, 1d8. You are proficient with your bite, and considered armed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Hunger": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Hunger": 5
+    }
+  },
+  {
+    "id": "eyes_of_the_king",
+    "name": "Eyes of the King",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 98
+    },
+    "domains": [
+      {
+        "domain": "Hunger",
+        "level": 6,
+        "domainPower": "You gain a bite attack. If you are Small, your bite attack deals 1d4 points of damage; Medium, 1d6; or Large, 1d8. You are proficient with your bite, and considered armed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Hunger": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Hunger": 6
+    }
+  },
+  {
+    "id": "field_of_ghouls",
+    "name": "Field of Ghouls",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 98
+    },
+    "domains": [
+      {
+        "domain": "Hunger",
+        "level": 7,
+        "domainPower": "You gain a bite attack. If you are Small, your bite attack deals 1d4 points of damage; Medium, 1d6; or Large, 1d8. You are proficient with your bite, and considered armed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Hunger": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Hunger": 7
+    }
+  },
+  {
+    "id": "persistant_image",
+    "name": "Persistant Image",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 99
+    },
+    "domains": [
+      {
+        "domain": "Illusion",
+        "level": 5,
+        "domainPower": "You cast all illusion spells at +1 caster level.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Illusion": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Illusion": 5
+    }
+  },
+  {
+    "id": "unbinding",
+    "name": "Unbinding",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 101
+    },
+    "domains": [
+      {
+        "domain": "Liberation",
+        "level": 9,
+        "domainPower": "As a supernatural ability, if affected by a charm, compulsion, or fear effect as a result of a failed save, you can attempt the save 1 round later at the same DC.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Liberation",
+        "level": 9,
+        "domainPower": "You gain a +2 morale bonus on all saving throws against Enchantment spells or effects.",
+        "source": "DragonLance"
+      }
+    ],
+    "levels": {
+      "Liberation": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Liberation": 9
+    }
+  },
+  {
+    "id": "touch_of_madness",
+    "name": "Touch of Madness",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 103
+    },
+    "domains": [
+      {
+        "domain": "Madness",
+        "level": 2,
+        "domainPower": "You subtract 1 from all Wisdom-based skill checks and all Will saves. However, once per day you can add 1 to a single Wisdom-based check or Will save.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Madness": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Madness": 2
+    }
+  },
+  {
+    "id": "bolts_of_bedevilment",
+    "name": "Bolts of Bedevilment",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 103
+    },
+    "domains": [
+      {
+        "domain": "Madness",
+        "level": 5,
+        "domainPower": "You subtract 1 from all Wisdom-based skill checks and all Will saves. However, once per day you can add 1 to a single Wisdom-based check or Will save.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Madness": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Madness": 5
+    }
+  },
+  {
+    "id": "maddening_scream",
+    "name": "Maddening Scream",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 103
+    },
+    "domains": [
+      {
+        "domain": "Madness",
+        "level": 8,
+        "domainPower": "You subtract 1 from all Wisdom-based skill checks and all Will saves. However, once per day you can add 1 to a single Wisdom-based check or Will save.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Madness": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Madness": 8
+    }
+  },
+  {
+    "id": "rusting_grasp",
+    "name": "Rusting Grasp",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 105
+    },
+    "domains": [
+      {
+        "domain": "Metal",
+        "level": 4,
+        "domainPower": "Free Martial Weapon Proficiency Feat and Weapon Focus feat with your choice of Light Hammer or Warhammer.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Slime",
+        "level": 4,
+        "domainPower": "You can rebuke or command oozes 0 times per day as a Supernatural Ability.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Metal": 4,
+      "Slime": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Metal": 4,
+      "Slime": 4
+    }
+  },
+  {
+    "id": "telepathic_bond_lesser",
+    "name": "Telepathic Bond, Lesser",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 106
+    },
+    "domains": [
+      {
+        "domain": "Mind",
+        "level": 3,
+        "domainPower": "Gain a +2 bonus on Bluff, Diplomacy, and Sense Motive Checks.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Mind": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mind": 3
+    }
+  },
+  {
+    "id": "probe_thoughts",
+    "name": "Probe Thoughts",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 106
+    },
+    "domains": [
+      {
+        "domain": "Mind",
+        "level": 6,
+        "domainPower": "Gain a +2 bonus on Bluff, Diplomacy, and Sense Motive Checks.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Mind": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mind": 6
+    }
+  },
+  {
+    "id": "brain_spider",
+    "name": "Brain Spider",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 106
+    },
+    "domains": [
+      {
+        "domain": "Mind",
+        "level": 7,
+        "domainPower": "Gain a +2 bonus on Bluff, Diplomacy, and Sense Motive Checks.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Mind": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mind": 7
+    }
+  },
+  {
+    "id": "moonbeam",
+    "name": "Moonbeam",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 107
+    },
+    "domains": [
+      {
+        "domain": "Moon",
+        "level": 2,
+        "domainPower": "You can turn or destroy Lycanthropes 0 times per day as a Supernatural Ability.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Moon": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Moon": 2
+    }
+  },
+  {
+    "id": "moon_blade",
+    "name": "Moon Blade",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 107
+    },
+    "domains": [
+      {
+        "domain": "Moon",
+        "level": 3,
+        "domainPower": "You can turn or destroy Lycanthropes 0 times per day as a Supernatural Ability.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Moon": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Moon": 3
+    }
+  },
+  {
+    "id": "moon_path",
+    "name": "Moon Path",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 107
+    },
+    "domains": [
+      {
+        "domain": "Moon",
+        "level": 5,
+        "domainPower": "You can turn or destroy Lycanthropes 0 times per day as a Supernatural Ability.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Moon": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Moon": 5
+    }
+  },
+  {
+    "id": "moonfire",
+    "name": "Moonfire",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 107
+    },
+    "domains": [
+      {
+        "domain": "Moon",
+        "level": 9,
+        "domainPower": "You can turn or destroy Lycanthropes 0 times per day as a Supernatural Ability.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Moon": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Moon": 9
+    }
+  },
+  {
+    "id": "visage_of_the_deity_lesser",
+    "name": "Visage of the Deity, Lesser",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 108
+    },
+    "domains": [
+      {
+        "domain": "Mysticism",
+        "level": 3,
+        "domainPower": "As a supernatural ability, once per day you can use a free action to grant yourself a +-1 luck bonus on your saving throws for 0 rounds.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Mysticism": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mysticism": 3
+    }
+  },
+  {
+    "id": "weapon_of_the_deity",
+    "name": "Weapon of the Deity",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 108
+    },
+    "domains": [
+      {
+        "domain": "Mysticism",
+        "level": 4,
+        "domainPower": "As a supernatural ability, once per day you can use a free action to grant yourself a +-1 luck bonus on your saving throws for 0 rounds.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Mysticism": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mysticism": 4
+    }
+  },
+  {
+    "id": "visage_of_the_deity",
+    "name": "Visage of the Deity",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 108
+    },
+    "domains": [
+      {
+        "domain": "Mysticism",
+        "level": 6,
+        "domainPower": "As a supernatural ability, once per day you can use a free action to grant yourself a +-1 luck bonus on your saving throws for 0 rounds.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Mysticism": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mysticism": 6
+    }
+  },
+  {
+    "id": "blasphemy_holy_word",
+    "name": "Blasphemy/Holy Word",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 108
+    },
+    "domains": [
+      {
+        "domain": "Mysticism",
+        "level": 7,
+        "domainPower": "As a supernatural ability, once per day you can use a free action to grant yourself a +-1 luck bonus on your saving throws for 0 rounds.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Mysticism": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mysticism": 7
+    }
+  },
+  {
+    "id": "holy_aura_unholy_aura",
+    "name": "Holy Aura/Unholy Aura",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 108
+    },
+    "domains": [
+      {
+        "domain": "Mysticism",
+        "level": 8,
+        "domainPower": "As a supernatural ability, once per day you can use a free action to grant yourself a +-1 luck bonus on your saving throws for 0 rounds.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Mysticism": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mysticism": 8
+    }
+  },
+  {
+    "id": "waterspout",
+    "name": "Waterspout",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 110
+    },
+    "domains": [
+      {
+        "domain": "Ocean",
+        "level": 7,
+        "domainPower": "You have the supernatural ability to breathe water as water breathing spell for up to 0 rounds.  This effect occurs automatically as soon as it applies, lasts until it runs out or is no longer needed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Ocean": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Ocean": 7
+    }
+  },
+  {
+    "id": "renewal_pact",
+    "name": "Renewal Pact",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 113
+    },
+    "domains": [
+      {
+        "domain": "Pact",
+        "level": 7,
+        "domainPower": "Add Appraise, Intimidate, and Sense Motive to your list of cleric class skills.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Pact": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pact": 7
+    }
+  },
+  {
+    "id": "death_pact",
+    "name": "Death Pact",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 113
+    },
+    "domains": [
+      {
+        "domain": "Pact",
+        "level": 8,
+        "domainPower": "Add Appraise, Intimidate, and Sense Motive to your list of cleric class skills.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Pact": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pact": 8
+    }
+  },
+  {
+    "id": "plague_of_rats",
+    "name": "Plague of Rats",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 114
+    },
+    "domains": [
+      {
+        "domain": "Pestilence",
+        "level": 5,
+        "domainPower": "Immunity to the effects of all diseases, though you can still carry infectious diseases.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Pestilence": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pestilence": 5
+    }
+  },
+  {
+    "id": "curse_of_lycanthropy",
+    "name": "Curse of Lycanthropy",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 114
+    },
+    "domains": [
+      {
+        "domain": "Pestilence",
+        "level": 6,
+        "domainPower": "Immunity to the effects of all diseases, though you can still carry infectious diseases.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Pestilence": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pestilence": 6
+    }
+  },
+  {
+    "id": "scourge",
+    "name": "Scourge",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 114
+    },
+    "domains": [
+      {
+        "domain": "Pestilence",
+        "level": 7,
+        "domainPower": "Immunity to the effects of all diseases, though you can still carry infectious diseases.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Pestilence": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pestilence": 7
+    }
+  },
+  {
+    "id": "otyugh_swarm",
+    "name": "Otyugh Swarm",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 114
+    },
+    "domains": [
+      {
+        "domain": "Pestilence",
+        "level": 9,
+        "domainPower": "Immunity to the effects of all diseases, though you can still carry infectious diseases.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Pestilence": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Pestilence": 9
+    }
+  },
+  {
+    "id": "analyze_portal",
+    "name": "Analyze Portal",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 116
+    },
+    "domains": [
+      {
+        "domain": "Portal",
+        "level": 2,
+        "domainPower": "You can detect an active or inactive portal as if it were a normal secret door (DC 20).",
+        "source": "SpC"
+      },
+      {
+        "domain": "Portal (alternative)",
+        "level": 2,
+        "domainPower": "You gain Portal Sensitive as a bonus feat.",
+        "source": "Underdark"
+      }
+    ],
+    "levels": {
+      "Portal": 2,
+      "Portal (alternative)": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Portal": 2,
+      "Portal (alternative)": 2
+    }
+  },
+  {
+    "id": "nimbus_of_light",
+    "name": "Nimbus of Light",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 118
+    },
+    "domains": [
+      {
+        "domain": "Purification",
+        "level": 1,
+        "domainPower": "You cast abjuration spells at +1 caster level.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Purification": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Purification": 1
+    }
+  },
+  {
+    "id": "deific_vengeance",
+    "name": "Deific Vengeance",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 118
+    },
+    "domains": [
+      {
+        "domain": "Purification",
+        "level": 2,
+        "domainPower": "You cast abjuration spells at +1 caster level.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Purification": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Purification": 2
+    }
+  },
+  {
+    "id": "recitation",
+    "name": "Recitation",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 118
+    },
+    "domains": [
+      {
+        "domain": "Purification",
+        "level": 3,
+        "domainPower": "You cast abjuration spells at +1 caster level.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Purification": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Purification": 3
+    }
+  },
+  {
+    "id": "castigate",
+    "name": "Castigate",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 118
+    },
+    "domains": [
+      {
+        "domain": "Purification",
+        "level": 4,
+        "domainPower": "You cast abjuration spells at +1 caster level.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Purification": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Purification": 4
+    }
+  },
+  {
+    "id": "dance_of_the_unicorn",
+    "name": "Dance of the Unicorn",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 118
+    },
+    "domains": [
+      {
+        "domain": "Purification",
+        "level": 5,
+        "domainPower": "You cast abjuration spells at +1 caster level.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Purification": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Purification": 5
+    }
+  },
+  {
+    "id": "fires_of_purity",
+    "name": "Fires of Purity",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 118
+    },
+    "domains": [
+      {
+        "domain": "Purification",
+        "level": 6,
+        "domainPower": "You cast abjuration spells at +1 caster level.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Purification": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Purification": 6
+    }
+  },
+  {
+    "id": "righteous_wrath_of_the_faithful",
+    "name": "Righteous Wrath of the Faithful",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 118
+    },
+    "domains": [
+      {
+        "domain": "Purification",
+        "level": 7,
+        "domainPower": "You cast abjuration spells at +1 caster level.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Purification": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Purification": 7
+    }
+  },
+  {
+    "id": "anyspell",
+    "name": "Anyspell",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 125
+    },
+    "domains": [
+      {
+        "domain": "Spell",
+        "level": 3,
+        "domainPower": "You get a +2 bonus on Concentration and Spellcraft checks.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Spell": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spell": 3
+    }
+  },
+  {
+    "id": "anyspell_greater",
+    "name": "Anyspell, Greater",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 125
+    },
+    "domains": [
+      {
+        "domain": "Spell",
+        "level": 6,
+        "domainPower": "You get a +2 bonus on Concentration and Spellcraft checks.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Spell": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spell": 6
+    }
+  },
+  {
+    "id": "spider_curse",
+    "name": "Spider Curse",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 126
+    },
+    "domains": [
+      {
+        "domain": "Spider",
+        "level": 6,
+        "domainPower": "You can rebuke or command spiders 0 times per day as a Supernatural Ability.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Spider": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spider": 6
+    }
+  },
+  {
+    "id": "stone_spiders",
+    "name": "Stone Spiders",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 126
+    },
+    "domains": [
+      {
+        "domain": "Spider",
+        "level": 7,
+        "domainPower": "You can rebuke or command spiders 0 times per day as a Supernatural Ability.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Spider": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spider": 7
+    }
+  },
+  {
+    "id": "spider_shapes",
+    "name": "Spider Shapes",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 126
+    },
+    "domains": [
+      {
+        "domain": "Spider",
+        "level": 9,
+        "domainPower": "You can rebuke or command spiders 0 times per day as a Supernatural Ability.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Spider": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Spider": 9
+    }
+  },
+  {
+    "id": "gust_of_wind",
+    "name": "Gust of Wind",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 127
+    },
+    "domains": [
+      {
+        "domain": "Storm",
+        "level": 2,
+        "domainPower": "You gain resistance to electricity 5.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Storm": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Storm": 2
+    }
+  },
+  {
+    "id": "binding_winds",
+    "name": "Binding Winds",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 135
+    },
+    "domains": [
+      {
+        "domain": "Windstorm",
+        "level": 2,
+        "domainPower": "Rain and snow don't penalize your spot and search checks.  You can move through snow-covered and icy terrain at normal movement.  Wind effects affect you as if you were one size category larger.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Windstorm": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Windstorm": 2
+    }
+  },
+  {
+    "id": "arc_of_lightning",
+    "name": "Arc of Lightning",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 135
+    },
+    "domains": [
+      {
+        "domain": "Windstorm",
+        "level": 5,
+        "domainPower": "Rain and snow don't penalize your spot and search checks.  You can move through snow-covered and icy terrain at normal movement.  Wind effects affect you as if you were one size category larger.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Windstorm": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Windstorm": 5
+    }
+  },
+  {
+    "id": "cloudwalkers",
+    "name": "Cloudwalkers",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 135
+    },
+    "domains": [
+      {
+        "domain": "Windstorm",
+        "level": 6,
+        "domainPower": "Rain and snow don't penalize your spot and search checks.  You can move through snow-covered and icy terrain at normal movement.  Wind effects affect you as if you were one size category larger.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Windstorm": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Windstorm": 6
+    }
+  },
+  {
+    "id": "whirlwind_greater",
+    "name": "Whirlwind, Greater",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 135
+    },
+    "domains": [
+      {
+        "domain": "Windstorm",
+        "level": 9,
+        "domainPower": "Rain and snow don't penalize your spot and search checks.  You can move through snow-covered and icy terrain at normal movement.  Wind effects affect you as if you were one size category larger.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Windstorm": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Windstorm": 9
+    }
+  },
+  {
+    "id": "rhino_s_rush",
+    "name": "Rhino's Rush",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 136
+    },
+    "domains": [
+      {
+        "domain": "Wrath",
+        "level": 1,
+        "domainPower": "Once per day, you can subtract Wisdom points (equal to or less than your cleric level) and trade them (2 for 1) for Strength points. This effect lasts for 1 round per cleric level and cannot be ended prematurely.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Wrath": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Wrath": 1
+    }
+  },
+  {
+    "id": "babau_slime",
+    "name": "Babau Slime",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 137
+    },
+    "domains": [
+      {
+        "domain": "Abyss-1",
+        "level": 3,
+        "domainPower": "Once per day as a free action, you may channel the power of demons, gaining a +4 bonus to Strength but a -2 penalty to Armor Class.  The effect lasts 5 rounds.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Abyss-1": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Abyss-1": 3
+    }
+  },
+  {
+    "id": "balor_nimbus",
+    "name": "Balor Nimbus",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 137
+    },
+    "domains": [
+      {
+        "domain": "Abyss-1",
+        "level": 4,
+        "domainPower": "Once per day as a free action, you may channel the power of demons, gaining a +4 bonus to Strength but a -2 penalty to Armor Class.  The effect lasts 5 rounds.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Abyss-1": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Abyss-1": 4
+    }
+  },
+  {
+    "id": "bodak_s_glare",
+    "name": "Bodak's Glare",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 138
+    },
+    "domains": [
+      {
+        "domain": "Abyss-2",
+        "level": 8,
+        "domainPower": "No domain power listed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Abyss-2": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Abyss-2": 8
+    }
+  },
+  {
+    "id": "opalescent_glare",
+    "name": "Opalescent Glare",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 140
+    },
+    "domains": [
+      {
+        "domain": "Arborea-2",
+        "level": 4,
+        "domainPower": "No domain power listed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Arborea-2": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Arborea-2": 4
+    }
+  },
+  {
+    "id": "light_of_lunia",
+    "name": "Light of Lunia",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 143
+    },
+    "domains": [
+      {
+        "domain": "Celestia-1",
+        "level": 1,
+        "domainPower": "Once per day, as a free action, you can generate an aura of menace similar to that of the archons.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Celestia-1": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Celestia-1": 1
+    }
+  },
+  {
+    "id": "planar_tolerance",
+    "name": "Planar Tolerance",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 146
+    },
+    "domains": [
+      {
+        "domain": "Elysium-2",
+        "level": 2,
+        "domainPower": "No domain power listed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Elysium-2": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Elysium-2": 2
+    }
+  },
+  {
+    "id": "mantle_of_good",
+    "name": "Mantle of Good",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 146
+    },
+    "domains": [
+      {
+        "domain": "Elysium-2",
+        "level": 3,
+        "domainPower": "No domain power listed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Elysium-2": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Elysium-2": 3
+    }
+  },
+  {
+    "id": "resist_planar_alignment",
+    "name": "Resist Planar Alignment",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 147
+    },
+    "domains": [
+      {
+        "domain": "Hades-1",
+        "level": 2,
+        "domainPower": "You can smite good once per day, gaining a +0 bonus to your attack and +0 to damage.",
+        "source": "SpC"
+      },
+      {
+        "domain": "Limbo-2",
+        "level": 2,
+        "domainPower": "No domain power listed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Hades-1": 2,
+      "Limbo-2": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Hades-1": 2,
+      "Limbo-2": 2
+    }
+  },
+  {
+    "id": "mantle_of_evil",
+    "name": "Mantle of Evil",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 148
+    },
+    "domains": [
+      {
+        "domain": "Hades-2",
+        "level": 3,
+        "domainPower": "No domain power listed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Hades-2": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Hades-2": 3
+    }
+  },
+  {
+    "id": "perinarch_planar",
+    "name": "Perinarch, Planar",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 149
+    },
+    "domains": [
+      {
+        "domain": "Limbo-1",
+        "level": 9,
+        "domainPower": "You can smite law once per day, gaining a +0 bonus to your attack and +0 to damage.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Limbo-1": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Limbo-1": 9
+    }
+  },
+  {
+    "id": "mantle_of_chaos",
+    "name": "Mantle of Chaos",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 150
+    },
+    "domains": [
+      {
+        "domain": "Limbo-2",
+        "level": 3,
+        "domainPower": "No domain power listed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Limbo-2": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Limbo-2": 3
+    }
+  },
+  {
+    "id": "perinarch",
+    "name": "Perinarch",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 150
+    },
+    "domains": [
+      {
+        "domain": "Limbo-2",
+        "level": 4,
+        "domainPower": "No domain power listed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Limbo-2": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Limbo-2": 4
+    }
+  },
+  {
+    "id": "call_marut",
+    "name": "Call Marut",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 151
+    },
+    "domains": [
+      {
+        "domain": "Mechanus-1",
+        "level": 9,
+        "domainPower": "You can smite chaos once per day, gaining a +0 bonus to your attack and +0 to damage.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Mechanus-1": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mechanus-1": 9
+    }
+  },
+  {
+    "id": "mechanus_mind",
+    "name": "Mechanus Mind",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 152
+    },
+    "domains": [
+      {
+        "domain": "Mechanus-2",
+        "level": 2,
+        "domainPower": "No domain power listed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Mechanus-2": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mechanus-2": 2
+    }
+  },
+  {
+    "id": "mantle_of_law",
+    "name": "Mantle of Law",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 152
+    },
+    "domains": [
+      {
+        "domain": "Mechanus-2",
+        "level": 3,
+        "domainPower": "No domain power listed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Mechanus-2": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mechanus-2": 3
+    }
+  },
+  {
+    "id": "wall_of_gears",
+    "name": "Wall of Gears",
+    "source": "SpC",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 152
+    },
+    "domains": [
+      {
+        "domain": "Mechanus-2",
+        "level": 6,
+        "domainPower": "No domain power listed.",
+        "source": "SpC"
+      }
+    ],
+    "levels": {
+      "Mechanus-2": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mechanus-2": 6
+    }
+  },
+  {
+    "id": "portal_stablization",
+    "name": "Portal Stablization",
+    "source": "Underdark",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 154
+    },
+    "domains": [
+      {
+        "domain": "Portal (alternative)",
+        "level": 1,
+        "domainPower": "You gain Portal Sensitive as a bonus feat.",
+        "source": "Underdark"
+      }
+    ],
+    "levels": {
+      "Portal (alternative)": 1
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Portal (alternative)": 1
+    }
+  },
+  {
+    "id": "portal_view",
+    "name": "Portal View",
+    "source": "Underdark",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 154
+    },
+    "domains": [
+      {
+        "domain": "Portal (alternative)",
+        "level": 3,
+        "domainPower": "You gain Portal Sensitive as a bonus feat.",
+        "source": "Underdark"
+      }
+    ],
+    "levels": {
+      "Portal (alternative)": 3
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Portal (alternative)": 3
+    }
+  },
+  {
+    "id": "portal_barricade",
+    "name": "Portal Barricade",
+    "source": "Underdark",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 154
+    },
+    "domains": [
+      {
+        "domain": "Portal (alternative)",
+        "level": 5,
+        "domainPower": "You gain Portal Sensitive as a bonus feat.",
+        "source": "Underdark"
+      }
+    ],
+    "levels": {
+      "Portal (alternative)": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Portal (alternative)": 5
+    }
+  },
+  {
+    "id": "portal_to_portal_redirect",
+    "name": "Portal-to-Portal Redirect",
+    "source": "Underdark",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 154
+    },
+    "domains": [
+      {
+        "domain": "Portal (alternative)",
+        "level": 6,
+        "domainPower": "You gain Portal Sensitive as a bonus feat.",
+        "source": "Underdark"
+      }
+    ],
+    "levels": {
+      "Portal (alternative)": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Portal (alternative)": 6
+    }
+  },
+  {
+    "id": "portal_reformat",
+    "name": "Portal Reformat",
+    "source": "Underdark",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 154
+    },
+    "domains": [
+      {
+        "domain": "Portal (alternative)",
+        "level": 8,
+        "domainPower": "You gain Portal Sensitive as a bonus feat.",
+        "source": "Underdark"
+      }
+    ],
+    "levels": {
+      "Portal (alternative)": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Portal (alternative)": 8
+    }
+  },
+  {
+    "id": "mark_of_the_outcast",
+    "name": "Mark of the Outcast",
+    "source": "Underdark",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 155
+    },
+    "domains": [
+      {
+        "domain": "Watery Death",
+        "level": 2,
+        "domainPower": "You gain the ability to smite any nonaquatic creature once per day with one normal melee attack. You add +-1 to your attack roll and deal 0 extra points of damage.",
+        "source": "Underdark"
+      }
+    ],
+    "levels": {
+      "Watery Death": 2
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Watery Death": 2
+    }
+  },
+  {
+    "id": "rushing_water",
+    "name": "Rushing Water",
+    "source": "Underdark",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 155
+    },
+    "domains": [
+      {
+        "domain": "Watery Death",
+        "level": 4,
+        "domainPower": "You gain the ability to smite any nonaquatic creature once per day with one normal melee attack. You add +-1 to your attack roll and deal 0 extra points of damage.",
+        "source": "Underdark"
+      }
+    ],
+    "levels": {
+      "Watery Death": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Watery Death": 4
+    }
+  },
+  {
+    "id": "dehydrate",
+    "name": "Dehydrate",
+    "source": "Underdark",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 155
+    },
+    "domains": [
+      {
+        "domain": "Watery Death",
+        "level": 5,
+        "domainPower": "You gain the ability to smite any nonaquatic creature once per day with one normal melee attack. You add +-1 to your attack roll and deal 0 extra points of damage.",
+        "source": "Underdark"
+      }
+    ],
+    "levels": {
+      "Watery Death": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Watery Death": 5
+    }
+  },
+  {
+    "id": "drown",
+    "name": "Drown",
+    "source": "Underdark",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 155
+    },
+    "domains": [
+      {
+        "domain": "Watery Death",
+        "level": 6,
+        "domainPower": "You gain the ability to smite any nonaquatic creature once per day with one normal melee attack. You add +-1 to your attack roll and deal 0 extra points of damage.",
+        "source": "Underdark"
+      }
+    ],
+    "levels": {
+      "Watery Death": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Watery Death": 6
+    }
+  },
+  {
+    "id": "contagious_fog",
+    "name": "Contagious Fog",
+    "source": "Underdark",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 155
+    },
+    "domains": [
+      {
+        "domain": "Watery Death",
+        "level": 7,
+        "domainPower": "You gain the ability to smite any nonaquatic creature once per day with one normal melee attack. You add +-1 to your attack roll and deal 0 extra points of damage.",
+        "source": "Underdark"
+      }
+    ],
+    "levels": {
+      "Watery Death": 7
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Watery Death": 7
+    }
+  },
+  {
+    "id": "drown_mass",
+    "name": "Drown, Mass",
+    "source": "Underdark",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 155
+    },
+    "domains": [
+      {
+        "domain": "Watery Death",
+        "level": 9,
+        "domainPower": "You gain the ability to smite any nonaquatic creature once per day with one normal melee attack. You add +-1 to your attack roll and deal 0 extra points of damage.",
+        "source": "Underdark"
+      }
+    ],
+    "levels": {
+      "Watery Death": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Watery Death": 9
+    }
+  },
+  {
+    "id": "vanish",
+    "name": "Vanish",
+    "source": "RVLT",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 157
+    },
+    "domains": [
+      {
+        "domain": "Mists",
+        "level": 8,
+        "domainPower": "Once per day, you may call on the shield of Ezra, a film of luminous mist that envelops your body granting you protection based on your alignment.",
+        "source": "RVLT"
+      }
+    ],
+    "levels": {
+      "Mists": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mists": 8
+    }
+  },
+  {
+    "id": "mass_owl_s_wisdom",
+    "name": "Mass Owl's Wisdom",
+    "source": "DragonLance",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 164
+    },
+    "domains": [
+      {
+        "domain": "Insight",
+        "level": 6,
+        "domainPower": "You gain uncanny dodge. If you already have uncanny dodge from another class you gain Improved uncanny dodge.",
+        "source": "DragonLance"
+      }
+    ],
+    "levels": {
+      "Insight": 6
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Insight": 6
+    }
+  },
+  {
+    "id": "dicern_lies",
+    "name": "Dicern Lies",
+    "source": "DragonLance",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 166
+    },
+    "domains": [
+      {
+        "domain": "Mentalism(DLCS)",
+        "level": 4,
+        "domainPower": "You gain +2 bonus on Bluff, Diplomacy, and Sense Motive checks. You also gain a +2 bonus on Will saves against Enchantment spells and effects.",
+        "source": "DragonLance"
+      }
+    ],
+    "levels": {
+      "Mentalism(DLCS)": 4
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mentalism(DLCS)": 4
+    }
+  },
+  {
+    "id": "mass_charm",
+    "name": "Mass Charm",
+    "source": "DragonLance",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 166
+    },
+    "domains": [
+      {
+        "domain": "Mentalism(DLCS)",
+        "level": 8,
+        "domainPower": "You gain +2 bonus on Bluff, Diplomacy, and Sense Motive checks. You also gain a +2 bonus on Will saves against Enchantment spells and effects.",
+        "source": "DragonLance"
+      }
+    ],
+    "levels": {
+      "Mentalism(DLCS)": 8
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Mentalism(DLCS)": 8
+    }
+  },
+  {
+    "id": "true_resurection",
+    "name": "True Resurection",
+    "source": "DragonLance",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 168
+    },
+    "domains": [
+      {
+        "domain": "Restoration",
+        "level": 9,
+        "domainPower": "You cast healing spells at +1 caster level.",
+        "source": "DragonLance"
+      }
+    ],
+    "levels": {
+      "Restoration": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Restoration": 9
+    }
+  },
+  {
+    "id": "diamond_body",
+    "name": "Diamond Body",
+    "source": "Age Of Mortals",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 172
+    },
+    "domains": [
+      {
+        "domain": "Channeling",
+        "level": 9,
+        "domainPower": "All Transmutation spells that affect living creatures are cast at +1 caster level.",
+        "source": "Age Of Mortals"
+      }
+    ],
+    "levels": {
+      "Channeling": 9
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Channeling": 9
+    }
+  },
+  {
+    "id": "analyxe_dweomer",
+    "name": "Analyxe Dweomer",
+    "source": "Age Of Mortals",
+    "excelOrigin": {
+      "sheet": "Domains",
+      "row": 173
+    },
+    "domains": [
+      {
+        "domain": "Sensitivity",
+        "level": 5,
+        "domainPower": "All Divination spells with a range of Personal are cast at +1 caster level.",
+        "source": "Age Of Mortals"
+      }
+    ],
+    "levels": {
+      "Sensitivity": 5
+    },
+    "classLevels": {},
+    "domainLevels": {
+      "Sensitivity": 5
+    }
+  }
+]

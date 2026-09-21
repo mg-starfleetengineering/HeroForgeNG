@@ -12,6 +12,88 @@ Given a version number MAJOR.SOURCE.MINOR.BUGFIX, increment the:
 
 Prior to version 7.4.0.0, the difference between SOURCE and MINOR, and between MINOR and BUGFIX updates, was highly subjective.
 
+## [3.0.0] - 2026-09-19
+### Added
+- **Universal Command Palette (`Ctrl+K` / `Cmd+K`)**: Added a global search palette to jump to tabs, switch characters, browse compendium items, spells, and feats, and quickly trigger common actions like exporting or printing.
+- **Undo and Redo (`Ctrl+Z`, `Ctrl+Y`)**: Added snapshot history with standard undo/redo shortcuts and header buttons. Includes debounced slider/stepper edits and a 50-state history limit.
+- **Wondrous Items Compendium**: Added 1,059 wondrous items from the *Dungeon Master's Guide*, *Magic Item Compendium*, *Complete Arcane*, and *Races of Destiny*, with slot filtering, search, and 1-click inventory equipping.
+- **Magic Item Body Slots & Conflict Warnings**: Implemented all 14 official 3.5e item body slots with item affinity notes and conflict warnings when assigning multiple items to one slot.
+- **Ammunition Tracking**: Added inventory tracking for arrows, bolts, sling bullets, and shuriken. Ranged weapons link to ammo counters with quick spend/restore buttons and empty-ammo warnings.
+- **Weapon Special Qualities & Bane Selector**: Added structured weapon qualities, including a Bane target type selector that automatically adds +2 to attack rolls and +2d6 damage against chosen creature types.
+- **Combat Buffs & Stances System**: Replaced hardcoded stance flags with a structured buff system supporting tactical toggles, custom modifiers, and inline stat breakdowns.
+- **Progressive Data Loading**: Split compendium loading into two tiers so core data (races, classes, weapons) loads immediately on start, while secondary datasets (feats, spells, wondrous items) stream in the background.
+- **Character Data Migration**: Added an automatic migration on character load to convert older character saves into structured data models (feats, inventory, canonical class IDs, defense stats, ammunition, and body slots) without data loss.
+- **Schema Validation**: Added Zod schema validation for character saves and roster backups on import to guard against corrupted data while preserving custom properties.
+
+### Changed
+- **React 19 Upgrade**: Upgraded to React 19, adopting the native `use()` hook and dedicated context providers for character and game data.
+- **React Compiler**: Enabled the React Compiler for automatic memoization to reduce unnecessary component re-renders.
+- **Tailwind CSS v4**: Migrated to Tailwind CSS v4 and `@tailwindcss/vite` for modernized styling and theme configuration.
+- **Build Tooling**: Upgraded to Vite 8.3 and Vitest 5.0 for faster bundling and test execution.
+- **Tab Code-Splitting**: Converted top-level views into lazy-loaded chunks with `Suspense` fallbacks to minimize initial load times.
+
+### Fixed
+- Restored pointer cursor styles on buttons under Tailwind CSS v4.
+- Fixed search input text overlapping the magnifying glass icon in compendium search bars.
+- Fixed empty "None" weapon cards displaying in weapon arsenals.
+- Fixed race and domain identifier mismatches on multi-class character sheets.
+
+## [2.1.0] - 2026-09-06
+### Added
+- **Complete Feat Deduplication & Canonical Resolution**: Aggregates all cross-reference dashed feat records (`-- Feat Name --`) and edition aliases into singular canonical entries, reducing library clutter across all 103 dashed entries.
+- **3.0e & Variant Edition Alias Support**: Automatically resolves older edition/variant feat names (*Ki Shout* -> *Kiai Shout*, *Remain Conscious* -> *Diehard*, *Superior Expertise* -> *Improved Combat Expertise*, *Longstrider Elite* -> *Longstride Elite*, *Tunnel Fighter* -> *Tunnel Fighting*) to modern 3.5e equivalents.
+- **Multi-Sourcebook Feat Inclusions & Badging**: Feats existing in multiple sourcebooks (e.g. *MM4* and *PHB*) aggregate all sources (`sources: string[]`), qualify as Allowed if any source is enabled in Allowed Sources settings, and render multi-source badge indicators.
+- **Smart Description Merging**: Intelligently evaluates description variations to preserve specific tactical rules, timings (e.g. *Clinging Breath* extra damage 1 round later), action economy, and penalty mechanics (e.g. *Fling Enemy* -20 grapple check), while stripping generic pointer stubs.
+- **Base Save Prerequisite Validation**: Prerequisite engine natively parses and evaluates `Base Fortitude save bonus +X`, `Base Will save +X`, and `Base Reflex save +X` directly against calculated class progression base saves.
+- **Interactive Visual Feat Dependency Tree Modal**: Directed acyclic graph viewer visualizing complex feat trees (e.g. *Power Attack* -> *Cleave* -> *Great Cleave*) with color-coded Learned (Green), Available/Eligible (Blue), and Locked (Amber/Red) states, full-canvas pan/zoom, live search, and slide-out inspection drawer.
+- **Live Feat Prerequisite Validator Engine**: Multi-dimensional prerequisite evaluation checking BAB, base saves, ability scores, class levels, skill ranks, caster levels, and active feat lineages with "Available / Qualified" and "Missing Prerequisites" UI filters.
+- **Interactive Click-to-Roll Dice Engine**: Full tabletop dice mechanics supporting standard notation (`1d20+8`, `3d6+STR`), weapon critical threat ranges (e.g. 18-20/x2), automated critical confirmation rolls, and Natural 20 / Natural 1 detection.
+- **Dockable Dice Tray HUD Widget**: Virtual 3D/flat polyhedral dice tray dockable at the bottom of the screen with quick d4-d100 buttons, custom formula input, and timestamped roll history with 1-click clipboard copy and clear.
+- **Click-to-Roll Sheet Integration**: 1-click rolling across Character Sheet and Equipment views for attacks, damage, saves, ability checks, skill checks, initiative, and grapple.
+
+### Fixed
+- **Search Bar Magnifying Glass Icon Overlap**: Corrected input field padding and icon absolute positioning across Feats, Feat Tree, Skills, and Traits/Flaws search bars to ensure typed text never overlaps search icons.
+- **Tunnel Fighting Description Correction**: Corrected dataset copy-paste anomaly where *PH* table had errant *Goad* description, restoring authentic *Dungeonscape* squeezing mechanics.
+
+## [2.0.0] - 2026-08-23
+### Added
+- **Active Spell Slot Cast Tracking & Long Rest Sync**: Dynamic active spell slot tracking engine with interactive usage bubbles `[●][●][○]`, spend/restore steppers, and class-level restore.
+- **Daily Class Resources & Usage Tracking HUD**: Unified combat tracking section housing active ability usages (Rage, Lay on Hands, Smite, Turn Undead, Wild Shape, etc.), resource pools, and spell slots directly on the Character Sheet view.
+- **Prepared Spell Cast Synchronization**: Dedicated `[Cast]` / `[Expended]` buttons per prepared spell that automatically deduct and restore available slot capacity and usage bubbles in real-time.
+- **8-Hour Long Rest Automation**: Synchronized long rest action automatically restores character HP, daily class resource usages, point pools, expended spell slots, and marks all prepared spells ready.
+- **Live Spellbook & Daily Preparation Workshop**: Daily preparation workshop with class level slot formulas, bonus spells from high ability scores (PHB Table 1-1), domain bonus slots, and wizard specialist slots.
+- **3.5e Core Spells Database & Searchable Compendium**: 600+ official PHB/SRD spells searchable by school, level, casting time, and component with detailed spell inspector card.
+- **In-Play Vitals Tracker & Conditions Engine**: Dynamic current/max/temp HP tracker with nonlethal damage calculations, dynamic health status badges (Healthy, Bloodied, Disabled, Dying, Dead), and 19 standard D&D 3.5e conditions with automated stat penalties.
+- **Wild Shape Form Manager & Forms Dataset**: Full Druid Wild Shape engine featuring 100+ animal/plant/elemental forms, progression scaling (uses/day, sizes Small-Huge, elemental forms), physical ability score overrides, natural armor, speeds, and natural attack routines.
+- **Clean Static Printable Sheet View**: Separated live combat HUD from printable `#printable-character-sheet` layout, providing a clean non-interactive layout with paper-friendly checkboxes for PDF/print export.
+
+## [1.4.0] - 2026-08-16
+### Added
+- **Active Combat Modifiers & Tactical Stances Display**: Comprehensive active combat modifiers engine tracking and banner across character sheet and equipment views. Displays active stances (Whirling Frenzy, Barbarian Rage, Haste, Power Attack, Combat Expertise, Fighting Defensively, Flurry of Blows) with icons, bonus/penalty breakdowns, and inline dismissal buttons.
+- **Stat Cause Breakdowns**: Explicit source annotations next to modified Ability Scores (e.g. `+4 (Frenzy)`, `+4 (Rage)` alongside base score), Saving Throws (dedicated Tactical/Misc column for Fortitude, Reflex, and Will), Vitals (HP, AC, Speed, Grapple), and Attacks arsenal.
+- **Zen Writing Mode Font Size Controls**: Compact text sizing default with Small (12px), Default (14px), and Large (16px) controls in fullscreen Zen writing mode.
+
+### Changed
+- **Character Sheet Possessions Table**: Removed fixed max-height and scrollbar constraints from the Possessions & Adventuring Gear section so inventory expands naturally to fit all rows in both on-screen and print views.
+
+## [1.3.0] - 2026-08-10
+### Added
+- **Multi-Character Management System**: 100% local-first, client-side character management powered by IndexedDB with `localStorage` failover.
+- **Character Quick Switcher & Roster Dashboard**: Clickable character summary pill dropdown with search filtering, and a full dashboard modal with character cards grid.
+- **Export All & Import All (Roster Backup)**: Complete roster backup package export/import functionality alongside per-character JSON export/import.
+- **Legacy Migration & URL Query Sync**: Automatic boot migration for legacy single-character local state and live synchronization of active character context via `?characterId=<uuid>`.
+
+## [1.2.0] - 2026-08-09
+### Added
+- **Animal Companion Tab**: Built complete Animal Companion tab for Druids and Rangers with 106 extracted base companion species, Effective Druid Level (EDL) calculation engine (factoring Ranger levels, Beastmaster, prestige classes, and Natural Bond feat), companion HD/HP/AC/Save scaling, natural attacks, carrying capacity calculator (Light/Medium/Heavy loads, Lift & Drag), companion feat assignment, skill rank distribution, bonus tricks controls, and custom companion creation.
+- **Dynamic DR Calculator**: Advanced Damage Reduction engine with multi-source stacking and prioritization.
+- **Familiars Tab**: Arcane familiar stat scaling, master level calculation, and custom familiar support.
+- **Deity & Domain Selection**: Domain powers and spell progression integration.
+- **Auras & Emanations**: Aura radius, target tracking, and active toggles.
+
+### Changed
+- Navigation bar optimized to flex-wrap without requiring horizontal scrolling across responsive viewport widths.
+
 ## [8.0.0.0.alpha] - 2017-05-02
 ### N.B.: THIS IS AN ALPHA RELEASE. NOT ALL PLANNED V8.0 FEATURES HAVE BEEN IMPLEMENTED.
 ### Bugfix

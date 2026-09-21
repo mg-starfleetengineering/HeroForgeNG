@@ -1,0 +1,690 @@
+/* ==========================================================================
+   HEROFORGE ANEW D&D 3.5e - ROLL20 CUSTOM CHARACTER SHEET STYLESHEET
+   Scoped under .charsheet for Roll20 VTT Sandbox Compatibility
+   ========================================================================== */
+
+/* CORE CONTAINER & THEME BASE */
+.charsheet {
+  background-color: #090d16;
+  color: #e2e8f0;
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 16px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 820px;
+}
+
+.charsheet * {
+  box-sizing: border-box;
+}
+
+/* TYPOGRAPHY & HEADINGS */
+.charsheet h1, .charsheet h2, .charsheet h3, .charsheet h4 {
+  margin: 0;
+  padding: 0;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.charsheet label {
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+  display: block;
+}
+
+/* INPUTS, SELECTS & TEXTAREAS */
+.charsheet input[type="text"],
+.charsheet input[type="number"],
+.charsheet select,
+.charsheet textarea {
+  background-color: #0f172a;
+  border: 1px solid #1e293b;
+  color: #f8fafc;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 11px;
+  font-family: inherit;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* REMOVE BROWSER NUMBER SPINNERS / INNER PADDING CLIPPING */
+.charsheet input[type="number"]::-webkit-outer-spin-button,
+.charsheet input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.charsheet input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+  padding: 4px 3px;
+  text-align: center;
+}
+
+.charsheet select {
+  padding: 4px 18px 4px 6px;
+}
+
+.charsheet input[type="text"]:focus,
+.charsheet input[type="number"]:focus,
+.charsheet select:focus,
+.charsheet textarea:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.charsheet input[readonly] {
+  background-color: #1e293b;
+  color: #cbd5e1;
+  border-color: #334155;
+  cursor: default;
+}
+
+.charsheet .sheet-bold-input {
+  font-weight: 700;
+  color: #fbbf24 !important;
+}
+
+.charsheet .sheet-highlight-input {
+  font-weight: 800;
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+  border-color: #f59e0b !important;
+}
+
+.charsheet .sheet-mini-input {
+  width: 55px !important;
+  text-align: center;
+  padding: 3px 4px;
+}
+
+/* TAB NAVIGATION BAR (5 Equal Grid Columns) */
+.charsheet .sheet-tabs-nav {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #1e293b;
+  padding-bottom: 8px;
+  width: 100%;
+}
+
+.charsheet .sheet-tab-unit {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  margin: 0;
+  height: 36px;
+  width: 100%;
+}
+
+.charsheet input.sheet-tab-radio {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+  margin: 0;
+}
+
+.charsheet .sheet-tab-btn {
+  width: 100%;
+  height: 100%;
+  background-color: #1e293b;
+  color: #94a3b8;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 4px 6px;
+  font-weight: 700;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.charsheet .sheet-tab-unit:hover .sheet-tab-btn {
+  color: #f8fafc;
+  border-color: #f59e0b;
+}
+
+.charsheet input.sheet-tab-radio:checked + .sheet-tab-btn {
+  background-color: #f59e0b !important;
+  color: #0f172a !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4) !important;
+}
+
+/* TAB VISIBILITY LOGIC */
+.charsheet .sheet-tab-content {
+  display: none !important;
+}
+
+.charsheet:has(input.sheet-tab-core:checked) .sheet-tab-core,
+.charsheet:has(input.sheet-tab-skills:checked) .sheet-tab-skills,
+.charsheet:has(input.sheet-tab-feats_spells:checked) .sheet-tab-feats_spells,
+.charsheet:has(input.sheet-tab-equipment:checked) .sheet-tab-equipment,
+.charsheet:has(input.sheet-tab-notes:checked) .sheet-tab-notes,
+.charsheet input.sheet-tab-core:checked ~ .sheet-tab-core,
+.charsheet input.sheet-tab-skills:checked ~ .sheet-tab-skills,
+.charsheet input.sheet-tab-feats_spells:checked ~ .sheet-tab-feats_spells,
+.charsheet input.sheet-tab-equipment:checked ~ .sheet-tab-equipment,
+.charsheet input.sheet-tab-notes:checked ~ .sheet-tab-notes {
+  display: block !important;
+}
+
+/* HEADER SECTION */
+.charsheet .sheet-header-box {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9));
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.charsheet .sheet-brand {
+  font-size: 10px;
+  font-weight: 800;
+  color: #f59e0b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.charsheet .sheet-input-header-name {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: #fbbf24 !important;
+  background: transparent !important;
+  border-bottom: 2px solid #f59e0b !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-radius: 0 !important;
+  padding: 2px 4px !important;
+  width: 260px !important;
+}
+
+.charsheet .sheet-header-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  flex: 1;
+  min-width: 500px;
+}
+
+.charsheet .sheet-field label {
+  font-size: 9px;
+}
+
+/* VITALS BANNER */
+.charsheet .sheet-vitals-banner {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.charsheet .sheet-vital-card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.charsheet .sheet-vital-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.charsheet .sheet-hp-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.charsheet .sheet-hp-group input {
+  font-size: 18px;
+  font-weight: 800;
+  text-align: center;
+  width: 55px;
+  color: #38bdf8;
+}
+
+.charsheet .sheet-slash {
+  font-size: 18px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.charsheet .sheet-large-stat {
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  text-align: center;
+  color: #fbbf24 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.charsheet .sheet-sublabel-group {
+  font-size: 10px;
+  color: #94a3b8;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.charsheet .sheet-unit {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* LAYOUT GRIDS */
+.charsheet .sheet-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.charsheet .sheet-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.charsheet .sheet-panel {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.charsheet .sheet-panel-title {
+  font-size: 13px;
+  color: #f8fafc;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.charsheet .sheet-panel-title i {
+  color: #f59e0b;
+}
+
+.charsheet .sheet-panel-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.charsheet .sheet-panel-header-flex .sheet-panel-title {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+/* TABLES & SKILLS */
+.charsheet .sheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.charsheet .sheet-table th {
+  color: #64748b;
+  font-size: 9px;
+  text-transform: uppercase;
+  padding: 6px 4px;
+  text-align: center;
+  border-bottom: 1px solid #1e293b;
+}
+
+.charsheet .sheet-table td {
+  padding: 4px 2px;
+  text-align: center;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+}
+
+.charsheet .sheet-table input[type="number"] {
+  padding: 3px 2px !important;
+  text-align: center !important;
+  font-size: 11px;
+}
+
+.charsheet .sheet-stat-label {
+  font-weight: 800;
+  color: #fbbf24;
+  text-align: left !important;
+}
+
+.charsheet .sheet-skill-name {
+  font-weight: 600;
+  color: #e2e8f0;
+  text-align: left !important;
+}
+
+.charsheet .sheet-key-ability {
+  font-weight: 800;
+  color: #f59e0b;
+  font-family: monospace;
+}
+
+/* ROLL BUTTONS */
+.charsheet button[type="roll"].sheet-roll-btn {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.charsheet button[type="roll"].sheet-roll-btn:hover .sheet-vital-label {
+  color: #f59e0b;
+  text-decoration: underline;
+}
+
+.charsheet button[type="roll"].sheet-roll-icon::before {
+  font-family: 'dicefontd20';
+  content: 't';
+  font-size: 16px;
+  color: #f59e0b;
+}
+
+.charsheet button[type="roll"].sheet-roll-icon {
+  background: transparent;
+  border: none;
+  color: #f59e0b;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.charsheet button[type="roll"].sheet-roll-icon:hover {
+  color: #fbbf24;
+  transform: scale(1.15);
+}
+
+.charsheet .sheet-weapon-roll-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #0f172a !important;
+  font-weight: 800;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.charsheet .sheet-weapon-roll-btn:hover {
+  background: #fbbf24;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+
+/* ARMOR CLASS BREAKDOWN & WEAPON ARSENAL */
+.charsheet .sheet-ac-breakdown {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.charsheet .sheet-ac-field {
+  text-align: center;
+}
+
+.charsheet .sheet-ac-field label {
+  font-size: 8px;
+}
+
+.charsheet .sheet-ac-field input {
+  text-align: center;
+  padding: 3px;
+}
+
+.charsheet .sheet-gear-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* REPEATING WEAPONS */
+.charsheet .sheet-weapon-row {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.charsheet .sheet-weapon-top {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.charsheet .sheet-weapon-name {
+  flex: 1;
+  font-weight: 700;
+  color: #fbbf24 !important;
+}
+
+.charsheet .sheet-weapon-stat {
+  width: 140px;
+}
+
+.charsheet .sheet-weapon-bottom {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+.charsheet .sheet-mini-field label {
+  font-size: 8px;
+  text-align: center;
+}
+
+.charsheet .sheet-mini-field input {
+  text-align: center;
+}
+
+/* FEATS, SPELLS & INVENTORY REPEATING SECTIONS */
+.charsheet .sheet-feat-card,
+.charsheet .sheet-spell-card,
+.charsheet .sheet-quest-card,
+.charsheet .sheet-npc-card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.charsheet .sheet-feat-name,
+.charsheet .sheet-spell-name,
+.charsheet .sheet-quest-title,
+.charsheet .sheet-npc-name {
+  font-weight: 700;
+  color: #38bdf8 !important;
+  margin-bottom: 4px;
+}
+
+.charsheet .sheet-feat-type {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.charsheet .sheet-feat-textarea,
+.charsheet .sheet-spell-textarea,
+.charsheet .sheet-quest-textarea,
+.charsheet .sheet-npc-textarea,
+.charsheet .sheet-medium-textarea,
+.charsheet .sheet-large-textarea {
+  resize: vertical;
+  min-height: 50px;
+  font-size: 11px;
+}
+
+.charsheet .sheet-large-textarea {
+  min-height: 120px;
+}
+
+/* SPELL METADATA */
+.charsheet .sheet-caster-bar {
+  display: grid;
+  grid-template-columns: 90px 1fr 100px;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.charsheet .sheet-spell-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.charsheet .sheet-spell-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.charsheet .sheet-subpanel-title {
+  font-size: 11px;
+  color: #f59e0b;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+/* INVENTORY ITEM ROW */
+.charsheet .sheet-item-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.charsheet .sheet-item-name {
+  flex: 2;
+  font-weight: 600;
+}
+
+.charsheet .sheet-item-loc {
+  flex: 1;
+}
+
+.charsheet .sheet-item-weight-total {
+  width: 60px !important;
+  text-align: center;
+  font-weight: 700;
+  color: #f59e0b !important;
+}
+
+/* CURRENCY & NET WORTH */
+.charsheet .sheet-currency-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.charsheet .sheet-currency-grid input {
+  padding: 4px 2px !important;
+  text-align: center;
+  font-weight: 700;
+}
+
+.charsheet .sheet-networth-banner {
+  background: #1e293b;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+/* CARRYING CAPACITY */
+.charsheet .sheet-capacity-grid {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.charsheet .sheet-capacity-thresholds {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  font-size: 10px;
+  color: #94a3b8;
+  border-top: 1px solid #1e293b;
+  padding-top: 8px;
+}
+
+.charsheet .sheet-capacity-thresholds strong {
+  color: #f8fafc;
+}
+
+/* ROLL20 REPEATING SECTION CONTROL BUTTONS */
+.charsheet .repcontrol {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+}
+
+.charsheet .repcontrol .btn {
+  background: #1e293b !important;
+  color: #cbd5e1 !important;
+  border: 1px solid #334155 !important;
+  border-radius: 6px !important;
+  padding: 3px 8px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.charsheet .repcontrol .btn:hover {
+  background: #f59e0b !important;
+  color: #0f172a !important;
+  border-color: #fbbf24 !important;
+}
