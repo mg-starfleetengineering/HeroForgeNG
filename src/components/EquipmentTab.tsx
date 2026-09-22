@@ -40,7 +40,8 @@ import {
   getTacticalCombatState,
   calculateTacticalCombatModifiers,
   generateFullAttackSequence,
-  getActiveCombatModifiers
+  getActiveCombatModifiers,
+  isTwoHandedWeapon
 } from '../engine/combat';
 import { rollAttack, rollDamage } from '../engine/dice';
 import {
@@ -2056,7 +2057,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
   const primaryEffectiveAtkEnh = getWeaponEffectiveAttackEnhancement(primaryWpnObj?.material || eq.primaryWeaponMaterial, primaryEnhancement, isPrimaryMwk || Boolean(primaryWpnObj?.isMasterwork));
   const primaryMatDmgMod = getWeaponMaterialDamageMod(primaryWpnObj?.material || eq.primaryWeaponMaterial);
   const primaryTotalAtk = primaryWpnObj ? (bab + effectiveStrMod + primaryEffectiveAtkEnh + primaryFeatBonuses.attackBonus + (primaryTacticalMods?.attackMod || 0)) : 0;
-  const primaryDmgVal = primaryWpnObj ? (effectiveStrMod + primaryEnhancement + primaryFeatBonuses.damageBonus + (primaryTacticalMods?.damageMod || 0) + primaryMatDmgMod) : 0;
+  const primaryStrDmg = (isTwoHandedWeapon(primaryWpnObj) && effectiveStrMod > 0) ? Math.floor(effectiveStrMod * 1.5) : effectiveStrMod;
+  const primaryDmgVal = primaryWpnObj ? (primaryStrDmg + primaryEnhancement + primaryFeatBonuses.damageBonus + (primaryTacticalMods?.damageMod || 0) + primaryMatDmgMod) : 0;
   const primaryDmgStr = primaryDmgVal >= 0 ? `+${primaryDmgVal}` : `${primaryDmgVal}`;
   const primaryBaseDmgFormula = primaryWpnObj ? `${primaryWpnObj.damageM}${primaryDmgVal !== 0 ? primaryDmgStr : ''}` : '';
   const primaryDamageDisplay = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceString}`;
@@ -2089,7 +2091,8 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
   const secondaryEffectiveAtkEnh = getWeaponEffectiveAttackEnhancement(secondaryWpnObj?.material || eq.secondaryWeaponMaterial, secondaryEnhancement, isSecondaryMwk || Boolean(secondaryWpnObj?.isMasterwork));
   const secondaryMatDmgMod = getWeaponMaterialDamageMod(secondaryWpnObj?.material || eq.secondaryWeaponMaterial);
   const secondaryTotalAtk = secondaryWpnObj ? (bab + effectiveStrMod + secondaryEffectiveAtkEnh + secondaryFeatBonuses.attackBonus + (secondaryTacticalMods?.attackMod || 0)) : 0;
-  const secondaryDmgVal = secondaryWpnObj ? (Math.floor(effectiveStrMod / 2) + secondaryEnhancement + secondaryFeatBonuses.damageBonus + (secondaryTacticalMods?.damageMod || 0) + secondaryMatDmgMod) : 0;
+  const secondaryStrDmg = effectiveStrMod < 0 ? effectiveStrMod : Math.floor(effectiveStrMod / 2);
+  const secondaryDmgVal = secondaryWpnObj ? (secondaryStrDmg + secondaryEnhancement + secondaryFeatBonuses.damageBonus + (secondaryTacticalMods?.damageMod || 0) + secondaryMatDmgMod) : 0;
   const secondaryBaseDmgFormula = secondaryWpnObj ? `${secondaryWpnObj.damageM}${secondaryDmgVal >= 0 ? `+${secondaryDmgVal}` : secondaryDmgVal}` : '';
   const secondaryDamageDisplay = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceString}`;
   const secondaryRollDamageFormula = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceFormula}`;

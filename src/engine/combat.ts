@@ -903,7 +903,6 @@ export function calculateTacticalCombatModifiers(
   const effectiveBuffs = resolveActiveBuffs(tcState, activeBuffs);
   const buffAgg = aggregateBuffBonuses(effectiveBuffs);
 
-  const isRageActive = tcState.rage || effectiveBuffs.some(b => b.id === 'rage' && b.active);
   const isWhirlingFrenzyActive = tcState.whirlingFrenzy || effectiveBuffs.some(b => b.id === 'whirling_frenzy' && b.active);
 
   // 1. Attack roll stance modifier (penalties & direct stance attack bonuses)
@@ -927,25 +926,6 @@ export function calculateTacticalCombatModifiers(
         damageMod += tcState.powerAttack * 2;
       } else {
         damageMod += tcState.powerAttack * 1;
-      }
-    }
-
-    // Barbarian Rage / Frenzy Strength bonus to damage (+4 Str = +2 Str mod)
-    if (isRageActive) {
-      if (is2H) {
-        damageMod += 3; // 1.5x Str mod (+2 * 1.5 = +3)
-      } else if (isOffhand) {
-        damageMod += 1; // 0.5x Str mod (+2 * 0.5 = +1)
-      } else {
-        damageMod += 2; // 1.0x Str mod
-      }
-    } else if (isWhirlingFrenzyActive) {
-      if (is2H) {
-        damageMod += 3;
-      } else if (isOffhand) {
-        damageMod += 1;
-      } else {
-        damageMod += 2;
       }
     }
 

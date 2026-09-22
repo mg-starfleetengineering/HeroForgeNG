@@ -353,7 +353,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
     const netAtkBonus = effectiveStrMod + effectiveAtkEnh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
     const totalAtk = bab + netAtkBonus;
     const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste || (generalTcMods.extraAttacks || 0) > 0, tcState.flurryOfBlows, tcState.whirlingFrenzy, primaryHasSpeed);
-    const dmgVal = effectiveStrMod + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty + matDmgMod;
+    const primaryStrDmg = (isTwoHandedWeapon(primaryWpn) && effectiveStrMod > 0) ? Math.floor(effectiveStrMod * 1.5) : effectiveStrMod;
+    const dmgVal = primaryStrDmg + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty + matDmgMod;
     const baseDmgStr = `${primaryWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`;
     const damageStr = `${baseDmgStr}${primarySpecialDmg.damageDiceString}`;
     const damageFormula = `${baseDmgStr}${primarySpecialDmg.damageDiceFormula}`;
@@ -426,7 +427,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
     const netAtkBonus = effectiveStrMod + effectiveAtkEnh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
     const totalAtk = bab + netAtkBonus;
     const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste || (generalTcMods.extraAttacks || 0) > 0, tcState.flurryOfBlows, tcState.whirlingFrenzy, secondaryHasSpeed);
-    const dmgVal = Math.floor(effectiveStrMod / 2) + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty + matDmgMod;
+    const secondaryStrDmg = effectiveStrMod < 0 ? effectiveStrMod : Math.floor(effectiveStrMod / 2);
+    const dmgVal = secondaryStrDmg + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty + matDmgMod;
     const baseDmgStr = `${secWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`;
     const damageStr = `${baseDmgStr}${secondarySpecialDmg.damageDiceString}`;
     const damageFormula = `${baseDmgStr}${secondarySpecialDmg.damageDiceFormula}`;
@@ -493,7 +495,7 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
     const netAtkBonus = effectiveDexMod + effectiveAtkEnh + featBonuses.attackBonus + wMods.attackMod + conditionPenalties.attackPenalty + conditionPenalties.rangedAttackPenalty;
     const totalAtk = bab + netAtkBonus;
     const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste || (generalTcMods.extraAttacks || 0) > 0, tcState.flurryOfBlows, tcState.whirlingFrenzy, rangedHasSpeed);
-    const dmgVal = enh + wMods.damageMod + conditionPenalties.damagePenalty + matDmgMod;
+    const dmgVal = enh + featBonuses.damageBonus + wMods.damageMod + conditionPenalties.damagePenalty + matDmgMod;
     const baseDmgStr = `${rngWpn.damageM}${dmgVal > 0 ? `+${dmgVal}` : (dmgVal < 0 ? `${dmgVal}` : '')}`;
     const damageStr = `${baseDmgStr}${rangedSpecialDmg.damageDiceString}`;
     const damageFormula = `${baseDmgStr}${rangedSpecialDmg.damageDiceFormula}`;

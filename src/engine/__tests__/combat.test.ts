@@ -19,6 +19,7 @@ import {
   migrateCharacterBuffs
 } from '../combat';
 import { CharacterState, TacticalCombatState, ActiveCombatBuff, WeaponData, RaceData } from '../../types/character';
+import { calculateFeatCombatBonuses } from '../equipment';
 
 describe('Tactical Combat Engine', () => {
   const dummyGreatsword: WeaponData = {
@@ -228,7 +229,7 @@ describe('Tactical Combat Engine', () => {
 
     const mods = calculateTacticalCombatModifiers(tcState, dummyGreatsword);
     expect(mods.attackMod).toBe(0); // Stance penalty 0 (Str +4 adds +2 to Str mod)
-    expect(mods.damageMod).toBe(3); // 2H 1.5x Str mod => +3
+    expect(mods.damageMod).toBe(0); // Rage Str bonus is reflected in character Str mod, not double-counted in damageMod
     expect(mods.acNetMod).toBe(-2);
     expect(mods.touchAcMod).toBe(-2);
     expect(mods.flatAcMod).toBe(-2);
@@ -245,7 +246,7 @@ describe('Tactical Combat Engine', () => {
 
     const mods = calculateTacticalCombatModifiers(tcState, dummyGreatsword);
     expect(mods.attackMod).toBe(-2); // -2 flurry penalty on all attacks
-    expect(mods.damageMod).toBe(3); // 2H 1.5x Str mod => +3
+    expect(mods.damageMod).toBe(0); // Frenzy Str bonus is reflected in character Str mod, not double-counted in damageMod
     expect(mods.acDodgeMod).toBe(2);
     expect(mods.acNetMod).toBe(2);
     expect(mods.refSaveMod).toBe(2);
@@ -627,7 +628,7 @@ describe('Tactical Combat Engine', () => {
       expect(mods.conBonus).toBe(4);
       expect(mods.acNetMod).toBe(-1); // +1 Haste dodge - 2 Rage untyped = -1
       expect(mods.touchAcMod).toBe(-1);
-      expect(mods.damageMod).toBe(3); // 2H 1.5x Str mod from Rage
+      expect(mods.damageMod).toBe(0); // Rage Str bonus is reflected in character Str mod, not double-counted in damageMod
 
       // Verify resolveActiveBuffs does not duplicate when both legacy flag and entity exist
       const resolved = resolveActiveBuffs(legacyTc, [{
@@ -739,6 +740,93 @@ describe('Tactical Combat Engine', () => {
       expect(dragonStance?.name).toBe('Dragon Stance');
       expect(dragonStance?.affectedStats.str).toBe(2);
       expect(dragonStance?.affectedStats.ac).toBe(2);
+    });
+  });
+
+  describe('Core Weapon Damage Mechanics & PHB Compliance', () => {
+    it('calculates 1.5x Str bonus for two-handed weapons and avoids double-counting Rage damage', () => {
+      // Barbarian with 18 Str (+4 mod) entering Rage (+4 Str -> 22 Str, +6 mod) wielding a Greatsword
+      const baseStrScore = 18;
+      const baseStrMod = Math.floor((baseStrScore - 10) / 2); // +4
+      const baseTwoHandedStrDmg = (isTwoHandedWeapon(dummyGreatsword) && baseStrMod > 0) ? Math.floor(baseStrMod * 1.5) : baseStrMod;
+      expect(baseTwoHandedStrDmg).toBe(6); // 4 * 1.5 = 6
+
+      // Tactical combat state with Rage active
+      const tcState: TacticalCombatState = {
+        ...DEFAULT_TACTICAL_COMBAT,
+        rage: true
+      };
+
+      // Modifiers should have damageMod = 0 because Rage Str is in effectiveStrMod
+      const mods = calculateTacticalCombatModifiers(tcState, dummyGreatsword);
+      expect(mods.damageMod).toBe(0);
+      expect(mods.strBonus).toBe(4);
+
+      // In Rage: effective Str = 18 + 4 = 22, mod = +6
+      const rageStrScore = baseStrScore + mods.strBonus;
+      const effectiveStrMod = Math.floor((rageStrScore - 10) / 2); // +6
+      const rageTwoHandedStrDmg = (isTwoHandedWeapon(dummyGreatsword) && effectiveStrMod > 0) ? Math.floor(effectiveStrMod * 1.5) : effectiveStrMod;
+      expect(rageTwoHandedStrDmg).toBe(9); // 6 * 1.5 = 9
+
+      // Total damage bonus: primaryStrDmg + mods.damageMod = 9 + 0 = 9 (not 12!)
+      const totalRageDmg = rageTwoHandedStrDmg + mods.damageMod;
+      expect(totalRageDmg).toBe(9);
+    });
+
+    it('applies full 1.0x penalty for negative Str on off-hand attacks per PHB p. 113', () => {
+      // Character with Str 6 (-2 mod)
+      const lowStrScore = 6;
+      const effectiveStrMod = Math.floor((lowStrScore - 10) / 2); // -2
+      const secondaryStrDmg = effectiveStrMod < 0 ? effectiveStrMod : Math.floor(effectiveStrMod / 2);
+      expect(secondaryStrDmg).toBe(-2); // Full penalty, not floored division (-1)
+
+      // Character with Str 16 (+3 mod) gets 1/2 Str bonus floored
+      const highStrScore = 16;
+      const highStrMod = Math.floor((highStrScore - 10) / 2); // +3
+      const positiveSecondaryStrDmg = highStrMod < 0 ? highStrMod : Math.floor(highStrMod / 2);
+      expect(positiveSecondaryStrDmg).toBe(1); // floor(3 / 2) = 1
+    });
+
+    it('correctly incorporates feat damage bonuses (e.g. Weapon Specialization) into ranged damage', () => {
+      const dummyLongbow: WeaponData = {
+        id: 'longbow',
+        name: 'Longbow',
+        category: 'Martial Ranged',
+        size: 'M',
+        damageM: '1d8',
+        threat: 20,
+        critMultiplier: 3,
+        weight: 3,
+        type: 'Piercing'
+      };
+
+      const dummyChar: CharacterState = {
+        name: 'Archer',
+        baseStats: { str: 10, dex: 16, con: 12, int: 10, wis: 10, cha: 10 },
+        levelProgression: [
+          { level: 1, class: 'fighter', hpRoll: 10 },
+          { level: 2, class: 'fighter', hpRoll: 6 },
+          { level: 3, class: 'fighter', hpRoll: 6 },
+          { level: 4, class: 'fighter', hpRoll: 6 }
+        ],
+        selectedFeatEntities: [
+          { featId: 'weapon_specialization', targetId: 'longbow' }
+        ],
+        selectedFeats: [
+          'Weapon Specialization (Longbow)'
+        ]
+      } as unknown as CharacterState;
+
+      const featBonuses = calculateFeatCombatBonuses(dummyChar, dummyLongbow);
+      expect(featBonuses.damageBonus).toBe(2);
+
+      const enh = 0;
+      const wMods = calculateTacticalCombatModifiers(DEFAULT_TACTICAL_COMBAT, dummyLongbow, false, true);
+      const conditionPenalties = { damagePenalty: 0 };
+      const matDmgMod = 0;
+
+      const dmgVal = enh + featBonuses.damageBonus + wMods.damageMod + conditionPenalties.damagePenalty + matDmgMod;
+      expect(dmgVal).toBe(2);
     });
   });
 });
