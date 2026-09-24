@@ -16,7 +16,8 @@ import {
   STANDARD_SRD_BUFFS,
   aggregateBuffBonuses,
   resolveActiveBuffs,
-  migrateCharacterBuffs
+  migrateCharacterBuffs,
+  calculateEquippedWeaponCombatProfile
 } from '../combat';
 import { CharacterState, TacticalCombatState, ActiveCombatBuff, WeaponData, RaceData } from '../../types/character';
 import { calculateFeatCombatBonuses } from '../equipment';
@@ -827,6 +828,190 @@ describe('Tactical Combat Engine', () => {
 
       const dmgVal = enh + featBonuses.damageBonus + wMods.damageMod + conditionPenalties.damagePenalty + matDmgMod;
       expect(dmgVal).toBe(2);
+    });
+
+    describe('calculateEquippedWeaponCombatProfile', () => {
+      const weaponsDict: Record<string, WeaponData> = {
+        greatsword: dummyGreatsword,
+        dagger: {
+          id: 'dagger',
+          name: 'Dagger',
+          category: 'Simple Light',
+          size: 'M',
+          damageM: '1d4',
+          threat: 19,
+          critMultiplier: 2,
+          weight: 1,
+          type: 'Piercing'
+        },
+        longbow: {
+          id: 'longbow',
+          name: 'Longbow',
+          category: 'Martial Ranged',
+          size: 'M',
+          damageM: '1d8',
+          threat: 20,
+          critMultiplier: 3,
+          weight: 3,
+          type: 'Piercing'
+        },
+        longsword: {
+          id: 'longsword',
+          name: 'Longsword',
+          category: 'Martial One-Handed',
+          size: 'M',
+          damageM: '1d8',
+          threat: 19,
+          critMultiplier: 2,
+          weight: 4,
+          type: 'Slashing'
+        }
+      };
+
+      it('returns null if slot is empty or set to none', () => {
+        const char: CharacterState = {
+          name: 'Hero',
+          baseStats: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+          equipment: { primaryWeapon: 'none' }
+        } as any;
+
+        const profile = calculateEquippedWeaponCombatProfile(char, 'primaryWeapon', weaponsDict);
+        expect(profile).toBeNull();
+      });
+
+      it('calculates primary 2H weapon profile with Rage, 1.5x Str, and Power Attack', () => {
+        const char: CharacterState = {
+          name: 'Barbarian',
+          baseStats: { str: 18, dex: 12, con: 14, int: 10, wis: 10, cha: 10 },
+          levelProgression: [
+            { level: 1, class: 'barbarian', hpRoll: 12 },
+            { level: 2, class: 'barbarian', hpRoll: 8 },
+            { level: 3, class: 'barbarian', hpRoll: 8 },
+            { level: 4, class: 'barbarian', hpRoll: 8 },
+            { level: 5, class: 'barbarian', hpRoll: 8 },
+            { level: 6, class: 'barbarian', hpRoll: 8 }
+          ],
+          equipment: {
+            primaryWeapon: 'greatsword',
+            primaryWeaponEnhancement: 1
+          },
+          tacticalCombat: {
+            ...DEFAULT_TACTICAL_COMBAT,
+            rage: true,
+            powerAttack: 2
+          }
+        } as any;
+
+        const profile = calculateEquippedWeaponCombatProfile(char, 'primaryWeapon', weaponsDict, [], {
+          bab: 6,
+          effectiveStrMod: 6 // 18 + 4 rage = 22 (+6 mod)
+        });
+
+        expect(profile).not.toBeNull();
+        if (!profile) return;
+
+        expect(profile.label).toBe('Primary');
+        expect(profile.threatMin).toBe(19);
+        expect(profile.critStr).toBe('19-20/x2');
+
+        // Attack: BAB 6 + Str 6 + Enh 1 + PA -2 = 11
+        expect(profile.totalAtk).toBe(11);
+        expect(profile.fullSeq).toBe('+11/+6');
+
+        // Damage: 2H Str (floor(6 * 1.5) = 9) + Enh 1 + PA 2H (2 * 2 = 4) = +14
+        expect(profile.damageBonus).toBe(14);
+        expect(profile.damageStr).toBe('2d6+14');
+        expect(profile.tacticalNote).toContain('Barbarian Rage: +2 Str');
+        expect(profile.tacticalNote).toContain('Power Attack (-2): +4 Dmg');
+      });
+
+      it('calculates off-hand weapon profile applying full penalty for negative Str', () => {
+        const weakChar: CharacterState = {
+          name: 'Weakling',
+          baseStats: { str: 6, dex: 14, con: 10, int: 10, wis: 10, cha: 10 },
+          equipment: {
+            secondaryWeapon: 'dagger'
+          }
+        } as any;
+
+        const profile = calculateEquippedWeaponCombatProfile(weakChar, 'secondaryWeapon', weaponsDict, [], {
+          bab: 1,
+          effectiveStrMod: -2
+        });
+
+        expect(profile).not.toBeNull();
+        if (!profile) return;
+
+        expect(profile.label).toBe('Off-Hand');
+        // Negative Str penalty applied in full (1.0x) => -2
+        expect(profile.damageBonus).toBe(-2);
+        expect(profile.damageStr).toBe('1d4-2');
+      });
+
+      it('calculates ranged weapon profile with Dexterity attack bonus and feat damage', () => {
+        const archer: CharacterState = {
+          name: 'Hawkeye',
+          baseStats: { str: 10, dex: 16, con: 12, int: 10, wis: 10, cha: 10 },
+          equipment: {
+            rangedWeapon: 'longbow',
+            rangedWeaponEnhancement: 2
+          },
+          selectedFeatEntities: [
+            { featId: 'weapon_specialization', targetId: 'longbow' }
+          ]
+        } as any;
+
+        const profile = calculateEquippedWeaponCombatProfile(archer, 'rangedWeapon', weaponsDict, [], {
+          bab: 4,
+          effectiveDexMod: 3
+        });
+
+        expect(profile).not.toBeNull();
+        if (!profile) return;
+
+        expect(profile.label).toBe('Ranged');
+        // Attack: BAB 4 + Dex 3 + Enh 2 = 9
+        expect(profile.totalAtk).toBe(9);
+        // Damage: Enh 2 + Feat 2 = 4
+        expect(profile.damageBonus).toBe(4);
+        expect(profile.damageStr).toBe('1d8+4');
+      });
+
+      it('calculates Paladin Smite Evil on melee attacks', () => {
+        const paladin: CharacterState = {
+          name: 'Paladin',
+          baseStats: { str: 14, dex: 10, con: 12, int: 10, wis: 12, cha: 16 },
+          levelProgression: [
+            { level: 1, primaryClass: 'paladin', hpRoll: 10 },
+            { level: 2, primaryClass: 'paladin', hpRoll: 8 },
+            { level: 3, primaryClass: 'paladin', hpRoll: 8 },
+            { level: 4, primaryClass: 'paladin', hpRoll: 8 },
+            { level: 5, primaryClass: 'paladin', hpRoll: 8 }
+          ],
+          equipment: {
+            primaryWeapon: 'longsword'
+          },
+          tacticalCombat: {
+            ...DEFAULT_TACTICAL_COMBAT,
+            smiteEvil: true
+          }
+        } as any;
+
+        const profile = calculateEquippedWeaponCombatProfile(paladin, 'primaryWeapon', weaponsDict, [], {
+          bab: 5,
+          effectiveStrMod: 2,
+          chaMod: 3
+        });
+
+        expect(profile).not.toBeNull();
+        if (!profile) return;
+
+        // Attack: BAB 5 + Str 2 + Smite (+3 Cha) = 10
+        expect(profile.totalAtk).toBe(10);
+        // Damage: Str 2 + Smite (+5 Paladin level) = 7
+        expect(profile.damageBonus).toBe(7);
+        expect(profile.tacticalNote).toContain('Smite Evil: +3 Atk, +5 Dmg vs Evil');
+      });
     });
   });
 });

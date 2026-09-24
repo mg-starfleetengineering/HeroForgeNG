@@ -42,7 +42,9 @@ import {
   calculateGrappleModifier,
   getGrappleAttackEntry,
   getActiveCombatModifiers,
-  isTwoHandedWeapon
+  isTwoHandedWeapon,
+  calculateEquippedWeaponCombatProfile,
+  EquippedWeaponCombatContext
 } from '../engine/combat';
 import {
   calculateKeenThreat,
@@ -323,232 +325,27 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
     const wsAttacks = calculateWildShapeAttacks(character, activeWildShape, bab, effectiveStrMod, effectiveDexMod, tcState);
     activeWeaponsList.push(...wsAttacks);
   }
+  const combatContext: EquippedWeaponCombatContext = {
+    bab,
+    classesData,
+    effectiveStrMod,
+    effectiveDexMod,
+    chaMod,
+    wisMod,
+    totalLevel,
+    tcState,
+    conditionPenalties,
+    extraAttacks: (generalTcMods.extraAttacks || 0)
+  };
 
-  const paladinLevel = (character.levelProgression || []).filter(l => {
-    const c1 = (l.primaryClass || '').toLowerCase().trim();
-    const c2 = (l.secondaryClass || '').toLowerCase().trim();
-    return c1 === 'paladin' || c2 === 'paladin';
-  }).length;
-  const smiteAtkBonus = tcState.smiteEvil ? Math.max(0, chaMod) : 0;
-  const smiteDmgBonus = tcState.smiteEvil ? Math.max(1, paladinLevel) : 0;
+  const primaryProfile = calculateEquippedWeaponCombatProfile(character, 'primaryWeapon', weaponsData, customWeapons, combatContext);
+  if (primaryProfile) activeWeaponsList.push(primaryProfile);
 
-  // 1. Primary Weapon
-  if (eq.primaryWeapon && eq.primaryWeapon !== 'none') {
-    const primaryWpn = resolveEquippedWeapon(character, 'primaryWeapon', weaponsData, customWeapons);
-    const primaryQualities = (eq.primaryWeaponQualities && eq.primaryWeaponQualities.length > 0) ? eq.primaryWeaponQualities : (primaryWpn.specialQualities || []);
-    const primaryBaneTarget = eq.primaryWeaponBaneTarget || primaryWpn.baneTarget;
-    const primarySpecialDmg = getWeaponSpecialDamage(primaryQualities, primaryBaneTarget);
-    const primaryHasKeen = hasKeenQuality(primaryQualities);
-    const primaryHasSpeed = hasSpeedQuality(primaryQualities);
-    const primaryThreat = primaryHasKeen ? calculateKeenThreat(primaryWpn.threat) : primaryWpn.threat;
-    const featBonuses = calculateFeatCombatBonuses(character, primaryWpn);
-    const wMods = calculateTacticalCombatModifiers(tcState, primaryWpn, false, false, character.activeBuffs);
-    const enh = eq.primaryWeaponEnhancement ?? primaryWpn.enhancementBonus ?? 0;
-    const isMelee = !primaryWpn.category?.toLowerCase().includes('ranged');
-    const netSmiteAtk = isMelee ? smiteAtkBonus : 0;
-    const netSmiteDmg = isMelee ? smiteDmgBonus : 0;
-    const isMwk = Boolean(primaryWpn.isMasterwork || eq.primaryWeaponMasterwork);
-    const effectiveAtkEnh = getWeaponEffectiveAttackEnhancement(primaryWpn.material || eq.primaryWeaponMaterial, enh, isMwk);
-    const matDmgMod = getWeaponMaterialDamageMod(primaryWpn.material || eq.primaryWeaponMaterial);
-    const netAtkBonus = effectiveStrMod + effectiveAtkEnh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
-    const totalAtk = bab + netAtkBonus;
-    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste || (generalTcMods.extraAttacks || 0) > 0, tcState.flurryOfBlows, tcState.whirlingFrenzy, primaryHasSpeed);
-    const primaryStrDmg = (isTwoHandedWeapon(primaryWpn) && effectiveStrMod > 0) ? Math.floor(effectiveStrMod * 1.5) : effectiveStrMod;
-    const dmgVal = primaryStrDmg + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty + matDmgMod;
-    const baseDmgStr = `${primaryWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`;
-    const damageStr = `${baseDmgStr}${primarySpecialDmg.damageDiceString}`;
-    const damageFormula = `${baseDmgStr}${primarySpecialDmg.damageDiceFormula}`;
+  const secondaryProfile = calculateEquippedWeaponCombatProfile(character, 'secondaryWeapon', weaponsData, customWeapons, combatContext);
+  if (secondaryProfile) activeWeaponsList.push(secondaryProfile);
 
-    const primaryRollOptions = getWeaponRollOptions(primaryWpn, baseDmgStr, dmgVal, totalAtk, primaryQualities, primaryBaneTarget);
-    const primaryBaneAtk = primarySpecialDmg.hasBane ? getBaneAttackOption(totalAtk, primaryWpn.name, primaryBaneTarget) : null;
-    const primaryCritInfo = calculateCritDamagePools(primaryWpn, dmgVal, primaryQualities, primaryBaneTarget);
-
-    const primaryNote = (() => {
-      const notes: string[] = [];
-      const matTraits = getWeaponMaterialTraits(primaryWpn.material || eq.primaryWeaponMaterial, isMwk);
-      matTraits.forEach(t => notes.push(t));
-      if (primaryHasSpeed) { notes.push('Speed: +1 Extra Atk'); }
-      if (primarySpecialDmg.summaryLabels.length > 0) { notes.push(`Magic: ${primarySpecialDmg.summaryLabels.join(', ')}`); }
-      if (tcState.whirlingFrenzy) { notes.push('Whirling Frenzy: +2 Str, -2 Flurry, +1 Extra Atk'); }
-      else if (tcState.rage) { notes.push('Barbarian Rage: +2 Str'); }
-      if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('Flurry: -2 Atk, +1 Extra Atk'); }
-      if (tcState.haste) { notes.push('Haste: +1 Atk, +1 Extra Atk'); }
-      if (tcState.smiteEvil && isMelee) { notes.push(`Smite Evil: +${smiteAtkBonus} Atk, +${smiteDmgBonus} Dmg vs Evil`); }
-      if (tcState.stunningFist) { notes.push(`Stunning Fist: Fort DC ${10 + Math.floor(totalLevel / 2) + wisMod}`); }
-      if (tcState.powerAttack > 0) {
-        const is2H = isTwoHandedWeapon(primaryWpn);
-        notes.push(`Power Attack (-${tcState.powerAttack}): +${is2H ? tcState.powerAttack * 2 : tcState.powerAttack} Dmg`);
-      }
-      if (tcState.combatExpertise > 0) { notes.push(`Combat Exp: -${tcState.combatExpertise} Atk`); }
-      if (tcState.fightingDefensively) { notes.push('Fight Defensively: -4 Atk'); }
-      if (conditionPenalties.attackPenalty !== 0) { notes.push(`Condition: ${conditionPenalties.attackPenalty} Atk`); }
-      if (conditionPenalties.meleeAttackPenalty !== 0) { notes.push(`Prone: ${conditionPenalties.meleeAttackPenalty} Melee Atk`); }
-      return notes.length > 0 ? `(${notes.join(' • ')})` : '';
-    })();
-
-    activeWeaponsList.push({
-      label: 'Primary',
-      weapon: { ...primaryWpn, threat: primaryThreat },
-      attackBonus: totalAtk,
-      fullSeq,
-      damageStr,
-      damageFormula,
-      damageBonus: dmgVal,
-      threatMin: primaryThreat,
-      critStr: `${primaryThreat < 20 ? `${primaryThreat}-20` : '20'}/x${primaryWpn.critMultiplier || 2}${primaryHasKeen ? ' (Keen)' : ''}`,
-      type: primaryWpn.type || 'Slashing',
-      featAtkBonus: featBonuses.attackBonus,
-      featDmgBonus: featBonuses.damageBonus,
-      tacticalNote: primaryNote,
-      rollOptions: primaryRollOptions,
-      critInfo: primaryCritInfo,
-      baneAtk: primaryBaneAtk
-    });
-  }
-
-  // 2. Secondary Weapon
-  if (eq.secondaryWeapon && eq.secondaryWeapon !== 'none') {
-    const secWpn = resolveEquippedWeapon(character, 'secondaryWeapon', weaponsData, customWeapons);
-    const secondaryQualities = (eq.secondaryWeaponQualities && eq.secondaryWeaponQualities.length > 0) ? eq.secondaryWeaponQualities : (secWpn.specialQualities || []);
-    const secBaneTarget = eq.secondaryWeaponBaneTarget || secWpn.baneTarget;
-    const secondarySpecialDmg = getWeaponSpecialDamage(secondaryQualities, secBaneTarget);
-    const secondaryHasKeen = hasKeenQuality(secondaryQualities);
-    const secondaryHasSpeed = hasSpeedQuality(secondaryQualities);
-    const secThreat = secondaryHasKeen ? calculateKeenThreat(secWpn.threat) : secWpn.threat;
-    const featBonuses = calculateFeatCombatBonuses(character, secWpn);
-    const wMods = calculateTacticalCombatModifiers(tcState, secWpn, true, false, character.activeBuffs);
-    const enh = eq.secondaryWeaponEnhancement ?? secWpn.enhancementBonus ?? 0;
-    const isMelee = !secWpn.category?.toLowerCase().includes('ranged');
-    const netSmiteAtk = isMelee ? smiteAtkBonus : 0;
-    const netSmiteDmg = isMelee ? smiteDmgBonus : 0;
-    const isMwk = Boolean(secWpn.isMasterwork || eq.secondaryWeaponMasterwork);
-    const effectiveAtkEnh = getWeaponEffectiveAttackEnhancement(secWpn.material || eq.secondaryWeaponMaterial, enh, isMwk);
-    const matDmgMod = getWeaponMaterialDamageMod(secWpn.material || eq.secondaryWeaponMaterial);
-    const netAtkBonus = effectiveStrMod + effectiveAtkEnh + featBonuses.attackBonus + wMods.attackMod + netSmiteAtk + conditionPenalties.attackPenalty + conditionPenalties.meleeAttackPenalty;
-    const totalAtk = bab + netAtkBonus;
-    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste || (generalTcMods.extraAttacks || 0) > 0, tcState.flurryOfBlows, tcState.whirlingFrenzy, secondaryHasSpeed);
-    const secondaryStrDmg = effectiveStrMod < 0 ? effectiveStrMod : Math.floor(effectiveStrMod / 2);
-    const dmgVal = secondaryStrDmg + enh + featBonuses.damageBonus + wMods.damageMod + netSmiteDmg + conditionPenalties.damagePenalty + matDmgMod;
-    const baseDmgStr = `${secWpn.damageM}${dmgVal >= 0 ? `+${dmgVal}` : dmgVal}`;
-    const damageStr = `${baseDmgStr}${secondarySpecialDmg.damageDiceString}`;
-    const damageFormula = `${baseDmgStr}${secondarySpecialDmg.damageDiceFormula}`;
-
-    const secRollOptions = getWeaponRollOptions(secWpn, baseDmgStr, dmgVal, totalAtk, secondaryQualities, secBaneTarget);
-    const secBaneAtk = secondarySpecialDmg.hasBane ? getBaneAttackOption(totalAtk, secWpn.name, secBaneTarget) : null;
-    const secCritInfo = calculateCritDamagePools(secWpn, dmgVal, secondaryQualities, secBaneTarget);
-
-    const secNote = (() => {
-      const notes: string[] = [];
-      const matTraits = getWeaponMaterialTraits(secWpn.material || eq.secondaryWeaponMaterial, isMwk);
-      matTraits.forEach(t => notes.push(t));
-      if (secondaryHasSpeed) { notes.push('Speed: +1 Extra Atk'); }
-      if (secondarySpecialDmg.summaryLabels.length > 0) { notes.push(`Magic: ${secondarySpecialDmg.summaryLabels.join(', ')}`); }
-      if (tcState.whirlingFrenzy) { notes.push('Whirling Frenzy: +2 Str, -2 Flurry, +1 Extra Atk'); }
-      else if (tcState.rage) { notes.push('Barbarian Rage: +2 Str'); }
-      if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('Flurry: -2 Atk, +1 Extra Atk'); }
-      if (tcState.haste) { notes.push('Haste: +1 Atk, +1 Extra Atk'); }
-      if (tcState.smiteEvil && isMelee) { notes.push(`Smite Evil: +${smiteAtkBonus} Atk, +${smiteDmgBonus} Dmg vs Evil`); }
-      if (tcState.stunningFist) { notes.push(`Stunning Fist: Fort DC ${10 + Math.floor(totalLevel / 2) + wisMod}`); }
-      if (tcState.powerAttack > 0) { notes.push(`Power Attack: -${tcState.powerAttack} Atk`); }
-      if (tcState.combatExpertise > 0) { notes.push(`Combat Exp: -${tcState.combatExpertise} Atk`); }
-      if (tcState.fightingDefensively) { notes.push('Fight Defensively: -4 Atk'); }
-      if (conditionPenalties.attackPenalty !== 0) { notes.push(`Condition: ${conditionPenalties.attackPenalty} Atk`); }
-      if (conditionPenalties.meleeAttackPenalty !== 0) { notes.push(`Prone: ${conditionPenalties.meleeAttackPenalty} Melee Atk`); }
-      return notes.length > 0 ? `(${notes.join(' • ')})` : '';
-    })();
-
-    activeWeaponsList.push({
-      label: 'Off-Hand',
-      weapon: { ...secWpn, threat: secThreat },
-      attackBonus: totalAtk,
-      fullSeq,
-      damageStr,
-      damageFormula,
-      damageBonus: dmgVal,
-      threatMin: secThreat,
-      critStr: `${secThreat < 20 ? `${secThreat}-20` : '20'}/x${secWpn.critMultiplier || 2}${secondaryHasKeen ? ' (Keen)' : ''}`,
-      type: secWpn.type || 'Slashing',
-      featAtkBonus: featBonuses.attackBonus,
-      featDmgBonus: featBonuses.damageBonus,
-      tacticalNote: secNote,
-      rollOptions: secRollOptions,
-      critInfo: secCritInfo,
-      baneAtk: secBaneAtk
-    });
-  }
-
-  // 3. Ranged Weapon
-  if (eq.rangedWeapon && eq.rangedWeapon !== 'none') {
-    const rngWpn = resolveEquippedWeapon(character, 'rangedWeapon', weaponsData, customWeapons);
-    const rangedQualities = (eq.rangedWeaponQualities && eq.rangedWeaponQualities.length > 0) ? eq.rangedWeaponQualities : (rngWpn.specialQualities || []);
-    const rngBaneTarget = eq.rangedWeaponBaneTarget || rngWpn.baneTarget;
-    const rangedSpecialDmg = getWeaponSpecialDamage(rangedQualities, rngBaneTarget);
-    const rangedHasKeen = hasKeenQuality(rangedQualities);
-    const rangedHasSpeed = hasSpeedQuality(rangedQualities);
-    const rngThreat = rangedHasKeen ? calculateKeenThreat(rngWpn.threat) : rngWpn.threat;
-    const featBonuses = calculateFeatCombatBonuses(character, rngWpn);
-    const wMods = calculateTacticalCombatModifiers(tcState, rngWpn, false, true, character.activeBuffs);
-    const enh = eq.rangedWeaponEnhancement ?? rngWpn.enhancementBonus ?? 0;
-    const isMwk = Boolean(rngWpn.isMasterwork || eq.rangedWeaponMasterwork);
-    const effectiveAtkEnh = getWeaponEffectiveAttackEnhancement(rngWpn.material || eq.rangedWeaponMaterial, enh, isMwk);
-    const matDmgMod = getWeaponMaterialDamageMod(rngWpn.material || eq.rangedWeaponMaterial);
-    const netAtkBonus = effectiveDexMod + effectiveAtkEnh + featBonuses.attackBonus + wMods.attackMod + conditionPenalties.attackPenalty + conditionPenalties.rangedAttackPenalty;
-    const totalAtk = bab + netAtkBonus;
-    const fullSeq = generateFullAttackSequence(bab, netAtkBonus, tcState.haste || (generalTcMods.extraAttacks || 0) > 0, tcState.flurryOfBlows, tcState.whirlingFrenzy, rangedHasSpeed);
-    const dmgVal = enh + featBonuses.damageBonus + wMods.damageMod + conditionPenalties.damagePenalty + matDmgMod;
-    const baseDmgStr = `${rngWpn.damageM}${dmgVal > 0 ? `+${dmgVal}` : (dmgVal < 0 ? `${dmgVal}` : '')}`;
-    const damageStr = `${baseDmgStr}${rangedSpecialDmg.damageDiceString}`;
-    const damageFormula = `${baseDmgStr}${rangedSpecialDmg.damageDiceFormula}`;
-
-    const rngRollOptions = getWeaponRollOptions(rngWpn, baseDmgStr, dmgVal, totalAtk, rangedQualities, rngBaneTarget);
-    const rngBaneAtk = rangedSpecialDmg.hasBane ? getBaneAttackOption(totalAtk, rngWpn.name, rngBaneTarget) : null;
-    const rngCritInfo = calculateCritDamagePools(rngWpn, dmgVal, rangedQualities, rngBaneTarget);
-
-    const rngNote = (() => {
-      const notes: string[] = [];
-      const matTraits = getWeaponMaterialTraits(rngWpn.material || eq.rangedWeaponMaterial, isMwk);
-      matTraits.forEach(t => notes.push(t));
-      if (rangedHasSpeed) { notes.push('Speed: +1 Extra Atk'); }
-      if (rangedSpecialDmg.summaryLabels.length > 0) { notes.push(`Magic: ${rangedSpecialDmg.summaryLabels.join(', ')}`); }
-      if (tcState.whirlingFrenzy) { notes.push('Whirling Frenzy: -2 Flurry, +1 Extra Atk'); }
-      if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('Flurry: -2 Atk, +1 Extra Atk'); }
-      if (tcState.haste) { notes.push('Haste: +1 Atk, +1 Extra Atk'); }
-      if (tcState.combatExpertise > 0) { notes.push(`Combat Exp: -${tcState.combatExpertise} Atk`); }
-      if (tcState.fightingDefensively) { notes.push('Fight Defensively: -4 Atk'); }
-      if (conditionPenalties.attackPenalty !== 0) { notes.push(`Condition: ${conditionPenalties.attackPenalty} Atk`); }
-      const activeAmmo = (() => {
-        if (eq.equippedAmmoId) {
-          return (character.inventory || []).find(i => i.id === eq.equippedAmmoId);
-        }
-        const ammos = getCharacterAmmunition(character);
-        const matchType = getMatchingAmmoTypeForWeapon(rngWpn.name);
-        return ammos.find(a => a.ammoType === matchType && (a.quantity || 0) > 0) || ammos.find(a => (a.quantity || 0) > 0);
-      })();
-      if (activeAmmo) {
-        notes.push(`Ammo: ${activeAmmo.name} [${activeAmmo.quantity || 0}]`);
-      }
-      return notes.length > 0 ? `(${notes.join(' • ')})` : '';
-    })();
-
-    activeWeaponsList.push({
-      label: 'Ranged',
-      weapon: { ...rngWpn, threat: rngThreat },
-      attackBonus: totalAtk,
-      fullSeq,
-      damageStr,
-      damageFormula,
-      damageBonus: dmgVal,
-      threatMin: rngThreat,
-      critStr: `${rngThreat < 20 ? `${rngThreat}-20` : '20'}/x${rngWpn.critMultiplier || 2}${rangedHasKeen ? ' (Keen)' : ''}`,
-      type: rngWpn.type || 'Piercing',
-      featAtkBonus: featBonuses.attackBonus,
-      featDmgBonus: featBonuses.damageBonus,
-      tacticalNote: rngNote,
-      rollOptions: rngRollOptions,
-      critInfo: rngCritInfo,
-      baneAtk: rngBaneAtk
-    });
-  }
+  const rangedProfile = calculateEquippedWeaponCombatProfile(character, 'rangedWeapon', weaponsData, customWeapons, combatContext);
+  if (rangedProfile) activeWeaponsList.push(rangedProfile);
 
   // 4. Special Maneuver: Grapple
   const grappleCalc = calculateGrappleModifier(

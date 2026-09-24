@@ -41,7 +41,9 @@ import {
   calculateTacticalCombatModifiers,
   generateFullAttackSequence,
   getActiveCombatModifiers,
-  isTwoHandedWeapon
+  isTwoHandedWeapon,
+  calculateEquippedWeaponCombatProfile,
+  EquippedWeaponCombatContext
 } from '../engine/combat';
 import { rollAttack, rollDamage } from '../engine/dice';
 import {
@@ -2042,89 +2044,69 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
   const isRangedInherentlyMwk = (eq.rangedWeaponEnhancement || 0) > 0 || eq.rangedWeaponMaterial === 'adamantine';
   const isRangedMwk = isRangedInherentlyMwk || !!eq.rangedWeaponMasterwork;
 
+  // Unified Combat Profiles for Equipped Weapons
+  const combatContext: EquippedWeaponCombatContext = {
+    bab,
+    classesData,
+    effectiveStrMod,
+    effectiveDexMod,
+    totalLevel,
+    tcState,
+    extraAttacks: (generalTcMods.extraAttacks || 0)
+  };
+
   // Resolve Primary Weapon & Special Qualities
   const hasPrimary = Boolean(eq.primaryWeapon && eq.primaryWeapon !== 'none');
+  const primaryProfile = calculateEquippedWeaponCombatProfile(character, 'primaryWeapon', weaponsData, customWeapons, combatContext);
+  const primaryWpnObj = primaryProfile?.weapon || null;
+  const primaryHasKeen = primaryProfile?.hasKeen || false;
+  const primaryTotalAtk = primaryProfile?.totalAtk || 0;
+  const primaryThreat = primaryProfile?.threatMin || 20;
+  const primaryDmgVal = primaryProfile?.dmgVal || 0;
+  const primaryDamageDisplay = primaryProfile?.damageDisplay || '';
+  const primaryDamageFormula = primaryProfile?.damageFormula || '';
+  const primaryRollOptions = primaryProfile?.rollOptions || [];
+  const primaryBaneAtk = primaryProfile?.baneAtk || null;
+  const primaryCritInfo = primaryProfile?.critInfo || null;
   const primaryQualities = eq.primaryWeaponQualities || [];
-  const primaryWpnObj = hasPrimary ? resolveEquippedWeapon({ ...character, equipment: eq }, 'primaryWeapon', weaponsData, customWeapons) : null;
-  const primaryBaneTarget = eq.primaryWeaponBaneTarget || primaryWpnObj?.baneTarget;
-  const primarySpecialDmg = getWeaponSpecialDamage(primaryQualities, primaryBaneTarget);
-  const primaryHasKeen = hasKeenQuality(primaryQualities);
-  const primaryHasSpeed = hasSpeedQuality(primaryQualities);
-  const primaryThreat = primaryWpnObj ? (primaryHasKeen ? calculateKeenThreat(primaryWpnObj.threat) : primaryWpnObj.threat) : 20;
-  const primaryTacticalMods = primaryWpnObj ? calculateTacticalCombatModifiers(tcState, primaryWpnObj, false, false, character.activeBuffs) : null;
-  const primaryFeatBonuses = primaryWpnObj ? calculateFeatCombatBonuses(character, primaryWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const primaryEnhancement = eq.primaryWeaponEnhancement || 0;
-  const primaryEffectiveAtkEnh = getWeaponEffectiveAttackEnhancement(primaryWpnObj?.material || eq.primaryWeaponMaterial, primaryEnhancement, isPrimaryMwk || Boolean(primaryWpnObj?.isMasterwork));
-  const primaryMatDmgMod = getWeaponMaterialDamageMod(primaryWpnObj?.material || eq.primaryWeaponMaterial);
-  const primaryTotalAtk = primaryWpnObj ? (bab + effectiveStrMod + primaryEffectiveAtkEnh + primaryFeatBonuses.attackBonus + (primaryTacticalMods?.attackMod || 0)) : 0;
-  const primaryStrDmg = (isTwoHandedWeapon(primaryWpnObj) && effectiveStrMod > 0) ? Math.floor(effectiveStrMod * 1.5) : effectiveStrMod;
-  const primaryDmgVal = primaryWpnObj ? (primaryStrDmg + primaryEnhancement + primaryFeatBonuses.damageBonus + (primaryTacticalMods?.damageMod || 0) + primaryMatDmgMod) : 0;
-  const primaryDmgStr = primaryDmgVal >= 0 ? `+${primaryDmgVal}` : `${primaryDmgVal}`;
-  const primaryBaseDmgFormula = primaryWpnObj ? `${primaryWpnObj.damageM}${primaryDmgVal !== 0 ? primaryDmgStr : ''}` : '';
-  const primaryDamageDisplay = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceString}`;
-  const primaryRollDamageFormula = `${primaryBaseDmgFormula}${primarySpecialDmg.damageDiceFormula}`;
-  const primaryDamageFormula = primaryRollDamageFormula;
-  const primaryRollOptions = primaryWpnObj ? getWeaponRollOptions(primaryWpnObj, primaryBaseDmgFormula, primaryDmgVal, primaryTotalAtk, primaryQualities, primaryBaneTarget) : [];
-  const primaryBaneAtk = primarySpecialDmg.hasBane && primaryWpnObj ? getBaneAttackOption(primaryTotalAtk, primaryWpnObj.name, primaryBaneTarget) : null;
-  const primaryCritInfo = primaryWpnObj ? calculateCritDamagePools(primaryWpnObj, primaryDmgVal, primaryQualities, primaryBaneTarget) : null;
-  const primaryFullAttackSeq = primaryWpnObj ? generateFullAttackSequence(
-    bab,
-    effectiveStrMod + primaryEffectiveAtkEnh + primaryFeatBonuses.attackBonus + (primaryTacticalMods?.attackMod || 0),
-    tcState.haste || (generalTcMods.extraAttacks || 0) > 0,
-    tcState.flurryOfBlows,
-    tcState.whirlingFrenzy,
-    primaryHasSpeed
-  ) : [];
+  const primaryFeatBonuses = { attackBonus: primaryProfile?.featAtkBonus || 0, damageBonus: primaryProfile?.featDmgBonus || 0 };
+  const primarySpecialDmg = primaryProfile?.specialDmg || { summaryLabels: [], hasBane: false, damageDiceString: '', damageDiceFormula: '' };
+  const primaryHasSpeed = primaryProfile?.hasSpeed || false;
 
   // Resolve Secondary Weapon & Special Qualities
-  const hasSecondary = eq.secondaryWeapon && eq.secondaryWeapon !== 'none';
+  const hasSecondary = Boolean(eq.secondaryWeapon && eq.secondaryWeapon !== 'none');
+  const secondaryProfile = calculateEquippedWeaponCombatProfile(character, 'secondaryWeapon', weaponsData, customWeapons, combatContext);
+  const secondaryWpnObj = secondaryProfile?.weapon || null;
+  const secondaryHasKeen = secondaryProfile?.hasKeen || false;
+  const secondaryTotalAtk = secondaryProfile?.totalAtk || 0;
+  const secondaryThreat = secondaryProfile?.threatMin || 20;
+  const secondaryDmgVal = secondaryProfile?.dmgVal || 0;
+  const secondaryDamageDisplay = secondaryProfile?.damageDisplay || '';
+  const secondaryDamageFormula = secondaryProfile?.damageFormula || '';
+  const secondaryRollOptions = secondaryProfile?.rollOptions || [];
+  const secondaryBaneAtk = secondaryProfile?.baneAtk || null;
+  const secondaryCritInfo = secondaryProfile?.critInfo || null;
   const secondaryQualities = eq.secondaryWeaponQualities || [];
-  const secondaryWpnObj = hasSecondary ? resolveEquippedWeapon({ ...character, equipment: eq }, 'secondaryWeapon', weaponsData, customWeapons) : null;
-  const secondaryBaneTarget = eq.secondaryWeaponBaneTarget || secondaryWpnObj?.baneTarget;
-  const secondarySpecialDmg = getWeaponSpecialDamage(secondaryQualities, secondaryBaneTarget);
-  const secondaryHasKeen = hasKeenQuality(secondaryQualities);
-  const secondaryHasSpeed = hasSpeedQuality(secondaryQualities);
-  const secondaryThreat = secondaryWpnObj ? (secondaryHasKeen ? calculateKeenThreat(secondaryWpnObj.threat) : secondaryWpnObj.threat) : 20;
-  const secondaryTacticalMods = secondaryWpnObj ? calculateTacticalCombatModifiers(tcState, secondaryWpnObj, true, false, character.activeBuffs) : null;
-  const secondaryFeatBonuses = secondaryWpnObj ? calculateFeatCombatBonuses(character, secondaryWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const secondaryEnhancement = eq.secondaryWeaponEnhancement || 0;
-  const secondaryEffectiveAtkEnh = getWeaponEffectiveAttackEnhancement(secondaryWpnObj?.material || eq.secondaryWeaponMaterial, secondaryEnhancement, isSecondaryMwk || Boolean(secondaryWpnObj?.isMasterwork));
-  const secondaryMatDmgMod = getWeaponMaterialDamageMod(secondaryWpnObj?.material || eq.secondaryWeaponMaterial);
-  const secondaryTotalAtk = secondaryWpnObj ? (bab + effectiveStrMod + secondaryEffectiveAtkEnh + secondaryFeatBonuses.attackBonus + (secondaryTacticalMods?.attackMod || 0)) : 0;
-  const secondaryStrDmg = effectiveStrMod < 0 ? effectiveStrMod : Math.floor(effectiveStrMod / 2);
-  const secondaryDmgVal = secondaryWpnObj ? (secondaryStrDmg + secondaryEnhancement + secondaryFeatBonuses.damageBonus + (secondaryTacticalMods?.damageMod || 0) + secondaryMatDmgMod) : 0;
-  const secondaryBaseDmgFormula = secondaryWpnObj ? `${secondaryWpnObj.damageM}${secondaryDmgVal >= 0 ? `+${secondaryDmgVal}` : secondaryDmgVal}` : '';
-  const secondaryDamageDisplay = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceString}`;
-  const secondaryRollDamageFormula = `${secondaryBaseDmgFormula}${secondarySpecialDmg.damageDiceFormula}`;
-  const secondaryDamageFormula = secondaryRollDamageFormula;
-  const secondaryRollOptions = secondaryWpnObj ? getWeaponRollOptions(secondaryWpnObj, secondaryBaseDmgFormula, secondaryDmgVal, secondaryTotalAtk, secondaryQualities, secondaryBaneTarget) : [];
-  const secondaryBaneAtk = secondarySpecialDmg.hasBane && secondaryWpnObj ? getBaneAttackOption(secondaryTotalAtk, secondaryWpnObj.name, secondaryBaneTarget) : null;
-  const secondaryCritInfo = secondaryWpnObj ? calculateCritDamagePools(secondaryWpnObj, secondaryDmgVal, secondaryQualities, secondaryBaneTarget) : null;
+  const secondarySpecialDmg = secondaryProfile?.specialDmg || { summaryLabels: [], hasBane: false, damageDiceString: '', damageDiceFormula: '' };
 
   // Resolve Ranged Weapon & Special Qualities
-  const hasRanged = eq.rangedWeapon && eq.rangedWeapon !== 'none';
+  const hasRanged = Boolean(eq.rangedWeapon && eq.rangedWeapon !== 'none');
+  const rangedProfile = calculateEquippedWeaponCombatProfile(character, 'rangedWeapon', weaponsData, customWeapons, combatContext);
+  const rangedWpnObj = rangedProfile?.weapon || null;
+  const rangedHasKeen = rangedProfile?.hasKeen || false;
+  const rangedTotalAtk = rangedProfile?.totalAtk || 0;
+  const rangedThreat = rangedProfile?.threatMin || 20;
+  const rangedDmgVal = rangedProfile?.dmgVal || 0;
+  const rangedDamageDisplay = rangedProfile?.damageDisplay || '';
+  const rangedDamageFormula = rangedProfile?.damageFormula || '';
+  const rangedRollOptions = rangedProfile?.rollOptions || [];
+  const rangedBaneAtk = rangedProfile?.baneAtk || null;
+  const rangedCritInfo = rangedProfile?.critInfo || null;
   const rangedQualities = eq.rangedWeaponQualities || [];
-  const rangedWpnObj = hasRanged ? resolveEquippedWeapon({ ...character, equipment: eq }, 'rangedWeapon', weaponsData, customWeapons) : null;
-  const rangedBaneTarget = eq.rangedWeaponBaneTarget || rangedWpnObj?.baneTarget;
-  const rangedSpecialDmg = getWeaponSpecialDamage(rangedQualities, rangedBaneTarget);
-  const rangedHasKeen = hasKeenQuality(rangedQualities);
-  const rangedHasSpeed = hasSpeedQuality(rangedQualities);
-  const rangedThreat = rangedWpnObj ? (rangedHasKeen ? calculateKeenThreat(rangedWpnObj.threat) : rangedWpnObj.threat) : 20;
-  const rangedTacticalMods = rangedWpnObj ? calculateTacticalCombatModifiers(tcState, rangedWpnObj, false, true, character.activeBuffs) : null;
-  const rangedFeatBonuses = rangedWpnObj ? calculateFeatCombatBonuses(character, rangedWpnObj) : { attackBonus: 0, damageBonus: 0 };
   const rangedEnhancement = eq.rangedWeaponEnhancement || 0;
-  const rangedEffectiveAtkEnh = getWeaponEffectiveAttackEnhancement(rangedWpnObj?.material || eq.rangedWeaponMaterial, rangedEnhancement, isRangedMwk || Boolean(rangedWpnObj?.isMasterwork));
-  const rangedMatDmgMod = getWeaponMaterialDamageMod(rangedWpnObj?.material || eq.rangedWeaponMaterial);
-  const rangedTotalAtk = rangedWpnObj ? (bab + effectiveDexMod + rangedEffectiveAtkEnh + rangedFeatBonuses.attackBonus + (rangedTacticalMods?.attackMod || 0)) : 0;
-  const rangedDmgVal = rangedWpnObj ? (rangedEnhancement + rangedFeatBonuses.damageBonus + (rangedTacticalMods?.damageMod || 0) + rangedMatDmgMod) : 0;
-  const rangedDmgStr = rangedDmgVal > 0 ? `+${rangedDmgVal}` : (rangedDmgVal < 0 ? `${rangedDmgVal}` : '');
-  const rangedBaseDmgFormula = rangedWpnObj ? `${rangedWpnObj.damageM}${rangedDmgStr}` : '';
-  const rangedDamageDisplay = `${rangedBaseDmgFormula}${rangedSpecialDmg.damageDiceString}`;
-  const rangedRollDamageFormula = `${rangedBaseDmgFormula}${rangedSpecialDmg.damageDiceFormula}`;
-  const rangedDamageFormula = rangedRollDamageFormula;
-  const rangedRollOptions = rangedWpnObj ? getWeaponRollOptions(rangedWpnObj, rangedBaseDmgFormula, rangedDmgVal, rangedTotalAtk, rangedQualities, rangedBaneTarget) : [];
-  const rangedBaneAtk = rangedSpecialDmg.hasBane && rangedWpnObj ? getBaneAttackOption(rangedTotalAtk, rangedWpnObj.name, rangedBaneTarget) : null;
-  const rangedCritInfo = rangedWpnObj ? calculateCritDamagePools(rangedWpnObj, rangedDmgVal, rangedQualities, rangedBaneTarget) : null;
+  const rangedSpecialDmg = rangedProfile?.specialDmg || { summaryLabels: [], hasBane: false, damageDiceString: '', damageDiceFormula: '' };
 
   // Inventory Actions
   const handleAddInventoryItem = (e: React.FormEvent) => {

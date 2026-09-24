@@ -1,5 +1,27 @@
-import { CharacterState, TacticalCombatState, ActiveCombatBuff, WeaponData, RaceData, TemplateData } from '../types/character';
+import { CharacterState, TacticalCombatState, ActiveCombatBuff, WeaponData, RaceData, TemplateData, ClassData, Equipment, ConditionPenalties } from '../types/character';
 import { hasRacialTrait } from './features';
+import {
+  resolveEquippedWeapon,
+  calculateFeatCombatBonuses,
+  getWeaponEffectiveAttackEnhancement,
+  getWeaponMaterialDamageMod,
+  getWeaponMaterialTraits,
+  getCharacterAmmunition,
+  getMatchingAmmoTypeForWeapon
+} from './equipment';
+import {
+  calculateKeenThreat,
+  hasKeenQuality,
+  hasSpeedQuality,
+  getWeaponSpecialDamage,
+  getWeaponRollOptions,
+  calculateCritDamagePools,
+  getBaneAttackOption,
+  WeaponRollOption
+} from './magicItems';
+import { calculateBAB, toCanonicalClassId } from './classes';
+import { calculateConditionPenalties } from './conditions';
+import { getAbilityMod } from './stats';
 
 export const STANDARD_SRD_BUFFS: ActiveCombatBuff[] = [
   {
@@ -1083,6 +1105,310 @@ export function generateFullAttackSequence(
       return val >= 0 ? `+${val}` : `${val}`;
     })
     .join('/');
+}
+
+export type EquippedWeaponSlot = 'primaryWeapon' | 'secondaryWeapon' | 'rangedWeapon';
+
+export interface EquippedWeaponCombatContext {
+  bab?: number;
+  classesData?: ClassData[] | Record<string, ClassData>;
+  effectiveStrMod?: number;
+  effectiveDexMod?: number;
+  chaMod?: number;
+  wisMod?: number;
+  totalLevel?: number;
+  tcState?: TacticalCombatState;
+  conditionPenalties?: ConditionPenalties;
+  extraAttacks?: number;
+}
+
+export interface EquippedWeaponCombatBreakdown {
+  bab: number;
+  statAtkBonus: number;
+  effectiveAtkEnh: number;
+  featAtkBonus: number;
+  tacticalAtkMod: number;
+  smiteAtkBonus: number;
+  conditionAtkPenalty: number;
+  strDmgBonus: number;
+  enhancementDmg: number;
+  featDmgBonus: number;
+  tacticalDmgMod: number;
+  smiteDmgBonus: number;
+  conditionDmgPenalty: number;
+  materialDmgMod: number;
+}
+
+export interface EquippedWeaponCombatProfile {
+  slot: EquippedWeaponSlot;
+  label: 'Primary' | 'Off-Hand' | 'Ranged';
+  weapon: WeaponData;
+  isEquipped: boolean;
+  totalAtk: number;
+  attackBonus: number; // SheetViewTab compatibility
+  fullSeq: string;
+  damageStr: string;
+  damageDisplay: string; // EquipmentTab compatibility
+  damageFormula: string;
+  damageBonus: number;
+  dmgVal: number; // EquipmentTab & SheetViewTab compatibility
+  threatMin: number;
+  threat: number; // EquipmentTab compatibility
+  critStr: string;
+  type: string;
+  featAtkBonus: number;
+  featDmgBonus: number;
+  tacticalNote: string;
+  hasKeen: boolean;
+  hasSpeed: boolean;
+  specialDmg: ReturnType<typeof getWeaponSpecialDamage>;
+  qualities: string[];
+  enhancement: number;
+  rollOptions: WeaponRollOption[];
+  critInfo: ReturnType<typeof calculateCritDamagePools> | null;
+  baneAtk: ReturnType<typeof getBaneAttackOption> | null;
+  tacticalMods: TacticalCombatModifiers;
+  breakdown: EquippedWeaponCombatBreakdown;
+}
+
+/**
+ * Calculates a complete, unified combat profile for an equipped weapon slot.
+ * Serves as the single canonical calculation engine for SheetViewTab, EquipmentTab,
+ * roll dialogs, and character stat exports.
+ */
+export function calculateEquippedWeaponCombatProfile(
+  character: CharacterState,
+  slot: EquippedWeaponSlot,
+  weaponsData: WeaponData[] | Record<string, WeaponData> = [],
+  customWeapons?: WeaponData[],
+  context?: EquippedWeaponCombatContext
+): EquippedWeaponCombatProfile | null {
+  const eq: Equipment = (character.equipment || {}) as Equipment;
+  const weaponsList: WeaponData[] = Array.isArray(weaponsData) ? weaponsData : Object.values(weaponsData);
+
+  let equippedId: string | undefined;
+  let label: 'Primary' | 'Off-Hand' | 'Ranged';
+  let qualitiesKey: 'primaryWeaponQualities' | 'secondaryWeaponQualities' | 'rangedWeaponQualities';
+  let baneTargetKey: 'primaryWeaponBaneTarget' | 'secondaryWeaponBaneTarget' | 'rangedWeaponBaneTarget';
+  let enhancementKey: 'primaryWeaponEnhancement' | 'secondaryWeaponEnhancement' | 'rangedWeaponEnhancement';
+  let masterworkKey: 'primaryWeaponMasterwork' | 'secondaryWeaponMasterwork' | 'rangedWeaponMasterwork';
+  let materialKey: 'primaryWeaponMaterial' | 'secondaryWeaponMaterial' | 'rangedWeaponMaterial';
+  let isOffhand = false;
+
+  if (slot === 'primaryWeapon') {
+    equippedId = eq.primaryWeapon;
+    label = 'Primary';
+    qualitiesKey = 'primaryWeaponQualities';
+    baneTargetKey = 'primaryWeaponBaneTarget';
+    enhancementKey = 'primaryWeaponEnhancement';
+    masterworkKey = 'primaryWeaponMasterwork';
+    materialKey = 'primaryWeaponMaterial';
+  } else if (slot === 'secondaryWeapon') {
+    equippedId = eq.secondaryWeapon;
+    label = 'Off-Hand';
+    qualitiesKey = 'secondaryWeaponQualities';
+    baneTargetKey = 'secondaryWeaponBaneTarget';
+    enhancementKey = 'secondaryWeaponEnhancement';
+    masterworkKey = 'secondaryWeaponMasterwork';
+    materialKey = 'secondaryWeaponMaterial';
+    isOffhand = true;
+  } else {
+    equippedId = eq.rangedWeapon;
+    label = 'Ranged';
+    qualitiesKey = 'rangedWeaponQualities';
+    baneTargetKey = 'rangedWeaponBaneTarget';
+    enhancementKey = 'rangedWeaponEnhancement';
+    masterworkKey = 'rangedWeaponMasterwork';
+    materialKey = 'rangedWeaponMaterial';
+  }
+
+  if (!equippedId || equippedId === 'none') {
+    return null;
+  }
+
+  const weapon = resolveEquippedWeapon(character, slot, weaponsList, customWeapons);
+  const isRanged = slot === 'rangedWeapon' || Boolean(weapon.category?.toLowerCase().includes('ranged'));
+  const isMelee = !isRanged;
+
+  const userQualities = (eq as any)[qualitiesKey];
+  const qualities: string[] = (Array.isArray(userQualities) && userQualities.length > 0)
+    ? userQualities
+    : (weapon.specialQualities || []);
+  const baneTarget: string | undefined = (eq as any)[baneTargetKey] || weapon.baneTarget;
+
+  const specialDmg = getWeaponSpecialDamage(qualities, baneTarget);
+  const hasKeen = hasKeenQuality(qualities);
+  const hasSpeed = hasSpeedQuality(qualities);
+  const threatMin = hasKeen ? calculateKeenThreat(weapon.threat) : (weapon.threat || 20);
+  const critMult = weapon.critMultiplier || 2;
+  const critStr = `${threatMin < 20 ? `${threatMin}-20` : '20'}/x${critMult}${hasKeen ? ' (Keen)' : ''}`;
+
+  const rawClasses = context?.classesData || [];
+  const classesList: ClassData[] = Array.isArray(rawClasses) ? rawClasses : Object.values(rawClasses);
+  const bab = context?.bab !== undefined ? context.bab : calculateBAB(character.levelProgression, classesList);
+  const tcState = context?.tcState || getTacticalCombatState(character, bab);
+  const generalTcMods = calculateTacticalCombatModifiers(tcState, undefined, false, false, character.activeBuffs);
+
+  const totalLevel = context?.totalLevel !== undefined
+    ? context.totalLevel
+    : (character.levelProgression?.length || 1);
+
+  const effectiveStrMod = context?.effectiveStrMod !== undefined
+    ? context.effectiveStrMod
+    : getAbilityMod((character.baseStats?.str ?? 10) + (generalTcMods.strBonus || 0));
+
+  const effectiveDexMod = context?.effectiveDexMod !== undefined
+    ? context.effectiveDexMod
+    : getAbilityMod((character.baseStats?.dex ?? 10) + (generalTcMods.dexBonus || 0));
+
+  const chaMod = context?.chaMod !== undefined
+    ? context.chaMod
+    : getAbilityMod(character.baseStats?.cha ?? 10);
+
+  const wisMod = context?.wisMod !== undefined
+    ? context.wisMod
+    : getAbilityMod(character.baseStats?.wis ?? 10);
+
+  const conditionPenalties = context?.conditionPenalties || calculateConditionPenalties(character.activeConditions || []);
+  const extraAttacks = context?.extraAttacks !== undefined ? context.extraAttacks : (generalTcMods.extraAttacks || 0);
+
+  const featBonuses = calculateFeatCombatBonuses(character, weapon);
+  const wMods = calculateTacticalCombatModifiers(tcState, weapon, isOffhand, isRanged, character.activeBuffs);
+
+  const enh: number = (eq as any)[enhancementKey] ?? weapon.enhancementBonus ?? 0;
+  const isMwk = Boolean(weapon.isMasterwork || (eq as any)[masterworkKey]);
+  const material = (eq as any)[materialKey] || weapon.material;
+  const effectiveAtkEnh = getWeaponEffectiveAttackEnhancement(material, enh, isMwk);
+  const matDmgMod = getWeaponMaterialDamageMod(material);
+
+  const paladinLevel = (character.levelProgression || []).filter(lvl => {
+    const c1 = toCanonicalClassId(lvl.primaryClass || (lvl as any).class || '');
+    const c2 = toCanonicalClassId(lvl.secondaryClass || '');
+    return c1 === 'paladin' || c2 === 'paladin';
+  }).length;
+  const smiteAtkBonus = (tcState.smiteEvil && isMelee) ? Math.max(0, chaMod) : 0;
+  const smiteDmgBonus = (tcState.smiteEvil && isMelee) ? Math.max(1, paladinLevel) : 0;
+
+  const statAtkBonus = isRanged ? effectiveDexMod : effectiveStrMod;
+  const condAtkPenalty = conditionPenalties.attackPenalty + (isRanged ? conditionPenalties.rangedAttackPenalty : conditionPenalties.meleeAttackPenalty);
+
+  const netAtkBonus = statAtkBonus + effectiveAtkEnh + featBonuses.attackBonus + wMods.attackMod + smiteAtkBonus + condAtkPenalty;
+  const totalAtk = bab + netAtkBonus;
+
+  let strDmg = 0;
+  if (!isRanged) {
+    if (isOffhand) {
+      strDmg = effectiveStrMod < 0 ? effectiveStrMod : Math.floor(effectiveStrMod / 2);
+    } else if (isTwoHandedWeapon(weapon) && effectiveStrMod > 0) {
+      strDmg = Math.floor(effectiveStrMod * 1.5);
+    } else {
+      strDmg = effectiveStrMod;
+    }
+  }
+
+  const dmgVal = strDmg + enh + featBonuses.damageBonus + wMods.damageMod + smiteDmgBonus + conditionPenalties.damagePenalty + matDmgMod;
+
+  const signStr = dmgVal > 0 ? `+${dmgVal}` : (dmgVal < 0 ? `${dmgVal}` : (isRanged ? '' : '+0'));
+  const baseDmgStr = `${weapon.damageM}${signStr}`;
+  const damageStr = `${baseDmgStr}${specialDmg.damageDiceString}`;
+  const damageFormula = `${baseDmgStr}${specialDmg.damageDiceFormula}`;
+
+  const hasHaste = tcState.haste || extraAttacks > 0;
+  const fullSeq = generateFullAttackSequence(bab, netAtkBonus, hasHaste, tcState.flurryOfBlows, tcState.whirlingFrenzy, hasSpeed);
+
+  const rollOptions = getWeaponRollOptions(weapon, baseDmgStr, dmgVal, totalAtk, qualities, baneTarget);
+  const baneAtk = specialDmg.hasBane ? getBaneAttackOption(totalAtk, weapon.name, baneTarget) : null;
+  const critInfo = calculateCritDamagePools(weapon, dmgVal, qualities, baneTarget);
+
+  const notes: string[] = [];
+  const matTraits = getWeaponMaterialTraits(material, isMwk);
+  matTraits.forEach(t => notes.push(t));
+  if (hasSpeed) { notes.push('Speed: +1 Extra Atk'); }
+  if (specialDmg.summaryLabels.length > 0) { notes.push(`Magic: ${specialDmg.summaryLabels.join(', ')}`); }
+  if (tcState.whirlingFrenzy) {
+    notes.push(isRanged ? 'Whirling Frenzy: -2 Flurry, +1 Extra Atk' : 'Whirling Frenzy: +2 Str, -2 Flurry, +1 Extra Atk');
+  } else if (tcState.rage && !isRanged) {
+    notes.push('Barbarian Rage: +2 Str');
+  }
+  if (tcState.flurryOfBlows && !tcState.whirlingFrenzy) { notes.push('Flurry: -2 Atk, +1 Extra Atk'); }
+  if (tcState.haste) { notes.push('Haste: +1 Atk, +1 Extra Atk'); }
+  if (tcState.smiteEvil && isMelee) { notes.push(`Smite Evil: +${smiteAtkBonus} Atk, +${smiteDmgBonus} Dmg vs Evil`); }
+  if (tcState.stunningFist && !isRanged) { notes.push(`Stunning Fist: Fort DC ${10 + Math.floor(totalLevel / 2) + wisMod}`); }
+  if (tcState.powerAttack > 0 && !isRanged) {
+    const is2H = isTwoHandedWeapon(weapon);
+    if (isOffhand) {
+      notes.push(`Power Attack: -${tcState.powerAttack} Atk`);
+    } else {
+      notes.push(`Power Attack (-${tcState.powerAttack}): +${is2H ? tcState.powerAttack * 2 : tcState.powerAttack} Dmg`);
+    }
+  }
+  if (tcState.combatExpertise > 0) { notes.push(`Combat Exp: -${tcState.combatExpertise} Atk`); }
+  if (tcState.fightingDefensively) { notes.push('Fight Defensively: -4 Atk'); }
+  if (conditionPenalties.attackPenalty !== 0) { notes.push(`Condition: ${conditionPenalties.attackPenalty} Atk`); }
+  if (!isRanged && conditionPenalties.meleeAttackPenalty !== 0) { notes.push(`Prone: ${conditionPenalties.meleeAttackPenalty} Melee Atk`); }
+
+  if (isRanged) {
+    const activeAmmo = (() => {
+      if (eq.equippedAmmoId) {
+        return (character.inventory || []).find(i => i.id === eq.equippedAmmoId);
+      }
+      const ammos = getCharacterAmmunition(character);
+      const matchType = getMatchingAmmoTypeForWeapon(weapon.name);
+      return ammos.find(a => a.ammoType === matchType && (a.quantity || 0) > 0) || ammos.find(a => (a.quantity || 0) > 0);
+    })();
+    if (activeAmmo) {
+      notes.push(`Ammo: ${activeAmmo.name} [${activeAmmo.quantity || 0}]`);
+    }
+  }
+
+  const tacticalNote = notes.length > 0 ? `(${notes.join(' • ')})` : '';
+
+  return {
+    slot,
+    label,
+    weapon: { ...weapon, threat: threatMin },
+    isEquipped: true,
+    totalAtk,
+    attackBonus: totalAtk,
+    fullSeq,
+    damageStr,
+    damageDisplay: damageStr,
+    damageFormula,
+    damageBonus: dmgVal,
+    dmgVal,
+    threatMin,
+    threat: threatMin,
+    critStr,
+    type: weapon.type || (isRanged ? 'Piercing' : 'Slashing'),
+    featAtkBonus: featBonuses.attackBonus,
+    featDmgBonus: featBonuses.damageBonus,
+    tacticalNote,
+    hasKeen,
+    hasSpeed,
+    specialDmg,
+    qualities,
+    enhancement: enh,
+    rollOptions,
+    critInfo,
+    baneAtk,
+    tacticalMods: wMods,
+    breakdown: {
+      bab,
+      statAtkBonus,
+      effectiveAtkEnh,
+      featAtkBonus: featBonuses.attackBonus,
+      tacticalAtkMod: wMods.attackMod,
+      smiteAtkBonus,
+      conditionAtkPenalty: condAtkPenalty,
+      strDmgBonus: strDmg,
+      enhancementDmg: enh,
+      featDmgBonus: featBonuses.damageBonus,
+      tacticalDmgMod: wMods.damageMod,
+      smiteDmgBonus,
+      conditionDmgPenalty: conditionPenalties.damagePenalty,
+      materialDmgMod: matDmgMod
+    }
+  };
 }
 
 /**
