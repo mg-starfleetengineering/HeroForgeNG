@@ -8,7 +8,8 @@ import {
   TacticalCombatState
 } from '../types/character';
 import { getAbilityMod, parseVal } from './stats';
-import { getSizeGrappleModifier } from './combat';
+import { getSizeGrappleModifier, getSizeAttackModifier } from './combat';
+export { getSizeAttackModifier };
 
 export const DEFAULT_CUSTOM_WILDSHAPE: CustomWildShapeData = {
   name: 'Custom Beast Form',
@@ -243,24 +244,6 @@ export function resolveActiveWildShape(
   return found || null;
 }
 
-/**
- * Returns D&D 3.5e Size Attack Modifier:
- * Fine +8, Diminutive +4, Tiny +2, Small +1, Medium 0, Large -1, Huge -2, Gargantuan -4, Colossal -8
- */
-export function getSizeAttackModifier(sizeStr?: string): number {
-  if (!sizeStr) return 0;
-  const s = sizeStr.trim().toLowerCase();
-  if (s.startsWith('fine') || s === 'f') return 8;
-  if (s.startsWith('dim') || s === 'd') return 4;
-  if (s.startsWith('tiny') || s === 't') return 2;
-  if (s.startsWith('small') || s === 's') return 1;
-  if (s.startsWith('med') || s === 'm') return 0;
-  if (s.startsWith('large') || s === 'l') return -1;
-  if (s.startsWith('huge') || s === 'h') return -2;
-  if (s.startsWith('garg') || s === 'g') return -4;
-  if (s.startsWith('col') || s === 'c') return -8;
-  return 0;
-}
 
 /**
  * Returns D&D 3.5e Size Armor Class Modifier:

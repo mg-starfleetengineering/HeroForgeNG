@@ -12895,7 +12895,7 @@
     "refFactor": 0.5,
     "willFactor": 0.34,
     "bonusCaster": null,
-    "source": "PHB",
+    "source": "DrComp",
     "proficiencies": {
       "lightArmor": true,
       "mediumArmor": true,
@@ -12991,7 +12991,7 @@
     "refFactor": 0.5,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "source": "PHB",
+    "source": "DrComp",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -15912,7 +15912,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "source": "PHB",
+    "source": "DrComp",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -16319,7 +16319,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "source": "PHB",
+    "source": "DrComp",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,
@@ -27619,7 +27619,7 @@
     "refFactor": 0.34,
     "willFactor": 0.5,
     "bonusCaster": 0,
-    "source": "PHB",
+    "source": "DrComp",
     "proficiencies": {
       "lightArmor": false,
       "mediumArmor": false,

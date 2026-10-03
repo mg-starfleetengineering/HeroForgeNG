@@ -525,6 +525,21 @@ export function isLightWeapon(weapon?: WeaponData): boolean {
   );
 }
 
+/**
+ * Checks if a weapon can be used with Weapon Finesse in D&D 3.5e.
+ * All light weapons, plus rapier, whip, and spiked chain can be finessed.
+ */
+export function isFinesseWeapon(weapon?: WeaponData): boolean {
+  if (!weapon) return false;
+  if (isLightWeapon(weapon)) return true;
+  const name = (weapon.name || '').toLowerCase();
+  return (
+    name.includes('rapier') ||
+    name.includes('whip') ||
+    name.includes('spiked chain')
+  );
+}
+
 export interface ActiveCombatModifier {
   id: string;
   name: string;
@@ -1120,11 +1135,14 @@ export interface EquippedWeaponCombatContext {
   tcState?: TacticalCombatState;
   conditionPenalties?: ConditionPenalties;
   extraAttacks?: number;
+  sizeAtkMod?: number;
+  hasWeaponFinesse?: boolean;
 }
 
 export interface EquippedWeaponCombatBreakdown {
   bab: number;
   statAtkBonus: number;
+  sizeAtkMod?: number;
   effectiveAtkEnh: number;
   featAtkBonus: number;
   tacticalAtkMod: number;
@@ -1289,10 +1307,17 @@ export function calculateEquippedWeaponCombatProfile(
   const smiteAtkBonus = (tcState.smiteEvil && isMelee) ? Math.max(0, chaMod) : 0;
   const smiteDmgBonus = (tcState.smiteEvil && isMelee) ? Math.max(1, paladinLevel) : 0;
 
-  const statAtkBonus = isRanged ? effectiveDexMod : effectiveStrMod;
+  const hasWeaponFinesse = context?.hasWeaponFinesse !== undefined
+    ? context.hasWeaponFinesse
+    : (character.selectedFeatEntities || []).some(f => f.featId === 'weapon_finesse' || (f.notes && f.notes.toLowerCase().includes('weapon finesse')));
+
+  const sizeAtkMod = context?.sizeAtkMod !== undefined ? context.sizeAtkMod : 0;
+
+  const isFinessable = isMelee && hasWeaponFinesse && isFinesseWeapon(weapon) && effectiveDexMod > effectiveStrMod;
+  const statAtkBonus = isRanged ? effectiveDexMod : (isFinessable ? effectiveDexMod : effectiveStrMod);
   const condAtkPenalty = conditionPenalties.attackPenalty + (isRanged ? conditionPenalties.rangedAttackPenalty : conditionPenalties.meleeAttackPenalty);
 
-  const netAtkBonus = statAtkBonus + effectiveAtkEnh + featBonuses.attackBonus + wMods.attackMod + smiteAtkBonus + condAtkPenalty;
+  const netAtkBonus = statAtkBonus + effectiveAtkEnh + featBonuses.attackBonus + wMods.attackMod + smiteAtkBonus + condAtkPenalty + sizeAtkMod;
   const totalAtk = bab + netAtkBonus;
 
   let strDmg = 0;
@@ -1344,6 +1369,7 @@ export function calculateEquippedWeaponCombatProfile(
   }
   if (tcState.combatExpertise > 0) { notes.push(`Combat Exp: -${tcState.combatExpertise} Atk`); }
   if (tcState.fightingDefensively) { notes.push('Fight Defensively: -4 Atk'); }
+  if (isFinessable) { notes.push('Weapon Finesse'); }
   if (conditionPenalties.attackPenalty !== 0) { notes.push(`Condition: ${conditionPenalties.attackPenalty} Atk`); }
   if (!isRanged && conditionPenalties.meleeAttackPenalty !== 0) { notes.push(`Prone: ${conditionPenalties.meleeAttackPenalty} Melee Atk`); }
 
@@ -1395,6 +1421,7 @@ export function calculateEquippedWeaponCombatProfile(
     breakdown: {
       bab,
       statAtkBonus,
+      sizeAtkMod,
       effectiveAtkEnh,
       featAtkBonus: featBonuses.attackBonus,
       tacticalAtkMod: wMods.attackMod,
@@ -1409,6 +1436,25 @@ export function calculateEquippedWeaponCombatProfile(
       materialDmgMod: matDmgMod
     }
   };
+}
+
+/**
+ * Returns D&D 3.5e Size Attack Modifier:
+ * Fine +8, Diminutive +4, Tiny +2, Small +1, Medium 0, Large -1, Huge -2, Gargantuan -4, Colossal -8
+ */
+export function getSizeAttackModifier(sizeStr?: string): number {
+  if (!sizeStr) return 0;
+  const s = sizeStr.trim().toLowerCase();
+  if (s.startsWith('fine') || s === 'f') return 8;
+  if (s.startsWith('dim') || s === 'd') return 4;
+  if (s.startsWith('tiny') || s === 't') return 2;
+  if (s.startsWith('small') || s === 's') return 1;
+  if (s.startsWith('med') || s === 'm') return 0;
+  if (s.startsWith('large') || s === 'l') return -1;
+  if (s.startsWith('huge') || s === 'h') return -2;
+  if (s.startsWith('garg') || s === 'g') return -4;
+  if (s.startsWith('col') || s === 'c') return -8;
+  return 0;
 }
 
 /**

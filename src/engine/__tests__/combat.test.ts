@@ -4,11 +4,13 @@ import {
   getTacticalCombatState,
   isTwoHandedWeapon,
   isLightWeapon,
+  isFinesseWeapon,
   calculateTacticalCombatModifiers,
   calculateTacticalCombat,
   calculateCombatStats,
   generateFullAttackSequence,
   getSizeGrappleModifier,
+  getSizeAttackModifier,
   calculateGrappleModifier,
   getGrappleDamageDice,
   getGrappleAttackEntry,
@@ -865,6 +867,39 @@ describe('Tactical Combat Engine', () => {
           critMultiplier: 2,
           weight: 4,
           type: 'Slashing'
+        },
+        rapier: {
+          id: 'rapier',
+          name: 'Rapier',
+          category: 'Martial One-Handed',
+          size: 'M',
+          damageM: '1d6',
+          threat: 18,
+          critMultiplier: 2,
+          weight: 2,
+          type: 'Piercing'
+        },
+        whip: {
+          id: 'whip',
+          name: 'Whip',
+          category: 'Exotic One-Handed',
+          size: 'M',
+          damageM: '1d3',
+          threat: 20,
+          critMultiplier: 2,
+          weight: 2,
+          type: 'Slashing'
+        },
+        spiked_chain: {
+          id: 'spiked_chain',
+          name: 'Spiked Chain',
+          category: 'Exotic Two-Handed',
+          size: 'M',
+          damageM: '2d4',
+          threat: 20,
+          critMultiplier: 2,
+          weight: 10,
+          type: 'Piercing'
         }
       };
 
@@ -1011,6 +1046,217 @@ describe('Tactical Combat Engine', () => {
         // Damage: Str 2 + Smite (+5 Paladin level) = 7
         expect(profile.damageBonus).toBe(7);
         expect(profile.tacticalNote).toContain('Smite Evil: +3 Atk, +5 Dmg vs Evil');
+      });
+
+      it('applies creature size attack modifier (+1 for Small Halfling, -1 for Large creature)', () => {
+        // 1. Small Halfling (+1 size attack modifier)
+        const halfling: CharacterState = {
+          name: 'Halfling Rogue',
+          baseStats: { str: 10, dex: 14, con: 12, int: 10, wis: 10, cha: 10 },
+          equipment: { primaryWeapon: 'dagger' }
+        } as any;
+
+        const halflingProfile = calculateEquippedWeaponCombatProfile(halfling, 'primaryWeapon', weaponsDict, [], {
+          bab: 1,
+          effectiveStrMod: 0,
+          effectiveDexMod: 2,
+          sizeAtkMod: getSizeAttackModifier('Small') // +1
+        });
+
+        expect(halflingProfile).not.toBeNull();
+        if (halflingProfile) {
+          // BAB 1 + Str 0 + Size 1 = 2
+          expect(halflingProfile.totalAtk).toBe(2);
+          expect(halflingProfile.fullSeq).toBe('+2');
+          expect(halflingProfile.breakdown.sizeAtkMod).toBe(1);
+          expect(halflingProfile.damageBonus).toBe(0);
+        }
+
+        // 2. Large Creature (-1 size attack modifier)
+        const largeWarrior: CharacterState = {
+          name: 'Ogre Barbarian',
+          baseStats: { str: 20, dex: 10, con: 16, int: 8, wis: 10, cha: 8 },
+          equipment: { primaryWeapon: 'greatsword' }
+        } as any;
+
+        const largeProfile = calculateEquippedWeaponCombatProfile(largeWarrior, 'primaryWeapon', weaponsDict, [], {
+          bab: 4,
+          effectiveStrMod: 5,
+          sizeAtkMod: getSizeAttackModifier('Large') // -1
+        });
+
+        expect(largeProfile).not.toBeNull();
+        if (largeProfile) {
+          // BAB 4 + Str 5 + Size (-1) = 8
+          expect(largeProfile.totalAtk).toBe(8);
+          expect(largeProfile.fullSeq).toBe('+8');
+          expect(largeProfile.breakdown.sizeAtkMod).toBe(-1);
+          // 2H Str: floor(5 * 1.5) = 7
+          expect(largeProfile.damageBonus).toBe(7);
+        }
+
+        // 3. Off-hand and Ranged weapons with size modifiers
+        const smallRanger: CharacterState = {
+          name: 'Small Archer',
+          baseStats: { str: 10, dex: 16, con: 12, int: 10, wis: 10, cha: 10 },
+          equipment: {
+            secondaryWeapon: 'dagger',
+            rangedWeapon: 'longbow'
+          }
+        } as any;
+
+        const rangedProfile = calculateEquippedWeaponCombatProfile(smallRanger, 'rangedWeapon', weaponsDict, [], {
+          bab: 2,
+          effectiveDexMod: 3,
+          sizeAtkMod: getSizeAttackModifier('Small') // +1
+        });
+        expect(rangedProfile).not.toBeNull();
+        // BAB 2 + Dex 3 + Size 1 = 6
+        expect(rangedProfile?.totalAtk).toBe(6);
+        expect(rangedProfile?.fullSeq).toBe('+6');
+
+        const offhandProfile = calculateEquippedWeaponCombatProfile(smallRanger, 'secondaryWeapon', weaponsDict, [], {
+          bab: 2,
+          effectiveStrMod: 0,
+          sizeAtkMod: getSizeAttackModifier('Small') // +1
+        });
+        expect(offhandProfile).not.toBeNull();
+        // BAB 2 + Str 0 + Size 1 = 3
+        expect(offhandProfile?.totalAtk).toBe(3);
+        expect(offhandProfile?.fullSeq).toBe('+3');
+      });
+
+      it('applies Weapon Finesse for finesse melee weapons (Dex to attack, Str to damage)', () => {
+        // Rogue with Dex 18 (+4) and Str 10 (+0) wielding Rapier with Weapon Finesse
+        const rogueRapier: CharacterState = {
+          name: 'Finesse Rogue',
+          baseStats: { str: 10, dex: 18, con: 12, int: 14, wis: 10, cha: 10 },
+          equipment: { primaryWeapon: 'rapier' },
+          selectedFeatEntities: [
+            { featId: 'weapon_finesse', notes: 'Weapon Finesse' }
+          ]
+        } as any;
+
+        const rapierProfile = calculateEquippedWeaponCombatProfile(rogueRapier, 'primaryWeapon', weaponsDict, [], {
+          bab: 3,
+          effectiveStrMod: 0,
+          effectiveDexMod: 4
+        });
+
+        expect(rapierProfile).not.toBeNull();
+        if (rapierProfile) {
+          // BAB 3 + Dex 4 (Weapon Finesse) = 7
+          expect(rapierProfile.totalAtk).toBe(7);
+          expect(rapierProfile.fullSeq).toBe('+7');
+          // Damage continues to use Str (+0)
+          expect(rapierProfile.damageBonus).toBe(0);
+          expect(rapierProfile.damageStr).toBe('1d6+0');
+          expect(rapierProfile.tacticalNote).toContain('Weapon Finesse');
+        }
+
+        // Rogue wielding Dagger with Weapon Finesse
+        const rogueDagger: CharacterState = {
+          name: 'Dagger Rogue',
+          baseStats: { str: 10, dex: 18, con: 12, int: 14, wis: 10, cha: 10 },
+          equipment: { primaryWeapon: 'dagger' },
+          selectedFeatEntities: [
+            { featId: 'weapon_finesse', notes: 'Weapon Finesse' }
+          ]
+        } as any;
+
+        const daggerProfile = calculateEquippedWeaponCombatProfile(rogueDagger, 'primaryWeapon', weaponsDict, [], {
+          bab: 3,
+          effectiveStrMod: 0,
+          effectiveDexMod: 4
+        });
+
+        expect(daggerProfile).not.toBeNull();
+        if (daggerProfile) {
+          // BAB 3 + Dex 4 = 7
+          expect(daggerProfile.totalAtk).toBe(7);
+          expect(daggerProfile.damageBonus).toBe(0);
+          expect(daggerProfile.damageStr).toBe('1d4+0');
+        }
+
+        // Rogue wielding non-finesse weapon (Longsword) cannot finesse
+        const rogueLongsword: CharacterState = {
+          name: 'Non-Finesse Rogue',
+          baseStats: { str: 10, dex: 18, con: 12, int: 14, wis: 10, cha: 10 },
+          equipment: { primaryWeapon: 'longsword' },
+          selectedFeatEntities: [
+            { featId: 'weapon_finesse', notes: 'Weapon Finesse' }
+          ]
+        } as any;
+
+        const longswordProfile = calculateEquippedWeaponCombatProfile(rogueLongsword, 'primaryWeapon', weaponsDict, [], {
+          bab: 3,
+          effectiveStrMod: 0,
+          effectiveDexMod: 4
+        });
+
+        expect(longswordProfile).not.toBeNull();
+        if (longswordProfile) {
+          // Longsword cannot be finessed: BAB 3 + Str 0 = 3
+          expect(longswordProfile.totalAtk).toBe(3);
+          expect(longswordProfile.damageBonus).toBe(0);
+        }
+
+        // Fighter with higher Str than Dex wielding Dagger keeps Str
+        const strongFighter: CharacterState = {
+          name: 'Strong Fighter',
+          baseStats: { str: 18, dex: 12, con: 14, int: 10, wis: 10, cha: 10 },
+          equipment: { primaryWeapon: 'dagger' },
+          selectedFeatEntities: [
+            { featId: 'weapon_finesse', notes: 'Weapon Finesse' }
+          ]
+        } as any;
+
+        const fighterProfile = calculateEquippedWeaponCombatProfile(strongFighter, 'primaryWeapon', weaponsDict, [], {
+          bab: 1,
+          effectiveStrMod: 4,
+          effectiveDexMod: 1
+        });
+
+        expect(fighterProfile).not.toBeNull();
+        if (fighterProfile) {
+          // Str > Dex: BAB 1 + Str 4 = 5
+          expect(fighterProfile.totalAtk).toBe(5);
+          expect(fighterProfile.damageBonus).toBe(4);
+        }
+      });
+    });
+
+    describe('isFinesseWeapon', () => {
+      it('returns true for light weapons, rapier, whip, and spiked chain', () => {
+        expect(isFinesseWeapon({ name: 'Dagger', category: 'Simple Light', size: 'L' } as WeaponData)).toBe(true);
+        expect(isFinesseWeapon({ name: 'Short sword', category: 'Martial Light', size: 'L' } as WeaponData)).toBe(true);
+        expect(isFinesseWeapon({ name: 'Rapier', category: 'Martial One-Handed', size: 'M' } as WeaponData)).toBe(true);
+        expect(isFinesseWeapon({ name: 'Masterwork Rapier', category: 'Martial One-Handed', size: 'M' } as WeaponData)).toBe(true);
+        expect(isFinesseWeapon({ name: 'Whip', category: 'Exotic One-Handed', size: 'M' } as WeaponData)).toBe(true);
+        expect(isFinesseWeapon({ name: 'Spiked Chain', category: 'Exotic Two-Handed', size: 'M' } as WeaponData)).toBe(true);
+      });
+
+      it('returns false for non-finesse weapons', () => {
+        expect(isFinesseWeapon({ name: 'Longsword', category: 'Martial One-Handed', size: 'M' } as WeaponData)).toBe(false);
+        expect(isFinesseWeapon({ name: 'Greatsword', category: 'Martial Two-Handed', size: 'T' } as WeaponData)).toBe(false);
+        expect(isFinesseWeapon({ name: 'Heavy Flail', category: 'Martial Two-Handed', size: 'T' } as WeaponData)).toBe(false);
+        expect(isFinesseWeapon(undefined)).toBe(false);
+      });
+    });
+
+    describe('getSizeAttackModifier', () => {
+      it('verifies D&D 3.5e size attack modifier values', () => {
+        expect(getSizeAttackModifier('Fine')).toBe(8);
+        expect(getSizeAttackModifier('Diminutive')).toBe(4);
+        expect(getSizeAttackModifier('Tiny')).toBe(2);
+        expect(getSizeAttackModifier('Small')).toBe(1);
+        expect(getSizeAttackModifier('Medium')).toBe(0);
+        expect(getSizeAttackModifier('Large')).toBe(-1);
+        expect(getSizeAttackModifier('Huge')).toBe(-2);
+        expect(getSizeAttackModifier('Gargantuan')).toBe(-4);
+        expect(getSizeAttackModifier('Colossal')).toBe(-8);
+        expect(getSizeAttackModifier(undefined)).toBe(0);
+        expect(getSizeAttackModifier('')).toBe(0);
       });
     });
   });

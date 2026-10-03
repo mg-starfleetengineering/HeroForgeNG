@@ -53,7 +53,11 @@ export function normalizeSourceCode(rawSource?: string): string {
     'MAGIC ITEM COMPENDIUM': 'Mag',
     'COMPLETE ARCANE': 'CAr',
     'COMPLETE MAGE': 'CM',
-    'RACES OF DESTINY': 'RoD'
+    'RACES OF DESTINY': 'RoD',
+    'DRCOMP': 'DrComp',
+    'DRAGON COMPENDIUM': 'DrComp',
+    'DRC': 'DrComp',
+    'DC': 'DrComp'
   };
 
   if (aliasMap[clean]) return aliasMap[clean];

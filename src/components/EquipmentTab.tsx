@@ -13,7 +13,9 @@ import {
   ItemArmorData,
   BodySlotId,
   BodySlotDefinition,
-  AmmoCategory
+  AmmoCategory,
+  TemplateData,
+  WildShapeFormData
 } from '../types/character';
 import { getSourceBadgeInfo, sortDropdownItems } from '../utils/sourceFilter';
 import { SearchableSelect, SearchableOption } from './SearchableSelect';
@@ -43,9 +45,12 @@ import {
   getActiveCombatModifiers,
   isTwoHandedWeapon,
   calculateEquippedWeaponCombatProfile,
-  EquippedWeaponCombatContext
+  EquippedWeaponCombatContext,
+  getSizeAttackModifier,
+  isFinesseWeapon
 } from '../engine/combat';
-import { rollAttack, rollDamage } from '../engine/dice';
+import { resolveActiveWildShape } from '../engine/wildshape';
+import { rollAttack, rollAttackSequence, rollDamage } from '../engine/dice';
 import {
   getAvailableWeaponQualities,
   getAvailableArmorQualities,
@@ -2044,6 +2049,16 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
   const isRangedInherentlyMwk = (eq.rangedWeaponEnhancement || 0) > 0 || eq.rangedWeaponMaterial === 'adamantine';
   const isRangedMwk = isRangedInherentlyMwk || !!eq.rangedWeaponMasterwork;
 
+  const templatesData: TemplateData[] = (props as any).templatesData ?? gameData.templatesData ?? [];
+  const wildShapeFormsData: WildShapeFormData[] = (props as any).wildShapeFormsData ?? gameData.wildShapeFormsData ?? [];
+  const templateObj: Partial<TemplateData> | undefined = templatesData.find(t => t.name === character.selectedTemplate || t.id === character.selectedTemplate);
+  const activeWildShape = resolveActiveWildShape(character, wildShapeFormsData);
+  const activeSize = activeWildShape ? activeWildShape.size : (templateObj?.size || raceObj.size || 'Medium');
+  const sizeAtkMod = getSizeAttackModifier(activeSize);
+  const hasWeaponFinesse = (character.selectedFeatEntities || []).some(
+    f => f.featId === 'weapon_finesse' || (f.notes && f.notes.toLowerCase().includes('weapon finesse'))
+  );
+
   // Unified Combat Profiles for Equipped Weapons
   const combatContext: EquippedWeaponCombatContext = {
     bab,
@@ -2052,7 +2067,9 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
     effectiveDexMod,
     totalLevel,
     tcState,
-    extraAttacks: (generalTcMods.extraAttacks || 0)
+    extraAttacks: (generalTcMods.extraAttacks || 0),
+    sizeAtkMod,
+    hasWeaponFinesse
   };
 
   // Resolve Primary Weapon & Special Qualities
@@ -2073,6 +2090,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
   const primaryFeatBonuses = { attackBonus: primaryProfile?.featAtkBonus || 0, damageBonus: primaryProfile?.featDmgBonus || 0 };
   const primarySpecialDmg = primaryProfile?.specialDmg || { summaryLabels: [], hasBane: false, damageDiceString: '', damageDiceFormula: '' };
   const primaryHasSpeed = primaryProfile?.hasSpeed || false;
+  const primaryFullSeq = primaryProfile?.fullSeq || '';
 
   // Resolve Secondary Weapon & Special Qualities
   const hasSecondary = Boolean(eq.secondaryWeapon && eq.secondaryWeapon !== 'none');
@@ -2090,6 +2108,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
   const secondaryQualities = eq.secondaryWeaponQualities || [];
   const secondaryEnhancement = eq.secondaryWeaponEnhancement || 0;
   const secondarySpecialDmg = secondaryProfile?.specialDmg || { summaryLabels: [], hasBane: false, damageDiceString: '', damageDiceFormula: '' };
+  const secondaryFullSeq = secondaryProfile?.fullSeq || '';
 
   // Resolve Ranged Weapon & Special Qualities
   const hasRanged = Boolean(eq.rangedWeapon && eq.rangedWeapon !== 'none');
@@ -2107,6 +2126,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
   const rangedQualities = eq.rangedWeaponQualities || [];
   const rangedEnhancement = eq.rangedWeaponEnhancement || 0;
   const rangedSpecialDmg = rangedProfile?.specialDmg || { summaryLabels: [], hasBane: false, damageDiceString: '', damageDiceFormula: '' };
+  const rangedFullSeq = rangedProfile?.fullSeq || '';
 
   // Inventory Actions
   const handleAddInventoryItem = (e: React.FormEvent) => {
@@ -3654,12 +3674,18 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
                   </div>
                   <div className="flex items-center gap-1.5 flex-wrap justify-end">
                     <button
-                      onClick={() => rollAttack(primaryTotalAtk, `${primaryWpnObj.name} Attack`, primaryWpnObj, { threatMin: primaryThreat, damageBonus: primaryDmgVal, damageFormula: primaryDamageFormula })}
+                      onClick={() => {
+                        if (primaryFullSeq && primaryFullSeq.includes('/')) {
+                          rollAttackSequence(primaryFullSeq, `${primaryWpnObj.name} Attack`, primaryWpnObj, { threatMin: primaryThreat, damageBonus: primaryDmgVal, damageFormula: primaryDamageFormula });
+                        } else {
+                          rollAttack(primaryTotalAtk, `${primaryWpnObj.name} Attack`, primaryWpnObj, { threatMin: primaryThreat, damageBonus: primaryDmgVal, damageFormula: primaryDamageFormula });
+                        }
+                      }}
                       className="font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/30 font-bold text-sm transition flex items-center gap-1.5 cursor-pointer shadow-xs"
-                      title={`Click to roll ${primaryWpnObj.name} Attack`}
+                      title={`Click to roll ${primaryWpnObj.name} Attack${primaryFullSeq ? ` (${primaryFullSeq})` : ''}`}
                     >
                       <i className="fa-solid fa-dice-d20 text-xs"></i>
-                      <span>{primaryTotalAtk >= 0 ? '+' : ''}{primaryTotalAtk} Melee</span>
+                      <span>{primaryFullSeq || `${primaryTotalAtk >= 0 ? '+' : ''}${primaryTotalAtk}`} Melee</span>
                     </button>
                     {primaryBaneAtk && (
                       <button
@@ -3845,12 +3871,18 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
                   </div>
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <button
-                      onClick={() => rollAttack(secondaryTotalAtk, `${secondaryWpnObj.name} Off-Hand Attack`, secondaryWpnObj, { threatMin: secondaryThreat, damageBonus: secondaryDmgVal, damageFormula: secondaryDamageFormula })}
+                      onClick={() => {
+                        if (secondaryFullSeq && secondaryFullSeq.includes('/')) {
+                          rollAttackSequence(secondaryFullSeq, `${secondaryWpnObj.name} Off-Hand Attack`, secondaryWpnObj, { threatMin: secondaryThreat, damageBonus: secondaryDmgVal, damageFormula: secondaryDamageFormula });
+                        } else {
+                          rollAttack(secondaryTotalAtk, `${secondaryWpnObj.name} Off-Hand Attack`, secondaryWpnObj, { threatMin: secondaryThreat, damageBonus: secondaryDmgVal, damageFormula: secondaryDamageFormula });
+                        }
+                      }}
                       className="font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
-                      title={`Click to roll ${secondaryWpnObj.name} Off-Hand Attack`}
+                      title={`Click to roll ${secondaryWpnObj.name} Off-Hand Attack${secondaryFullSeq ? ` (${secondaryFullSeq})` : ''}`}
                     >
                       <i className="fa-solid fa-dice-d20 text-[10px]"></i>
-                      <span>{secondaryTotalAtk >= 0 ? '+' : ''}{secondaryTotalAtk} Atk</span>
+                      <span>{secondaryFullSeq || `${secondaryTotalAtk >= 0 ? '+' : ''}${secondaryTotalAtk}`} Atk</span>
                     </button>
                     {secondaryBaneAtk && (
                       <button
@@ -4018,8 +4050,9 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <button
                       onClick={() => {
+                        const count = rangedFullSeq && rangedFullSeq.includes('/') ? rangedFullSeq.split('/').length : 1;
                         if (eq.autoDecrementAmmo) {
-                          const result = decrementEquippedAmmunition(character, 1);
+                          const result = decrementEquippedAmmunition(character, count);
                           if (result.ammoItem) {
                             onChange(result.updatedCharacter);
                             setAmmoRollFeedback(result.message);
@@ -4029,13 +4062,17 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
                             setTimeout(() => setAmmoRollFeedback(null), 4500);
                           }
                         }
-                        rollAttack(rangedTotalAtk, `${rangedWpnObj.name} Ranged Attack`, rangedWpnObj, { threatMin: rangedThreat, damageBonus: rangedDmgVal, damageFormula: rangedDamageFormula });
+                        if (rangedFullSeq && rangedFullSeq.includes('/')) {
+                          rollAttackSequence(rangedFullSeq, `${rangedWpnObj.name} Ranged Attack`, rangedWpnObj, { threatMin: rangedThreat, damageBonus: rangedDmgVal, damageFormula: rangedDamageFormula });
+                        } else {
+                          rollAttack(rangedTotalAtk, `${rangedWpnObj.name} Ranged Attack`, rangedWpnObj, { threatMin: rangedThreat, damageBonus: rangedDmgVal, damageFormula: rangedDamageFormula });
+                        }
                       }}
                       className="font-mono text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/20 px-2 py-0.5 rounded border border-cyan-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
-                      title={`Click to roll ${rangedWpnObj.name} Ranged Attack`}
+                      title={`Click to roll ${rangedWpnObj.name} Ranged Attack${rangedFullSeq ? ` (${rangedFullSeq})` : ''}`}
                     >
                       <i className="fa-solid fa-dice-d20 text-[10px]"></i>
-                      <span>{rangedTotalAtk >= 0 ? '+' : ''}{rangedTotalAtk} Ranged</span>
+                      <span>{rangedFullSeq || `${rangedTotalAtk >= 0 ? '+' : ''}${rangedTotalAtk}`} Ranged</span>
                     </button>
                     {rangedBaneAtk && (
                       <button

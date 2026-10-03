@@ -2203,7 +2203,7 @@
     "spellLikeAbilities": null,
     "psionicAbilities": null,
     "racialSkills": null,
-    "source": "DC",
+    "source": "DrComp",
     "subtypes": [
       "humanoid"
     ],
@@ -8502,7 +8502,7 @@
     "bonusLanguages": "Abyssal, Aquan, Draconic, Dwarven, Elven, Gnome, Infernal, Terran",
     "bonusFeats": null,
     "specialAbilities": null,
-    "spellLikeAbilities": "× Psionics (Sp): At Will: Charm Monster (DC 13), Detect Thoughts (DC 11), Levitate, Plane Shift, Suggestion (DC 12).",
+    "spellLikeAbilities": "\u00d7 Psionics (Sp): At Will: Charm Monster (DC 13), Detect Thoughts (DC 11), Levitate, Plane Shift, Suggestion (DC 12).",
     "psionicAbilities": null,
     "racialSkills": "Bluff,Concentration,Diplomacy,Disguise,Hide,Intimidate,Knowledge (any),Listen,Move Silently,Sense Motive,Spot",
     "source": "MM",
@@ -10797,6 +10797,46 @@
       "humanoid"
     ],
     "traits": []
+  },
+  {
+    "id": "tibbit",
+    "name": "Tibbit",
+    "category": null,
+    "size": "Small",
+    "type": "Monstrous Humanoid",
+    "subtype": "Shapechanger",
+    "hd": null,
+    "speed": {
+      "land": 20,
+      "fly": null,
+      "swim": null,
+      "burrow": null,
+      "climb": null
+    },
+    "strAdj": -2,
+    "dexAdj": 2,
+    "conAdj": 0,
+    "intAdj": 0,
+    "wisAdj": 0,
+    "chaAdj": 0,
+    "naturalArmor": 0,
+    "levelAdj": 0,
+    "favoredClass": "Rogue",
+    "automaticLanguages": "Common, Tibbit",
+    "bonusLanguages": "Any",
+    "bonusFeats": null,
+    "specialAbilities": "Cat Shape (Su): Transform into a domestic cat at will. +2 racial bonus on Jump, Climb, and Escape Artist checks. Low-light vision.",
+    "spellLikeAbilities": null,
+    "psionicAbilities": null,
+    "racialSkills": "Climb+2,Escape Artist+2,Jump+2",
+    "source": "DrComp",
+    "subtypes": [
+      "humanoid",
+      "shapechanger"
+    ],
+    "traits": [
+      "darkvision"
+    ]
   },
   {
     "id": "tiefling",

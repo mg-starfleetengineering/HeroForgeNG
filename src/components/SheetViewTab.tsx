@@ -44,7 +44,9 @@ import {
   getActiveCombatModifiers,
   isTwoHandedWeapon,
   calculateEquippedWeaponCombatProfile,
-  EquippedWeaponCombatContext
+  EquippedWeaponCombatContext,
+  getSizeAttackModifier,
+  isFinesseWeapon
 } from '../engine/combat';
 import {
   calculateKeenThreat,
@@ -212,6 +214,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
 
   const activeSize = activeWildShape ? activeWildShape.size : (templateObj?.size || raceObj.size || 'Medium');
   const sizeAcMod = getSizeAcModifier(activeSize);
+  const sizeAtkMod = getSizeAttackModifier(activeSize);
+  const hasWeaponFinesse = (character.selectedFeatEntities || []).some(
+    f => f.featId === 'weapon_finesse' || (f.notes && f.notes.toLowerCase().includes('weapon finesse'))
+  );
   const wildShapeNatArmor = activeWildShape ? activeWildShape.naturalArmor : 0;
 
   const baseSpeed = (activeWildShape ? activeWildShape.speed.land : speedData.land) + generalTcMods.speedMod;
@@ -335,7 +341,9 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
     totalLevel,
     tcState,
     conditionPenalties,
-    extraAttacks: (generalTcMods.extraAttacks || 0)
+    extraAttacks: (generalTcMods.extraAttacks || 0),
+    sizeAtkMod,
+    hasWeaponFinesse
   };
 
   const primaryProfile = calculateEquippedWeaponCombatProfile(character, 'primaryWeapon', weaponsData, customWeapons, combatContext);

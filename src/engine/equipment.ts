@@ -117,19 +117,19 @@ export const COMMON_ITEM_PRESETS = [
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 const DAMAGE_INDEX_MAP: Record<string, string> = {
-  '1': '1d2',
-  '2': '1d3',
-  '3': '1d4',
-  '4': '1d6',
-  '5': '1d8',
-  '6': '1d10',
-  '7': '1d12',
-  '8': '2d4',
+  '1': '1',
+  '2': '1d2',
+  '3': '1d3',
+  '4': '1d4',
+  '5': '1d6',
+  '6': '1d8',
+  '7': '1d10',
+  '8': '1d12',
   '9': '2d4',
   '10': '2d6',
   '11': '2d8',
   '12': '2d10',
-  '13': '3d6'
+  '13': '—'
 };
 
 const normalizeWeapon = (wpn: WeaponData): WeaponData => {

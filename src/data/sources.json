@@ -70,5 +70,6 @@
   { "id": "CoD", "name": "Champions of Darkness", "abbr": "CoD", "category": "Campaign Settings", "isCore": false },
 
   { "id": "OA", "name": "Oriental Adventures", "abbr": "OA", "category": "Campaign Settings", "isCore": false },
-  { "id": "DMag", "name": "Dragon Magazine", "abbr": "DMag", "category": "Periodicals", "isCore": false }
+  { "id": "DMag", "name": "Dragon Magazine", "abbr": "DMag", "category": "Periodicals", "isCore": false },
+  { "id": "DrComp", "name": "Dragon Compendium", "abbr": "DrComp", "category": "Periodicals", "isCore": false }
 ]

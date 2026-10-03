@@ -8,8 +8,9 @@ import {
   getWeaponEffectiveAttackEnhancement, getWeaponMaterialDamageMod, getWeaponMaterialTraits
 } from '../equipment';
 import { formatMagicItemName } from '../magicItems';
-import { CharacterState, InventoryItem, CharacterFeat, CharacterSheetData } from '../../types/character';
+import { CharacterState, InventoryItem, CharacterFeat, CharacterSheetData, WeaponData } from '../../types/character';
 import { migrateLegacyEquipmentToInventory } from '../../storage/migration';
+import weaponsCatalog from '../../data/weapons.json';
 
 describe('equipment engine & inventory sync', () => {
   it('identifies if item is in inventory case-insensitively', () => {
@@ -1095,6 +1096,54 @@ describe('equipment engine & inventory sync', () => {
       expect(getWeaponEffectiveAttackEnhancement(resolved.material, 0, resolved.isMasterwork)).toBe(1);
     });
   });
+
+  describe('DAMAGE_INDEX_MAP & standard weapon damage resolution', () => {
+    const catalog = weaponsCatalog as unknown as WeaponData[];
+
+    it('resolves Dagger to 1d4 (index 4)', () => {
+      const dagger = resolveWeapon('Dagger', [], catalog);
+      expect(dagger.damageM).toBe('1d4');
+    });
+
+    it('resolves Longsword to 1d8 (index 6)', () => {
+      const longsword = resolveWeapon('Longsword', [], catalog);
+      expect(longsword.damageM).toBe('1d8');
+    });
+
+    it('resolves Short Sword to 1d6 (index 5)', () => {
+      const shortSword = resolveWeapon('Short sword', [], catalog);
+      expect(shortSword.damageM).toBe('1d6');
+    });
+
+    it('resolves Greataxe to 1d12 (index 8)', () => {
+      const greataxe = resolveWeapon('Greataxe', [], catalog);
+      expect(greataxe.damageM).toBe('1d12');
+    });
+
+    it('resolves Falchion to 2d4 (index 9)', () => {
+      const falchion = resolveWeapon('Falchion', [], catalog);
+      expect(falchion.damageM).toBe('2d4');
+    });
+
+    it('resolves Greatsword to 2d6 (index 10)', () => {
+      const greatsword = resolveWeapon('Greatsword', [], catalog);
+      expect(greatsword.damageM).toBe('2d6');
+    });
+
+    it('resolves Shuriken to 1d2 (index 2) and Whip to 1d3 (index 3)', () => {
+      const shuriken = resolveWeapon('Shuriken', [], catalog);
+      expect(shuriken.damageM).toBe('1d2');
+
+      const whip = resolveWeapon('Whip', [], catalog);
+      expect(whip.damageM).toBe('1d3');
+    });
+
+    it('resolves Blowgun to 1 (index 1)', () => {
+      const blowgun = resolveWeapon('Blowgun', [], catalog);
+      expect(blowgun.damageM).toBe('1');
+    });
+  });
 });
+
 
 

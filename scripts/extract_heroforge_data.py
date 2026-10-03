@@ -128,8 +128,20 @@ def extract_classes():
                     if skill_clean and skill_clean not in class_skills:
                         class_skills.append(skill_clean)
         
+        class_id = class_name.lower().replace(" ", "_").replace("/", "_")
+        class_source = "PHB" if class_name in ["Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Wizard"] else current_source
+        class_source_overrides = {
+            "crimson_scourge": "DrComp",
+            "urban_savant": "DrComp",
+            "spellguard_of_silverymoon": "DrComp",
+            "heartwarder": "DrComp",
+            "osteomancer": "DrComp"
+        }
+        if class_id in class_source_overrides:
+            class_source = class_source_overrides[class_id]
+
         classes.append({
-            "id": class_name.lower().replace(" ", "_").replace("/", "_"),
+            "id": class_id,
             "name": class_name,
             "abbr": abbreviation or class_name[:3],
             "maxLevels": max_lvl,
@@ -140,7 +152,7 @@ def extract_classes():
             "refFactor": fref,
             "willFactor": fwill,
             "bonusCaster": bonus_caster,
-            "source": "PHB" if class_name in ["Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Wizard"] else current_source,
+            "source": class_source,
             "proficiencies": {
                 "lightArmor": prof_light,
                 "mediumArmor": prof_med,
@@ -200,9 +212,51 @@ def extract_races():
             "spellLikeAbilities": clean_val(row.get("Spell-like abilities")),
             "psionicAbilities": clean_val(row.get("Psionic abilities")),
             "racialSkills": clean_val(row.get("Racial Skills")),
-            "source": clean_val(row.get("Src"))
+            "source": "DrComp" if clean_val(row.get("Src")) == "DC" else clean_val(row.get("Src"))
         })
     
+    # Supplemental / manual races not present in raw CreatureInfo.csv
+    supplemental_races = [
+        {
+            "id": "tibbit",
+            "name": "Tibbit",
+            "category": None,
+            "size": "Small",
+            "type": "Monstrous Humanoid",
+            "subtype": "Shapechanger",
+            "hd": None,
+            "speed": {
+                "land": 20,
+                "fly": None,
+                "swim": None,
+                "burrow": None,
+                "climb": None
+            },
+            "strAdj": -2,
+            "dexAdj": 2,
+            "conAdj": 0,
+            "intAdj": 0,
+            "wisAdj": 0,
+            "chaAdj": 0,
+            "naturalArmor": 0,
+            "levelAdj": 0,
+            "favoredClass": "Rogue",
+            "automaticLanguages": "Common, Tibbit",
+            "bonusLanguages": "Any",
+            "bonusFeats": None,
+            "specialAbilities": "Cat Shape (Su): Transform into a domestic cat at will. +2 racial bonus on Jump, Climb, and Escape Artist checks. Low-light vision.",
+            "spellLikeAbilities": None,
+            "psionicAbilities": None,
+            "racialSkills": "Climb+2,Escape Artist+2,Jump+2",
+            "source": "DrComp",
+            "subtypes": ["humanoid", "shapechanger"],
+            "traits": ["darkvision"]
+        }
+    ]
+    for supp in supplemental_races:
+        if not any(r["id"] == supp["id"] for r in races):
+            races.append(supp)
+
     with open(os.path.join(OUTPUT_DIR, "races.json"), "w", encoding="utf-8") as f:
         json.dump(races, f, indent=2)
     with open(os.path.join(PUBLIC_DATA_DIR, "races.json"), "w", encoding="utf-8") as f:
