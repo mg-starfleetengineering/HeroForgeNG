@@ -214,3 +214,6 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+# Local extraction scripts
+scripts/extract_heroforge_data.py

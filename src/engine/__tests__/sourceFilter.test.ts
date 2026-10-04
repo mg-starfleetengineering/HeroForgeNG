@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { normalizeSourceCode, isSourceAllowed, getSourceBadgeInfo, ALL_SOURCES } from '../../utils/sourceFilter';
 import racesData from '../../data/races.json';
 import classesData from '../../data/classes.json';
+import weaponsData from '../../data/weapons.json';
 
 describe('Source Filtering & Dragon Compendium Integration', () => {
   it('should include DrComp in ALL_SOURCES list', () => {
@@ -27,6 +28,8 @@ describe('Source Filtering & Dragon Compendium Integration', () => {
     expect(isSourceAllowed('DC', allowed)).toBe(true);
     expect(isSourceAllowed('DRC', allowed)).toBe(true);
     expect(isSourceAllowed('Dragon Compendium', allowed)).toBe(true);
+    expect(isSourceAllowed('DC', ['DrComp'])).toBe(true);
+    expect(isSourceAllowed('DrComp', ['DrComp'])).toBe(true);
     expect(isSourceAllowed('Frost', allowed)).toBe(false);
   });
 
@@ -68,4 +71,26 @@ describe('Source Filtering & Dragon Compendium Integration', () => {
       expect(cls?.source).toBe('DrComp');
     }
   });
+
+  it('should confirm Dragon Compendium weapons have DrComp source in weapons.json', () => {
+    const targetWeapons = [
+      'duom',
+      'flindbar',
+      'mancatcher',
+      'ritiik',
+      'whip-dagger',
+      'bracer,_claw',
+      'manti',
+      'pincer_staff'
+    ];
+
+    for (const wid of targetWeapons) {
+      const wpn = weaponsData.find((w: { id: string }) => w.id === wid);
+      expect(wpn).toBeDefined();
+      expect(wpn?.source).toBe('DrComp');
+      expect(isSourceAllowed(wpn?.source, ['DrComp'])).toBe(true);
+      expect(isSourceAllowed(wpn?.source, ['PHB', 'DMG', 'MM'])).toBe(false);
+    }
+  });
 });
+

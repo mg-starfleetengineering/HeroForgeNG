@@ -361,7 +361,7 @@
     "weight": "2",
     "type": "P",
     "special": null,
-    "source": null
+    "source": "DrComp"
   },
   {
     "id": "buckler-axe,_dwarven",
@@ -921,7 +921,7 @@
     "weight": "8",
     "type": "P",
     "special": null,
-    "source": null
+    "source": "DrComp"
   },
   {
     "id": "etherblade",
@@ -1061,7 +1061,7 @@
     "weight": "2",
     "type": "B",
     "special": null,
-    "source": null
+    "source": "DrComp"
   },
   {
     "id": "flutter_blade",
@@ -1999,7 +1999,7 @@
     "weight": "8",
     "type": "B",
     "special": null,
-    "source": null
+    "source": "DrComp"
   },
   {
     "id": "manriki-gusari",
@@ -2041,7 +2041,7 @@
     "weight": "9",
     "type": "P",
     "special": null,
-    "source": null
+    "source": "DrComp"
   },
   {
     "id": "maquahuitl",
@@ -2321,7 +2321,7 @@
     "weight": "15",
     "type": "B",
     "special": null,
-    "source": null
+    "source": "DrComp"
   },
   {
     "id": "pistol",
@@ -2545,7 +2545,7 @@
     "weight": "6",
     "type": "P",
     "special": null,
-    "source": null
+    "source": "DrComp"
   },
   {
     "id": "sai",
@@ -3511,7 +3511,7 @@
     "weight": "3",
     "type": "S",
     "special": "M,F",
-    "source": null
+    "source": "DrComp"
   },
   {
     "id": "grapple",
