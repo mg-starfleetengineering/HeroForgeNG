@@ -9,10 +9,19 @@ import {
   revertPerceptionToSkills,
   calculatePerceptionStats,
   getMaxSkillTricks,
-  validateSkillTrickPrerequisites
+  validateSkillTrickPrerequisites,
+  getSkillCheckPenalty
 } from '../engine/skills';
 import { calculateTotalScore, getAbilityMod, parseRaceMods, calculateTraitFlawStatMods, calculateTraitFlawSkillMods } from '../engine/stats';
 import { getArmorSkillBonus } from '../engine/magicItems';
+import {
+  resolveEquippedArmor,
+  resolveEquippedShield,
+  calculateCarryingCapacity,
+  calculateTotalCarriedWeight,
+  getEncumbranceStatus,
+  calculateTotalACP
+} from '../engine/equipment';
 import { hasRacialTrait } from '../engine/features';
 import { useGameData } from '../context/GameDataContext';
 import { useCharacter, useCharacterDispatch } from '../context/CharacterContext';
@@ -65,6 +74,16 @@ export const SkillsTab: React.FC<SkillsTabProps> = (props) => {
   const spentPts = calculateSpentSkillPoints(character.skillRanks, character.levelProgression, classesData, usePathfinder, selectedSkillTricks);
   const maxSkillTricks = getMaxSkillTricks(totalLevel);
   const remainingSkillPoints = totalBudget - spentPts;
+
+  const strScore = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
+  const carryingCapacity = calculateCarryingCapacity(strScore, raceObj.size || 'Medium');
+  const totalCarriedWeight = calculateTotalCarriedWeight(character, gameData.weaponsData);
+  const encumbrance = getEncumbranceStatus(totalCarriedWeight, carryingCapacity);
+
+  const customArmors = character.customArmors || [];
+  const armorObj = resolveEquippedArmor(character, customArmors);
+  const shieldObj = resolveEquippedShield(character, customArmors);
+  const totalACP = calculateTotalACP(armorObj.checkPenalty, shieldObj.checkPenalty, encumbrance.checkPenalty);
 
   const handleRankChange = (skillName: string, ranks: number) => {
     const updatedRanks = { ...character.skillRanks, [skillName]: ranks };
@@ -129,6 +148,13 @@ export const SkillsTab: React.FC<SkillsTabProps> = (props) => {
               </span>
             </label>
 
+            <div className="flex items-center gap-2 bg-slate-950/80 px-4 py-2 rounded-xl border border-slate-800">
+              <span className="text-xs text-slate-400">Armor Check Penalty:</span>
+              <span className={`badge font-mono text-sm ${totalACP < 0 ? 'badge-rose text-rose-300' : 'badge-slate text-slate-400'}`}>
+                {totalACP}
+              </span>
+            </div>
+
             <div className="flex items-center gap-4 bg-slate-950/80 px-4 py-2 rounded-xl border border-slate-800">
               <span className="text-xs text-slate-400">Total Skill Points Available:</span>
               <span className="badge badge-amber font-mono text-sm">{spentPts} / {totalBudget}</span>
@@ -158,7 +184,8 @@ export const SkillsTab: React.FC<SkillsTabProps> = (props) => {
                 const tfSkillMod = traitFlawSkillMods[skill.name] || 0;
 
                 const armorSkillBonus = getArmorSkillBonus(character.equipment?.armorQualities, character.equipment?.shieldQualities, skill.name);
-                let totalMod = Math.floor(ranks) + abMod + tfSkillMod + armorSkillBonus;
+                const acpMod = getSkillCheckPenalty(skill.name, totalACP);
+                let totalMod = Math.floor(ranks) + abMod + tfSkillMod + armorSkillBonus + acpMod;
                 let featBonusText = '';
 
                 if (skill.name === 'Perception') {
@@ -182,6 +209,11 @@ export const SkillsTab: React.FC<SkillsTabProps> = (props) => {
                     </td>
                     <td className="py-2 px-2 font-semibold text-slate-200">
                       {skill.name}
+                      {acpMod < 0 && (
+                        <span className="ml-2 text-[10px] text-rose-400 font-normal font-mono font-semibold">
+                          ({acpMod} ACP{skill.name === 'Swim' ? ' 2×' : ''})
+                        </span>
+                      )}
                       {armorSkillBonus > 0 && (
                         <span className="ml-2 text-[10px] text-indigo-400 font-normal font-mono">
                           (+{armorSkillBonus} Magic Quality)

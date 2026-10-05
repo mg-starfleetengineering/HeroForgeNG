@@ -5,9 +5,12 @@ import {
   resolveArmor, resolveShield, createInventoryWeapon, createInventoryArmor, createInventoryShield,
   calculateFeatCombatBonuses, resolveEquippedWeapon, DEFAULT_WEAPON,
   resolveEquippedArmor, resolveEquippedShield, applyMaterialToArmorData, applyMaterialToWeight,
-  getWeaponEffectiveAttackEnhancement, getWeaponMaterialDamageMod, getWeaponMaterialTraits
+  getWeaponEffectiveAttackEnhancement, getWeaponMaterialDamageMod, getWeaponMaterialTraits,
+  calculateMaxDexCap, calculateFinalDexToAc, calculateTotalACP, STANDARD_SHIELD_MAP, STANDARD_ARMOR_MAP
 } from '../equipment';
 import { formatMagicItemName } from '../magicItems';
+import { getSkillCheckPenalty, isSkillSubjectToAcp, ACP_SKILL_NAMES } from '../skills';
+import { isFinesseWeapon } from '../combat';
 import { CharacterState, InventoryItem, CharacterFeat, CharacterSheetData, WeaponData } from '../../types/character';
 import { migrateLegacyEquipmentToInventory } from '../../storage/migration';
 import weaponsCatalog from '../../data/weapons.json';
@@ -1144,6 +1147,202 @@ describe('equipment engine & inventory sync', () => {
     });
   });
 });
+
+describe('Phase 2: Armor Class, Max DEX Cap, Armor Check Penalty & Encumbrance', () => {
+  describe('Standard & Non-Standard Armors and Shields Resolution', () => {
+    it('resolves Half-Plate, Splint Mail, Scale Mail, Banded Mail, and Hide accurately', () => {
+      const halfPlate = resolveArmor('Half-Plate');
+      expect(halfPlate.acBonus).toBe(7);
+      expect(halfPlate.maxDex).toBe(0);
+      expect(halfPlate.checkPenalty).toBe(-7);
+      expect(halfPlate.type).toBe('heavy');
+      expect(halfPlate.weight).toBe(50);
+
+      const splintMail = resolveArmor('Splint Mail');
+      expect(splintMail.acBonus).toBe(6);
+      expect(splintMail.maxDex).toBe(0);
+      expect(splintMail.checkPenalty).toBe(-7);
+      expect(splintMail.type).toBe('heavy');
+
+      const bandedMail = resolveArmor('Banded Mail');
+      expect(bandedMail.acBonus).toBe(6);
+      expect(bandedMail.maxDex).toBe(1);
+      expect(bandedMail.checkPenalty).toBe(-6);
+      expect(bandedMail.type).toBe('heavy');
+
+      const scaleMail = resolveArmor('Scale Mail');
+      expect(scaleMail.acBonus).toBe(4);
+      expect(scaleMail.maxDex).toBe(3);
+      expect(scaleMail.checkPenalty).toBe(-4);
+      expect(scaleMail.type).toBe('medium');
+
+      const hide = resolveArmor('Hide');
+      expect(hide.acBonus).toBe(3);
+      expect(hide.maxDex).toBe(4);
+      expect(hide.checkPenalty).toBe(-3);
+      expect(hide.type).toBe('medium');
+    });
+
+    it('resolves Tower Shield with +4 AC, Max DEX +2, ACP -10 in STANDARD_SHIELD_MAP', () => {
+      const tower = STANDARD_SHIELD_MAP.tower_shield;
+      expect(tower).toBeDefined();
+      expect(tower.acBonus).toBe(4);
+      expect(tower.maxDex).toBe(2);
+      expect(tower.checkPenalty).toBe(-10);
+
+      const resolved = resolveShield('Tower Shield');
+      expect(resolved.acBonus).toBe(4);
+      expect(resolved.maxDex).toBe(2);
+      expect(resolved.checkPenalty).toBe(-10);
+    });
+
+    it('createInventoryShield preserves maxDex: 2 for Tower Shield', () => {
+      const item = createInventoryShield('tower_shield');
+      expect(item.armorData?.acBonus).toBe(4);
+      expect(item.armorData?.maxDex).toBe(2);
+      expect(item.armorData?.armorCheckPenalty).toBe(-10);
+    });
+
+    it('resolves Mithral Tower Shield with increased Max DEX (+4) and reduced ACP (-7)', () => {
+      const mithralTower = resolveShield('Mithral Tower Shield');
+      expect(mithralTower.acBonus).toBe(4);
+      expect(mithralTower.maxDex).toBe(4); // +2 from Mithral
+      expect(mithralTower.checkPenalty).toBe(-7); // -10 + 3 = -7
+    });
+  });
+
+  describe('Max DEX Bonus Cap Enforcement (PHB p. 122, 162)', () => {
+    it('calculates maxDexCap taking the minimum of armor, shield, and encumbrance', () => {
+      // Full Plate (maxDex 1), Heavy Shield (no cap / 99), Light load (no cap / 99)
+      expect(calculateMaxDexCap(1, undefined, null)).toBe(1);
+
+      // Breastplate (maxDex 3), Tower Shield (maxDex 2), Medium load (maxDex 3)
+      expect(calculateMaxDexCap(3, 2, 3)).toBe(2);
+
+      // Chain Shirt (maxDex 4), Light Shield (no cap), Heavy load (maxDex 1)
+      expect(calculateMaxDexCap(4, undefined, 1)).toBe(1);
+
+      // No armor, no shield, light load
+      expect(calculateMaxDexCap(undefined, undefined, null)).toBe(99);
+    });
+
+    it('caps positive DEX modifier to AC based on maxDexCap', () => {
+      // Dex 18 (+4 mod), maxDexCap = 1 -> finalDexToAc = 1
+      expect(calculateFinalDexToAc(4, 1)).toBe(1);
+
+      // Dex 14 (+2 mod), maxDexCap = 3 -> finalDexToAc = 2
+      expect(calculateFinalDexToAc(2, 3)).toBe(2);
+
+      // Dex 18 (+4 mod), maxDexCap = 0 (Half-Plate) -> finalDexToAc = 0
+      expect(calculateFinalDexToAc(4, 0)).toBe(0);
+    });
+
+    it('never caps negative DEX penalties (negative modifiers always apply fully)', () => {
+      // Dex 8 (-1 mod), Half-Plate (maxDexCap = 0) -> penalty -1 applies fully
+      expect(calculateFinalDexToAc(-1, 0)).toBe(-1);
+
+      // Dex 6 (-2 mod), Full Plate (maxDexCap = 1) -> penalty -2 applies fully
+      expect(calculateFinalDexToAc(-2, 1)).toBe(-2);
+    });
+
+    it('drops positive Dex to 0 when loseDexToAc is active, while keeping negative penalties', () => {
+      // Flat-footed with +3 Dex mod -> 0
+      expect(calculateFinalDexToAc(3, 4, true)).toBe(0);
+
+      // Flat-footed with -2 Dex penalty -> -2
+      expect(calculateFinalDexToAc(-2, 4, true)).toBe(-2);
+    });
+  });
+
+  describe('Armor Check Penalty (ACP) and Skills (PHB p. 66)', () => {
+    it('calculates totalACP combining armor, shield, and encumbrance', () => {
+      // Full Plate (-6) + Heavy Shield (-2) + Medium load (-3) = -11
+      expect(calculateTotalACP(-6, -2, -3)).toBe(-11);
+
+      // Chain Shirt (-2) + Buckler (-1) + Light load (0) = -3
+      expect(calculateTotalACP(-2, -1, 0)).toBe(-3);
+
+      // Padded (0) + None (0) + Light load (0) = 0
+      expect(calculateTotalACP(0, 0, 0)).toBe(0);
+    });
+
+    it('identifies physical skills subject to ACP', () => {
+      expect(isSkillSubjectToAcp('Balance')).toBe(true);
+      expect(isSkillSubjectToAcp('Climb')).toBe(true);
+      expect(isSkillSubjectToAcp('Escape Artist')).toBe(true);
+      expect(isSkillSubjectToAcp('Hide')).toBe(true);
+      expect(isSkillSubjectToAcp('Jump')).toBe(true);
+      expect(isSkillSubjectToAcp('Move Silently')).toBe(true);
+      expect(isSkillSubjectToAcp('Sleight of Hand')).toBe(true);
+      expect(isSkillSubjectToAcp('Tumble')).toBe(true);
+      expect(isSkillSubjectToAcp('Swim')).toBe(true);
+
+      // Non-ACP skills
+      expect(isSkillSubjectToAcp('Ride')).toBe(false);
+      expect(isSkillSubjectToAcp('Use Rope')).toBe(false);
+      expect(isSkillSubjectToAcp('Concentration')).toBe(false);
+      expect(isSkillSubjectToAcp('Open Lock')).toBe(false);
+      expect(isSkillSubjectToAcp('Spot')).toBe(false);
+      expect(isSkillSubjectToAcp('Listen')).toBe(false);
+    });
+
+    it('applies standard 1x ACP to physical skills and double 2x ACP to Swim', () => {
+      const totalAcp = -4;
+
+      expect(getSkillCheckPenalty('Tumble', totalAcp)).toBe(-4);
+      expect(getSkillCheckPenalty('Hide', totalAcp)).toBe(-4);
+      expect(getSkillCheckPenalty('Move Silently', totalAcp)).toBe(-4);
+      expect(getSkillCheckPenalty('Balance', totalAcp)).toBe(-4);
+      expect(getSkillCheckPenalty('Climb', totalAcp)).toBe(-4);
+      expect(getSkillCheckPenalty('Jump', totalAcp)).toBe(-4);
+
+      // Swim takes double (2x) penalty
+      expect(getSkillCheckPenalty('Swim', totalAcp)).toBe(-8);
+
+      // Other skills take 0
+      expect(getSkillCheckPenalty('Ride', totalAcp)).toBe(0);
+      expect(getSkillCheckPenalty('Search', totalAcp)).toBe(0);
+    });
+  });
+
+  describe('Weapon Finesse: Spiked Chain & special "F" matching', () => {
+    it('recognizes "Chain, Spiked" catalog format as finesse weapon', () => {
+      const spikedChain = {
+        id: 'chain,_spiked',
+        name: 'Chain, Spiked',
+        category: 'E',
+        size: 'T',
+        damageM: '9',
+        threat: 20,
+        critMultiplier: 2,
+        weight: '10',
+        type: 'P',
+        special: 'F'
+      } as unknown as WeaponData;
+
+      expect(isFinesseWeapon(spikedChain)).toBe(true);
+    });
+
+    it('recognizes weapon with name containing both spiked and chain', () => {
+      expect(isFinesseWeapon({ name: 'Spiked chain' } as WeaponData)).toBe(true);
+      expect(isFinesseWeapon({ name: 'Chain, Spiked' } as WeaponData)).toBe(true);
+      expect(isFinesseWeapon({ name: '+1 Spiked Chain' } as WeaponData)).toBe(true);
+      expect(isFinesseWeapon({ name: '+2 Flaming Chain, Spiked' } as WeaponData)).toBe(true);
+    });
+
+    it('recognizes any weapon tagged with special: "F"', () => {
+      expect(isFinesseWeapon({ name: 'Custom Exotic Blade', special: 'F' } as WeaponData)).toBe(true);
+      expect(isFinesseWeapon({ name: 'Elven Thinblade', special: 'F, T' } as WeaponData)).toBe(true);
+    });
+
+    it('does not recognize non-finesse weapons', () => {
+      expect(isFinesseWeapon({ name: 'Greatsword', category: 'Martial Two-Handed', size: 'T' } as WeaponData)).toBe(false);
+      expect(isFinesseWeapon({ name: 'Halberd', category: 'Martial Two-Handed', size: 'T' } as WeaponData)).toBe(false);
+      expect(isFinesseWeapon({ name: 'Morningstar', category: 'Simple One-Handed', size: 'M' } as WeaponData)).toBe(false);
+    });
+  });
+});
+
 
 
 

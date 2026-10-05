@@ -20,12 +20,13 @@ import {
   resolveEquippedArmor, resolveEquippedShield, resolveEquippedWeapon,
   getWeaponEffectiveAttackEnhancement, getWeaponMaterialDamageMod, getWeaponMaterialTraits,
   decrementEquippedAmmunition, validateBodySlots, BODY_SLOT_MAP, getCharacterAmmunition,
-  getMatchingAmmoTypeForWeapon
+  getMatchingAmmoTypeForWeapon, calculateMaxDexCap, calculateFinalDexToAc, calculateTotalACP
 } from '../engine/equipment';
 import {
   getAvailableSkills,
   isClassSkillForCharacter,
-  calculatePerceptionStats
+  calculatePerceptionStats,
+  getSkillCheckPenalty
 } from '../engine/skills';
 import {
   SPELLCASTING_CLASSES,
@@ -261,6 +262,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
     cha: effectiveChaMod
   };
 
+  const totalACP = calculateTotalACP(armorObj.checkPenalty, shieldObj.checkPenalty, encumbrance.checkPenalty);
+
   const calculatedSkills = activeSkills.map(skill => {
     const isClass = isClassSkillForCharacter(skill.name, character.levelProgression, classesData);
     const ranks = (character.skillRanks || {})[skill.name] || 0;
@@ -273,7 +276,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
     if (skill.name === 'Listen') skillSpecificPenalty += conditionPenalties.listenPenalty;
 
     const armorSkillBonus = getArmorSkillBonus(armorQualities, shieldQualities, skill.name);
-    let totalMod = Math.floor(ranks) + abMod + tfSkillMod + skillSpecificPenalty + armorSkillBonus;
+    const acpMod = getSkillCheckPenalty(skill.name, totalACP);
+    let totalMod = Math.floor(ranks) + abMod + tfSkillMod + skillSpecificPenalty + armorSkillBonus + acpMod;
     if (skill.name === 'Perception') {
       const percStats = calculatePerceptionStats(character, classesData, abMod);
       totalMod = percStats.totalBonus + tfSkillMod + skillSpecificPenalty + armorSkillBonus;
@@ -288,7 +292,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
       abMod,
       tfSkillMod,
       skillSpecificPenalty,
-      armorSkillBonus
+      armorSkillBonus,
+      acpMod
     };
   });
 
@@ -299,7 +304,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
   const armorAc = armorObj.acBonus + armorEnhancement;
   const shieldAc = shieldObj.acBonus + shieldEnhancement;
 
-  const finalDexToAc = conditionPenalties.loseDexToAc ? Math.min(0, effectiveDexMod) : effectiveDexMod;
+  const maxDexCap = calculateMaxDexCap(armorObj.maxDex, shieldObj.maxDex, encumbrance.maxDexCap);
+  const finalDexToAc = calculateFinalDexToAc(effectiveDexMod, maxDexCap, conditionPenalties.loseDexToAc);
   const totalAc = 10 + armorAc + shieldAc + finalDexToAc + (eq.deflection || 0) + (eq.natural || 0) + wildShapeNatArmor + sizeAcMod + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.acNetMod + conditionPenalties.acPenalty;
   const touchAc = 10 + finalDexToAc + (eq.deflection || 0) + sizeAcMod + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.touchAcMod + conditionPenalties.acPenalty;
   const flatAc = 10 + armorAc + shieldAc + Math.min(0, effectiveDexMod) + (eq.deflection || 0) + (eq.natural || 0) + wildShapeNatArmor + sizeAcMod + traitFlawAcMod + generalTcMods.flatAcMod + conditionPenalties.acPenalty;
@@ -898,7 +904,15 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
                     </span>
                   )}
                 </span>
-                <p className="text-slate-600 text-[11px] print:text-[9.5px]">AC: +{shieldAc} | Check: {shieldObj.checkPenalty}</p>
+                <p className="text-slate-600 text-[11px] print:text-[9.5px]">
+                  AC: +{shieldAc}{shieldObj.maxDex !== undefined ? ` | Max Dex: +${shieldObj.maxDex}` : ''} | Check: {shieldObj.checkPenalty}
+                </p>
+              </div>
+              <div className="p-1.5 bg-white rounded border border-slate-200 flex justify-between items-center text-xs font-mono">
+                <span className="text-slate-700 font-sans font-bold">Total Armor Check Penalty:</span>
+                <span className={`font-bold ${totalACP < 0 ? 'text-rose-700' : 'text-slate-800'}`}>
+                  {totalACP} {totalACP < 0 ? `(Swim: ${totalACP * 2})` : ''}
+                </span>
               </div>
             </div>
           </div>
@@ -1499,9 +1513,16 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
 
           <div className="border border-slate-300 rounded-lg p-3.5 bg-slate-50 space-y-3 print:break-inside-avoid">
             <div className="flex items-center justify-between border-b border-slate-300 pb-1">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                Skills & Skill Modifiers
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                  Skills & Skill Modifiers
+                </h3>
+                {totalACP < 0 && (
+                  <span className="text-[10px] text-rose-700 font-sans font-semibold uppercase bg-rose-50 border border-rose-200 px-1.5 py-0.2 rounded">
+                    ACP: {totalACP} (Swim: {totalACP * 2})
+                  </span>
+                )}
+              </div>
               {usePathfinder && (
                 <span className="text-[10px] text-amber-700 font-sans font-semibold uppercase">
                   Pathfinder Perception Active
@@ -1531,7 +1552,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
                           { label: sk.keyAbility, value: sk.abMod },
                           ...(sk.tfSkillMod !== 0 ? [{ label: 'Trait/Flaw', value: sk.tfSkillMod }] : []),
                           ...(sk.armorSkillBonus !== 0 ? [{ label: 'Armor Quality', value: sk.armorSkillBonus }] : []),
-                          ...(sk.skillSpecificPenalty !== 0 ? [{ label: 'Penalty', value: sk.skillSpecificPenalty }] : [])
+                          ...(sk.skillSpecificPenalty !== 0 ? [{ label: 'Penalty', value: sk.skillSpecificPenalty }] : []),
+                          ...(sk.acpMod !== 0 ? [{ label: sk.name === 'Swim' ? 'Armor Check Penalty (2×)' : 'Armor Check Penalty', value: sk.acpMod }] : [])
                         ]
                       })}
                       className="hover:bg-slate-200/80 cursor-pointer transition-colors group"
@@ -1546,7 +1568,14 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
                       </td>
                       <td className="py-0.5 px-1 font-sans font-semibold text-slate-900 group-hover:text-amber-800">
                         <span className="flex items-center justify-between">
-                          <span>{sk.name}</span>
+                          <span>
+                            {sk.name}
+                            {sk.acpMod !== 0 && (
+                              <span className="ml-1 text-[9px] text-rose-700 font-normal font-mono" title={`Armor Check Penalty: ${sk.acpMod}`}>
+                                ({sk.acpMod})
+                              </span>
+                            )}
+                          </span>
                           <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition mr-1"></i>
                         </span>
                       </td>
@@ -1581,7 +1610,8 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
                           { label: sk.keyAbility, value: sk.abMod },
                           ...(sk.tfSkillMod !== 0 ? [{ label: 'Trait/Flaw', value: sk.tfSkillMod }] : []),
                           ...(sk.armorSkillBonus !== 0 ? [{ label: 'Armor Quality', value: sk.armorSkillBonus }] : []),
-                          ...(sk.skillSpecificPenalty !== 0 ? [{ label: 'Penalty', value: sk.skillSpecificPenalty }] : [])
+                          ...(sk.skillSpecificPenalty !== 0 ? [{ label: 'Penalty', value: sk.skillSpecificPenalty }] : []),
+                          ...(sk.acpMod !== 0 ? [{ label: sk.name === 'Swim' ? 'Armor Check Penalty (2×)' : 'Armor Check Penalty', value: sk.acpMod }] : [])
                         ]
                       })}
                       className="hover:bg-slate-200/80 cursor-pointer transition-colors group"
@@ -1596,7 +1626,14 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
                       </td>
                       <td className="py-0.5 px-1 font-sans font-semibold text-slate-900 group-hover:text-amber-800">
                         <span className="flex items-center justify-between">
-                          <span>{sk.name}</span>
+                          <span>
+                            {sk.name}
+                            {sk.acpMod !== 0 && (
+                              <span className="ml-1 text-[9px] text-rose-700 font-normal font-mono" title={`Armor Check Penalty: ${sk.acpMod}`}>
+                                ({sk.acpMod})
+                              </span>
+                            )}
+                          </span>
                           <i className="fa-solid fa-dice-d20 text-[9px] text-amber-600 opacity-0 group-hover:opacity-100 transition mr-1"></i>
                         </span>
                       </td>

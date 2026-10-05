@@ -19,7 +19,7 @@ import {
 } from '../types/character';
 import { getSourceBadgeInfo, sortDropdownItems } from '../utils/sourceFilter';
 import { SearchableSelect, SearchableOption } from './SearchableSelect';
-import { calculateTotalScore, getAbilityMod, parseRaceMods } from '../engine/stats';
+import { calculateTotalScore, getAbilityMod, parseRaceMods, calculateTraitFlawAcMod } from '../engine/stats';
 import { calculateBAB } from '../engine/classes';
 import {
   resolveWeapon, resolveArmor, resolveShield, calculateFeatCombatBonuses,
@@ -36,7 +36,8 @@ import {
   STANDARD_AMMO_PRESETS, createInventoryAmmo, getCharacterAmmunition, decrementEquippedAmmunition,
   getMatchingAmmoTypeForWeapon, AmmoPreset,
   STANDARD_WONDROUS_ITEMS, getPredefinedWondrousItems, createWondrousItemFromPredefined, PredefinedWondrousItem,
-  COMMON_ITEM_PRESETS
+  COMMON_ITEM_PRESETS,
+  calculateMaxDexCap, calculateFinalDexToAc, calculateTotalACP
 } from '../engine/equipment';
 import {
   getTacticalCombatState,
@@ -49,7 +50,7 @@ import {
   getSizeAttackModifier,
   isFinesseWeapon
 } from '../engine/combat';
-import { resolveActiveWildShape } from '../engine/wildshape';
+import { resolveActiveWildShape, getSizeAcModifier } from '../engine/wildshape';
 import { rollAttack, rollAttackSequence, rollDamage } from '../engine/dice';
 import {
   getAvailableWeaponQualities,
@@ -74,6 +75,7 @@ import {
   ARMOR_SHIELD_SPECIAL_QUALITIES,
   BANE_CREATURE_TYPES
 } from '../engine/magicItems';
+import { calculateConditionPenalties } from '../engine/conditions';
 import { useGameData } from '../context/GameDataContext';
 import { useCharacter, useCharacterDispatch } from '../context/CharacterContext';
 
@@ -1143,7 +1145,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
           const baseArmorData: ItemArmorData = {
             type: 'shield',
             acBonus: resolved.acBonus,
-            maxDex: 99,
+            maxDex: resolved.maxDex ?? 99,
             armorCheckPenalty: resolved.checkPenalty ?? 0,
             spellFailure: resolved.spellFailure ?? 0,
             speedPenalty: false
@@ -1278,7 +1280,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
             baseArmorData = {
               type: 'shield',
               acBonus: resolved.acBonus,
-              maxDex: 99,
+              maxDex: resolved.maxDex ?? 99,
               armorCheckPenalty: resolved.checkPenalty ?? 0,
               spellFailure: resolved.spellFailure ?? 0,
               speedPenalty: false
@@ -1931,7 +1933,7 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
       { value: 'buckler', label: 'Buckler', sublabel: '+1 AC, Check -1, 5 lbs', badge: 'PHB', isAllowed: true },
       { value: 'light_wooden', label: 'Light Shield', sublabel: '+1 AC, Check -1, 5 lbs', badge: 'PHB', isAllowed: true },
       { value: 'heavy_shield', label: 'Heavy Shield', sublabel: '+2 AC, Check -2, 15 lbs', badge: 'PHB', isAllowed: true },
-      { value: 'tower_shield', label: 'Tower Shield', sublabel: '+4 AC, Check -10, 45 lbs', badge: 'PHB', isAllowed: true },
+      { value: 'tower_shield', label: 'Tower Shield', sublabel: '+4 AC, Max Dex +2, Check -10, 45 lbs', badge: 'PHB', isAllowed: true },
     ];
 
     customArmors.filter(a => a.type === 'shield').forEach(ca => {
@@ -2058,6 +2060,15 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
   const hasWeaponFinesse = (character.selectedFeatEntities || []).some(
     f => f.featId === 'weapon_finesse' || (f.notes && f.notes.toLowerCase().includes('weapon finesse'))
   );
+
+  const conditionPenalties = calculateConditionPenalties(character.activeConditions || []);
+  const sizeAcMod = getSizeAcModifier(activeSize);
+  const wildShapeNatArmor = activeWildShape ? activeWildShape.naturalArmor : 0;
+  const maxDexCap = calculateMaxDexCap(armorObj.maxDex, shieldObj.maxDex, encumbrance.maxDexCap);
+  const finalDexToAc = calculateFinalDexToAc(effectiveDexMod, maxDexCap, conditionPenalties.loseDexToAc);
+  const totalACP = calculateTotalACP(armorObj.checkPenalty, shieldObj.checkPenalty, encumbrance.checkPenalty);
+  const traitFlawAcMod = calculateTraitFlawAcMod(character.selectedTraits || [], character.selectedFlaws || [], gameData.traitsData || [], gameData.flawsData || []);
+  const totalAc = 10 + armorAc + shieldAc + finalDexToAc + (eq.deflection || 0) + (eq.natural || 0) + wildShapeNatArmor + sizeAcMod + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.acNetMod + conditionPenalties.acPenalty;
 
   // Unified Combat Profiles for Equipped Weapons
   const combatContext: EquippedWeaponCombatContext = {
@@ -2881,9 +2892,22 @@ export const EquipmentTab: React.FC<EquipmentTabProps> = (props) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Armor & Shield Configuration */}
         <div className="card bg-slate-900/60 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-4">
-          <h2 className="text-lg font-bold font-heading text-slate-100 border-b border-slate-800 pb-3 flex items-center gap-2">
-            <i className="fa-solid fa-shield-cat text-amber-500"></i> Armor & Shield Configuration
-          </h2>
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <h2 className="text-lg font-bold font-heading text-slate-100 flex items-center gap-2">
+              <i className="fa-solid fa-shield-cat text-amber-500"></i> Armor & Shield Configuration
+            </h2>
+            <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+              <span className="bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800 text-slate-300">
+                Total AC: <span className="font-bold text-cyan-400">{totalAc}</span>
+              </span>
+              <span className="bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800 text-slate-300">
+                Max Dex Cap: <span className="font-bold text-white">{maxDexCap >= 99 ? 'None' : `+${maxDexCap}`}</span>
+              </span>
+              <span className="bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800 text-slate-300">
+                Total ACP: <span className={`font-bold ${totalACP < 0 ? 'text-rose-400' : 'text-slate-300'}`}>{totalACP}</span>
+              </span>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
             <div className="sm:col-span-5">

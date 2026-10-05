@@ -12,6 +12,17 @@ import {
 import { calculateBAB, calculateBaseSave, calculateTotalHP } from '../engine/classes';
 import { calculateTotalDR } from '../engine/dr';
 import { calculateConditionPenalties } from '../engine/conditions';
+import { resolveActiveWildShape, getSizeAcModifier } from '../engine/wildshape';
+import { getTacticalCombatState, calculateTacticalCombatModifiers } from '../engine/combat';
+import {
+  resolveEquippedArmor,
+  resolveEquippedShield,
+  calculateCarryingCapacity,
+  calculateTotalCarriedWeight,
+  getEncumbranceStatus,
+  calculateMaxDexCap,
+  calculateFinalDexToAc
+} from '../engine/equipment';
 import { useGameData } from '../context/GameDataContext';
 import { useCharacter, useCharacterDispatch } from '../context/CharacterContext';
 
@@ -93,39 +104,67 @@ export const Header: React.FC<HeaderProps> = (props) => {
   const conditionPenalties = calculateConditionPenalties(activeConditions);
 
   const totalLevel = character.levelProgression.filter(l => l.primaryClass).length || 1;
+  const rawStr = calculateTotalScore('str', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
   const rawCon = calculateTotalScore('con', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
   const rawDex = calculateTotalScore('dex', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
   const wisScore = calculateTotalScore('wis', character.baseStats, raceMods, character.levelBumps || {}, character.enhancementMods || {}, totalLevel, traitFlawStatMods);
 
-  const effectiveCon = Math.max(0, rawCon);
-  const effectiveDex = conditionPenalties.dexPenalty === -99 ? 0 : Math.max(0, rawDex + conditionPenalties.dexPenalty);
+  const bab = calculateBAB(character.levelProgression, classesData);
+  const tcState = getTacticalCombatState(character, bab);
+  const generalTcMods = calculateTacticalCombatModifiers(tcState, undefined, false, false, character.activeBuffs);
 
+  const activeWildShape = resolveActiveWildShape(character);
+  const templateObj = (gameData.templatesData || []).find(t => t.name === character.selectedTemplate);
+  const activeSize = activeWildShape ? activeWildShape.size : (templateObj?.size || raceObj.size || 'Medium');
+  const sizeAcMod = getSizeAcModifier(activeSize);
+  const wildShapeNatArmor = activeWildShape ? activeWildShape.naturalArmor : 0;
+
+  const strScore = activeWildShape ? activeWildShape.str : rawStr;
+  const dexScore = activeWildShape ? activeWildShape.dex : rawDex;
+
+  const rawEffectiveDex = dexScore + (generalTcMods.dexBonus || 0) + conditionPenalties.dexPenalty;
+  const effectiveDexScore = conditionPenalties.dexPenalty === -99 ? 0 : Math.max(0, rawEffectiveDex);
+
+  const effectiveCon = Math.max(0, rawCon);
   const conMod = getAbilityMod(effectiveCon);
-  const dexMod = getAbilityMod(effectiveDex);
+  const effectiveDexMod = getAbilityMod(effectiveDexScore);
   const wisMod = getAbilityMod(wisScore);
 
-  const maxHp = calculateTotalHP(character.levelProgression, classesData, conMod, traitFlawHpMod);
+  const baseConMod = getAbilityMod(rawCon);
+  const maxHp = calculateTotalHP(character.levelProgression, classesData, baseConMod, traitFlawHpMod) + (generalTcMods.hpBonusPerLevel * totalLevel);
   const currentHp = character.currentHp !== undefined ? character.currentHp : maxHp;
   const tempHp = character.tempHp || 0;
-
-  const bab = calculateBAB(character.levelProgression, classesData);
 
   const baseFort = calculateBaseSave('fort', character.levelProgression, classesData);
   const baseRef = calculateBaseSave('ref', character.levelProgression, classesData);
   const baseWill = calculateBaseSave('will', character.levelProgression, classesData);
 
-  const totalFort = baseFort + conMod + traitFlawSaveMods.fort + conditionPenalties.fortPenalty;
-  const totalRef = baseRef + dexMod + traitFlawSaveMods.ref + conditionPenalties.refPenalty;
-  const totalWill = baseWill + wisMod + traitFlawSaveMods.will + conditionPenalties.willPenalty;
+  const totalFort = baseFort + conMod + traitFlawSaveMods.fort + generalTcMods.fortSaveMod + conditionPenalties.fortPenalty;
+  const totalRef = baseRef + effectiveDexMod + traitFlawSaveMods.ref + generalTcMods.refSaveMod + conditionPenalties.refPenalty;
+  const totalWill = baseWill + wisMod + traitFlawSaveMods.will + generalTcMods.willSaveMod + conditionPenalties.willPenalty;
 
   const eq: Equipment = character.equipment || {
     armor: 'chainshirt', armorEnhancement: 1, shield: 'heavy_shield', shieldEnhancement: 1,
     deflection: 0, natural: 0, dodge: 0, primaryWeapon: 'Longsword'
   };
-  const armorBonusMap: Record<string, number> = { none: 0, padded: 1, leather: 2, studded: 3, chainshirt: 4, breastplate: 5, fullplate: 8 };
-  const shieldBonusMap: Record<string, number> = { none: 0, buckler: 1, light_wooden: 1, heavy_shield: 2, tower_shield: 4 };
-  const finalDexToAc = conditionPenalties.loseDexToAc ? Math.min(0, dexMod) : dexMod;
-  const totalAc = 10 + (armorBonusMap[eq.armor] || 0) + (eq.armorEnhancement || 0) + (shieldBonusMap[eq.shield] || 0) + (eq.shieldEnhancement || 0) + finalDexToAc + (eq.deflection || 0) + (eq.natural || 0) + (eq.dodge || 0) + traitFlawAcMod + conditionPenalties.acPenalty;
+
+  const carryingCapacity = calculateCarryingCapacity(strScore + (generalTcMods.strBonus || 0), raceObj.size || 'Medium');
+  const totalCarriedWeight = calculateTotalCarriedWeight(character, gameData.weaponsData);
+  const encumbrance = getEncumbranceStatus(totalCarriedWeight, carryingCapacity);
+
+  const customArmors = character.customArmors || [];
+  const armorObj = resolveEquippedArmor(character, customArmors);
+  const shieldObj = resolveEquippedShield(character, customArmors);
+
+  const armorEnhancement = eq.armorEnhancement ?? armorObj.enhancementBonus ?? 0;
+  const shieldEnhancement = eq.shieldEnhancement ?? shieldObj.enhancementBonus ?? 0;
+  const armorAc = armorObj.acBonus + armorEnhancement;
+  const shieldAc = shieldObj.acBonus + shieldEnhancement;
+
+  const maxDexCap = calculateMaxDexCap(armorObj.maxDex, shieldObj.maxDex, encumbrance.maxDexCap);
+  const finalDexToAc = calculateFinalDexToAc(effectiveDexMod, maxDexCap, conditionPenalties.loseDexToAc);
+
+  const totalAc = 10 + armorAc + shieldAc + finalDexToAc + (eq.deflection || 0) + (eq.natural || 0) + wildShapeNatArmor + sizeAcMod + (eq.dodge || 0) + traitFlawAcMod + generalTcMods.acNetMod + conditionPenalties.acPenalty;
 
   const drSummary = calculateTotalDR(character, raceObj, undefined, [], classesData);
 

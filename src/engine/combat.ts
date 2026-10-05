@@ -536,7 +536,9 @@ export function isFinesseWeapon(weapon?: WeaponData): boolean {
   return (
     name.includes('rapier') ||
     name.includes('whip') ||
-    name.includes('spiked chain')
+    (name.includes('spiked') && name.includes('chain')) ||
+    weapon.id === 'chain,_spiked' ||
+    Boolean(weapon.special?.includes('F'))
   );
 }
 

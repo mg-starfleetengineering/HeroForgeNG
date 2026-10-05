@@ -334,3 +334,39 @@ export function validateSkillTrickPrerequisites(
   };
 }
 
+/**
+ * Official D&D 3.5e SRD Skills subject to standard (1×) Armor Check Penalty (PHB p. 66).
+ * Balance, Climb, Escape Artist, Hide, Jump, Move Silently, Sleight of Hand, Tumble.
+ * Note: Swim takes double (2×) ACP.
+ */
+export const ACP_SKILL_NAMES = [
+  'Balance',
+  'Climb',
+  'Escape Artist',
+  'Hide',
+  'Jump',
+  'Move Silently',
+  'Sleight of Hand',
+  'Tumble'
+] as const;
+
+export function isSkillSubjectToAcp(skillName: string): boolean {
+  if (skillName === 'Swim') return true;
+  return ACP_SKILL_NAMES.includes(skillName as any);
+}
+
+/**
+ * Returns the Armor Check Penalty modifier to apply to a skill check.
+ * Swim takes double (2×) ACP. Balance, Climb, Escape Artist, Hide, Jump, Move Silently, Sleight of Hand, and Tumble take standard (1×) ACP.
+ * Other skills take 0.
+ */
+export function getSkillCheckPenalty(skillName: string, totalAcp: number): number {
+  if (skillName === 'Swim') {
+    return totalAcp * 2;
+  }
+  if (ACP_SKILL_NAMES.includes(skillName as any)) {
+    return totalAcp;
+  }
+  return 0;
+}
+

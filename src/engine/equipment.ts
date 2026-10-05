@@ -40,6 +40,7 @@ export interface StandardArmorEntry {
 export interface StandardShieldEntry {
   name: string;
   acBonus: number;
+  maxDex?: number;
   checkPenalty: number;
   type: 'shield';
   weight: number;
@@ -85,8 +86,8 @@ export const STANDARD_SHIELD_MAP: Record<string, StandardShieldEntry> = {
   'heavy shield': { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2, type: 'shield', weight: 15, spellFailure: 15 },
   'heavy steel shield': { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2, type: 'shield', weight: 15, spellFailure: 15 },
   'heavy wooden shield': { name: 'Heavy Shield', acBonus: 2, checkPenalty: -2, type: 'shield', weight: 15, spellFailure: 15 },
-  tower_shield: { name: 'Tower Shield', acBonus: 4, checkPenalty: -10, type: 'shield', weight: 45, spellFailure: 50 },
-  'tower shield': { name: 'Tower Shield', acBonus: 4, checkPenalty: -10, type: 'shield', weight: 45, spellFailure: 50 }
+  tower_shield: { name: 'Tower Shield', acBonus: 4, maxDex: 2, checkPenalty: -10, type: 'shield', weight: 45, spellFailure: 50 },
+  'tower shield': { name: 'Tower Shield', acBonus: 4, maxDex: 2, checkPenalty: -10, type: 'shield', weight: 45, spellFailure: 50 }
 };
 
 export const COMMON_ITEM_PRESETS = [
@@ -359,6 +360,7 @@ export interface ResolvedArmor {
 export interface ResolvedShield {
   name: string;
   acBonus: number;
+  maxDex?: number;
   checkPenalty: number;
   type: 'shield';
   weight?: number;
@@ -488,9 +490,27 @@ export function resolveArmor(
     if (baseResolved && baseResolved.type !== 'none') {
       const mat = keyLower.split(' ')[0].toLowerCase();
       const isMwk = mat === 'mithral' || mat === 'mithril' || mat === 'adamantine';
+      const maxDex = (mat === 'mithral' || mat === 'mithril')
+        ? (baseResolved.maxDex !== undefined ? baseResolved.maxDex + 2 : undefined)
+        : baseResolved.maxDex;
+      const checkPenaltyAdjust = (mat === 'mithral' || mat === 'mithril') ? 3 : (mat === 'adamantine' || isMwk ? 1 : 0);
+      const checkPenalty = Math.min(0, baseResolved.checkPenalty + checkPenaltyAdjust);
+      const spellFailure = (mat === 'mithral' || mat === 'mithril')
+        ? Math.max(0, (baseResolved.spellFailure ?? 0) - 10)
+        : baseResolved.spellFailure;
+      const weight = applyMaterialToWeight(baseResolved.weight ?? (ARMOR_WEIGHT_MAP[baseResolved.name.toLowerCase()] ?? 20), mat);
+      const type = (mat === 'mithral' || mat === 'mithril')
+        ? (baseResolved.type === 'heavy' ? 'medium' : (baseResolved.type === 'medium' ? 'light' : baseResolved.type))
+        : baseResolved.type;
       return {
         ...baseResolved,
         name: armorKey,
+        type,
+        maxDex,
+        checkPenalty,
+        spellFailure,
+        weight,
+        material: mat,
         baseArmorId: baseResolved.baseArmorId || baseResolved.name,
         isMasterwork: isMwk ? true : baseResolved.isMasterwork
       };
@@ -545,6 +565,7 @@ export function resolveShield(
     return {
       name: customMatch.name,
       acBonus: customMatch.acBonus,
+      maxDex: customMatch.maxDex,
       checkPenalty: customMatch.armorCheckPenalty ?? 0,
       type: 'shield',
       weight: customMatch.weight ?? 10,
@@ -574,9 +595,23 @@ export function resolveShield(
     if (baseResolved && baseResolved.name.toLowerCase() !== 'none') {
       const mat = keyLower.split(' ')[0].toLowerCase();
       const isMwk = mat === 'mithral' || mat === 'mithril' || mat === 'darkwood' || mat === 'adamantine';
+      const maxDex = (baseResolved.maxDex !== undefined && (mat === 'mithral' || mat === 'mithril'))
+        ? baseResolved.maxDex + 2
+        : baseResolved.maxDex;
+      const checkPenaltyAdjust = (mat === 'mithral' || mat === 'mithril') ? 3 : (mat === 'darkwood' ? 2 : (mat === 'adamantine' || isMwk ? 1 : 0));
+      const checkPenalty = Math.min(0, baseResolved.checkPenalty + checkPenaltyAdjust);
+      const spellFailure = (mat === 'mithral' || mat === 'mithril')
+        ? Math.max(0, (baseResolved.spellFailure ?? 0) - 10)
+        : baseResolved.spellFailure;
+      const weight = applyMaterialToWeight(baseResolved.weight ?? (SHIELD_WEIGHT_MAP[baseResolved.name.toLowerCase()] ?? 10), mat);
       return {
         ...baseResolved,
         name: shieldKey,
+        maxDex,
+        checkPenalty,
+        spellFailure,
+        weight,
+        material: mat,
         baseArmorId: baseResolved.baseArmorId || baseResolved.name,
         isMasterwork: isMwk ? true : baseResolved.isMasterwork
       };
@@ -1177,7 +1212,7 @@ export function createInventoryShield(
   const baseArmorData: ItemArmorData = {
     type: 'shield',
     acBonus: resolved.acBonus,
-    maxDex: 99,
+    maxDex: resolved.maxDex ?? 99,
     armorCheckPenalty: resolved.checkPenalty ?? 0,
     spellFailure: resolved.spellFailure ?? 0,
     speedPenalty: false
@@ -1291,6 +1326,7 @@ export function resolveEquippedShield(
       return {
         name: item.name,
         acBonus: item.armorData.acBonus,
+        maxDex: item.armorData.maxDex,
         checkPenalty: item.armorData.armorCheckPenalty,
         type: 'shield',
         weight: item.weight ?? 0,
@@ -1646,7 +1682,7 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
           const baseArmorData: ItemArmorData = {
             type: 'shield',
             acBonus: resolved.acBonus,
-            maxDex: 99,
+            maxDex: resolved.maxDex ?? 99,
             armorCheckPenalty: resolved.checkPenalty ?? 0,
             spellFailure: resolved.spellFailure ?? 0,
             speedPenalty: false
@@ -1690,7 +1726,7 @@ export function syncEquippedItemsToInventory<T extends CharacterState>(
         const baseArmorData: ItemArmorData = {
           type: 'shield',
           acBonus: resolved.acBonus,
-          maxDex: 99,
+          maxDex: resolved.maxDex ?? 99,
           armorCheckPenalty: resolved.checkPenalty ?? 0,
           spellFailure: resolved.spellFailure ?? 0,
           speedPenalty: false
@@ -2938,3 +2974,49 @@ export {
   createWondrousItemFromPredefined
 } from './wondrousItems';
 export type { PredefinedWondrousItem } from './wondrousItems';
+
+/**
+ * Calculates the Maximum Dexterity Bonus cap imposed by armor, shield, and encumbrance.
+ * Returns 99 if no cap applies.
+ */
+export function calculateMaxDexCap(
+  armorMaxDex?: number | null,
+  shieldMaxDex?: number | null,
+  encumbranceMaxDex?: number | null
+): number {
+  return Math.min(
+    armorMaxDex ?? 99,
+    shieldMaxDex ?? 99,
+    encumbranceMaxDex ?? 99
+  );
+}
+
+/**
+ * Calculates final Dexterity bonus to AC.
+ * Per D&D 3.5e PHB p. 122 & 162:
+ * Positive Dexterity bonus is capped by maxDexCap.
+ * Negative Dexterity penalties are NEVER capped.
+ * If loseDexToAc is true (e.g. flat-footed, blinded, stunned), positive Dex is lost (max 0).
+ */
+export function calculateFinalDexToAc(
+  dexMod: number,
+  maxDexCap: number,
+  loseDexToAc: boolean = false
+): number {
+  if (loseDexToAc) {
+    return Math.min(0, dexMod);
+  }
+  return dexMod > 0 ? Math.min(dexMod, maxDexCap) : dexMod;
+}
+
+/**
+ * Calculates total Armor Check Penalty (ACP) from equipped armor, shield, and encumbrance.
+ * In D&D 3.5e, ACP is always <= 0 (penalties are negative numbers or zero).
+ */
+export function calculateTotalACP(
+  armorCheckPenalty?: number | null,
+  shieldCheckPenalty?: number | null,
+  encumbranceCheckPenalty?: number | null
+): number {
+  return Math.min(0, (armorCheckPenalty || 0) + (shieldCheckPenalty || 0) + (encumbranceCheckPenalty || 0));
+}
