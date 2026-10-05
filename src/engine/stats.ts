@@ -1,5 +1,5 @@
 import { BaseStats, RaceData, StatType, TraitData, FlawData, CharacterState, CharacterFeat, ClassData, TemplateData, ActiveCombatBuff } from '../types/character';
-import { resolveArmor } from './equipment';
+import { resolveArmor, EncumbranceLevel } from './equipment';
 import { hasRacialTrait } from './features';
 export { calculateCombatStats, calculateTacticalCombat, aggregateBuffBonuses, resolveActiveBuffs, migrateCharacterBuffs, STANDARD_SRD_BUFFS } from './combat';
 
@@ -487,7 +487,8 @@ export function calculateTotalSpeed(
   raceObj?: Partial<RaceData>,
   templateObj?: Partial<TemplateData>,
   traitsData: TraitData[] = [],
-  flawsData: FlawData[] = []
+  flawsData: FlawData[] = [],
+  encumbranceLevel?: EncumbranceLevel
 ): {
   land: number;
   fly?: number;
@@ -516,7 +517,8 @@ export function calculateTotalSpeed(
   const armorKey = armorCategory || (character.equipment?.armor || 'none').toLowerCase();
   const isDwarf = hasRacialTrait(raceObj as RaceData || character.selectedRace, 'dwarf_speed');
 
-  const classBonus = calculateClassSpeedBonus(character.levelProgression, armorKey, false);
+  const isEncumbered = encumbranceLevel === 'heavy' || encumbranceLevel === 'medium' || encumbranceLevel === 'overloaded';
+  const classBonus = calculateClassSpeedBonus(character.levelProgression, armorKey, isEncumbered);
   const featBonus = calculateFeatSpeedBonus(character.selectedFeatEntities || character.selectedFeats);
 
   const selectedTraits = character.selectedTraits || [];
@@ -527,7 +529,7 @@ export function calculateTotalSpeed(
 
   const isHeavy = armorCategory === 'heavy' || armorKey === 'fullplate' || armorKey.includes('heavy');
   const isMedium = armorCategory === 'medium' || armorKey === 'breastplate' || armorKey.includes('medium');
-  if (!isDwarf && (isHeavy || isMedium)) {
+  if (!isDwarf && (isHeavy || isMedium || isEncumbered)) {
     if (land >= 40) {
       land = Math.max(30, land - 10);
     } else if (land >= 30) {

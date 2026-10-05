@@ -144,7 +144,6 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
   const activeConditions = character.activeConditions || [];
   const conditionPenalties = calculateConditionPenalties(activeConditions);
 
-  const speedData = calculateTotalSpeed(character, raceObj, templateObj, traitsData, flawsData);
   const drSummary = calculateTotalDR(character, raceObj, templateObj, [], classesData);
   const srSummary = calculateTotalSR(character, raceObj, templateObj, [], classesData);
   const activeWildShape = resolveActiveWildShape(character, wildShapeFormsData);
@@ -221,9 +220,6 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
   );
   const wildShapeNatArmor = activeWildShape ? activeWildShape.naturalArmor : 0;
 
-  const baseSpeed = (activeWildShape ? activeWildShape.speed.land : speedData.land) + generalTcMods.speedMod;
-  const finalSpeed = Math.max(5, Math.floor(baseSpeed * conditionPenalties.speedMultiplier));
-
   const eq: Equipment = character.equipment || {
     armor: 'chainshirt', armorEnhancement: 1, shield: 'heavy_shield', shieldEnhancement: 1,
     deflection: 0, natural: 0, dodge: 0, primaryWeapon: 'Longsword'
@@ -237,6 +233,10 @@ export const SheetViewTab: React.FC<SheetViewTabProps> = (props) => {
   const coinWeight = calculateCoinWeight(funds);
   const netWorthGP = calculateTotalNetWorthGP(funds);
   const encumbrance = getEncumbranceStatus(totalCarriedWeight, carryingCapacity);
+
+  const speedData = calculateTotalSpeed(character, raceObj, templateObj, traitsData, flawsData, encumbrance.level);
+  const baseSpeed = (activeWildShape ? activeWildShape.speed.land : speedData.land) + generalTcMods.speedMod;
+  const finalSpeed = Math.max(5, Math.floor(baseSpeed * conditionPenalties.speedMultiplier));
 
   const customWeapons = character.customWeapons || [];
   const customArmors = character.customArmors || [];
